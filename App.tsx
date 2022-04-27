@@ -1,11 +1,12 @@
-import { View, Text } from 'react-native';
 import React from 'react';
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import GlobalNav from './src/navigators/globalNav';
 
 const App = () => {
 	return (
-		<View style={{ flex: 1 }}>
-			<Text>hello</Text>
-		</View>
+		<SafeAreaProvider>
+			<GlobalNav />
+		</SafeAreaProvider>
 	);
 };
 
