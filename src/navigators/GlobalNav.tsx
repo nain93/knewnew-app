@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { TransitionPresets, createStackNavigator } from '@react-navigation/stack';
-import Onboarding from '../screens/onboarding';
+import Onboarding from '~/screens/onboarding';
 
 const TransitionScreenOptions = {
 	...TransitionPresets.ModalSlideFromBottomIOS,
