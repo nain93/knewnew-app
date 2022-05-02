@@ -1,4 +1,4 @@
-package com.cartpickapp.newarchitecture;
+package com.knewnnew.newarchitecture;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
@@ -19,9 +19,9 @@ import com.facebook.react.fabric.CoreComponentsRegistry;
 import com.facebook.react.fabric.EmptyReactNativeConfig;
 import com.facebook.react.fabric.FabricJSIModuleProvider;
 import com.facebook.react.uimanager.ViewManagerRegistry;
-import com.cartpickapp.BuildConfig;
-import com.cartpickapp.newarchitecture.components.MainComponentsRegistry;
-import com.cartpickapp.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
+import com.knewnnew.BuildConfig;
+import com.knewnnew.newarchitecture.components.MainComponentsRegistry;
+import com.knewnnew.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
 import java.util.ArrayList;
 import java.util.List;
 
