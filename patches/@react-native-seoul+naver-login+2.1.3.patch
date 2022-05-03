@@ -1,0 +1,12 @@
+diff --git a/node_modules/@react-native-seoul/naver-login/android/build.gradle b/node_modules/@react-native-seoul/naver-login/android/build.gradle
+index 3f663a6..56c534e 100644
+--- a/node_modules/@react-native-seoul/naver-login/android/build.gradle
++++ b/node_modules/@react-native-seoul/naver-login/android/build.gradle
+@@ -35,6 +35,6 @@ repositories {
+ }
+ 
+ dependencies {
+-  compile 'com.facebook.react:react-native:+'
++  implementation 'com.facebook.react:react-native:+'
+   implementation 'com.naver.nid:naveridlogin-android-sdk:4.2.6'
+ }
