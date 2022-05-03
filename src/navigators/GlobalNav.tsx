@@ -5,7 +5,7 @@ import { TransitionPresets, createStackNavigator } from '@react-navigation/stack
 import Onboarding from '~/screens/onboarding';
 import BadgeSelect from '~/screens/onboarding/badgeSelect';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
-import Welcome from '~/screens/onboarding/Welcome';
+import Welcome from '~/screens/onboarding/welcome';
 import CloseIcon from '~/components/icon/closeIcon';
 
 const TransitionScreenOptions = {
