@@ -5,6 +5,8 @@ import { TransitionPresets, createStackNavigator } from '@react-navigation/stack
 import Onboarding from '~/screens/onboarding';
 import BadgeSelect from '~/screens/onboarding/badgeSelect';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
+import Welcome from '~/screens/onboarding/Welcome';
+import CloseIcon from '~/components/icon/closeIcon';
 
 const TransitionScreenOptions = {
 	...TransitionPresets.ModalSlideFromBottomIOS,
@@ -20,6 +22,14 @@ const GlobalNav = () => {
 					Platform.OS === "android" && TransitionScreenOptions,
 					{ cardStyle: { backgroundColor: "white" } }
 				)}>
+				<Stack.Screen
+					name="Welcome"
+					options={{
+						title: "",
+						headerLeft: () => <CloseIcon />,
+						headerShadowVisible: false,
+					}}
+					component={Welcome} />
 				<Stack.Screen
 					name="BadgeSelect"
 					options={{
