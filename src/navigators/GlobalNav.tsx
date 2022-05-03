@@ -21,7 +21,7 @@ const GlobalNav = () => {
 				<Stack.Screen
 					name="OnBoarding"
 					options={{
-						headerShown: false,
+						title: "",
 					}}
 					component={Onboarding}
 				/>
