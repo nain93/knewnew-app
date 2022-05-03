@@ -6,3 +6,7 @@ export function d2p(size: number) {
 	// console.log(Dimensions.get("screen").width)
 	return size / 360 * Dimensions.get("window").width;
 }
+
+export function h2p(size: number) {
+	return size / 760 * Dimensions.get("window").height;
+}
