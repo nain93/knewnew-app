@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
 		width: Dimensions.get('window').width - d2p(40),
 		marginHorizontal: d2p(20),
 		borderRadius: 5,
-		height: d2p(45),
+		height: d2p(45)
 	},
 	textContainer: {
 		flex: 1,

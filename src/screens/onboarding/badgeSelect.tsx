@@ -58,7 +58,7 @@ const BadgeSelect = () => {
 					<PickerBadge viewStyle={{ marginLeft: d2p(20) }} text="간단조리파⏱" />
 					<PickerBadge text="직접요리파👨‍🍳" />
 				</ScrollView>
-				<BasicButton text="선택완료" color={theme.color.main} viewStyle={{ marginTop: d2p(40) }} />
+				<BasicButton text="선택완료" color={theme.color.main} viewStyle={{ marginTop: d2p(40), marginBottom: isIphoneX() ? getBottomSpace() : d2p(40) }} />
 			</ScrollView>
 		</View>
 	);
@@ -67,8 +67,7 @@ const BadgeSelect = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		marginTop: d2p(42.5),
-		marginBottom: isIphoneX() ? getBottomSpace() : d2p(40)
+		marginTop: d2p(42.5)
 	},
 	title: {
 		fontSize: 26,
