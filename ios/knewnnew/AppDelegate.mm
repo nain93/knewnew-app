@@ -4,6 +4,7 @@
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
+#import <NaverThirdPartyLogin/NaverThirdPartyLoginConnection.h>
 
 #import <React/RCTAppSetupUtils.h>
 
@@ -28,20 +29,20 @@
 
 @implementation AppDelegate
 
-- (BOOL)application:(UIApplication *)app
-     openURL:(NSURL *)url
-     options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
-  dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
-      dispatch_async(dispatch_get_main_queue(), ^(void){
-        if ([RNKakaoLogins isKakaoTalkLoginUrl:url]) {
-          [RNKakaoLogins handleOpenUrl: url];
-        }
-      });
-  });
- return NO;
+- (BOOL)application:(UIApplication *)application openURL:(nonnull NSURL *)url options:(nonnull NSDictionary<NSString *,id> *)options {
+  if ([RNKakaoLogins isKakaoTalkLoginUrl:url]) {
+    [RNKakaoLogins handleOpenUrl: url];
+  }
+  if ([url.scheme isEqualToString:@"naverlogin"]) {
+    return [[NaverThirdPartyLoginConnection getSharedInstance] application:application openURL:url options:options];
+  }
+	return NO;
+//   return [RNGoogleSignin application:application openURL:url options:options];
 }
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  [[NaverThirdPartyLoginConnection getSharedInstance] setIsNaverAppOauthEnable:YES];
   RCTAppSetupPrepareApp(application);
 
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
