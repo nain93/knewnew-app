@@ -23,6 +23,14 @@ const GlobalNav = () => {
 					{ cardStyle: { backgroundColor: "white" } }
 				)}>
 				<Stack.Screen
+					name="OnBoarding"
+					options={{
+						title: "",
+						headerShadowVisible: false,
+					}}
+					component={Onboarding}
+				/>
+				<Stack.Screen
 					name="BadgeSelect"
 					options={{
 						title: "",
@@ -38,13 +46,6 @@ const GlobalNav = () => {
 						headerShadowVisible: false,
 					}}
 					component={Welcome} />
-				<Stack.Screen
-					name="OnBoarding"
-					options={{
-						title: "",
-					}}
-					component={Onboarding}
-				/>
 			</Stack.Navigator>
 		</NavigationContainer>
 	);
