@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "1025814485939",
+    "project_id": "knewnnew-1651632709301",
+    "storage_bucket": "knewnnew-1651632709301.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1025814485939:android:ac2e22f2df095e369a49c6",
+        "android_client_info": {
+          "package_name": "com.knewnnew"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1025814485939-bkg1dgq34foqppunv5582h02onuicnj0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.knewnnew",
+            "certificate_hash": "b96f7a0d601e2e3d85dfe9a19b241e6b831f3566"
+          }
+        },
+        {
+          "client_id": "1025814485939-95vtu3p4iqb7qp23henp85c1nd2d2i3c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXHRzQoFZIBHr7-Oj_0V9LXSoLEk7NCto"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1025814485939-95vtu3p4iqb7qp23henp85c1nd2d2i3c.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1025814485939-hebcl4c1tmq4bqt9q0ifng6mq7amltnf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.name.knewnew"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

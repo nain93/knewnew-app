@@ -35,4 +35,7 @@ target 'knewnnew' do
       config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
     end
   end
+
+  pod 'GoogleSignIn', '~> 6.1.0'
+  
 end
