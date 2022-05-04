@@ -1,10 +1,11 @@
 #import "AppDelegate.h"
 #import <RNKakaoLogins.h>
+#import <NaverThirdPartyLogin/NaverThirdPartyLoginConnection.h>
+// #import <Firebase.h>
 
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
-#import <NaverThirdPartyLogin/NaverThirdPartyLoginConnection.h>
 
 #import <React/RCTAppSetupUtils.h>
 
@@ -27,6 +28,7 @@
 @end
 #endif
 
+#include <Firebase/Firebase.h>
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application openURL:(nonnull NSURL *)url options:(nonnull NSDictionary<NSString *,id> *)options {
@@ -42,6 +44,9 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+   if ([FIRApp defaultApp] == nil) {
+    [FIRApp configure];
+  }
   [[NaverThirdPartyLoginConnection getSharedInstance] setIsNaverAppOauthEnable:YES];
   RCTAppSetupPrepareApp(application);
 
