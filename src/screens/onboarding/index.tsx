@@ -2,10 +2,12 @@ import { View, Text, StyleSheet, ScrollView, Image, Dimensions, TouchableOpacity
 import React from 'react';
 import { d2p, h2p } from '~/utils';
 import onboardingImg from "assets/images/onboardingImg.png";
-import kakaoImg from "assets/images/snsImg/kakaoImg.png";
-import googleImg from "assets/images/snsImg/googleImg.png";
-import naverImg from "assets/images/snsImg/naverImg.png";
-import appleImg from "assets/images/snsImg/appleImg.png";
+import {
+	kakaoImg,
+	googleImg,
+	naverImg,
+	appleImg
+} from "~/assets/images/snsImg/index"
 
 const Onboarding = () => {
 
