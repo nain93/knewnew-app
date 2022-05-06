@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { Image, Platform } from 'react-native';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { TransitionPresets, createStackNavigator } from '@react-navigation/stack';
@@ -8,7 +8,8 @@ import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import Welcome from '~/screens/onboarding/welcome';
 import CloseIcon from '~/components/icon/closeIcon';
 import TabNavigator from '~/navigators/tabNav';
-
+import Feed from '~/screens/feed';
+import { mainLogo } from '~/assets/logo';
 
 const TransitionScreenOptions = {
 	...TransitionPresets.ModalSlideFromBottomIOS,
@@ -24,6 +25,14 @@ const GlobalNav = () => {
 					Platform.OS === "android" && TransitionScreenOptions,
 					{ cardStyle: { backgroundColor: "white" } }
 				)}>
+				<Stack.Screen
+					name="Feed"
+					options={{
+						title: "",
+						headerLeft: () => <Image source={mainLogo} resizeMode="contain"
+							style={{ width: 96, height: 20, marginLeft: 20 }} />,
+					}}
+					component={Feed} />
 				<Stack.Screen
 					name="Welcome"
 					options={{

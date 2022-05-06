@@ -1,6 +1,6 @@
 import React from "react";
-import { TouchableOpacity, Image, ViewStyle, ImageStyle } from "react-native";
-import close from "../../assets/icons/close.png";
+import { TouchableOpacity, Image, ImageStyle } from "react-native";
+import { close } from "~/assets/icons";
 
 interface CloseIcon {
 	imageStyle?: ImageStyle

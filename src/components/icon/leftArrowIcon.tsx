@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
+import { leftArrow } from "~/assets/icons";
 import { TouchableOpacity, Image, ImageStyle } from "react-native";
-import leftArrow from "../../assets/icons/leftArrow.png";
 
 interface LeftArrowIconProps {
 	onBackClick?: () => void;
