@@ -19,6 +19,9 @@ const TabNavigator = () => {
 			<Tabs.Screen
 				name="피드"
 				component={Feed}
+				options={{
+					headerShown: false,
+				}}
 			/>
 			<Tabs.Screen
 				name="작성"
