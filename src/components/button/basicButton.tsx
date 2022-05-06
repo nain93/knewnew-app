@@ -7,11 +7,12 @@ interface BasicButtonProp {
 	text: string;
 	color: string;
 	viewStyle?: ViewStyle;
+	onPress: () => void;
 }
 
-const BasicButton = ({ text, color, viewStyle }: BasicButtonProp) => {
+const BasicButton = ({ text, color, viewStyle, onPress }: BasicButtonProp) => {
 	return (
-		<TouchableOpacity>
+		<TouchableOpacity onPress={onPress}>
 			<View style={{ ...styles.container, backgroundColor: color, ...viewStyle }}>
 				<View style={styles.textContainer}>
 					<Text style={styles.text}>{text}</Text>

@@ -1,12 +1,21 @@
 import { Platform } from 'react-native';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { TransitionPresets, createStackNavigator } from '@react-navigation/stack';
+import { TransitionPresets, createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import Onboarding from '~/screens/onboarding';
 import BadgeSelect from '~/screens/onboarding/badgeSelect';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import Welcome from '~/screens/onboarding/welcome';
 import CloseIcon from '~/components/icon/closeIcon';
+import TabNavigator from '~/navigators/tabNav';
+
+
+export type RootStackParamList = {
+	Welcome: undefined;
+	TabNav: undefined;
+	OnBoarding: undefined;
+	BadgeSelect: undefined;
+};
 
 const TransitionScreenOptions = {
 	...TransitionPresets.ModalSlideFromBottomIOS,
@@ -23,6 +32,14 @@ const GlobalNav = () => {
 					{ cardStyle: { backgroundColor: "white" } }
 				)}>
 				<Stack.Screen
+					name="Welcome"
+					options={{
+						title: "",
+						headerLeft: () => <CloseIcon />,
+						headerShadowVisible: false,
+					}}
+					component={Welcome} />
+				<Stack.Screen
 					name="OnBoarding"
 					options={{
 						title: "",
@@ -38,14 +55,14 @@ const GlobalNav = () => {
 						headerShadowVisible: false,
 					}}
 					component={BadgeSelect} />
+
 				<Stack.Screen
-					name="Welcome"
+					name="TabNav"
+					component={TabNavigator}
 					options={{
-						title: "",
-						headerLeft: () => <CloseIcon />,
-						headerShadowVisible: false,
+						headerShown: false
 					}}
-					component={Welcome} />
+				/>
 			</Stack.Navigator>
 		</NavigationContainer>
 	);

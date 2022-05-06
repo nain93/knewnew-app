@@ -7,7 +7,7 @@ import {
 	googleImg,
 	naverImg,
 	appleImg
-} from "~/assets/images/snsImg/index"
+} from "~/assets/images/snsImg/index";
 
 const Onboarding = () => {
 
