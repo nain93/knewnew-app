@@ -1,13 +1,22 @@
 const main = "#ff5d5d";
-const gray = "#79737e";
-const lightgray = "#eae7ec";
 const white = "#ffffff";
+const black = "#000000";
+const placeholder = "#D3D0D5";
+
+const grayscale = {
+	C_79737e: '#79737e',
+	eae7ec: '#eae7ec',
+	a09ca4: '#a09ca4',
+	f7f7fc: '#f7f7fc',
+	e9e7ec: '#e9e7ec',
+};
 
 const color = {
 	main,
-	gray,
-	lightgray,
-	white
+	grayscale,
+	placeholder,
+	white,
+	black
 };
 
 export default color;

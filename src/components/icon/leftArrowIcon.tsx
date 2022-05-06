@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
 import { TouchableOpacity, Image } from "react-native";
-import leftArrow from "../../assets/icons/leftArrow.png";
+import { leftArrow } from "~/assets/icons";
 
 const LeftArrowIcon = () => {
   const navigation = useNavigation();

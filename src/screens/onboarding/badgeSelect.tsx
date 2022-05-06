@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
 	},
 	subTitle: {
 		fontSize: 14,
-		color: theme.color.gray,
+		color: theme.color.grayscale.C_79737e,
 		marginTop: d2p(20),
 		paddingHorizontal: d2p(20)
 	},
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
 		marginLeft: d2p(20)
 	},
 	select: {
-		borderWidth: 1, borderColor: theme.color.lightgray,
+		borderWidth: 1, borderColor: theme.color.grayscale.eae7ec,
 		borderRadius: 16,
 		marginTop: d2p(8), marginRight: d2p(5),
 		paddingVertical: d2p(5), paddingHorizontal: d2p(15),
