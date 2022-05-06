@@ -12,61 +12,61 @@ import Feed from '~/screens/feed';
 import { mainLogo } from '~/assets/logo';
 
 const TransitionScreenOptions = {
-	...TransitionPresets.ModalSlideFromBottomIOS,
+  ...TransitionPresets.ModalSlideFromBottomIOS,
 };
 const Stack = createStackNavigator();
 
 const GlobalNav = () => {
-	return (
-		<NavigationContainer>
-			<Stack.Navigator
-				screenOptions={Object.assign(
-					{},
-					Platform.OS === "android" && TransitionScreenOptions,
-					{ cardStyle: { backgroundColor: "white" } }
-				)}>
-				<Stack.Screen
-					name="Feed"
-					options={{
-						title: "",
-						headerLeft: () => <Image source={mainLogo} resizeMode="contain"
-							style={{ width: 96, height: 20, marginLeft: 20 }} />,
-					}}
-					component={Feed} />
-				<Stack.Screen
-					name="Welcome"
-					options={{
-						title: "",
-						headerLeft: () => <CloseIcon />,
-						headerShadowVisible: false,
-					}}
-					component={Welcome} />
-				<Stack.Screen
-					name="OnBoarding"
-					options={{
-						title: "",
-						headerShadowVisible: false,
-					}}
-					component={Onboarding}
-				/>
-				<Stack.Screen
-					name="BadgeSelect"
-					options={{
-						title: "",
-						headerLeft: () => <LeftArrowIcon />,
-						headerShadowVisible: false,
-					}}
-					component={BadgeSelect} />
-				<Stack.Screen
-					name="TabNav"
-					component={TabNavigator}
-					options={{
-						headerShown: false
-					}}
-				/>
-			</Stack.Navigator>
-		</NavigationContainer>
-	);
+  return (
+    <NavigationContainer>
+      <Stack.Navigator
+        screenOptions={Object.assign(
+          {},
+          Platform.OS === "android" && TransitionScreenOptions,
+          { cardStyle: { backgroundColor: "white" } }
+        )}>
+        <Stack.Screen
+          name="Feed"
+          options={{
+            title: "",
+            headerLeft: () => <Image source={mainLogo} resizeMode="contain"
+              style={{ width: 96, height: 20, marginLeft: 20 }} />,
+          }}
+          component={Feed} />
+        <Stack.Screen
+          name="Welcome"
+          options={{
+            title: "",
+            headerLeft: () => <CloseIcon />,
+            headerShadowVisible: false,
+          }}
+          component={Welcome} />
+        <Stack.Screen
+          name="OnBoarding"
+          options={{
+            title: "",
+            headerShadowVisible: false,
+          }}
+          component={Onboarding}
+        />
+        <Stack.Screen
+          name="BadgeSelect"
+          options={{
+            title: "",
+            headerLeft: () => <LeftArrowIcon />,
+            headerShadowVisible: false,
+          }}
+          component={BadgeSelect} />
+        <Stack.Screen
+          name="TabNav"
+          component={TabNavigator}
+          options={{
+            headerShown: false
+          }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
 };
 
 export default GlobalNav;
