@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from 'react';
 import Feed from '~/screens/feed';
@@ -17,19 +17,22 @@ const TabNavigator = () => {
 			}}
 		>
 			<Tabs.Screen
-				name="Feed"
+				name="피드"
 				component={Feed}
 			/>
 			<Tabs.Screen
-				name="Write"
+				name="작성"
 				component={Write}
 			/>
 			<Tabs.Screen
-				name="Search"
+				name="검색"
 				component={Search}
+				options={{
+					headerShown: false,
+				}}
 			/>
 			<Tabs.Screen
-				name="Mypage"
+				name="마이페이지"
 				component={Mypage}
 			/>
 		</Tabs.Navigator>

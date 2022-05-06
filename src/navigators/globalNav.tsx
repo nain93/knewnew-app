@@ -1,7 +1,7 @@
 import { Image, Platform } from 'react-native';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { TransitionPresets, createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
+import { TransitionPresets, createStackNavigator } from '@react-navigation/stack';
 import Onboarding from '~/screens/onboarding';
 import BadgeSelect from '~/screens/onboarding/badgeSelect';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
@@ -57,7 +57,6 @@ const GlobalNav = () => {
 						headerShadowVisible: false,
 					}}
 					component={BadgeSelect} />
-
 				<Stack.Screen
 					name="TabNav"
 					component={TabNavigator}

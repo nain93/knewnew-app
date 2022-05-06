@@ -1,19 +1,21 @@
 import React from "react";
-import { useNavigation } from "@react-navigation/native";
-import { TouchableOpacity, Image } from "react-native";
+import { TouchableOpacity, Image, ImageStyle } from "react-native";
 import { close } from "~/assets/icons";
 
-const CloseIcon = () => {
-    const navigation = useNavigation();
-    return (
-        <TouchableOpacity>
-            <Image
-                source={close}
-                resizeMode="contain"
-                style={{ width: 24, height: 24, marginLeft: 20 }}
-            />
-        </TouchableOpacity>
-    );
+interface CloseIcon {
+	imageStyle?: ImageStyle
+}
+
+const CloseIcon = ({ imageStyle }: CloseIcon) => {
+	return (
+		<TouchableOpacity onPress={() => console.log("close")}>
+			<Image
+				source={close}
+				resizeMode="contain"
+				style={{ width: 24, height: 24, ...imageStyle }}
+			/>
+		</TouchableOpacity>
+	);
 };
 
 export default CloseIcon;

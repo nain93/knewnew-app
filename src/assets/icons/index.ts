@@ -9,5 +9,8 @@ import dislike from './dislike.png';
 import retweet from './retweet.png';
 import save from './save.png';
 import comment from './comment.png';
+import searchIcon from "./searchIcon.png";
+import colorSearchIcon from "./colorSearchIcon.png";
 
-export { close, leftArrow, bottomArrow, more, heart, triangle, like, dislike, retweet, save, comment };
+export { close, leftArrow, bottomArrow, more, heart, triangle, like, dislike, retweet, save, comment, searchIcon, colorSearchIcon };
+
