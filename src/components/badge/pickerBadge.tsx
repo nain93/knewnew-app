@@ -19,7 +19,7 @@ export default PickerBadge;
 
 const styles = StyleSheet.create({
   select: {
-    borderWidth: 1, borderColor: theme.color.lightgray,
+    borderWidth: 1, borderColor: theme.color.grayscale.eae7ec,
     borderRadius: 16,
     marginTop: d2p(8), marginRight: d2p(5),
     paddingVertical: d2p(5), paddingHorizontal: d2p(15),
