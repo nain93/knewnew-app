@@ -1,19 +1,24 @@
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
-import { TouchableOpacity, Image } from "react-native";
+import { TouchableOpacity, Image, ImageStyle } from "react-native";
 import leftArrow from "../../assets/icons/leftArrow.png";
 
-const LeftArrowIcon = () => {
-  const navigation = useNavigation();
-  return (
-    <TouchableOpacity onPress={() => navigation.goBack()}>
-      <Image
-        source={leftArrow}
-        resizeMode="contain"
-        style={{ width: 24, height: 24.5, marginLeft: 20 }}
-      />
-    </TouchableOpacity>
-  );
+interface LeftArrowIconProps {
+	onBackClick?: () => void;
+	imageStyle?: ImageStyle
+}
+
+const LeftArrowIcon = ({ onBackClick, imageStyle }: LeftArrowIconProps) => {
+	const navigation = useNavigation();
+	return (
+		<TouchableOpacity onPress={onBackClick ? onBackClick : () => navigation.goBack()}>
+			<Image
+				source={leftArrow}
+				resizeMode="contain"
+				style={{ height: 24.5, ...imageStyle }}
+			/>
+		</TouchableOpacity>
+	);
 };
 
 export default LeftArrowIcon;

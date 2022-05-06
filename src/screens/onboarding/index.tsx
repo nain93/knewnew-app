@@ -8,6 +8,7 @@ import {
 	naverImg,
 	appleImg
 } from "~/assets/images/snsImg/index";
+import { mainLogo } from '~/assets/logo';
 
 const Onboarding = () => {
 
@@ -32,7 +33,7 @@ const Onboarding = () => {
 			<View style={{ marginLeft: 20 }}>
 				<Text style={{ fontSize: 24, fontWeight: "600" }}>실패없는 장보기</Text>
 				<View style={styles.logo}>
-					<Text>로고 영역</Text>
+					<Image source={mainLogo} style={{ width: d2p(215), height: d2p(35) }} />
 				</View>
 				<Image
 					source={onboardingImg}
@@ -69,8 +70,7 @@ const styles = StyleSheet.create({
 	logo: {
 		width: d2p(260),
 		height: d2p(80),
-		borderWidth: 1,
-		marginTop: d2p(8)
+		marginTop: d2p(10)
 	},
 	onboardingImg: {
 		width: d2p(302),
