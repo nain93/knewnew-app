@@ -1,4 +1,4 @@
-import { Image, Platform } from 'react-native';
+import { Platform } from 'react-native';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { TransitionPresets, createStackNavigator } from '@react-navigation/stack';
@@ -8,8 +8,7 @@ import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import Welcome from '~/screens/onboarding/welcome';
 import CloseIcon from '~/components/icon/closeIcon';
 import TabNavigator from '~/navigators/tabNav';
-import Feed from '~/screens/feed';
-import mainLogo from '~/assets/logo';
+import { d2p } from '~/utils';
 
 const TransitionScreenOptions = {
   ...TransitionPresets.ModalSlideFromBottomIOS,
@@ -26,26 +25,10 @@ const GlobalNav = () => {
           { cardStyle: { backgroundColor: "white" } }
         )}>
         <Stack.Screen
-          name="Feed"
-          options={{
-            title: "",
-            headerLeft: () => <Image source={mainLogo} resizeMode="contain"
-              style={{ width: 96, height: 20, marginLeft: 20 }} />,
-          }}
-          component={Feed} />
-        <Stack.Screen
-          name="Welcome"
-          options={{
-            title: "",
-            headerLeft: () => <CloseIcon />,
-            headerShadowVisible: false,
-          }}
-          component={Welcome} />
-        <Stack.Screen
           name="OnBoarding"
           options={{
             title: "",
-            headerShadowVisible: false,
+            headerShown: false
           }}
           component={Onboarding}
         />
@@ -54,9 +37,19 @@ const GlobalNav = () => {
           options={{
             title: "",
             headerLeft: () => <LeftArrowIcon />,
+            headerLeftContainerStyle: { paddingLeft: d2p(20) },
             headerShadowVisible: false,
           }}
           component={BadgeSelect} />
+        <Stack.Screen
+          name="Welcome"
+          options={{
+            title: "",
+            headerLeft: () => <CloseIcon />,
+            headerLeftContainerStyle: { paddingLeft: d2p(20) },
+            headerShadowVisible: false,
+          }}
+          component={Welcome} />
         <Stack.Screen
           name="TabNav"
           component={TabNavigator}

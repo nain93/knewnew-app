@@ -1,17 +1,11 @@
-import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { NavigationRoute } from 'react-navigation';
 import BasicButton from '~/components/button/basicButton';
 import theme from '~/styles/theme';
+import { NavigationType } from '~/types';
 import { d2p } from '~/utils';
 
-type WelcomeProps = {
-  navigation: StackNavigationProp<any>
-  route: NavigationRoute;
-}
-
-const Welcome = ({ navigation }: WelcomeProps) => {
+const Welcome = ({ navigation }: NavigationType) => {
 
   const handleSignIn = () => {
     // todo sigin api 연결

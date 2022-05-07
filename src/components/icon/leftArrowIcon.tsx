@@ -15,7 +15,7 @@ const LeftArrowIcon = ({ onBackClick, imageStyle }: LeftArrowIconProps) => {
       <Image
         source={leftArrow}
         resizeMode="contain"
-        style={{ height: 24.5, ...imageStyle }}
+        style={{ height: 24.5, width: 24, ...imageStyle }}
       />
     </TouchableOpacity>
   );

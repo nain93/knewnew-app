@@ -9,23 +9,28 @@ import {
   appleImg
 } from "~/assets/images/snsImg/index";
 import mainLogo from '~/assets/logo';
+import { NavigationType } from '~/types';
 
-const Onboarding = () => {
+const Onboarding = ({ navigation }: NavigationType) => {
+
+  const goToBadgeSelect = () => {
+    navigation.navigate("BadgeSelect");
+  };
 
   const handleKakaoLogin = () => {
-
+    goToBadgeSelect();
   };
 
   const handleNaverLogin = () => {
-
+    goToBadgeSelect();
   };
 
   const handleGoogleLogin = () => {
-
+    goToBadgeSelect();
   };
 
   const handleAppleLogin = () => {
-
+    goToBadgeSelect();
   };
 
   return (
@@ -65,7 +70,8 @@ const Onboarding = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    paddingTop: h2p(102)
   },
   logo: {
     width: d2p(260),
