@@ -8,7 +8,7 @@ import {
 	naverImg,
 	appleImg
 } from "~/assets/images/snsImg/index";
-import { mainLogo } from '~/assets/logo';
+import mainLogo from '~/assets/logo';
 
 const Onboarding = () => {
 

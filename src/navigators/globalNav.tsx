@@ -9,7 +9,7 @@ import Welcome from '~/screens/onboarding/welcome';
 import CloseIcon from '~/components/icon/closeIcon';
 import TabNavigator from '~/navigators/tabNav';
 import Feed from '~/screens/feed';
-import { mainLogo } from '~/assets/logo';
+import mainLogo from '~/assets/logo';
 
 const TransitionScreenOptions = {
 	...TransitionPresets.ModalSlideFromBottomIOS,

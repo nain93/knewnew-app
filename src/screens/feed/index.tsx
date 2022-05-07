@@ -8,7 +8,7 @@ import FeedBadge from '~/components/badge/feedBadge';
 import ReviewIcon from '~/components/icon/reviewIcon';
 import ReactionIcon from '~/components/icon/reactionIcon';
 import Header from '~/components/header';
-import { mainLogo } from '~/assets/logo';
+import mainLogo from '~/assets/logo';
 
 const Feed = () => {
 	return (

@@ -13,4 +13,3 @@ import searchIcon from "./searchIcon.png";
 import colorSearchIcon from "./colorSearchIcon.png";
 
 export { close, leftArrow, bottomArrow, more, heart, triangle, like, dislike, retweet, save, comment, searchIcon, colorSearchIcon };
-
