@@ -19,6 +19,7 @@ const Feed = () => {
         </View>
         <FlatList
           data={data}
+          showsVerticalScrollIndicator={false}
           renderItem={(review) => <FeedReview review={review} />}
           style={{ marginTop: h2p(40), paddingBottom: h2p(31) }}
           keyExtractor={(review) => String(review.id)} />
@@ -72,7 +73,7 @@ const data = [{
   photo: 'ss',
   date: '2022.04.26',
   writer: '꿈빛파티시엘'
-},]
+},];
 
 export default Feed;
 
