@@ -10,25 +10,20 @@ interface BadgeProp {
 }
 
 const Badge = ({ text, type, viewStyle }: BadgeProp) => {
-  const BadgeComponent = (type: string) => {
-    switch (type) {
-      case 'picker':
-        return <TouchableOpacity style={[styles.select, { ...viewStyle }]}>
-          <Text>{text}</Text>
-        </TouchableOpacity>;
-      case 'feed':
-        return <View style={styles.badge}>
-          <Text style={styles.badgeText}>{text}</Text>
-        </View>;
-      case 'mypage':
-        return null;
-    }
-  };
-
-  return (<>
-    {BadgeComponent(type)}
-  </>
-  );
+  switch (type) {
+    case 'picker':
+      return <TouchableOpacity style={[styles.select, { ...viewStyle }]}>
+        <Text>{text}</Text>
+      </TouchableOpacity>;
+    case 'feed':
+      return <View style={styles.badge}>
+        <Text style={styles.badgeText}>{text}</Text>
+      </View>;
+    case 'mypage':
+      return <View />;
+    default:
+      return <View />;
+  }
 };
 
 export default Badge;
