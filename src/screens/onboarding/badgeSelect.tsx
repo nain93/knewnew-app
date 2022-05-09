@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 import { d2p } from '~/utils';
 import theme from '~/styles/theme';
 import BasicButton from '~/components/button/basicButton';
@@ -65,7 +64,7 @@ const BadgeSelect = ({ navigation }: NavigationType) => {
           <PickerBadge viewStyle={{ marginLeft: d2p(20) }} text="간단조리파⏱" />
           <PickerBadge text="직접요리파👨‍🍳" />
         </ScrollView>
-        <BasicButton onPress={handleLogin} text="선택완료" color={theme.color.main} viewStyle={{ marginTop: d2p(40), marginBottom: isIphoneX() ? getBottomSpace() : d2p(40) }} />
+        <BasicButton onPress={handleLogin} text="선택완료" color={theme.color.main} viewStyle={{ marginTop: d2p(40), marginBottom: d2p(40) }} />
       </ScrollView>
     </View>
   );

@@ -13,15 +13,11 @@ interface HeaderProps {
 const Header = ({ headerLeft, headerRight, title }: HeaderProps) => {
   return (
     <View style={styles.container}>
-      <TouchableOpacity>
-        {headerLeft}
-      </TouchableOpacity>
+      {headerLeft}
       <Text>
         {title}
       </Text>
-      <TouchableOpacity>
-        {headerRight}
-      </TouchableOpacity>
+      {headerRight}
     </View>
   );
 };
