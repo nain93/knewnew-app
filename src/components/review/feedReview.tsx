@@ -2,7 +2,7 @@ import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native'
 import React, { useState } from 'react'
 import theme from '~/styles/theme';
 import { d2p, h2p } from '~/utils';
-import FeedBadge from '../badge/feedBadge';
+import Badge from '../badge';
 import MoreIcon from '~/components/icon/moreIcon';
 import ReviewIcon from '../icon/reviewIcon';
 import ReactionIcon from '../icon/reactionIcon';
@@ -16,7 +16,7 @@ const FeedReview = ({ review }) => {
   return (
     <View style={styles.review}>
       <View style={{ flexDirection: 'row' }}>
-        <FeedBadge text={review.item.badge} />
+        <Badge type="feed" text={review.item.badge} />
         <MoreIcon onPress={() => console.log('공유/신고')} />
       </View>
       <Pressable onPress={() => console.log('피드 상세')}>
