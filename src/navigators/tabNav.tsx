@@ -26,6 +26,9 @@ const TabNavigator = () => {
       <Tabs.Screen
         name="작성"
         component={Write}
+        options={{
+          headerShown: false,
+        }}
       />
       <Tabs.Screen
         name="검색"
@@ -37,6 +40,9 @@ const TabNavigator = () => {
       <Tabs.Screen
         name="마이페이지"
         component={Mypage}
+        options={{
+          headerShown: false,
+        }}
       />
     </Tabs.Navigator>
   );

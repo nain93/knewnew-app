@@ -9,6 +9,7 @@ import Welcome from '~/screens/onboarding/welcome';
 import CloseIcon from '~/components/icon/closeIcon';
 import TabNavigator from '~/navigators/tabNav';
 import { d2p } from '~/utils';
+import EditProfile from '~/screens/mypage/editProfile';
 
 const TransitionScreenOptions = {
   ...TransitionPresets.ModalSlideFromBottomIOS,
@@ -45,7 +46,7 @@ const GlobalNav = () => {
           name="Welcome"
           options={{
             title: "",
-            headerLeft: () => <CloseIcon />,
+            headerLeft: () => <CloseIcon onPress={() => console.log("close")} />,
             headerLeftContainerStyle: { paddingLeft: d2p(20) },
             headerShadowVisible: false,
           }}
@@ -53,6 +54,13 @@ const GlobalNav = () => {
         <Stack.Screen
           name="TabNav"
           component={TabNavigator}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="editProfile"
+          component={EditProfile}
           options={{
             headerShown: false
           }}
