@@ -11,5 +11,8 @@ import save from './save.png';
 import comment from './comment.png';
 import searchIcon from "./searchIcon.png";
 import colorSearchIcon from "./colorSearchIcon.png";
+import colorLike from './colorLike.png';
+import colorDislike from './colorDislike.png';
+import colorSave from './colorSave.png';
 
-export { close, leftArrow, bottomArrow, more, heart, triangle, like, dislike, retweet, save, comment, searchIcon, colorSearchIcon };
+export { close, leftArrow, bottomArrow, more, heart, triangle, like, dislike, retweet, save, comment, searchIcon, colorSearchIcon, colorLike, colorDislike, colorSave };
