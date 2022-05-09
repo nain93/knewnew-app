@@ -8,7 +8,9 @@ import theme from '~/styles/theme';
 const EditProfile = ({ navigation }: NavigationType) => {
   return (
     <>
-      <Header headerLeft={<LeftArrowIcon onBackClick={() => navigation.goBack()} imageStyle={{ width: 11, height: 25 }} />}
+      <Header
+        isBorder={false}
+        headerLeft={<LeftArrowIcon onBackClick={() => navigation.goBack()} imageStyle={{ width: 11, height: 25 }} />}
         title="프로필 수정"
         headerRight={
           <TouchableOpacity>

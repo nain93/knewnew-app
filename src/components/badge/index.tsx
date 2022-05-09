@@ -5,7 +5,7 @@ import { d2p } from "~/utils";
 
 interface BadgeProp {
   text: string,
-  type: string,
+  type: "picker" | "feed" | "mypage",
   viewStyle?: ViewStyle
 }
 
