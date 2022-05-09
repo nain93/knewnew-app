@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View, Image, TouchableWithoutFeedback, Pressable, FlatList } from 'react-native';
+import { StyleSheet, Text, View, Image, FlatList } from 'react-native';
 import React from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
