@@ -13,7 +13,7 @@ interface BasicButtonProp {
 const BasicButton = ({ text, color, viewStyle, onPress }: BasicButtonProp) => {
   return (
     <TouchableOpacity onPress={onPress}>
-      <View style={{ ...styles.container, backgroundColor: color, ...viewStyle }}>
+      <View style={[styles.container, viewStyle, { backgroundColor: color }]}>
         <View style={styles.textContainer}>
           <Text style={styles.text}>{text}</Text>
         </View>

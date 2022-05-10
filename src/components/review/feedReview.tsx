@@ -1,5 +1,5 @@
-import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
+import React, { useState } from 'react';
 import theme from '~/styles/theme';
 import { d2p, h2p } from '~/utils';
 import Badge from '../badge';
@@ -7,8 +7,14 @@ import MoreIcon from '~/components/icon/moreIcon';
 import ReviewIcon from '../icon/reviewIcon';
 import ReactionIcon from '../icon/reactionIcon';
 import { TabBarItem } from 'react-native-tab-view';
+import { NavigationStackProp } from "react-navigation-stack";
+import { NavigationType } from '~/types';
 
-const FeedReview = ({ review }) => {
+interface FeedReviewProps {
+  review: any
+}
+
+const FeedReview = ({ review, navigation }: FeedReviewProps & NavigationType) => {
   const [like, setLike] = useState<boolean>(false);
   const [dislike, setDisLike] = useState<boolean>(false);
   const [save, setSave] = useState<boolean>(false);
@@ -39,17 +45,17 @@ const FeedReview = ({ review }) => {
         <Text style={styles.date}>{review.item.date}</Text>
         <Text style={{ color: theme.color.grayscale.C_79737e }}>{review.item.writer}</Text>
       </View>
-      <View style={styles.dottedLine}></View>
+      <View style={styles.dottedLine} />
       <View style={styles.reactionContainer}>
         <ReactionIcon name="like" state={like} setState={(isState: boolean) => setLike(isState)} />
         <ReactionIcon name="dislike" state={dislike} setState={(isState: boolean) => setDisLike(isState)} />
-        <ReactionIcon name="retweet" />
-        <ReactionIcon name="comment" />
+        <ReactionIcon name="retweet" navigation={navigation} />
+        <ReactionIcon name="comment" navigation={navigation} />
         <ReactionIcon name="save" state={save} setState={(isState: boolean) => setSave(isState)} />
       </View>
     </View>
-  )
-}
+  );
+};
 
 export default FeedReview;
 

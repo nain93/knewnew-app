@@ -1,17 +1,39 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { d2p } from '~/utils';
 import theme from '~/styles/theme';
 import BasicButton from '~/components/button/basicButton';
 import Badge from '~/components/badge';
-import { NavigationType } from '~/types';
+import { NavigationStackProp } from "react-navigation-stack";
+import { NavigationRoute } from "react-navigation";
+import { UserInfoType } from '~/types';
+import { userSignup } from '~/api/user';
 
-const BadgeSelect = ({ navigation }: NavigationType) => {
+interface BadgeSelectProps {
+  navigation: NavigationStackProp
+  route: NavigationRoute<UserInfoType>;
+}
 
-  const handleLogin = () => {
-    // todo login
+const BadgeSelect = ({ route, navigation }: BadgeSelectProps) => {
+
+  const [userInfo, setUserInfo] = useState<UserInfoType>();
+
+  const [errorMsg, setErrorMsg] = useState("");
+  const handleLogin = async () => {
+    // todo 토큰 리코일에서 뺴면됨
+    // todo 유효성검사
+    // const data = await userSignup({ token: "", ...userInfo });
+    // if(data){
+    //   navigation.navigate("Welcome");
+    // }
     navigation.navigate("Welcome");
   };
+
+  useEffect(() => {
+    setUserInfo(route.params);
+  }, [route.params]);
+
+  console.log(userInfo, 'userInfo');
 
   return (
     <View style={styles.container}>

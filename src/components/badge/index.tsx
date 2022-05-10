@@ -12,7 +12,7 @@ interface BadgeProp {
 const Badge = ({ text, type, viewStyle }: BadgeProp) => {
   switch (type) {
     case 'picker':
-      return <TouchableOpacity style={[styles.select, { ...viewStyle }]}>
+      return <TouchableOpacity style={[styles.select, viewStyle]}>
         <Text>{text}</Text>
       </TouchableOpacity>;
     case 'feed':

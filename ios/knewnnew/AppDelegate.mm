@@ -32,9 +32,13 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application openURL:(nonnull NSURL *)url options:(nonnull NSDictionary<NSString *,id> *)options {
-  if ([RNKakaoLogins isKakaoTalkLoginUrl:url]) {
-    [RNKakaoLogins handleOpenUrl: url];
-  }
+  dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+      dispatch_async(dispatch_get_main_queue(), ^(void){
+        if ([RNKakaoLogins isKakaoTalkLoginUrl:url]) {
+          [RNKakaoLogins handleOpenUrl: url];
+        }
+      });
+  });
   if ([url.scheme isEqualToString:@"naverlogin"]) {
     return [[NaverThirdPartyLoginConnection getSharedInstance] application:application openURL:url options:options];
   }

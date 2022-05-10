@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, Image, Dimensions, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Platform } from 'react-native';
 import React from 'react';
 import { d2p, h2p } from '~/utils';
 import onboardingImg from "assets/images/onboardingImg.png";
@@ -10,27 +10,98 @@ import {
 } from "~/assets/images/snsImg/index";
 import mainLogo from '~/assets/logo';
 import { NavigationType } from '~/types';
+import { login } from '@react-native-seoul/kakao-login';
+import { userLogin } from '~/api/user';
+import { NaverLogin } from '@react-native-seoul/naver-login';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import appleAuth from '@invertase/react-native-apple-authentication';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const iosKeys = {
+  kConsumerKey: "JLWtHkL9GxIG1Q5DzcG6",
+  kConsumerSecret: "QwW2FgXaT0",
+  kServiceAppName: "knewnnew",
+  kServiceAppUrlScheme: "naverlogin" // only for iOS
+};
+
+const aosKeys = {
+  kConsumerKey: "JLWtHkL9GxIG1Q5DzcG6",
+  kConsumerSecret: "QwW2FgXaT0",
+  kServiceAppName: "knewnnew"
+};
 
 const Onboarding = ({ navigation }: NavigationType) => {
 
-  const goToBadgeSelect = () => {
-    navigation.navigate("BadgeSelect");
+  const goToBadgeSelect = (userData: {
+    email: string,
+    nickname: string,
+    profileImage: string,
+    providerKey: number,
+    providerType: "kakao" | "naver" | "google" | "apple"
+  }) => {
+    navigation.navigate("BadgeSelect", userData);
   };
 
-  const handleKakaoLogin = () => {
-    goToBadgeSelect();
+  const handleKakaoLogin = async () => {
+    const { accessToken } = await login();
+    const data = await userLogin({ token: accessToken, providerType: "kakao" });
+    if (data) {
+      goToBadgeSelect(data);
+    }
   };
 
-  const handleNaverLogin = () => {
-    goToBadgeSelect();
+  const handleNaverLogin = async () => {
+    return new Promise((resolve, reject) => {
+      NaverLogin.login(Platform.OS === "ios" ? iosKeys : aosKeys, async (err, token) => {
+        if (token) {
+          const { accessToken } = token;
+          const data = await userLogin({ token: accessToken, providerType: "naver" });
+          if (data) {
+            goToBadgeSelect(data);
+          }
+        }
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(token);
+      });
+    });
   };
 
-  const handleGoogleLogin = () => {
-    goToBadgeSelect();
+  const handleGoogleLogin = async () => {
+    // * 추후 개발
+    // GoogleSignin.configure({
+    //   webClientId: "1025814485939-95vtu3p4iqb7qp23henp85c1nd2d2i3c.apps.googleusercontent.com",
+    //   iosClientId: "1025814485939-hebcl4c1tmq4bqt9q0ifng6mq7amltnf.apps.googleusercontent.com"
+    // });
+    // const userInfo = await GoogleSignin.signIn();
+    // const { idToken } = userInfo;
+    // if (idToken) {
+    //   const data = await userLogin({ token: idToken, providerType: "google" });
+    //   console.log(data, 'data');
+    //   if (data) {
+    //     goToBadgeSelect();
+    //   }
+    // }
   };
 
-  const handleAppleLogin = () => {
-    goToBadgeSelect();
+  const handleAppleLogin = async () => {
+    // * 추후 개발
+    // const appleAuthRequestResponse = await appleAuth.performRequest({
+    //   requestedOperation: appleAuth.Operation.LOGIN,
+    //   requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+    // });
+    // const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
+    // if (credentialState === appleAuth.State.AUTHORIZED) {
+    //   const token = appleAuthRequestResponse.authorizationCode;
+    //   if (token) {
+    //     const data = await userLogin({ token, providerType: "apple" });
+    //     if (data) {
+    //       goToBadgeSelect();
+    //     }
+    //   }
+    // }
   };
 
   return (
