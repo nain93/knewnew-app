@@ -9,6 +9,8 @@ import {
   appleImg
 } from "~/assets/images/snsImg/index";
 import mainLogo from '~/assets/logo';
+
+import Config from "react-native-config";
 import { NavigationType } from '~/types';
 import { login } from '@react-native-seoul/kakao-login';
 import { userLogin } from '~/api/user';
@@ -17,21 +19,23 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import appleAuth from '@invertase/react-native-apple-authentication';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import axios from "axios";
+
 const iosKeys = {
-  kConsumerKey: "JLWtHkL9GxIG1Q5DzcG6",
-  kConsumerSecret: "QwW2FgXaT0",
+  kConsumerKey: Config.NAVER_KEY,
+  kConsumerSecret: Config.NAVER_SECRET,
   kServiceAppName: "knewnnew",
   kServiceAppUrlScheme: "naverlogin" // only for iOS
 };
 
 const aosKeys = {
-  kConsumerKey: "JLWtHkL9GxIG1Q5DzcG6",
-  kConsumerSecret: "QwW2FgXaT0",
+  kConsumerKey: Config.NAVER_KEY,
+  kConsumerSecret: Config.NAVER_SECRET,
   kServiceAppName: "knewnnew"
 };
 
 const Onboarding = ({ navigation }: NavigationType) => {
-
+  console.log(Config, 'Config');
   const goToBadgeSelect = (userData: {
     email: string,
     nickname: string,

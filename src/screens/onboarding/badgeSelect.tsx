@@ -20,7 +20,7 @@ const BadgeSelect = ({ route, navigation }: BadgeSelectProps) => {
 
   const [errorMsg, setErrorMsg] = useState("");
   const handleLogin = async () => {
-    // todo 토큰 리코일에서 뺴면됨
+    // todo 토큰 리코일, asynstoarge에 저장
     // todo 유효성검사
     // const data = await userSignup({ token: "", ...userInfo });
     // if(data){

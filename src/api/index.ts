@@ -1,1 +1,3 @@
-export const baseURL = "https://api.knewnnew.com/";
+import Config from "react-native-config";
+
+export const baseURL = Config.BACKEND_URL;
