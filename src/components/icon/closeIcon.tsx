@@ -15,7 +15,7 @@ const CloseIcon = ({ imageStyle, onPress }: CloseIcon) => {
       <Image
         source={close}
         resizeMode="contain"
-        style={{ width: 24, height: 24, ...imageStyle }}
+        style={[{ width: 24, height: 24 }, imageStyle]}
       />
     </TouchableOpacity>
   );
