@@ -1,21 +1,22 @@
 import React from "react";
-import { Image, Text, TouchableOpacity, ViewStyle } from "react-native";
+import { Image, Text, TouchableOpacity } from "react-native";
 import { like, dislike, retweet, comment, save, colorLike, colorDislike, colorSave } from "~/assets/icons";
 import theme from "~/styles/theme";
-import { NavigationStackProp } from "react-navigation-stack";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "react-navigation-stack/lib/typescript/src/vendor/types";
 
 interface ReviewIconProp {
   name: "like" | "dislike" | "retweet" | "comment" | "save";
   state?: boolean;
   setState?: (isState: boolean) => void;
-  navigation?: NavigationStackProp;
 }
 
-const ReactionIcon = ({ name, state, setState, navigation }: ReviewIconProp) => {
+const ReactionIcon = ({ name, state, setState }: ReviewIconProp) => {
+  const navigation = useNavigation<StackNavigationProp>();
   return (
     <TouchableOpacity style={{
       flexDirection: "row", alignItems: 'center', justifyContent: 'space-around'
-    }} onPress={() => setState ? setState(!state) : navigation?.navigate(name)} >
+    }} onPress={() => setState ? setState(!state) : navigation.navigate(name)} >
       <Image
         source={!state ? imgSource(name) : imgColorSource(name)}
         resizeMode="contain"

@@ -13,7 +13,7 @@ export const userLogin = async ({ token, providerType }: UserLoginType) => {
       providerType,
     }, {
       headers: {
-        authorization: token
+        Authorization: token,
       }
     });
     if (res) {
@@ -40,7 +40,7 @@ export const userSignup = async ({
   userBadge
 }: UserInfoType) => {
   try {
-    const res = await axios.post(baseURL + "auth/signup/", {
+    const res = await axios.post(baseURL + "/auth/signup", {
       providerType,
       providerKey,
       email,

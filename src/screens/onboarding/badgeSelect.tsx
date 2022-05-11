@@ -98,6 +98,7 @@ const styles = StyleSheet.create({
     marginTop: d2p(42.5)
   },
   title: {
+    color: theme.color.black,
     fontSize: 26,
     fontWeight: '600',
     paddingHorizontal: d2p(20)

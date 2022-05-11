@@ -1,7 +1,6 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, Platform } from 'react-native';
 import React from 'react';
 import { d2p, h2p } from '~/utils';
-import onboardingImg from "assets/images/onboardingImg.png";
 import {
   kakaoImg,
   googleImg,
@@ -9,6 +8,7 @@ import {
   appleImg
 } from "~/assets/images/snsImg/index";
 import mainLogo from '~/assets/logo';
+import { onboardingImg } from '~/assets/images';
 
 import Config from "react-native-config";
 import { NavigationType } from '~/types';
@@ -17,9 +17,6 @@ import { userLogin } from '~/api/user';
 import { NaverLogin } from '@react-native-seoul/naver-login';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import appleAuth from '@invertase/react-native-apple-authentication';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-import axios from "axios";
 
 const iosKeys = {
   kConsumerKey: Config.NAVER_KEY,
@@ -35,7 +32,6 @@ const aosKeys = {
 };
 
 const Onboarding = ({ navigation }: NavigationType) => {
-  console.log(Config, 'Config');
   const goToBadgeSelect = (userData: {
     email: string,
     nickname: string,
@@ -92,20 +88,22 @@ const Onboarding = ({ navigation }: NavigationType) => {
 
   const handleAppleLogin = async () => {
     // * 추후 개발
-    // const appleAuthRequestResponse = await appleAuth.performRequest({
-    //   requestedOperation: appleAuth.Operation.LOGIN,
-    //   requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
-    // });
-    // const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
-    // if (credentialState === appleAuth.State.AUTHORIZED) {
-    //   const token = appleAuthRequestResponse.authorizationCode;
-    //   if (token) {
-    //     const data = await userLogin({ token, providerType: "apple" });
-    //     if (data) {
-    //       goToBadgeSelect();
-    //     }
-    //   }
-    // }
+    const appleAuthRequestResponse = await appleAuth.performRequest({
+      requestedOperation: appleAuth.Operation.LOGIN,
+      requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+    });
+    console.log(appleAuthRequestResponse, 'appleAuthRequestResponse');
+    const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
+    if (credentialState === appleAuth.State.AUTHORIZED) {
+      const token = appleAuthRequestResponse.identityToken;
+      console.log(token, 'token');
+      // if (token) {
+      //   const data = await userLogin({ token, providerType: "apple" });
+      //   if (data) {
+      //     goToBadgeSelect(data);
+      //   }
+      // }
+    }
   };
 
   return (
