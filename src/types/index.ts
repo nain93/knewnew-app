@@ -3,7 +3,7 @@ import { NavigationRoute } from "react-navigation";
 
 export interface NavigationType {
   navigation: NavigationStackProp
-  route: NavigationRoute;
+  route?: NavigationRoute;
 }
 
 export interface UserInfoType {

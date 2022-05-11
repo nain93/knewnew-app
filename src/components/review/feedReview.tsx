@@ -6,15 +6,12 @@ import Badge from '../badge';
 import MoreIcon from '~/components/icon/moreIcon';
 import ReviewIcon from '../icon/reviewIcon';
 import ReactionIcon from '../icon/reactionIcon';
-import { TabBarItem } from 'react-native-tab-view';
-import { NavigationStackProp } from "react-navigation-stack";
-import { NavigationType } from '~/types';
 
 interface FeedReviewProps {
   review: any
 }
 
-const FeedReview = ({ review, navigation }: FeedReviewProps & NavigationType) => {
+const FeedReview = ({ review }: FeedReviewProps) => {
   const [like, setLike] = useState<boolean>(false);
   const [dislike, setDisLike] = useState<boolean>(false);
   const [save, setSave] = useState<boolean>(false);
@@ -49,8 +46,8 @@ const FeedReview = ({ review, navigation }: FeedReviewProps & NavigationType) =>
       <View style={styles.reactionContainer}>
         <ReactionIcon name="like" state={like} setState={(isState: boolean) => setLike(isState)} />
         <ReactionIcon name="dislike" state={dislike} setState={(isState: boolean) => setDisLike(isState)} />
-        <ReactionIcon name="retweet" navigation={navigation} />
-        <ReactionIcon name="comment" navigation={navigation} />
+        <ReactionIcon name="retweet" />
+        <ReactionIcon name="comment" />
         <ReactionIcon name="save" state={save} setState={(isState: boolean) => setSave(isState)} />
       </View>
     </View>

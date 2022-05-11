@@ -1,20 +1,36 @@
-import { Dimensions, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import React, { useState } from 'react';
+import { Dimensions, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useRef, useState } from 'react';
 import Header from '~/components/header';
 import theme from '~/styles/theme';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import { NavigationType } from '~/types';
 
-import SelectDropdown from "react-native-select-dropdown";
-import { leftArrow } from '~/assets/icons';
 import { d2p, h2p } from '~/utils';
+import ReviewIcon from '~/components/icon/reviewIcon';
+import ImageCropPicker from 'react-native-image-crop-picker';
+import { photo, photoClose } from '~/assets/images';
 
 const Write = ({ navigation }: NavigationType) => {
-  const countries = ["Egypt", "Canada", "Australia", "Ireland"];
   const [writeData, setWriteData] = useState<{ name: string, content: string }>({
     name: "",
     content: ""
   });
+  const inputRef = useRef<TextInput>(null);
+  const [imageList, setImageList] = useState<string[]>([]);
+
+  const pickImage = () => {
+    if (imageList.length >= 5) {
+      return;
+    }
+
+    ImageCropPicker.openPicker({
+      mediaType: "photo",
+      crop: "true",
+      includeBase64: true,
+      compressImageMaxWidth: 720,
+      compressImageMaxHeight: 720
+    }).then(v => setImageList(imageList.concat(`data:${v.mime};base64,${v.data}`)));
+  };
 
   return (
     <>
@@ -28,73 +44,58 @@ const Write = ({ navigation }: NavigationType) => {
           </TouchableOpacity>
         } />
       <View style={styles.container}>
-        <View style={styles.dropdown}>
-          <SelectDropdown
-            data={countries}
-            defaultButtonText="추천템"
-            dropdownStyle={{ backgroundColor: theme.color.white, elevation: 0 }}
-            buttonTextStyle={{ textAlign: "left", marginHorizontal: 0, fontSize: 16, fontWeight: "500" }}
-            buttonStyle={{ paddingHorizontal: d2p(20), backgroundColor: theme.color.white }}
-            rowTextStyle={{ textAlign: "left", marginHorizontal: 0, fontSize: 16, fontWeight: "500" }}
-            rowStyle={{ paddingHorizontal: d2p(20), borderBottomWidth: 0 }}
-            dropdownOverlayColor="rgba(0,0,0,0)"
-            onSelect={(selectedItem, index) => {
-              console.log(selectedItem, index);
-            }}
-            renderDropdownIcon={(isOpened) =>
-              <Image
-                source={leftArrow}
-                resizeMode="contain"
-                style={{ height: 10, width: 20, transform: [{ rotate: isOpened ? "90deg" : "270deg" }] }}
-              />}
-            buttonTextAfterSelection={(selectedItem, _) => {
-              return selectedItem;
-            }}
-            rowTextForSelection={(item, _) => {
-              return item;
-            }}
-          />
-          <SelectDropdown
-            data={countries}
-            defaultButtonText="유통사 선택안함"
-            dropdownStyle={{ backgroundColor: theme.color.white, elevation: 0 }}
-            buttonTextStyle={{ textAlign: "left", marginHorizontal: 0, fontSize: 16, fontWeight: "500" }}
-            buttonStyle={{ paddingHorizontal: d2p(20), backgroundColor: theme.color.white }}
-            rowTextStyle={{ textAlign: "left", marginHorizontal: 0, fontSize: 16, fontWeight: "500" }}
-            rowStyle={{ paddingHorizontal: d2p(20), borderBottomWidth: 0 }}
-            dropdownOverlayColor="rgba(0,0,0,0)"
-            onSelect={(selectedItem, index) => {
-              console.log(selectedItem, index);
-            }}
-            renderDropdownIcon={(isOpened) =>
-              <Image
-                source={leftArrow}
-                resizeMode="contain"
-                style={{ height: 10, width: 20, transform: [{ rotate: isOpened ? "90deg" : "270deg" }] }}
-              />}
-            buttonTextAfterSelection={(selectedItem, _) => {
-              return selectedItem;
-            }}
-            rowTextForSelection={(item, _) => {
-              return item;
-            }}
-          />
-        </View>
         <View style={styles.textInputWrap}>
           <TextInput value={writeData.name}
             autoCapitalize="none"
+            multiline
             onChangeText={(e) => setWriteData({ ...writeData, name: e })}
-            style={[styles.textInput, { paddingVertical: h2p(14.5), width: Dimensions.get("window").width - d2p(40) }]} placeholder="상품명을 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
-          <View style={[styles.textInput, { flexDirection: "row" }]}>
-            <TextInput value={writeData.content}
+            style={{ fontSize: 16, paddingBottom: h2p(14.5), paddingTop: h2p(14.5), width: Dimensions.get("window").width - d2p(40) }}
+            placeholder="상품명을 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
+          <Pressable
+            onPress={() => inputRef.current?.focus()}
+            style={{ flexDirection: "row", minHeight: h2p(360) }}>
+            <TextInput
+              ref={inputRef}
+              value={writeData.content}
               autoCapitalize="none"
+              multiline
+              textAlignVertical="top"
               onChangeText={(e) => setWriteData({ ...writeData, content: e })}
-              style={{ paddingVertical: h2p(14.5), fontSize: 16, includeFontPadding: false, width: Dimensions.get("window").width - d2p(40) }} placeholder="내용을 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
+              style={{ paddingBottom: h2p(14.5), paddingTop: h2p(14.5), maxHeight: h2p(360), fontSize: 16, includeFontPadding: false }}
+              placeholder="내용을 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
             {!writeData?.content &&
-              <Text style={{ fontSize: 12, color: theme.color.main, marginTop: h2p(2) }}> (필수)</Text>}
-          </View>
+              <Text style={{ fontSize: 12, color: theme.color.main, marginTop: h2p(14.5) }}> (필수)</Text>}
+          </Pressable>
         </View>
-      </View>
+        <View style={styles.reviewIconWrap}>
+          <ReviewIcon imageStyle={{ ...styles.reviewIcon, marginLeft: d2p(8) }} review="heart" />
+          <ReviewIcon imageStyle={styles.reviewIcon} review="triangle" />
+          <ReviewIcon imageStyle={styles.reviewIcon} review="close" />
+        </View>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Pressable onPress={pickImage} style={[styles.images, { marginLeft: d2p(20), marginRight: d2p(15) }]}>
+            <View style={{ alignItems: "center" }}>
+              <Image source={photo} style={{ width: d2p(20), height: h2p(20), marginTop: h2p(12) }} />
+              <Text style={{ fontSize: 12, color: theme.color.placeholder, marginVertical: h2p(8) }}>{imageList.length}/5</Text>
+            </View>
+          </Pressable>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageWrap}>
+            {React.Children.toArray(imageList.map((image, idx) => {
+              return (
+                <View style={[styles.images, { marginRight: (idx === imageList.length - 1) ? d2p(20) : d2p(5) }]}>
+                  <View style={{ alignItems: "center" }}>
+                    <Image source={{ uri: image }} style={{ width: d2p(96), height: h2p(64), borderRadius: 4 }} />
+                    <Pressable onPress={() => setImageList(imageList.filter((_, filterIdx) => idx !== filterIdx))}
+                      style={{ position: "absolute", right: 0, top: 0 }}>
+                      <Image source={photoClose} style={{ width: d2p(16), height: h2p(16) }} />
+                    </Pressable>
+                  </View>
+                </View>
+              );
+            }))}
+          </ScrollView>
+        </View>
+      </View >
     </>
   );
 };
@@ -105,16 +106,28 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  dropdown: {
-    flexDirection: "row"
-  },
   textInputWrap: {
     paddingHorizontal: d2p(20),
     marginTop: h2p(22.5)
   },
-  textInput: {
-    fontSize: 16,
-    borderTopWidth: 1,
-    borderTopColor: theme.color.grayscale.f7f7fc
+  reviewIconWrap: {
+    height: h2p(60),
+    paddingVertical: h2p(9.5),
+    paddingHorizontal: d2p(20),
+    flexDirection: "row"
+  },
+  reviewIcon: {
+    width: 40, height: 40,
+    marginRight: d2p(15),
+  },
+  imageWrap: {
+    paddingVertical: h2p(19.5),
+  },
+  images: {
+    width: d2p(96),
+    height: h2p(64),
+    borderWidth: 1,
+    borderColor: theme.color.grayscale.eae7ec,
+    borderRadius: 4
   }
 });
