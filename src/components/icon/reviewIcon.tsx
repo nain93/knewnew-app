@@ -16,7 +16,7 @@ const ReviewIcon = ({ review, imageStyle }: ReviewIconProp) => {
         resizeMode="contain"
         style={[{ width: 20, height: 20 }, imageStyle]}
       />
-      <Text style={[{ paddingLeft: 5 }, review === 'heart' ? styles.heart : (review == 'triangle' ? styles.triangle : styles.default)]}>
+      <Text style={[{ paddingLeft: 5 }, review === 'heart' ? styles.heart : (review === 'triangle' ? styles.triangle : styles.default)]}>
         {reviewItem(review)?.text}</Text>
     </View >
   );

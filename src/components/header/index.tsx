@@ -18,7 +18,7 @@ const Header = ({ headerLeft, headerRight, title, isBorder = true, bgColor }: He
       <View style={{ position: "absolute", left: d2p(20) }}>
         {headerLeft}
       </View>
-      <Text style={{ fontSize: 16 }}>
+      <Text style={{ fontSize: 16, color: theme.color.black }}>
         {title}
       </Text>
       <View style={{ position: "absolute", right: d2p(20) }}>

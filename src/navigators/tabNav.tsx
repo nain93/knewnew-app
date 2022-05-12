@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from 'react';
 import Feed from '~/screens/feed';
-import Write from '~/screens/write/indes';
+import Write from '~/screens/write';
 import Search from '~/screens/search';
 import Mypage from '~/screens/mypage';
 import theme from '~/styles/theme';
@@ -12,6 +12,8 @@ const Tabs = createBottomTabNavigator();
 const TabNavigator = () => {
   return (
     <Tabs.Navigator
+      screenOptions={{
+      }}
       sceneContainerStyle={{
         backgroundColor: theme.color.white,
       }}
@@ -27,6 +29,7 @@ const TabNavigator = () => {
         name="작성"
         component={Write}
         options={{
+          tabBarStyle: { display: "none" },
           headerShown: false,
         }}
       />

@@ -16,10 +16,13 @@ import colorCart from './colorCart.png';
 import retweetfrom from './retweetfrom.png';
 import initialize from './initialize.png';
 import colorCheck from './colorCheck.png';
+import grayclose from './grayclose.png';
+import graytriangle from './graytriangle.png';
+import grayheart from './grayheart.png';
 
 export {
   close, leftArrow, more, heart, triangle, like, retweet, comment,
   searchIcon, colorSearchIcon, colorLike, tagfilter, tag, cart, colorCart, retweetfrom,
-  colorCheck,initialize
+  colorCheck, initialize, grayclose, graytriangle, grayheart
 };
 
