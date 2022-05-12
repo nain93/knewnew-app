@@ -3,7 +3,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from "reac
 import { colorCheck } from "~/assets/icons";
 import theme from "~/styles/theme";
 import { BadgeType } from "~/types";
-import { d2p } from "~/utils";
+import { d2p, h2p } from "~/utils";
 
 interface BadgeProp {
   text: string,
