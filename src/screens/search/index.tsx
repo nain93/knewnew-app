@@ -4,7 +4,7 @@ import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import CloseIcon from '~/components/icon/closeIcon';
 import SearchTabView from '~/screens/search/tabView';
-import { colorSearchIcon, searchIcon } from '~/assets/icons';
+import { mainSearchIcon, searchIcon } from '~/assets/icons';
 import theme from '~/styles/theme';
 import { d2p, h2p } from '~/utils';
 
@@ -86,7 +86,7 @@ const Search = ({ navigation }: SearchProps) => {
             <TouchableOpacity
               onPress={handleSearch}
               style={{ position: "absolute", right: d2p(10), top: d2p(6), }}>
-              <Image source={isSearchMode ? colorSearchIcon : searchIcon}
+              <Image source={isSearchMode ? mainSearchIcon : searchIcon}
                 style={{ width: d2p(16), height: d2p(16) }} />
             </TouchableOpacity>
           </View>
