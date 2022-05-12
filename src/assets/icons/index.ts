@@ -1,20 +1,25 @@
 import close from "./close.png";
 import leftArrow from './leftArrow.png';
-import bottomArrow from './bottomArrow.png';
 import more from './more.png';
 import heart from './heart.png';
 import triangle from './triangle.png';
 import like from './like.png';
-import dislike from './dislike.png';
 import retweet from './retweet.png';
-import save from './save.png';
 import comment from './comment.png';
 import searchIcon from "./searchIcon.png";
 import colorSearchIcon from "./colorSearchIcon.png";
 import colorLike from './colorLike.png';
-import colorDislike from './colorDislike.png';
-import colorSave from './colorSave.png';
+import tagfilter from './tagfilter.png';
+import tag from './tag.png';
+import cart from './cart.png';
+import colorCart from './colorCart.png';
+import retweetfrom from './retweetfrom.png';
 import initialize from './initialize.png';
 import colorCheck from './colorCheck.png';
 
-export { close, leftArrow, bottomArrow, more, heart, triangle, like, dislike, retweet, save, comment, searchIcon, colorSearchIcon, colorLike, colorDislike, colorSave, initialize, colorCheck };
+export {
+  close, leftArrow, more, heart, triangle, like, retweet, comment,
+  searchIcon, colorSearchIcon, colorLike, tagfilter, tag, cart, colorCart, retweetfrom,
+  colorCheck,initialize
+};
+

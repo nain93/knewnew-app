@@ -1,12 +1,12 @@
 import React from "react";
-import { Image, Text, TouchableOpacity } from "react-native";
-import { like, dislike, retweet, comment, save, colorLike, colorDislike, colorSave } from "~/assets/icons";
+import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { like, dislike, retweet, comment, save, colorLike, colorDislike, colorSave, cart, colorCart } from "~/assets/icons";
 import theme from "~/styles/theme";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "react-navigation-stack/lib/typescript/src/vendor/types";
 
 interface ReviewIconProp {
-  name: "like" | "dislike" | "retweet" | "comment" | "save";
+  name: "like" | "cart" | "retweet" | "comment";
   state?: boolean;
   setState?: (isState: boolean) => void;
 }
@@ -18,43 +18,36 @@ const ReactionIcon = ({ name, state, setState }: ReviewIconProp) => {
       flexDirection: "row", alignItems: 'center', justifyContent: 'space-around'
     }} onPress={() => setState ? setState(!state) : navigation.navigate(name)} >
       <Image
-        source={!state ? imgSource(name) : imgColorSource(name)}
+        source={!state ? imgSource(name)?.item : imgSource(name)?.colored}
         resizeMode="contain"
         style={{ width: 26, height: 26 }}
       />
-      <Text style={{ fontSize: 12, color: !state ? theme.color.grayscale.C_79737e : theme.color.main, marginLeft: 9 }}>15</Text>
+      <Text style={{ fontSize: 12, color: !state ? styles.default : styles.clicked, marginLeft: 9 }}>15</Text>
     </TouchableOpacity >
   );
 };
 
 const imgSource = (name: string) => {
   switch (name) {
+    case "cart":
+      return { item: cart, colored: colorCart };
     case "like":
-      return like;
-    case "dislike":
-      return dislike;
+      return { item: like, colored: colorLike };
     case "retweet":
-      return retweet;
+      return { item: retweet, colored: null };
     case "comment":
-      return comment;
-    case "save":
-      return save;
-  }
-};
-
-const imgColorSource = (name: string) => {
-  switch (name) {
-    case "like":
-      return colorLike;
-    case "dislike":
-      return colorDislike;
-    case "retweet":
-      return null;
-    case "comment":
-      return null;
-    case "save":
-      return colorSave;
+      return { item: comment, colored: null };
   }
 };
 
 export default ReactionIcon;
+
+const styles = StyleSheet.create({
+  default: {
+    color: theme.color.grayscale.C_79737e,
+  },
+  clicked: {
+    color: theme.color.grayscale.C_79737e,
+    fontWeight: 'bold'
+  },
+});

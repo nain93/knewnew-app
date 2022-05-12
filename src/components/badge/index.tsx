@@ -21,6 +21,7 @@ const Badge = ({ text, type, badge, isClick, idx, userBadge, setUserBadge, viewS
   switch (type) {
     case 'picker':
       return (
+
         <TouchableOpacity
           onPress={() => {
             if (badge) {
@@ -95,12 +96,13 @@ const styles = StyleSheet.create({
     color: theme.color.grayscale.d3d0d5
   },
   badge: {
-    borderWidth: 1, borderColor: theme.color.main,
-    borderRadius: 9,
-    paddingVertical: d2p(1), paddingHorizontal: d2p(4),
+    borderWidth: 1, borderColor: theme.color.grayscale.d2d0d5,
+    borderRadius: 10,
+    backgroundColor: theme.color.grayscale.f7f7fc,
+    paddingVertical: h2p(3), paddingHorizontal: d2p(10),
     marginRight: 'auto'
   },
   badgeText: {
-    fontSize: 10, color: theme.color.main
+    fontSize: 10, color: theme.color.grayscale.C_443e49
   }
 });
