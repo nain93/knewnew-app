@@ -1,55 +1,62 @@
-import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
-import React, { useState } from 'react';
+import { View, Text, Pressable, StyleSheet, Dimensions, Image } from 'react-native';
+import React, { Fragment, useState } from 'react';
 import theme from '~/styles/theme';
 import { d2p, h2p } from '~/utils';
 import Badge from '../badge';
 import MoreIcon from '~/components/icon/moreIcon';
 import ReviewIcon from '../icon/reviewIcon';
 import ReactionIcon from '../icon/reactionIcon';
+import { retweetfrom, tag } from '~/assets/icons';
 
 interface FeedReviewProps {
-  review: any
+  review: any,
+  isRetweet: boolean
 }
 
-const FeedReview = ({ review }: FeedReviewProps) => {
+const FeedReview = ({ review, isRetweet }: FeedReviewProps) => {
   const [like, setLike] = useState<boolean>(false);
-  const [dislike, setDisLike] = useState<boolean>(false);
+  const [cart, setCart] = useState<boolean>(false);
   const [save, setSave] = useState<boolean>(false);
 
   return (
     <View style={styles.review}>
-      <View style={{ flexDirection: 'row' }}>
-        <Badge type="feed" text={review.item.badge} />
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <View style={{ backgroundColor: 'black', width: 40, height: 40, borderRadius: 20, marginRight: 5, position: 'absolute', left: -50 }} />
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={styles.title}>{review.item.writer}</Text>
+          <Badge type="feed" text={review.item.badge} />
+          <Text style={{ fontSize: 12, marginLeft: 5, color: theme.color.grayscale.a09ca4 }}>{review.item.household}</Text>
+        </View>
         <MoreIcon onPress={() => console.log('공유/신고')} />
       </View>
       <Pressable onPress={() => console.log('피드 상세')}>
-        {review.item.title !== '' ?
-          <><View style={styles.titleContainer}>
-            <View style={{ backgroundColor: 'black', width: 24, height: 24, borderRadius: 12, marginRight: 5 }} />
-            <Text style={styles.title}>{review.item.title}</Text>
-            <ReviewIcon review={review.item.review} />
-          </View>
-            <Text style={{ paddingLeft: d2p(29) }}>{review.item.content}</Text>
-            {review.item.photo ? <View style={{ backgroundColor: 'black', width: 60, height: 60, borderRadius: 10, marginTop: 10, marginLeft: d2p(29) }} /> : null}
-          </> :
-          <View style={{ marginTop: h2p(15) }}>
-            <View style={{ backgroundColor: 'black', width: 24, height: 24, borderRadius: 12, marginRight: 5, position: 'absolute' }} />
-            <Text style={{ paddingLeft: d2p(29) }}>{review.item.content}</Text>
-          </View>
-        }
+        <View style={styles.titleContainer}>
+          <ReviewIcon review={review.item.review} />
+          <Text style={{ fontSize: 10, color: theme.color.grayscale.a09ca4 }}>5분 전</Text>
+        </View>
+        <Text style={{ color: theme.color.black }}>{review.item.content}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+          <Image source={tag} style={{ width: 10, height: 10, marginRight: 5 }} />
+          <Text style={{ fontSize: 12, color: theme.color.grayscale.C_79737e }}>#간편식 #한끼식사 <Text style={{ color: theme.color.main }}>#비건</Text></Text>
+        </View>
       </Pressable>
       <View style={styles.sign}>
-        <Text style={styles.date}>{review.item.date}</Text>
-        <Text style={{ color: theme.color.grayscale.C_79737e }}>{review.item.writer}</Text>
+        <Text style={styles.store}>{review.item.store}</Text>
       </View>
-      <View style={styles.dottedLine} />
+      {review.item.photo && <View style={{ backgroundColor: 'black', width: d2p(270), height: h2p(180), borderRadius: 18, marginRight: 5 }} />}
       <View style={styles.reactionContainer}>
-        <ReactionIcon name="like" state={like} setState={(isState: boolean) => setLike(isState)} />
-        <ReactionIcon name="dislike" state={dislike} setState={(isState: boolean) => setDisLike(isState)} />
-        <ReactionIcon name="retweet" />
+        <ReactionIcon name="cart" state={cart} setState={(isState: boolean) => setCart(isState)} />
         <ReactionIcon name="comment" />
-        <ReactionIcon name="save" state={save} setState={(isState: boolean) => setSave(isState)} />
+        <ReactionIcon name="like" state={like} setState={(isState: boolean) => setLike(isState)} />
+        <ReactionIcon name="retweet" />
       </View>
+      {isRetweet &&
+        <Fragment>
+          <View style={{ flexDirection: 'row' }}>
+            <Image source={retweetfrom} style={{ width: 15, height: 40, position: 'relative', left: -50 }} />
+            <View style={{ backgroundColor: 'black', width: 40, height: 40, borderRadius: 20, marginRight: 5, position: 'relative', left: -40 }} />
+          </View>
+        </Fragment>}
     </View>
   );
 };
@@ -62,10 +69,11 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width - d2p(20),
     marginHorizontal: d2p(10), marginTop: h2p(20),
     borderRadius: 10,
-    paddingHorizontal: d2p(15), paddingTop: d2p(15)
+    paddingRight: d2p(10), paddingLeft: d2p(60), paddingTop: d2p(15)
   },
   titleContainer: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: "center",
     marginVertical: h2p(12),
   },
@@ -76,12 +84,12 @@ const styles = StyleSheet.create({
   sign: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginTop: h2p(20), marginBottom: h2p(14.5),
+    marginTop: h2p(10), marginBottom: h2p(14.5),
     bordeWidth: 1,
     borderStyle: 'dotted',
     borderColor: theme.color.grayscale.e9e7ec
   },
-  date: {
+  store: {
     fontSize: 12,
     color: theme.color.grayscale.a09ca4,
     marginRight: d2p(10)

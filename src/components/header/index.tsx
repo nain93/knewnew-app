@@ -7,13 +7,14 @@ import theme from '~/styles/theme';
 interface HeaderProps {
   title?: string;
   isBorder?: boolean;
+  bgColor?: string;
   headerLeft?: JSX.Element;
   headerRight?: JSX.Element;
 }
 
-const Header = ({ headerLeft, headerRight, title, isBorder = true }: HeaderProps) => {
+const Header = ({ headerLeft, headerRight, title, isBorder = true, bgColor }: HeaderProps) => {
   return (
-    <View style={[styles.container, { borderBottomWidth: isBorder ? 1 : 0 }]}>
+    <View style={[styles.container, { borderBottomWidth: isBorder ? 1 : 0 }, { backgroundColor: bgColor }]}>
       <View style={{ position: "absolute", left: d2p(20) }}>
         {headerLeft}
       </View>

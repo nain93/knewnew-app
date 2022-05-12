@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from "react-native";
 import theme from "~/styles/theme";
-import { d2p } from "~/utils";
+import { d2p, h2p } from "~/utils";
 
 interface BadgeProp {
   text: string,
@@ -12,13 +12,17 @@ interface BadgeProp {
 const Badge = ({ text, type, viewStyle }: BadgeProp) => {
   switch (type) {
     case 'picker':
-      return <TouchableOpacity style={[styles.select, viewStyle]}>
-        <Text>{text}</Text>
-      </TouchableOpacity>;
+      return (
+        <TouchableOpacity style={[styles.select, viewStyle]}>
+          <Text>{text}</Text>
+        </TouchableOpacity>
+      );
     case 'feed':
-      return <View style={styles.badge}>
-        <Text style={styles.badgeText}>{text}</Text>
-      </View>;
+      return (
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>{text}</Text>
+        </View>
+      );
     case 'mypage':
       return <View />;
     default:
@@ -36,12 +40,13 @@ const styles = StyleSheet.create({
     paddingVertical: d2p(5), paddingHorizontal: d2p(15),
   },
   badge: {
-    borderWidth: 1, borderColor: theme.color.main,
-    borderRadius: 9,
-    paddingVertical: d2p(1), paddingHorizontal: d2p(4),
+    borderWidth: 1, borderColor: theme.color.grayscale.d2d0d5,
+    borderRadius: 10,
+    backgroundColor: theme.color.grayscale.f7f7fc,
+    paddingVertical: h2p(3), paddingHorizontal: d2p(10),
     marginRight: 'auto'
   },
   badgeText: {
-    fontSize: 10, color: theme.color.main
+    fontSize: 10, color: theme.color.grayscale.C_443e49
   }
 });
