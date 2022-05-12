@@ -5,3 +5,16 @@ export const tokenState = atom<string>({
   key: "tokenState",
   default: "",
 });
+
+interface popupStateProps {
+  isOpen: boolean;
+  content: string;
+}
+
+export const popupState = atom<popupStateProps>({
+  key: "popupState",
+  default: {
+    isOpen: false,
+    content: "",
+  }
+});

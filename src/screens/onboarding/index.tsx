@@ -39,7 +39,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
     providerKey: number,
     providerType: "kakao" | "naver" | "google" | "apple"
   }) => {
-    navigation.navigate("BadgeSelect", userData);
+    navigation.navigate("TagSelect", userData);
   };
 
   const handleKakaoLogin = async () => {

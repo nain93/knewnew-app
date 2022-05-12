@@ -14,8 +14,12 @@ import tag from './tag.png';
 import cart from './cart.png';
 import colorCart from './colorCart.png';
 import retweetfrom from './retweetfrom.png';
+import initialize from './initialize.png';
+import colorCheck from './colorCheck.png';
 
 export {
   close, leftArrow, more, heart, triangle, like, retweet, comment,
-  searchIcon, colorSearchIcon, colorLike, tagfilter, tag, cart, colorCart, retweetfrom
+  searchIcon, colorSearchIcon, colorLike, tagfilter, tag, cart, colorCart, retweetfrom,
+  colorCheck,initialize
 };
+

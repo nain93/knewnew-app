@@ -1,93 +1,120 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { d2p } from '~/utils';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import BasicButton from '~/components/button/basicButton';
 import Badge from '~/components/badge';
 import { NavigationStackProp } from "react-navigation-stack";
 import { NavigationRoute } from "react-navigation";
-import { UserInfoType } from '~/types';
+import { BadgeType, UserInfoType } from '~/types';
 import { userSignup } from '~/api/user';
+import { colorCheck } from '~/assets/icons';
+import { useSetRecoilState } from 'recoil';
+import { popupState } from '~/recoil/atoms';
 
 interface BadgeSelectProps {
   navigation: NavigationStackProp
-  route: NavigationRoute<UserInfoType>;
+  route: NavigationRoute<BadgeType>;
 }
 
 const BadgeSelect = ({ route, navigation }: BadgeSelectProps) => {
 
-  const [userInfo, setUserInfo] = useState<UserInfoType>();
-
+  const [userBadge, setUserBadge] = useState<BadgeType>({
+    interest: [],
+    household: [],
+    taste: []
+  });
   const [errorMsg, setErrorMsg] = useState("");
-  const handleLogin = async () => {
+  const setIspopupOpen = useSetRecoilState(popupState);
+
+  const handleNext = async () => {
     // todo 토큰 리코일, asynstoarge에 저장
-    // todo 유효성검사
-    // const data = await userSignup({ token: "", ...userInfo });
-    // if(data){
-    //   navigation.navigate("Welcome");
-    // }
-    navigation.navigate("Welcome");
+    if (userBadge.interest.every(v => !v.masterBadge)) {
+      setIspopupOpen({ isOpen: true, content: "대표 뱃지를 선택해주세요" });
+      return;
+    }
+    navigation.navigate("Welcome", userBadge.interest.filter(v => v.isClick));
   };
 
   useEffect(() => {
-    setUserInfo(route.params);
+    if (route.params) {
+      setUserBadge(route.params);
+    }
   }, [route.params]);
 
-  console.log(userInfo, 'userInfo');
 
   return (
     <View style={styles.container}>
       <View style={{ marginBottom: d2p(60) }}>
         {/* eslint-disable-next-line react-native/no-raw-text */}
-        <Text style={styles.title}>픽커님을 나타낼 뱃지를{"\n"}
-          {/* eslint-disable-next-line react-native/no-raw-text */}
-          <Text style={{ color: theme.color.main }}>2가지 이상</Text> 선택해주세요.</Text>
-        <Text style={styles.subTitle}>최소 2개 최대 10개까지 고를 수 있고,{"\n"}
-          마이페이지에서 언제든지 수정할 수 있어요.</Text>
+        <Text style={styles.title}>나를 <Text style={{ color: theme.color.main }}>대표하는 뱃지</Text>를{"\n"}
+          골라주세요.</Text>
+        {/* eslint-disable-next-line react-native/no-raw-text */}
+        <Text style={styles.subTitle}>선택하신 관심사 중에서{"\n"}<Text style={{ fontWeight: 'bold' }}>나를 대표하는 뱃지 1개</Text>를 선택해주세요.</Text>
+        <Text style={{ color: theme.color.main, marginTop: h2p(20), fontSize: 12 }}>대표 뱃지는 저장 후 7일동안 다시 변경할 수 없습니다.</Text>
       </View>
-      <ScrollView>
-        <Text style={{ ...styles.menu, marginTop: 0 }}>소비스타일</Text>
-        <ScrollView horizontal>
-          <Badge type="picker" viewStyle={{ marginLeft: d2p(20) }} text="가성비좋아😍" />
-          <Badge type="picker" text="비싸도FLEX💸" />
-        </ScrollView>
-        <Text style={styles.menu}>관심사</Text>
-        <ScrollView horizontal>
-          <Badge type="picker" viewStyle={{ marginLeft: d2p(20) }} text="빵식가🥐" />
-          <Badge type="picker" text="애주가🍻" />
-          <Badge type="picker" text="디저트러버🍰" />
-        </ScrollView>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <Badge type="picker" viewStyle={{ marginLeft: d2p(20) }} text="속편한식사🍚" />
-          <Badge type="picker" text="다이어터🥗" />
-          <Badge type="picker" text="캠핑족🏕" />
-          <Badge type="picker" viewStyle={{ marginRight: d2p(15) }} text="비건" />
-        </ScrollView>
-        <Text style={styles.menu}>가족구성</Text>
-        <ScrollView horizontal>
-          <Badge type="picker" viewStyle={{ marginLeft: d2p(20) }} text="자취생🙂" />
-          <Badge type="picker" text="애기가족👶" />
-          <Badge type="picker" text="가족한끼👪" />
-        </ScrollView>
+      <View style={{ flex: 1 }}>
+        <View style={{ flexDirection: 'row' }}><Text style={{ ...styles.menu, marginTop: 0 }}>관심사 </Text><Text style={{ color: theme.color.main }}>*</Text></View>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+          {React.Children.toArray(userBadge.interest.map((item, idx) => {
+            if (item.masterBadge) {
+              return (
+                <View
+                  style={[styles.tag, { borderColor: theme.color.main }]}>
+                  <Image source={colorCheck} resizeMode="contain" style={{ width: 10, height: 8, marginRight: 5 }} />
+                  <Text style={{ color: theme.color.main, fontWeight: "500" }}>{item.title}</Text>
+                </View>
+              );
+            }
+            if (item.isClick) {
+              return (
+                <TouchableOpacity
+                  style={styles.tag}
+                  onPress={() => {
+                    setUserBadge({
+                      ...userBadge, interest: userBadge.interest.map((v, i) => {
+                        if (i === idx) {
+                          return { ...v, masterBadge: true };
+                        }
+                        else {
+                          return { ...v, masterBadge: false };
+                        }
+                      })
+                    });
+                  }}>
+                  <Text style={{ color: theme.color.black, fontWeight: "500" }}>{item.title}</Text>
+                </TouchableOpacity>
+              );
+            }
+
+            else {
+              return (
+                <Badge type="unabled" badge="interest" text={item.title} idx={idx} isClick={userBadge.interest[idx].isClick}
+                  userBadge={userBadge} setUserBadge={(interestProp) => setUserBadge({ ...userBadge, interest: interestProp })} />
+              );
+            }
+          }
+          ))}
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', ...styles.menu }}><Text>가족구성 </Text><Text style={{ color: theme.color.main }}>*</Text>
+          <Text style={{ marginLeft: 15, color: theme.color.grayscale.a09ca4, fontSize: 12 }}>1가지만 선택해주세요</Text></View>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+          {React.Children.toArray(userBadge.household.map((item, idx) => (
+            <Badge type="unabled" badge="household" text={item.title} idx={idx} isClick={userBadge.household[idx].isClick}
+              userBadge={userBadge} setUserBadge={(householdProp) => setUserBadge({ ...userBadge, household: householdProp })} />
+          )))}
+        </View>
         <Text style={styles.menu}>입맛</Text>
-        <ScrollView horizontal>
-          <Badge type="picker" viewStyle={{ marginLeft: d2p(20) }} text="맵찔이😣" />
-          <Badge type="picker" text="맵고수🌶" />
-          <Badge type="picker" text="느끼만렙😏" />
-        </ScrollView>
-        <Text style={styles.menu}>선호하는 재료</Text>
-        <ScrollView horizontal>
-          <Badge type="picker" viewStyle={{ marginLeft: d2p(20) }} text="고기파🍖" />
-          <Badge type="picker" text="채소파🥦" />
-          <Badge type="picker" text="해산물파🦐" />
-        </ScrollView>
-        <Text style={styles.menu}>조리방법</Text>
-        <ScrollView horizontal>
-          <Badge type="picker" viewStyle={{ marginLeft: d2p(20) }} text="간단조리파⏱" />
-          <Badge type="picker" text="직접요리파👨‍🍳" />
-        </ScrollView>
-        <BasicButton onPress={handleLogin} text="선택완료" color={theme.color.main} viewStyle={{ marginTop: d2p(40), marginBottom: d2p(40) }} />
-      </ScrollView>
+        <View style={{ flexDirection: 'row', marginBottom: 'auto' }}>
+          {React.Children.toArray(userBadge.taste.map((item, idx) => (
+            <Badge type="unabled" badge="taste" text={item.title} idx={idx} isClick={userBadge.taste[idx].isClick}
+              userBadge={userBadge} setUserBadge={(tasteProp) => setUserBadge({ ...userBadge, taste: tasteProp })}
+            />
+          )))}
+        </View>
+        <BasicButton onPress={handleNext} text="선택완료" bgColor={theme.color.main} textColor={theme.color.white}
+          viewStyle={{ marginTop: h2p(41), marginBottom: h2p(40) }} />
+      </View>
     </View>
   );
 };
@@ -95,25 +122,32 @@ const BadgeSelect = ({ route, navigation }: BadgeSelectProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: d2p(42.5)
-  },
-  title: {
-    color: theme.color.black,
-    fontSize: 26,
-    fontWeight: '600',
+    marginTop: d2p(42.5),
     paddingHorizontal: d2p(20)
   },
-  subTitle: {
-    fontSize: 14,
-    color: theme.color.grayscale.C_79737e,
-    marginTop: d2p(20),
-    paddingHorizontal: d2p(20)
+  tag: {
+    flexDirection: 'row', alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 16,
+    borderColor: theme.color.grayscale.eae7ec,
+    marginTop: d2p(10), marginRight: d2p(5),
+    paddingVertical: d2p(5), paddingHorizontal: d2p(15),
   },
   menu: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: d2p(39),
-    marginLeft: d2p(20)
+    marginTop: h2p(40),
+    marginBottom: h2p(5)
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: '600',
+
+  },
+
+  subTitle: {
+    fontSize: 14,
+    color: theme.color.black,
+    marginTop: d2p(20),
+
   },
   select: {
     borderWidth: 1, borderColor: theme.color.grayscale.eae7ec,

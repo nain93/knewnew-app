@@ -5,17 +5,18 @@ import { d2p } from "~/utils";
 
 interface BasicButtonProp {
   text: string;
-  color: string;
+  bgColor: string;
+  textColor: string;
   viewStyle?: ViewStyle;
   onPress: () => void;
 }
 
-const BasicButton = ({ text, color, viewStyle, onPress }: BasicButtonProp) => {
+const BasicButton = ({ text, bgColor, textColor, viewStyle, onPress }: BasicButtonProp) => {
   return (
     <TouchableOpacity onPress={onPress}>
-      <View style={[styles.container, viewStyle, { backgroundColor: color }]}>
+      <View style={[styles.container, viewStyle, { backgroundColor: bgColor }, { borderColor: textColor }]}>
         <View style={styles.textContainer}>
-          <Text style={styles.text}>{text}</Text>
+          <Text style={[styles.text, { color: textColor }]}>{text}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -27,9 +28,9 @@ export default BasicButton;
 const styles = StyleSheet.create({
   container: {
     width: Dimensions.get('window').width - d2p(40),
-    marginHorizontal: d2p(20),
     borderRadius: 5,
-    height: d2p(45)
+    height: d2p(45),
+    borderWidth: 1,
   },
   textContainer: {
     flex: 1,

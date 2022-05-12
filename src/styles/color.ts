@@ -11,7 +11,9 @@ const grayscale = {
   a09ca4: '#a09ca4',
   f7f7fc: '#f7f7fc',
   e9e7ec: '#e9e7ec',
-  d2d0d5: '#d2d0d5'
+  d2d0d5: '#d2d0d5',
+  d3d0d5: '#d3d0d5'
+
 };
 
 const color = {
