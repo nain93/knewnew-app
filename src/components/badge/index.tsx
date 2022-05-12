@@ -2,46 +2,42 @@ import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from "react-native";
 import { colorCheck } from "~/assets/icons";
 import theme from "~/styles/theme";
+import { BadgeType } from "~/types";
 import { d2p } from "~/utils";
 
-
-interface badgeType {
-  interest: Array<{
-    title: string;
-    isClick: boolean;
-  }>,
-  household: Array<string>,
-  taste: Array<{
-    title: string;
-    isClick: boolean;
-  }>
-}
 interface BadgeProp {
   text: string,
   type: "picker" | "feed" | "mypage" | "unabled",
+  badge?: "interest" | "household" | "taste",
   isClick: boolean,
   idx: number,
-  userBadge: badgeType,
-  setUserBadge: (interestArr: { title: string, isClick: boolean }) => void;
+  userBadge: BadgeType,
+  setUserBadge: (badgeArr: Array<{ title: string, isClick: boolean }>) => void;
   viewStyle?: ViewStyle
 }
 
-const Badge = ({ text, type, isClick, idx, userBadge, setUserBadge, viewStyle }: BadgeProp) => {
-  console.log(userBadge, "badge");
+const Badge = ({ text, type, badge, isClick, idx, userBadge, setUserBadge, viewStyle }: BadgeProp) => {
 
   switch (type) {
     case 'picker':
-      console.log(idx);
       return (
         <TouchableOpacity
           onPress={() => {
-            userBadge.interest.map((v, i) => {
-              if (i === idx) {
-
-                setUserBadge({ isClick: !userBadge.interest[i].isClick, title: text });
-              }
-
-            })
+            if (badge) {
+              setUserBadge(
+                userBadge[badge].map((v, i) => {
+                  if (i === idx) {
+                    return { isClick: !v.isClick, title: v.title };
+                  }
+                  if (badge === "household") {
+                    return { isClick: false, title: v.title };
+                  }
+                  else {
+                    return v;
+                  }
+                })
+              );
+            }
           }} style={[styles.tag, !isClick ? styles.basic : styles.checked, viewStyle]}>
           {isClick && <Image source={colorCheck} resizeMode="contain" style={{ width: 10, height: 8, marginRight: 5 }} />}
           <Text style={[styles.text, !isClick ? styles.blackText : styles.colorText]}>{text}</Text>

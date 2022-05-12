@@ -3,8 +3,8 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { TransitionPresets, createStackNavigator } from '@react-navigation/stack';
 import Onboarding from '~/screens/onboarding';
+import TagSelect from '~/screens/onboarding/tagSelect';
 import BadgeSelect from '~/screens/onboarding/badgeSelect';
-import BadgeSelect2 from '~/screens/onboarding/badgeSelect2';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import Welcome from '~/screens/onboarding/welcome';
 import CloseIcon from '~/components/icon/closeIcon';
@@ -35,6 +35,15 @@ const GlobalNav = () => {
           component={Onboarding}
         />
         <Stack.Screen
+          name="TagSelect"
+          options={{
+            title: "",
+            headerLeft: () => <LeftArrowIcon />,
+            headerLeftContainerStyle: { paddingLeft: d2p(20) },
+            headerShadowVisible: false,
+          }}
+          component={TagSelect} />
+        <Stack.Screen
           name="BadgeSelect"
           options={{
             title: "",
@@ -43,15 +52,6 @@ const GlobalNav = () => {
             headerShadowVisible: false,
           }}
           component={BadgeSelect} />
-        <Stack.Screen
-          name="BadgeSelect2"
-          options={{
-            title: "",
-            headerLeft: () => <LeftArrowIcon />,
-            headerLeftContainerStyle: { paddingLeft: d2p(20) },
-            headerShadowVisible: false,
-          }}
-          component={BadgeSelect2} />
         <Stack.Screen
           name="Welcome"
           options={{

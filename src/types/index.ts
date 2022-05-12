@@ -2,7 +2,7 @@ import { NavigationStackProp } from "react-navigation-stack";
 import { NavigationRoute } from "react-navigation";
 
 export interface NavigationType {
-  navigation: NavigationStackProp
+  navigation: NavigationStackProp;
   route?: NavigationRoute;
 }
 
@@ -23,4 +23,22 @@ export interface UserInfoType {
     preferIngredient: string,
     cookingRecipe: string
   }
+}
+
+export interface InterestType {
+  title: string;
+  isClick: boolean;
+  masterBadge?: boolean
+}
+
+export interface BadgeType {
+  interest: Array<InterestType>,
+  household: Array<{
+    title: string,
+    isClick: boolean
+  }>,
+  taste: Array<{
+    title: string;
+    isClick: boolean;
+  }>
 }
