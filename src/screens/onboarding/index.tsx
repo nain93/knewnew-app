@@ -71,6 +71,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
 
   const handleGoogleLogin = async () => {
     // * 추후 개발
+    navigation.navigate("TagSelect");
     // GoogleSignin.configure({
     //   webClientId: "1025814485939-95vtu3p4iqb7qp23henp85c1nd2d2i3c.apps.googleusercontent.com",
     //   iosClientId: "1025814485939-hebcl4c1tmq4bqt9q0ifng6mq7amltnf.apps.googleusercontent.com"

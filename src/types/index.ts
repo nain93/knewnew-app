@@ -16,12 +16,9 @@ export interface UserInfoType {
   profileImage?: string,
   occupation?: string,
   userBadge: {
-    consumptionStyle: string,
-    interest: string,
-    household: string,
-    taste: string,
-    preferIngredient: string,
-    cookingRecipe: string
+    interest: Array<string>,
+    household: Array<string>,
+    taste: Array<string>
   }
 }
 

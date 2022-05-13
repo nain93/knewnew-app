@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import BasicButton from '~/components/button/basicButton';
-import Badge from '~/components/badge';
 import { NavigationStackProp } from "react-navigation-stack";
 import { NavigationRoute } from "react-navigation";
 import { BadgeType, UserInfoType } from '~/types';
-import { userSignup } from '~/api/user';
-import { initialize } from '~/assets/icons';
 import SelectLayout from '~/components/selectLayout';
 import { popupState } from '~/recoil/atoms';
 import { useSetRecoilState } from 'recoil';
@@ -21,7 +18,6 @@ interface BadgeSelectProps {
 const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
 
   const [userInfo, setUserInfo] = useState<UserInfoType>();
-  const [errorMsg, setErrorMsg] = useState("");
 
   const [userBadge, setUserBadge] = useState<BadgeType>({
     interest: [],
@@ -43,7 +39,7 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
       setIspopupOpen({ isOpen: true, content: "관심사(or가족구성)을 선택해주세요" });
       return;
     }
-    navigation.navigate("BadgeSelect", userBadge);
+    navigation.navigate("BadgeSelect", { userBadge, userInfo });
   };
 
   useEffect(() => {

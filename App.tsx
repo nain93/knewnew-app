@@ -48,10 +48,9 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <GlobalNav />
-      {/* <Toast config={toastConfig} ref={(ref) => Toast.setRef(ref)} /> */}
       {isPopupOpen.isOpen &&
         <Animated.View style={{ opacity: fadeAnim ? fadeAnim : 1, zIndex: fadeAnim ? fadeAnim : -1 }}>
-          <AlertPopup text={isPopupOpen.content} />
+          <AlertPopup text={isPopupOpen.content} popupStyle={isPopupOpen.popupStyle} />
         </Animated.View>}
     </SafeAreaProvider>
   );

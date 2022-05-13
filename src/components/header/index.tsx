@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, StatusBar, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import React from 'react';
 import { d2p, h2p } from '~/utils';
 import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
@@ -10,11 +10,12 @@ interface HeaderProps {
   bgColor?: string;
   headerLeft?: JSX.Element;
   headerRight?: JSX.Element;
+  viewStyle?: ViewStyle;
 }
 
-const Header = ({ headerLeft, headerRight, title, isBorder = true, bgColor }: HeaderProps) => {
+const Header = ({ headerLeft, headerRight, title, isBorder = true, bgColor, viewStyle }: HeaderProps) => {
   return (
-    <View style={[styles.container, { borderBottomWidth: isBorder ? 1 : 0 }, { backgroundColor: bgColor }]}>
+    <View style={[styles.container, viewStyle, { borderBottomWidth: isBorder ? 1 : 0 }, { backgroundColor: bgColor }]}>
       <View style={{ position: "absolute", left: d2p(20) }}>
         {headerLeft}
       </View>

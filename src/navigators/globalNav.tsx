@@ -27,6 +27,13 @@ const GlobalNav = () => {
           { cardStyle: { backgroundColor: "white" } }
         )}>
         <Stack.Screen
+          name="TabNav"
+          component={TabNavigator}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
           name="OnBoarding"
           options={{
             title: "",
@@ -61,13 +68,7 @@ const GlobalNav = () => {
             headerShadowVisible: false,
           }}
           component={Welcome} />
-        <Stack.Screen
-          name="TabNav"
-          component={TabNavigator}
-          options={{
-            headerShown: false
-          }}
-        />
+
         <Stack.Screen
           name="editProfile"
           component={EditProfile}
