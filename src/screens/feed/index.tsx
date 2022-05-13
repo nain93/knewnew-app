@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, Image, FlatList } from 'react-native';
-import React, { Fragment, useEffect, useState } from 'react';
+import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity } from 'react-native';
+import React, { useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import Header from '~/components/header';
@@ -7,30 +7,73 @@ import mainLogo from '~/assets/logo';
 import FeedReview from '~/components/review/feedReview';
 import { tagfilter } from '~/assets/icons';
 
+import RBSheet from "react-native-raw-bottom-sheet";
+import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
+import SelectLayout from '~/components/selectLayout';
+import { BadgeType } from '~/types';
+import AlertPopup from '~/components/popup/alertPopup';
+
+function StatusBarPlaceHolder() {
+  return (
+    <View style={{
+      width: "100%",
+      height: getStatusBarHeight(),
+      backgroundColor: theme.color.grayscale.f7f7fc
+    }} />
+  );
+}
+
 const Feed = () => {
+  const [isPopupOpen, setIspopupOpen] = useState(false);
   const [scrollOffset, setScrollOffset] = useState(0);
+  const tagRefRBSheet = useRef<RBSheet>(null);
+  const [userBadge, setUserBadge] = useState<BadgeType>({
+    interest: [],
+    household: [],
+    taste: []
+  });
 
   return (
     <>
+      {Platform.OS === "ios" &&
+        <StatusBarPlaceHolder />}
       <Header
+        viewStyle={isIphoneX() ? { marginTop: 0 } : {}}
+        headerRight={
+          scrollOffset >= h2p(130) ?
+            <TouchableOpacity
+              onPress={() => tagRefRBSheet.current?.open()}
+              style={[styles.filter, { marginRight: 0, marginBottom: 0 }]}>
+              <Image source={tagfilter} style={{ width: 11, height: 10, marginRight: d2p(10) }} />
+              <Text>태그 변경</Text>
+            </TouchableOpacity> : <View />}
         headerLeft={<Image source={mainLogo} resizeMode="contain" style={{ width: d2p(96), height: h2p(20) }} />}
         isBorder={false} bgColor={theme.color.grayscale.f7f7fc}
       />
       <View style={{ flex: 1, backgroundColor: theme.color.grayscale.f7f7fc }}>
-        {scrollOffset <= 0 &&
-          <Fragment>
-            {/* eslint-disable-next-line react-native/no-raw-text */}
-            <View style={styles.main}><Text style={{ fontSize: 20, fontWeight: 'bold' }}>뉴뉴는 지금{"\n"}
-              {/* eslint-disable-next-line react-native/no-raw-text */}
-              <Text style={{ color: theme.color.main }}>#비건</Text> 관련 메뉴 추천 중 👀</Text>
-            </View>
-            <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-              <View style={styles.filter}><Image source={tagfilter} style={{ width: 11, height: 10, marginRight: 10 }} /><Text>태그 변경</Text></View></View>
-          </Fragment>}
         <FlatList
           data={data}
+          ListHeaderComponent={() =>
+            <>
+              {/* eslint-disable-next-line react-native/no-raw-text */}
+              <View style={styles.main}><Text style={{ fontSize: 20, fontWeight: 'bold' }}>뉴뉴는 지금{"\n"}
+                {/* eslint-disable-next-line react-native/no-raw-text */}
+                <Text style={{ color: theme.color.main }}>#비건</Text> 관련 메뉴 추천 중 👀</Text>
+              </View>
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                <TouchableOpacity
+                  onPress={() => tagRefRBSheet.current?.open()}
+                  style={styles.filter}>
+                  <Image source={tagfilter} style={{ width: 11, height: 10, marginRight: 10 }} />
+                  <Text>태그 변경</Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          }
           showsVerticalScrollIndicator={false}
-          renderItem={(review) => <FeedReview review={review} />}
+          renderItem={(review) =>
+            <FeedReview review={review} isRetweet={true} />
+          }
           style={{ marginTop: 0, paddingBottom: h2p(31) }}
           keyExtractor={(review) => String(review.id)}
           onScroll={(event) => {
@@ -40,6 +83,66 @@ const Feed = () => {
           }}
         />
       </View>
+      <RBSheet
+        ref={tagRefRBSheet}
+        closeOnDragDown
+        dragFromTopOnly
+        animationType="fade"
+        height={Dimensions.get("window").height - d2p(300)}
+        openDuration={250}
+        customStyles={{
+          wrapper: {
+            transform: [{ rotate: '180deg' }],
+          },
+          container: {
+            transform: [{ rotate: '180deg' }],
+            borderBottomLeftRadius: 30,
+            borderBottomRightRadius: 30,
+            paddingHorizontal: d2p(20),
+            paddingVertical: h2p(20),
+            paddingTop: isIphoneX() ? getStatusBarHeight() + d2p(20) : d2p(20),
+          }, draggableIcon: {
+            display: "none"
+          }
+        }}
+      >
+        <>
+          <View style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center", marginBottom: h2p(40)
+          }}>
+            <Text style={{ color: theme.color.grayscale.C_79737e, fontWeight: "500" }}>
+              보고싶은 태그를 선택해주세요
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                // TODO 태그적용(필터) api
+                if (userBadge.household.every(v => !v.isClick) ||
+                  userBadge.interest.every(v => !v.isClick)) {
+                  setIspopupOpen(true);
+                  setTimeout(() => {
+                    setIspopupOpen(false);
+                  }, 1500);
+                  return;
+                }
+                tagRefRBSheet.current?.close();
+              }}
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: 5,
+                width: d2p(100), height: h2p(30), backgroundColor: theme.color.main
+              }}>
+              <Text style={{ color: theme.color.white, fontSize: 12, fontWeight: '500' }}>태그 적용</Text>
+            </TouchableOpacity>
+          </View>
+          <SelectLayout userBadge={userBadge} setUserBadge={setUserBadge} />
+          {isPopupOpen &&
+            <AlertPopup text={"관심사(or가족구성)을 선택해주세요"} popupStyle={{ bottom: h2p(20), }} />
+          }
+        </>
+      </RBSheet>
     </>
   );
 };

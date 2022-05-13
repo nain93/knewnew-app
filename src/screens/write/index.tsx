@@ -4,7 +4,7 @@ import Header from '~/components/header';
 import theme from '~/styles/theme';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import { BadgeType, NavigationType } from '~/types';
-import { cart, close, grayclose, grayheart, graytriangle, tag } from '~/assets/icons';
+import { cart, grayclose, grayheart, graytriangle, tag } from '~/assets/icons';
 import { photo, photoClose } from '~/assets/images';
 import { d2p, h2p } from '~/utils';
 
@@ -102,7 +102,7 @@ const Write = ({ navigation }: NavigationType) => {
               <Text style={{ fontSize: 12, color: theme.color.placeholder, marginVertical: h2p(8) }}>{imageList.length}/5</Text>
             </View>
           </Pressable>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageWrap}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {React.Children.toArray(imageList.map((image, idx) => {
               return (
                 <View style={[styles.images, { marginRight: (idx === imageList.length - 1) ? d2p(20) : d2p(5) }]}>
@@ -122,6 +122,7 @@ const Write = ({ navigation }: NavigationType) => {
 
       {/* 태그 선택 바텀시트 */}
       <RBSheet
+        animationType="fade"
         ref={tagRefRBSheet}
         closeOnDragDown
         dragFromTopOnly
@@ -155,6 +156,7 @@ const Write = ({ navigation }: NavigationType) => {
 
       {/* 유통사 선택 바텀시트 */}
       <RBSheet
+        animationType="fade"
         ref={marketRefRBSheet}
         closeOnDragDown
         dragFromTopOnly
@@ -233,9 +235,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     borderColor: theme.color.grayscale.e9e7ec
-  },
-  imageWrap: {
-    paddingVertical: h2p(19.5),
   },
   images: {
     width: d2p(96),

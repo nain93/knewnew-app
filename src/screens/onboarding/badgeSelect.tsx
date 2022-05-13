@@ -14,31 +14,45 @@ import { popupState } from '~/recoil/atoms';
 
 interface BadgeSelectProps {
   navigation: NavigationStackProp
-  route: NavigationRoute<BadgeType>;
+  route: NavigationRoute<{
+    userInfo: UserInfoType
+    userBadge: BadgeType
+  }>;
 }
 
 const BadgeSelect = ({ route, navigation }: BadgeSelectProps) => {
-
+  const [signupData, setSignupData] = useState<UserInfoType>();
   const [userBadge, setUserBadge] = useState<BadgeType>({
     interest: [],
     household: [],
     taste: []
   });
-  const [errorMsg, setErrorMsg] = useState("");
   const setIspopupOpen = useSetRecoilState(popupState);
 
-  const handleNext = async () => {
-    // todo 토큰 리코일, asynstoarge에 저장
+  const handleSignUp = async () => {
     if (userBadge.interest.every(v => !v.masterBadge)) {
       setIspopupOpen({ isOpen: true, content: "대표 뱃지를 선택해주세요" });
       return;
+    }
+    if (signupData) {
+      const data = await userSignup({
+        ...signupData, userBadge: {
+          interest: userBadge.interest.map(v => v.title),
+          household: userBadge.household.map(v => v.title),
+          taste: userBadge.taste.map(v => v.title)
+        }
+      });
+      // todo 토큰 리코일, asynstoarge에 저장
+      if (data) {
+      }
     }
     navigation.navigate("Welcome", userBadge.interest.filter(v => v.isClick));
   };
 
   useEffect(() => {
     if (route.params) {
-      setUserBadge(route.params);
+      setSignupData(route.params.userInfo);
+      setUserBadge(route.params.userBadge);
     }
   }, [route.params]);
 
@@ -112,7 +126,7 @@ const BadgeSelect = ({ route, navigation }: BadgeSelectProps) => {
             />
           )))}
         </View>
-        <BasicButton onPress={handleNext} text="선택완료" bgColor={theme.color.main} textColor={theme.color.white}
+        <BasicButton onPress={handleSignUp} text="선택완료" bgColor={theme.color.main} textColor={theme.color.white}
           viewStyle={{ marginTop: h2p(41), marginBottom: h2p(40) }} />
       </View>
     </View>

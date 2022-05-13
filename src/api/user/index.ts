@@ -40,7 +40,7 @@ export const userSignup = async ({
   userBadge
 }: UserInfoType) => {
   try {
-    const res = await axios.post(baseURL + "/auth/signup", {
+    const res = await axios.post(baseURL + "auth/signup/", {
       providerType,
       providerKey,
       email,
@@ -57,7 +57,7 @@ export const userSignup = async ({
   }
   catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      console.log(error.response.data);
+      console.log(JSON.stringify(error.response.data));
     }
   }
 };
