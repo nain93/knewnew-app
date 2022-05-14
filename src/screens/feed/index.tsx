@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, ViewStyle } from 'react-native';
+import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, ViewStyle, ScrollView } from 'react-native';
 import React, { Fragment, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
@@ -14,12 +14,12 @@ import { BadgeType } from '~/types';
 import AlertPopup from '~/components/popup/alertPopup';
 import ReReview from '~/components/review/reReview';
 
-function StatusBarPlaceHolder() {
+function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
   return (
     <View style={{
       width: "100%",
       height: getStatusBarHeight(),
-      backgroundColor: theme.color.grayscale.f7f7fc
+      backgroundColor: scrollOffset >= h2p(130) ? theme.color.white : theme.color.grayscale.f7f7fc
     }} />
   );
 }
@@ -34,13 +34,15 @@ const Feed = () => {
     taste: []
   });
 
+  const [bottomSheetHeight, setBottomSheetHeight] = useState(0);
+
   return (
     <>
       {Platform.OS === "ios" &&
-        <StatusBarPlaceHolder />}
+        <StatusBarPlaceHolder scrollOffset={scrollOffset} />}
       <Header
         viewStyle={isIphoneX() ? { marginTop: 0 } : {}}
-        headerRight={
+        customRight={
           scrollOffset >= h2p(130) ?
             <TouchableOpacity
               onPress={() => tagRefRBSheet.current?.open()}
@@ -90,7 +92,7 @@ const Feed = () => {
         closeOnDragDown
         dragFromTopOnly
         animationType="fade"
-        height={Dimensions.get("window").height - d2p(300)}
+        height={Dimensions.get("window").height * ((Platform.OS === "ios" ? 461 : 481) / 760)}
         openDuration={250}
         customStyles={{
           wrapper: {
@@ -101,19 +103,20 @@ const Feed = () => {
             borderBottomLeftRadius: 30,
             borderBottomRightRadius: 30,
             paddingHorizontal: d2p(20),
-            paddingVertical: h2p(20),
-            paddingTop: isIphoneX() ? getStatusBarHeight() + d2p(20) : d2p(20),
+            paddingBottom: h2p(20),
+            paddingTop: isIphoneX() ? getStatusBarHeight() + d2p(15) : d2p(15),
           }, draggableIcon: {
             display: "none"
           }
         }}
       >
-        <>
-          <View style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center", marginBottom: h2p(40)
-          }}>
+        <ScrollView>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center", marginBottom: h2p(40)
+            }}>
             <Text style={{ color: theme.color.grayscale.C_79737e, fontWeight: "500" }}>
               보고싶은 태그를 선택해주세요
             </Text>
@@ -141,9 +144,9 @@ const Feed = () => {
           </View>
           <SelectLayout userBadge={userBadge} setUserBadge={setUserBadge} />
           {isPopupOpen &&
-            <AlertPopup text={"관심사(or가족구성)을 선택해주세요"} popupStyle={{ bottom: h2p(20), }} />
+            <AlertPopup text={"관심사(or가족구성)을 선택해주세요"} popupStyle={{ bottom: h2p(20) }} />
           }
-        </>
+        </ScrollView>
       </RBSheet>
     </>
   );

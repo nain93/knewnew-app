@@ -47,14 +47,10 @@ const Write = ({ navigation }: NavigationType) => {
   return (
     <>
       <Header
-        isBorder={false}
+        isBorder={true}
         headerLeft={<LeftArrowIcon onBackClick={() => navigation.goBack()} imageStyle={{ width: 11, height: 25 }} />}
         title="작성하기"
-        headerRight={
-          <TouchableOpacity>
-            <Text style={{ color: theme.color.grayscale.a09ca4 }}>완료</Text>
-          </TouchableOpacity>
-        } />
+        headerRight={<Text style={{ color: theme.color.grayscale.a09ca4 }}>완료</Text>} />
       <View style={styles.container}>
         <View style={styles.reviewIconWrap}>
           <TouchableOpacity style={styles.reviewIcon}>

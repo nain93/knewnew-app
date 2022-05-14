@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { TransitionPresets, createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import Onboarding from '~/screens/onboarding';
 import TagSelect from '~/screens/onboarding/tagSelect';
 import BadgeSelect from '~/screens/onboarding/badgeSelect';
@@ -13,23 +13,25 @@ import { d2p } from '~/utils';
 import EditProfile from '~/screens/mypage/editProfile';
 import { useRecoilValue } from 'recoil';
 import { tokenState } from '~/recoil/atoms';
+import theme from '~/styles/theme';
 
-const TransitionScreenOptions = {
-  ...TransitionPresets.ModalSlideFromBottomIOS,
-};
 const Stack = createStackNavigator();
 
 const GlobalNav = () => {
   const isLogin = useRecoilValue(tokenState);
-  console.log(isLogin, 'isLogin');
+
   return (
     <NavigationContainer>
       <Stack.Navigator
-        screenOptions={Object.assign(
-          {},
-          Platform.OS === "android" && TransitionScreenOptions,
-          { cardStyle: { backgroundColor: "white" } }
-        )}>
+        screenOptions={
+          {
+            cardStyle: { backgroundColor: theme.color.white },
+            cardStyleInterpolator:
+              Platform.OS === "android" ?
+                CardStyleInterpolators.forFadeFromBottomAndroid :
+                CardStyleInterpolators.forHorizontalIOS
+          }
+        }>
         {!isLogin &&
           <>
             <Stack.Screen

@@ -63,7 +63,7 @@ const Search = ({ navigation }: SearchProps) => {
     <>
       <Header
         headerLeft={<LeftArrowIcon onBackClick={handleBackClick} imageStyle={{ width: 11, height: 25 }} />}
-        headerRight={
+        customRight={
           <View style={{
             position: "relative",
             width: Dimensions.get("window").width - d2p(70),

@@ -1,30 +1,44 @@
 import React, { useEffect, useRef } from 'react';
 import GlobalNav from './src/navigators/globalNav';
 import AlertPopup from '~/components/popup/alertPopup';
-import { popupState, tokenState } from '~/recoil/atoms';
+import { myIdState, popupState, tokenState } from '~/recoil/atoms';
 
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import SplashScreen from 'react-native-splash-screen';
 import { Animated } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useQuery } from 'react-query';
+import { getMyProfile } from '~/api/user';
+import { MyPrfoileType } from '~/types';
 
 const App = () => {
   const [isPopupOpen, setIsPopupOpen] = useRecoilState(popupState);
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const setToken = useSetRecoilState(tokenState);
+  const [token, setToken] = useRecoilState(tokenState);
+  const setMyId = useSetRecoilState(myIdState);
+  const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
+    enabled: !!token
+  });
 
   useEffect(() => {
+    // AsyncStorage.removeItem("token");
     const getToken = async () => {
       // TODO refresh api
-      const token = await AsyncStorage.getItem("token");
-      if (token) {
-        setToken(token);
+      const storageToken = await AsyncStorage.getItem("token");
+      if (storageToken) {
+        setToken(storageToken);
       }
     };
     getToken();
     SplashScreen.hide();
   }, []);
+
+  useEffect(() => {
+    if (getMyProfileQuery.data) {
+      setMyId(getMyProfileQuery.data.id);
+    }
+  }, [getMyProfileQuery.data]);
 
   const fadeIn = () => {
     Animated.timing(fadeAnim, {

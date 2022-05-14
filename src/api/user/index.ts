@@ -2,6 +2,17 @@ import axios from "axios";
 import { baseURL } from "~/api";
 import { UserInfoType } from "~/types";
 
+export const getMyProfile = async (token: string) => {
+  const res = await axios.get(baseURL + "user/", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+  if (res) {
+    return res.data;
+  }
+};
+
 interface UserLoginType {
   token: string,
   providerType: "kakao" | "naver" | "google" | "apple"
@@ -40,16 +51,6 @@ export const userSignup = async ({
   representBadge,
   tags
 }: UserInfoType) => {
-  // console.log(providerType, 'providerType');
-  // console.log(providerKey, 'providerKey');
-  // console.log(email, 'email');
-  // console.log(nickname, 'nickname');
-  // console.log(age, 'age');
-  // console.log(headline, 'headline');
-  // console.log(profileImage, 'profileImage');
-  // console.log(occupation, 'occupation');
-  // console.log(representBadge, 'representBadge');
-  // console.log(tags, 'tags');
   try {
     const res = await axios.post(baseURL + "auth/signup/", {
       providerType,
@@ -57,9 +58,9 @@ export const userSignup = async ({
       email,
       nickname,
       age: 30,
-      headline: "hello, world!",
-      profileImage: "mockprofileimage@meali.ng/12345/200x100.jpg",
-      occupation: "ㅋㅋ",
+      headline,
+      profileImage,
+      occupation,
       representBadge,
       tags
     });
