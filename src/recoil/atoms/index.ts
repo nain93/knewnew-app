@@ -7,6 +7,11 @@ export const tokenState = atom<string>({
   default: "",
 });
 
+export const myIdState = atom<number>({
+  key: "myIdState",
+  default: -1,
+});
+
 interface popupStateProps {
   isOpen: boolean;
   content: string;

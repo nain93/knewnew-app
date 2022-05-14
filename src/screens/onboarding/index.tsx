@@ -52,8 +52,9 @@ const Onboarding = ({ navigation }: NavigationType) => {
     const data = await userLogin({ token: accessToken, providerType: "kakao" });
     if (data.accessToken) {
       // * 이미 가입된 유저
-      setToken(accessToken);
-      AsyncStorage.setItem("token", accessToken);
+      setToken(data.accessToken);
+      AsyncStorage.setItem("token", data.accessToken);
+      AsyncStorage.setItem("refreshToken", data.refreshToken);
       //@ts-ignore
       navigation.reset({ routes: [{ name: "TabNav" }] });
     }

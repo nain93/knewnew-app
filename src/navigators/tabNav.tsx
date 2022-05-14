@@ -1,4 +1,4 @@
-import { Dimensions, Image, StyleSheet } from 'react-native';
+import { Image, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from 'react';
 import Feed from '~/screens/feed';
@@ -8,26 +8,27 @@ import Mypage from '~/screens/mypage';
 import theme from '~/styles/theme';
 import { d2p, h2p } from '~/utils';
 import { mainSearchIcon, graylogo, graymypage, graysearch, graywrite, mainmypage, mainlogoIcon } from '~/assets/icons';
-import { getBottomSpace } from 'react-native-iphone-x-helper';
 
 const Tabs = createBottomTabNavigator();
 
 const TabNavigator = () => {
   return (
     <Tabs.Navigator
+
       screenOptions={{
         tabBarLabelStyle: {
           backgroundColor: "transparent",
         },
+        // tabBarHideOnKeyboard: true,
         tabBarStyle: {
+          position: "absolute",
           height: h2p(77),
           paddingTop: h2p(20),
           paddingBottom: h2p(30),
           borderTopLeftRadius: 30,
           borderTopRightRadius: 30,
-
           shadowOffset: {
-            width: 0,
+            width: 10,
             height: 8,
           },
           shadowOpacity: 0.4,
@@ -38,7 +39,7 @@ const TabNavigator = () => {
         headerShown: false
       }}
       sceneContainerStyle={{
-        // backgroundColor: theme.color.white,
+        backgroundColor: theme.color.white,
       }}
     >
       <Tabs.Screen

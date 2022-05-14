@@ -38,7 +38,7 @@ const BadgeSelect = ({ route, navigation }: BadgeSelectProps) => {
     }
 
     if (signupData) {
-      const { accessToken } = await userSignup({
+      const { accessToken, refreshToken } = await userSignup({
         ...signupData,
         representBadge: userBadge.interest.filter(v => v.masterBadge)[0].title,
         tags: [
@@ -51,6 +51,7 @@ const BadgeSelect = ({ route, navigation }: BadgeSelectProps) => {
       if (accessToken) {
         setToken(accessToken);
         AsyncStorage.setItem("token", accessToken);
+        AsyncStorage.setItem("refreshToken", refreshToken);
         navigation.navigate("Welcome", userBadge.interest.filter(v => v.isClick));
       }
     }

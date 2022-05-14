@@ -20,17 +20,19 @@ import grayclose from './grayclose.png';
 import graytriangle from './graytriangle.png';
 import grayheart from './grayheart.png';
 import graywrite from './graywrite.png';
+import write from './write.png';
 import graylogo from './graylogo.png';
 import graymypage from './graymypage.png';
 import graysearch from './graysearch.png';
 import mainlogoIcon from './mainlogoIcon.png';
 import mainmypage from './mainmypage.png';
-import bad from './bad.png'
+import bad from './bad.png';
+import plusIcon from './plusIcon.png';
 
 export {
   close, leftArrow, more, heart, like, retweet, comment, circle,
   searchIcon, mainSearchIcon, colorLike, tagfilter, tag, cart, colorCart, retweetfrom,
   colorCheck, initialize, grayclose, graytriangle, grayheart, bad,
-  graywrite, graylogo, graymypage, graysearch, mainmypage, mainlogoIcon
+  graywrite, graylogo, graymypage, graysearch, mainmypage, mainlogoIcon, write, plusIcon
 };
 

@@ -38,7 +38,8 @@ const FeedReview = ({ review, isRetweet = false }: FeedReviewProps) => {
         {!isRetweet &&
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Image source={tag} style={{ width: 10, height: 10, marginRight: 5 }} />
-            <Text style={{ fontSize: 12, color: theme.color.grayscale.C_79737e }}>{review?.item?.tag?.map((v) => <Text>#{v} </Text>)}
+            <Text style={{ fontSize: 12, color: theme.color.grayscale.C_79737e }}>
+              {React.Children.toArray(review?.item?.tag?.map((v) => <Text>#{v} </Text>))}
               <Text style={{ color: theme.color.main }}>#비건</Text>
             </Text>
           </View>}

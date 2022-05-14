@@ -6,6 +6,13 @@ export interface NavigationType {
   route?: NavigationRoute;
 }
 
+export interface MyPrfoileType {
+  id: number,
+  nickname: string,
+  occupation: string,
+  created: string
+}
+
 export interface UserInfoType {
   providerType: "kakao" | "naver" | "google" | "apple",
   providerKey: number,
@@ -18,6 +25,9 @@ export interface UserInfoType {
   representBadge: string,
   tags: Array<string>
 }
+
+
+
 
 export interface InterestType {
   title: string;
