@@ -81,7 +81,7 @@ const Search = ({ navigation }: SearchProps) => {
               value={keyword}
               onChangeText={(text) => setKeyword(text)}
               onSubmitEditing={handleSearch}
-              placeholderTextColor={theme.color.placeholder}
+              placeholderTextColor={theme.color.grayscale.d3d0d5}
               placeholder="검색어를 입력하세요" />
             <TouchableOpacity
               onPress={handleSearch}

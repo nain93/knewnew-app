@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity } from 'react-native';
-import React, { useRef, useState } from 'react';
+import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, ViewStyle } from 'react-native';
+import React, { Fragment, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import Header from '~/components/header';
@@ -12,6 +12,7 @@ import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
 import SelectLayout from '~/components/selectLayout';
 import { BadgeType } from '~/types';
 import AlertPopup from '~/components/popup/alertPopup';
+import ReReview from '~/components/review/reReview';
 
 function StatusBarPlaceHolder() {
   return (
@@ -47,38 +48,40 @@ const Feed = () => {
               <Image source={tagfilter} style={{ width: 11, height: 10, marginRight: d2p(10) }} />
               <Text>태그 변경</Text>
             </TouchableOpacity> : <View />}
-        headerLeft={<Image source={mainLogo} resizeMode="contain" style={{ width: d2p(96), height: h2p(20) }} />}
-        isBorder={false} bgColor={theme.color.grayscale.f7f7fc}
+        headerLeft={scrollOffset >= h2p(130) ? <View /> : <Image source={mainLogo} resizeMode="contain" style={{ width: d2p(96), height: h2p(20) }} />}
+        isBorder={scrollOffset >= h2p(130) ? true : false} bgColor={scrollOffset >= h2p(130) ? theme.color.white : theme.color.grayscale.f7f7fc}
       />
       <View style={{ flex: 1, backgroundColor: theme.color.grayscale.f7f7fc }}>
         <FlatList
           data={data}
           ListHeaderComponent={() =>
-            <>
-              {/* eslint-disable-next-line react-native/no-raw-text */}
-              <View style={styles.main}><Text style={{ fontSize: 20, fontWeight: 'bold' }}>뉴뉴는 지금{"\n"}
-                {/* eslint-disable-next-line react-native/no-raw-text */}
-                <Text style={{ color: theme.color.main }}>#비건</Text> 관련 메뉴 추천 중 👀</Text>
+            <Fragment>
+              <View style={styles.main}>
+                <Text style={styles.mainText}>뉴뉴는 지금</Text>
+                <View style={{ flexDirection: 'row' }}>
+                  <Text style={{ ...styles.mainText, color: theme.color.main }}>#비건 </Text>
+                  <Text style={styles.mainText}>관련 메뉴 추천 중 👀</Text>
+                </View>
               </View>
               <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                 <TouchableOpacity
                   onPress={() => tagRefRBSheet.current?.open()}
                   style={styles.filter}>
-                  <Image source={tagfilter} style={{ width: 11, height: 10, marginRight: 10 }} />
+                  <Image source={tagfilter} style={{ width: 11, height: 10, marginRight: d2p(10) }} />
                   <Text>태그 변경</Text>
                 </TouchableOpacity>
               </View>
-            </>
+            </Fragment>
           }
           showsVerticalScrollIndicator={false}
           renderItem={(review) =>
             <FeedReview review={review} isRetweet={true} />
+            // <ReReview review={review} />
           }
           style={{ marginTop: 0, paddingBottom: h2p(31) }}
           keyExtractor={(review) => String(review.id)}
           onScroll={(event) => {
             const currentScrollOffset = event.nativeEvent.contentOffset.y;
-            console.log(currentScrollOffset);
             setScrollOffset(currentScrollOffset);
           }}
         />
@@ -158,7 +161,8 @@ const data = [{
 단백질 + 식이섬유 한번에 챙길 수 있음!`,
   date: '2022.04.26',
   store: '마켓컬리',
-  writer: '열려라참깨'
+  writer: '열려라참깨',
+  tag: ['간편식', '한끼식사']
 }, {
   id: 1,
   badge: '비건',
@@ -169,7 +173,8 @@ const data = [{
 가격은 좀 ㅎㄷㄷ하지만 … 오설록이라서 찐해서 좋아욤`,
   date: '2022.04.26',
   store: '마켓컬리',
-  writer: '룰루랄라'
+  writer: '룰루랄라',
+  tag: ['간편식', '한끼식사', '비건']
 }, {
   id: 2,
   badge: '다이어터',
@@ -189,7 +194,8 @@ const data = [{
   household: '가족한끼',
   content: `유통사, 상품명 둘 다 입력안했을 경우에는 추천표식도 없습니다 (뉴뉴 심볼과 같이 그냥 글만 노출)`,
   date: '2022.04.26',
-  writer: '일반글고객'
+  writer: '일반글고객',
+  tag: ['간편식']
 }, {
   id: 4,
   badge: '다이어터',
@@ -199,21 +205,21 @@ const data = [{
   content: `이거 사서 먹었는데 진짜 맛있네요 치킨 배달시켜먹었던 지난날이 후회될정도로 맛있고 양많고 싸고 간편해요. 생닭이라 좀 쫄았는데 냉동고에서 꺼내서 에프만 돌리면 완성이라서 저같은 자취생한테 딱…`,
   photo: 'ss',
   date: '2022.04.26',
-  writer: '꿈빛파티시엘'
+  writer: '꿈빛파티시엘',
+  tag: ['한끼식사']
 },];
 
 export default Feed;
 
 const styles = StyleSheet.create({
   main: {
-    fontSize: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     paddingTop: h2p(35),
     paddingBottom: h2p(18),
     paddingHorizontal: 20,
     width: '100%',
+  },
+  mainText: {
+    fontSize: 20, fontWeight: 'bold'
   },
   filter: {
     flexDirection: 'row',

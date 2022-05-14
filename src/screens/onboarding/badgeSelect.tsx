@@ -59,12 +59,18 @@ const BadgeSelect = ({ route, navigation }: BadgeSelectProps) => {
 
   return (
     <View style={styles.container}>
-      <View style={{ marginBottom: d2p(60) }}>
-        {/* eslint-disable-next-line react-native/no-raw-text */}
-        <Text style={styles.title}>나를 <Text style={{ color: theme.color.main }}>대표하는 뱃지</Text>를{"\n"}
-          골라주세요.</Text>
-        {/* eslint-disable-next-line react-native/no-raw-text */}
-        <Text style={styles.subTitle}>선택하신 관심사 중에서{"\n"}<Text style={{ fontWeight: 'bold' }}>나를 대표하는 뱃지 1개</Text>를 선택해주세요.</Text>
+      <View style={{ marginBottom: h2p(40) }}>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={styles.title}>나를 </Text>
+          <Text style={[styles.title, { color: theme.color.main }]}>대표하는 뱃지</Text>
+          <Text style={[styles.title, { lineHeight: 31 }]}>를</Text>
+        </View>
+        <Text style={styles.title}>골라주세요.</Text>
+        <Text style={styles.subTitle}>선택하신 관심사 중에서</Text>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={{ fontWeight: 'bold' }}>나를 대표하는 뱃지 1개</Text>
+          <Text>를 선택해주세요.</Text>
+        </View>
         <Text style={{ color: theme.color.main, marginTop: h2p(20), fontSize: 12 }}>대표 뱃지는 저장 후 7일동안 다시 변경할 수 없습니다.</Text>
       </View>
       <View style={{ flex: 1 }}>
@@ -154,14 +160,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: '600',
-
   },
-
   subTitle: {
     fontSize: 14,
     color: theme.color.black,
     marginTop: d2p(20),
-
   },
   select: {
     borderWidth: 1, borderColor: theme.color.grayscale.eae7ec,

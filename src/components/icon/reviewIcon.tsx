@@ -1,6 +1,6 @@
 import React from "react";
 import { Image, ImageStyle, StyleSheet, Text, View, ViewStyle } from "react-native";
-import { heart, triangle, close } from "~/assets/icons";
+import { heart, circle, bad } from "~/assets/icons";
 import theme from "~/styles/theme";
 
 interface ReviewIconProp {
@@ -16,7 +16,7 @@ const ReviewIcon = ({ review, imageStyle }: ReviewIconProp) => {
         resizeMode="contain"
         style={[{ width: 20, height: 20 }, imageStyle]}
       />
-      <Text style={[{ paddingLeft: 5 }, review === 'heart' ? styles.heart : (review === 'triangle' ? styles.triangle : styles.default)]}>
+      <Text style={[{ paddingLeft: 5, fontWeight: 'bold' }, review === 'heart' ? styles.heart : (review === 'triangle' ? styles.triangle : styles.default)]}>
         {reviewItem(review)?.text}</Text>
     </View >
   );
@@ -27,9 +27,9 @@ const reviewItem = (review: string) => {
     case "heart":
       return { image: heart, text: '최고예요', };
     case "triangle":
-      return { image: triangle, text: '그저그래요', };
+      return { image: circle, text: '괜찮아요', };
     case "close":
-      return { image: close, text: '별로예요', };
+      return { image: bad, text: '별로예요', };
   }
 };
 
