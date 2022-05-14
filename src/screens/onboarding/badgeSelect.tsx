@@ -10,7 +10,8 @@ import { BadgeType, UserInfoType } from '~/types';
 import { userSignup } from '~/api/user';
 import { colorCheck } from '~/assets/icons';
 import { useSetRecoilState } from 'recoil';
-import { popupState } from '~/recoil/atoms';
+import { popupState, tokenState } from '~/recoil/atoms';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface BadgeSelectProps {
   navigation: NavigationStackProp
@@ -28,25 +29,31 @@ const BadgeSelect = ({ route, navigation }: BadgeSelectProps) => {
     taste: []
   });
   const setIspopupOpen = useSetRecoilState(popupState);
+  const setToken = useSetRecoilState(tokenState);
 
   const handleSignUp = async () => {
     if (userBadge.interest.every(v => !v.masterBadge)) {
       setIspopupOpen({ isOpen: true, content: "대표 뱃지를 선택해주세요" });
       return;
     }
+
     if (signupData) {
-      const data = await userSignup({
-        ...signupData, userBadge: {
-          interest: userBadge.interest.map(v => v.title),
-          household: userBadge.household.map(v => v.title),
-          taste: userBadge.taste.map(v => v.title)
-        }
+      const { accessToken } = await userSignup({
+        ...signupData,
+        representBadge: userBadge.interest.filter(v => v.masterBadge)[0].title,
+        tags: [
+          ...userBadge.interest.map(v => v.title),
+          ...userBadge.household.map(v => v.title),
+          ...userBadge.taste.map(v => v.title)
+        ]
       });
       // todo 토큰 리코일, asynstoarge에 저장
-      if (data) {
+      if (accessToken) {
+        setToken(accessToken);
+        AsyncStorage.setItem("token", accessToken);
+        navigation.navigate("Welcome", userBadge.interest.filter(v => v.isClick));
       }
     }
-    navigation.navigate("Welcome", userBadge.interest.filter(v => v.isClick));
   };
 
   useEffect(() => {
@@ -106,7 +113,6 @@ const BadgeSelect = ({ route, navigation }: BadgeSelectProps) => {
                 </TouchableOpacity>
               );
             }
-
             else {
               return (
                 <Badge type="unabled" badge="interest" text={item.title} idx={idx} isClick={userBadge.interest[idx].isClick}

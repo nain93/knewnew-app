@@ -17,6 +17,9 @@ import { userLogin } from '~/api/user';
 import { NaverLogin } from '@react-native-seoul/naver-login';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import appleAuth from '@invertase/react-native-apple-authentication';
+import { tokenState } from '~/recoil/atoms';
+import { useSetRecoilState } from 'recoil';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const iosKeys = {
   kConsumerKey: Config.NAVER_KEY,
@@ -32,6 +35,8 @@ const aosKeys = {
 };
 
 const Onboarding = ({ navigation }: NavigationType) => {
+  const setToken = useSetRecoilState(tokenState);
+
   const goToBadgeSelect = (userData: {
     email: string,
     nickname: string,
@@ -45,7 +50,15 @@ const Onboarding = ({ navigation }: NavigationType) => {
   const handleKakaoLogin = async () => {
     const { accessToken } = await login();
     const data = await userLogin({ token: accessToken, providerType: "kakao" });
-    if (data) {
+    if (data.accessToken) {
+      // * 이미 가입된 유저
+      setToken(accessToken);
+      AsyncStorage.setItem("token", accessToken);
+      //@ts-ignore
+      navigation.reset({ routes: [{ name: "TabNav" }] });
+    }
+    else {
+      // * 새 유저
       goToBadgeSelect(data);
     }
   };

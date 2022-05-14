@@ -1,18 +1,28 @@
 import React, { useEffect, useRef } from 'react';
 import GlobalNav from './src/navigators/globalNav';
 import AlertPopup from '~/components/popup/alertPopup';
-import { popupState } from '~/recoil/atoms';
+import { popupState, tokenState } from '~/recoil/atoms';
 
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import SplashScreen from 'react-native-splash-screen';
 import { Animated } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const App = () => {
   const [isPopupOpen, setIsPopupOpen] = useRecoilState(popupState);
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const setToken = useSetRecoilState(tokenState);
 
   useEffect(() => {
+    const getToken = async () => {
+      // TODO refresh api
+      const token = await AsyncStorage.getItem("token");
+      if (token) {
+        setToken(token);
+      }
+    };
+    getToken();
     SplashScreen.hide();
   }, []);
 

@@ -75,8 +75,7 @@ const Feed = () => {
           }
           showsVerticalScrollIndicator={false}
           renderItem={(review) =>
-            <FeedReview review={review} isRetweet={true} />
-            // <ReReview review={review} />
+            <FeedReview review={review} />
           }
           style={{ marginTop: 0, paddingBottom: h2p(31) }}
           keyExtractor={(review) => String(review.id)}

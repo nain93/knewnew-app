@@ -28,12 +28,6 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
   const setIspopupOpen = useSetRecoilState(popupState);
 
   const handleNext = async () => {
-    // todo 토큰 리코일, asynstoarge에 저장
-    // todo 유효성검사
-    // const data = await userSignup({ token: "", ...userInfo });
-    // if(data){
-    //   navigation.navigate("Welcome");
-    // }
     if (userBadge.household.every(v => !v.isClick) ||
       userBadge.interest.every(v => !v.isClick)) {
       setIspopupOpen({ isOpen: true, content: "관심사(or가족구성)을 선택해주세요" });
