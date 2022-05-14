@@ -10,10 +10,10 @@ import { retweetfrom, tag } from '~/assets/icons';
 
 interface FeedReviewProps {
   review: any,
-  isRetweet: boolean
+  isRetweet?: boolean
 }
 
-const FeedReview = ({ review, isRetweet }: FeedReviewProps) => {
+const FeedReview = ({ review, isRetweet = false }: FeedReviewProps) => {
   const [like, setLike] = useState<boolean>(false);
   const [cart, setCart] = useState<boolean>(false);
   const [save, setSave] = useState<boolean>(false);
@@ -34,15 +34,19 @@ const FeedReview = ({ review, isRetweet }: FeedReviewProps) => {
           <ReviewIcon review={review.item.review} />
           <Text style={{ fontSize: 10, color: theme.color.grayscale.a09ca4 }}>5분 전</Text>
         </View>
-        <Text style={{ color: theme.color.black }}>{review.item.content}</Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
-          <Image source={tag} style={{ width: 10, height: 10, marginRight: 5 }} />
-          <Text style={{ fontSize: 12, color: theme.color.grayscale.C_79737e }}>#간편식 #한끼식사 <Text style={{ color: theme.color.main }}>#비건</Text></Text>
-        </View>
+        <Text style={{ color: theme.color.black, marginBottom: 10 }}>{review.item.content}</Text>
+        {!isRetweet &&
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Image source={tag} style={{ width: 10, height: 10, marginRight: 5 }} />
+            <Text style={{ fontSize: 12, color: theme.color.grayscale.C_79737e }}>{review?.item?.tag?.map((v) => <Text>#{v} </Text>)}
+              <Text style={{ color: theme.color.main }}>#비건</Text>
+            </Text>
+          </View>}
       </Pressable>
-      <View style={styles.sign}>
-        <Text style={styles.store}>{review.item.store}</Text>
-      </View>
+      {!isRetweet &&
+        <View style={styles.sign}>
+          <Text style={styles.store}>{review.item.store}</Text>
+        </View>}
       {review.item.photo && <View style={{ backgroundColor: 'black', width: d2p(270), height: h2p(180), borderRadius: 18, marginRight: 5 }} />}
       <View style={styles.reactionContainer}>
         <ReactionIcon name="cart" state={cart} setState={(isState: boolean) => setCart(isState)} />
@@ -50,13 +54,6 @@ const FeedReview = ({ review, isRetweet }: FeedReviewProps) => {
         <ReactionIcon name="like" state={like} setState={(isState: boolean) => setLike(isState)} />
         <ReactionIcon name="retweet" />
       </View>
-      {isRetweet &&
-        <Fragment>
-          <View style={{ flexDirection: 'row' }}>
-            <Image source={retweetfrom} style={{ width: 15, height: 40, position: 'relative', left: -50 }} />
-            <View style={{ backgroundColor: 'black', width: 40, height: 40, borderRadius: 20, marginRight: 5, position: 'relative', left: -40 }} />
-          </View>
-        </Fragment>}
     </View>
   );
 };

@@ -36,7 +36,7 @@ const SearchTabView = () => {
             height: h2p(44.5),
             paddingTop: h2p(5),
             backgroundColor: theme.color.white,
-            borderBottomColor: theme.color.placeholder, borderBottomWidth: 1,
+            borderBottomColor: theme.color.grayscale.d3d0d5, borderBottomWidth: 1,
             elevation: 0
           }}
           renderLabel={({ route }) =>

@@ -31,8 +31,10 @@ const Welcome = ({ navigation, route }: NavigationType) => {
 
   return (
     <View style={styles.container}>
-      {/* eslint-disable-next-line react-native/no-raw-text */}
-      <Text style={styles.mainText}><Text style={{ color: theme.color.main }}>여지아</Text>님 반가워요!</Text>
+      <View style={styles.main}>
+        <Text style={[styles.mainText, { color: theme.color.main }]}>여지아</Text>
+        <Text style={[styles.mainText, { lineHeight: 29 }]}>님 반가워요!</Text>
+      </View>
       <View style={{
         marginBottom: h2p(10),
         justifyContent: "center",
@@ -58,10 +60,13 @@ const styles = StyleSheet.create({
     paddingBottom: d2p(40),
     paddingHorizontal: d2p(20)
   },
+  main: {
+    flexDirection: 'row',
+    marginTop: d2p(173), marginBottom: d2p(40),
+  },
   mainText: {
     fontSize: 26,
     fontWeight: '600',
-    marginTop: d2p(173), marginBottom: d2p(40),
   }
 });
 

@@ -49,13 +49,15 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
   return (
     <View style={styles.container}>
       <View style={{ marginBottom: h2p(40) }}>
-        {/* eslint-disable-next-line react-native/no-raw-text */}
-        <Text style={styles.title}>나를 소개하는 태그를{"\n"}
-          {/* eslint-disable-next-line react-native/no-raw-text */}
-          <Text style={{ color: theme.color.main }}>2가지 이상</Text> 선택해주세요.</Text>
-        {/* eslint-disable-next-line react-native/no-raw-text */}
-        <Text style={styles.subTitle}><Text style={{ fontWeight: 'bold' }}>나를 소개하는 태그</Text>를 골라주세요.{"\n"}
-          최소 2개 최대 10개까지 고를 수 있어요.</Text>
+        <Text style={styles.title}>나를 소개하는 태그를</Text>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={[styles.title, { color: theme.color.main }]}>2가지 이상 </Text>
+          <Text style={styles.title}>선택해주세요.</Text></View>
+        <View style={{ flexDirection: 'row', marginTop: d2p(20) }}>
+          <Text style={{ fontWeight: 'bold' }}>나를 소개하는 태그</Text>
+          <Text>를 골라주세요.</Text>
+        </View>
+        <Text>최소 2개 최대 10개까지 고를 수 있어요.</Text>
       </View>
       <View style={{ flex: 1 }}>
         <SelectLayout userBadge={userBadge} setUserBadge={(badgeProp: BadgeType) => setUserBadge(badgeProp)} isInitial={true} />
@@ -81,11 +83,6 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: '600',
 
-  },
-  subTitle: {
-    fontSize: 14,
-    color: theme.color.black,
-    marginTop: d2p(20),
   },
   select: {
     borderWidth: 1, borderColor: theme.color.grayscale.eae7ec,

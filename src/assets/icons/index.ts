@@ -2,7 +2,7 @@ import close from "./close.png";
 import leftArrow from './leftArrow.png';
 import more from './more.png';
 import heart from './heart.png';
-import triangle from './triangle.png';
+import circle from './circle.png';
 import like from './like.png';
 import retweet from './retweet.png';
 import comment from './comment.png';
@@ -25,11 +25,12 @@ import graymypage from './graymypage.png';
 import graysearch from './graysearch.png';
 import mainlogoIcon from './mainlogoIcon.png';
 import mainmypage from './mainmypage.png';
+import bad from './bad.png'
 
 export {
-  close, leftArrow, more, heart, triangle, like, retweet, comment,
+  close, leftArrow, more, heart, like, retweet, comment, circle,
   searchIcon, mainSearchIcon, colorLike, tagfilter, tag, cart, colorCart, retweetfrom,
-  colorCheck, initialize, grayclose, graytriangle, grayheart,
+  colorCheck, initialize, grayclose, graytriangle, grayheart, bad,
   graywrite, graylogo, graymypage, graysearch, mainmypage, mainlogoIcon
 };
 

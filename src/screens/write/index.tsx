@@ -99,7 +99,7 @@ const Write = ({ navigation }: NavigationType) => {
           <Pressable onPress={pickImage} style={[styles.images, { marginLeft: d2p(20), marginRight: d2p(15) }]}>
             <View style={{ alignItems: "center" }}>
               <Image source={photo} style={{ width: d2p(20), height: h2p(20), marginTop: h2p(12) }} />
-              <Text style={{ fontSize: 12, color: theme.color.placeholder, marginVertical: h2p(8) }}>{imageList.length}/5</Text>
+              <Text style={{ fontSize: 12, color: theme.color.grayscale.d3d0d5, marginVertical: h2p(8) }}>{imageList.length}/5</Text>
             </View>
           </Pressable>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
