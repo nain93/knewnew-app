@@ -4,7 +4,7 @@ import { heart, circle, bad } from "~/assets/icons";
 import theme from "~/styles/theme";
 
 interface ReviewIconProp {
-  review: "heart" | "triangle" | "close";
+  review: "heart" | "triangle" | "bad";
   imageStyle?: ImageStyle
 }
 
@@ -28,7 +28,7 @@ const reviewItem = (review: string) => {
       return { image: heart, text: '최고예요', };
     case "triangle":
       return { image: circle, text: '괜찮아요', };
-    case "close":
+    case "bad":
       return { image: bad, text: '별로예요', };
   }
 };

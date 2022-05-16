@@ -20,19 +20,21 @@ const ReKnew = ({ review }: FeedReviewProps) => {
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 3 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={styles.title}>{review.item.writer}</Text>
-          <Badge type="feed" text={review.item.badge} />
-          <Text style={{ fontSize: 12, marginLeft: 5, color: theme.color.grayscale.a09ca4 }}>{review.item.household}</Text>
+          <Text style={styles.title}>{review.writer}</Text>
+          <Badge type="feed" text={review.badge} />
+          <Text style={{ fontSize: 12, marginLeft: 5, color: theme.color.grayscale.a09ca4 }}>{review.household}</Text>
         </View>
       </View>
       <Pressable onPress={() => console.log('피드 상세')}>
         <View style={{ marginVertical: h2p(12), }}>
-          <ReviewIcon review={review.item.review} />
+          <ReviewIcon review={review.review} />
         </View>
-        <Text style={{ color: theme.color.black }}>{review.item.content}</Text>
+        <Text style={{ color: theme.color.black }}>{review.content}</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
           <Image source={tag} style={{ width: 10, height: 10, marginRight: 5 }} />
-          <Text style={{ fontSize: 12, color: theme.color.grayscale.C_79737e }}>{review?.item?.tag?.map((v) => <Text>#{v} </Text>)}<Text style={{ color: theme.color.main }}>#비건</Text></Text>
+          <Text style={{ fontSize: 12, color: theme.color.grayscale.C_79737e }}>
+            {React.Children.toArray(review?.tag?.map((v) => <Text>#{v} </Text>))}
+            <Text style={{ color: theme.color.main }}>#비건</Text></Text>
         </View>
       </Pressable>
     </View>
@@ -54,3 +56,4 @@ const styles = StyleSheet.create({
     marginRight: 5
   },
 });
+
