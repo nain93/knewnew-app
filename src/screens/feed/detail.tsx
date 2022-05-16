@@ -3,14 +3,21 @@ import React, { Fragment, useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import theme from '~/styles/theme';
-import { NavigationType } from '~/types';
-import { d2p, h2p } from '~/utils';
+import { NavigationType, ReviewListType } from '~/types';
+import { d2p, h2p, simpleDate } from '~/utils';
 import ReviewIcon from '~/components/icon/reviewIcon';
 import MoreIcon from '~/components/icon/moreIcon';
 import Badge from '~/components/badge';
 import ReactionIcon from '~/components/icon/reactionIcon';
 import { tag } from '~/assets/icons';
 import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
+import { useRecoilValue } from 'recoil';
+import { tokenState } from '~/recoil/atoms';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { NavigationStackProp } from 'react-navigation-stack';
+import { NavigationRoute } from 'react-navigation';
+import { getReviewDetail, likeReview } from '~/api/review';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 interface reviewProps {
   id: number;
@@ -41,16 +48,37 @@ const reviewContent = {
   tag: ['간편식', '한끼식사'],
   photo: 'ss',
 };
+interface FeedDetailProps {
+  navigation: NavigationStackProp
+  route: NavigationRoute<{
+    id: number
+  }>;
+}
 
-const FeedDetail = ({ navigation }: NavigationType) => {
+const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [review, setReview] = useState<reviewProps>();
   const [like, setLike] = useState<boolean>(false);
   const [cart, setCart] = useState<boolean>(false);
   const commentRef = useRef<TextInput>(null);
+  const queryClient = useQueryClient();
+
+  const token = useRecoilValue(tokenState);
+
+  const reviewDetailQuery = useQuery<ReviewListType, Error>(["reviewDetail", token], async () => {
+    if (route.params) {
+      const detail = await getReviewDetail(token, route.params.id);
+      return detail;
+    }
+  }, {
+    enabled: !!token,
+    // onSuccess:(data)=>setLike(data.isLike)
+  });
+
+  const likeReviewMutation = useMutation('likeReview', ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state));
 
   useEffect(() => {
-    setReview(reviewContent);
-  }, []);
+    queryClient.invalidateQueries("reviewDetail")
+  }, [likeReviewMutation.data,])
 
   return (
     <Fragment>
@@ -60,42 +88,51 @@ const FeedDetail = ({ navigation }: NavigationType) => {
         title="리뷰 상세"
       />
       {/* <FeedReview review={review} /> */}
-      <View style={styles.review}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <View style={{ backgroundColor: 'black', width: 40, height: 40, borderRadius: 20, marginRight: 5, position: 'absolute', left: 0 }} />
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: d2p(50), }}>
-            <Text style={styles.writer}>{review?.writer}</Text>
-            <Badge type="feed" text={review?.badge} />
+      <KeyboardAwareScrollView style={styles.review}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flex: 1 }}
+      >
+        <View style={{ paddingHorizontal: d2p(20) }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <View style={{ backgroundColor: 'black', width: 40, height: 40, borderRadius: 20, marginRight: 5, position: 'absolute', left: 0 }} />
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: d2p(50), flexWrap: 'wrap', maxWidth: Dimensions.get('window').width - d2p(120) }}>
+              <Text style={styles.writer}>{reviewDetailQuery.data?.author.nickname}</Text>
+              <Badge type="feed" text={reviewDetailQuery.data?.author.representBadge} />
+            </View>
+            <MoreIcon onPress={() => console.log('공유/신고')} viewStyle={{ position: 'relative', top: 10 }} />
           </View>
-          <MoreIcon onPress={() => console.log('공유/신고')} viewStyle={{ position: 'relative', top: 10 }} />
-        </View>
-        <Pressable onPress={() => console.log('피드 상세')}>
-          <View style={{ marginTop: h2p(5), marginLeft: d2p(50), }}>
-            <Text style={{ fontSize: 12, color: theme.color.grayscale.a09ca4 }}>5분 전</Text>
-          </View>
-          <View style={{ paddingTop: h2p(20) }}>
-            <ReviewIcon review={review?.review} />
-            <Text style={{ color: theme.color.black, marginBottom: 10, paddingTop: h2p(15) }}>{review?.content}</Text>
-          </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Image source={tag} style={{ width: 10, height: 10, marginRight: 5 }} />
-            <Text style={{ fontSize: 12, color: theme.color.grayscale.C_79737e }}>{React.Children.toArray(review?.tag?.map((v) => <Text>#{v} </Text>))}
-              <Text style={{ color: theme.color.main }}>#비건</Text>
-            </Text>
-          </View>
-        </Pressable>
-        <View style={styles.sign}>
-          <Text style={styles.store}>{review?.store}</Text>
-        </View>
-        {review?.photo && <View style={{ backgroundColor: 'black', width: Dimensions.get('window').width - d2p(40), height: Dimensions.get("window").height * (180 / 760), borderRadius: 18, marginRight: 5 }} />}
-        <View style={styles.reactionContainer}>
-          <ReactionIcon name="cart" state={cart} setState={(isState: boolean) => setCart(isState)} />
-          <View style={{ borderLeftWidth: 1, borderLeftColor: theme.color.grayscale.eae7ec, height: h2p(26) }} />
-          <ReactionIcon name="like" state={like} setState={(isState: boolean) => setLike(isState)} />
-        </View>
-        <Text style={{ marginTop: 20, fontSize: 12, color: theme.color.grayscale.C_79737e, fontWeight: 'bold', paddingBottom: h2p(20) }}>작성된 댓글 2개</Text>
 
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: isIphoneX() ? getBottomSpace() : 0 }} style={{ paddingBottom: isIphoneX() ? getBottomSpace() : 0 }}>
+          <Pressable onPress={() => console.log('피드 상세')}>
+            <View style={{ marginTop: h2p(5), marginLeft: d2p(50), }}>
+              <Text style={{ fontSize: 12, color: theme.color.grayscale.a09ca4 }}>
+                {(reviewDetailQuery.data) && simpleDate(reviewDetailQuery.data?.created)} 전</Text>
+            </View>
+            <View style={{ paddingTop: h2p(20) }}>
+              <ReviewIcon review={reviewDetailQuery.data?.satisfaction} />
+              <Text style={{ color: theme.color.black, marginBottom: 10, paddingTop: h2p(15) }}>{reviewDetailQuery.data?.content}</Text>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Image source={tag} style={{ width: 10, height: 10, marginRight: 5 }} />
+              <Text style={{ fontSize: 12, color: theme.color.grayscale.C_79737e }}>{React.Children.toArray(reviewDetailQuery.data?.tags?.map((v) => <Text>#{v} </Text>))}
+                <Text style={{ color: theme.color.main }}>#비건</Text>
+              </Text>
+            </View>
+          </Pressable>
+
+          <View style={styles.sign}>
+            <Text style={styles.store}>{reviewDetailQuery.data?.market}</Text>
+          </View>
+          {review?.photo && <View style={{
+            backgroundColor: 'black', width: Dimensions.get('window').width - d2p(40),
+            height: Dimensions.get("window").height * (180 / 760), borderRadius: 18, marginRight: 5
+          }} />}
+          <View style={styles.reactionContainer}>
+            <ReactionIcon name="cart" state={cart} setState={(isState: boolean) => setCart(isState)} />
+            <View style={{ borderLeftWidth: 1, borderLeftColor: theme.color.grayscale.eae7ec, height: h2p(26) }} />
+            <ReactionIcon name="like" count={reviewDetailQuery.data?.likeCount} state={like}
+              isLike={(isState: boolean) => { setLike(isState) }} mutation={likeReviewMutation} id={route.params?.id} />
+          </View>
+          <Text style={{ marginTop: 20, fontSize: 12, color: theme.color.grayscale.C_79737e, fontWeight: 'bold', paddingBottom: h2p(20) }}>작성된 댓글 2개</Text>
           <View>
             <View style={{ backgroundColor: 'black', width: 30, height: 30, borderRadius: 15, marginRight: 5, position: 'absolute', left: 0 }} />
             <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: d2p(38), position: 'relative', top: 6, }}>
@@ -114,21 +151,22 @@ const FeedDetail = ({ navigation }: NavigationType) => {
             <Text style={{ color: theme.color.grayscale.C_443e49, paddingLeft: d2p(38), marginTop: h2p(10) }}>저도 이거 좋아해요!! 근데 염지가 많이 됐는지 저한테는 살짝 짜더라구요</Text>
             <View style={styles.commentLine} />
           </View>
-        </ScrollView>
+        </View>
+
+
         <View style={{
           borderTopColor: theme.color.grayscale.eae7ec, borderTopWidth: 1,
           left: 0,
-          position: 'absolute', bottom: getBottomSpace(), width: Dimensions.get("window").width, backgroundColor: theme.color.white, paddingVertical: h2p(14), paddingHorizontal: d2p(20)
+          position: 'absolute', bottom: 0, width: Dimensions.get("window").width, backgroundColor: theme.color.white, paddingVertical: h2p(14), paddingHorizontal: d2p(20)
         }}>
           <TextInput style={{
-            width: '91%',
           }}
             placeholder="댓글을 남겨보세요" placeholderTextColor={theme.color.grayscale.d3d0d5} />
           <Pressable style={{ position: 'absolute', right: 20, top: 14 }}>
             <Text style={{ color: theme.color.grayscale.a09ca4 }}>작성</Text>
           </Pressable>
         </View>
-      </View>
+      </KeyboardAwareScrollView>
     </Fragment>
   );
 };
@@ -137,9 +175,8 @@ export default FeedDetail;
 
 const styles = StyleSheet.create({
   review: {
-    flex: 1,
     position: "relative",
-    paddingHorizontal: d2p(20), marginTop: h2p(20),
+    marginTop: h2p(20),
     paddingBottom: isIphoneX() ? getBottomSpace() : 0
   },
   writer: {

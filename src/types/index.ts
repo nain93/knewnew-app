@@ -46,5 +46,26 @@ export interface BadgeType {
 
 export interface ReviewListType {
   id: number,
-  author: string
+  author: {
+    id: number,
+    nickname: string,
+    representBadge: string
+  },
+  bookmarkCount: number,
+  cart: {
+    id: number,
+    products: Array<string>
+  }
+  childCount: number,
+  commentCount: number,
+  content: string,
+  created: string,
+  dislikeCount: number,
+  image: Array<string>,
+  likeCount: number,
+  market: string,
+  parent: string,
+  product: string,
+  satisfaction: string,
+  tags: Array<string>
 }
