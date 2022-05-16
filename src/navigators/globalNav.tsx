@@ -14,6 +14,7 @@ import EditProfile from '~/screens/mypage/editProfile';
 import { useRecoilValue } from 'recoil';
 import { tokenState } from '~/recoil/atoms';
 import theme from '~/styles/theme';
+import FeedDetail from '~/screens/feed/detail';
 
 const Stack = createStackNavigator();
 
@@ -78,6 +79,13 @@ const GlobalNav = () => {
             headerShown: false
           }}
         />
+        <Stack.Screen
+          name="FeedDetail"
+          options={{
+            title: "",
+            headerShown: false,
+          }}
+          component={FeedDetail} />
         <Stack.Screen
           name="editProfile"
           component={EditProfile}

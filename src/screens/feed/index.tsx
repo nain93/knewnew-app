@@ -76,10 +76,11 @@ const Feed = () => {
             </Fragment>
           }
           showsVerticalScrollIndicator={false}
-          renderItem={(review) =>
-            <FeedReview review={review} />
+          renderItem={({ item }) =>
+            <FeedReview review={item} />
+            // <ReReview review={item} />
           }
-          style={{ marginTop: 0, paddingBottom: h2p(31) }}
+          style={{ marginTop: 0, marginBottom: h2p(80) }}
           keyExtractor={(review) => String(review.id)}
           onScroll={(event) => {
             const currentScrollOffset = event.nativeEvent.contentOffset.y;
@@ -181,7 +182,7 @@ const data = [{
   id: 2,
   badge: '다이어터',
   title: '쓱 양배추 웩',
-  review: 'close',
+  review: 'bad',
   household: '신혼부부',
   content: `쓱 양배추 진짜 별로에요;; 맨날 상해서 오는듯
 추천 표시는 유통사는 있든 없든 무관하게 상품명 등록해야 노출 (작성페이지에서 상품명-> 추천표식)`,
