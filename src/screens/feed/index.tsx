@@ -99,7 +99,7 @@ const Feed = () => {
       />
       <View style={{ flex: 1, backgroundColor: theme.color.grayscale.f7f7fc }}>
         <FlatList
-          data={data}
+          data={reviewListQuery.data}
           ListHeaderComponent={() =>
             <Fragment>
               <View style={styles.main}>
@@ -122,7 +122,7 @@ const Feed = () => {
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) =>
             <FeedReview review={item} />
-            // <ReReview review={item} />
+            // <ReKnew review={item} />
           }
           style={{ marginTop: 0, marginBottom: h2p(80) }}
           keyExtractor={(review) => String(review.id)}

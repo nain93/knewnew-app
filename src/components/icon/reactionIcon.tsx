@@ -4,25 +4,40 @@ import { like, retweet, comment, colorLike, cart, colorCart } from "~/assets/ico
 import theme from "~/styles/theme";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "react-navigation-stack/lib/typescript/src/vendor/types";
+import { UseMutationResult } from "react-query";
 
 interface ReviewIconProp {
   name: "like" | "cart" | "retweet" | "comment";
+  count?: number;
   state?: boolean;
-  setState?: (isState: boolean) => void;
+  isLike?: (isState: boolean) => void;
+  mutation?: UseMutationResult<any, unknown, {
+    id: number;
+    state: boolean;
+  }>;
+  id: number;
 }
 
-const ReactionIcon = ({ name, state, setState }: ReviewIconProp) => {
+const ReactionIcon = ({ name, count, state, isLike, mutation, id }: ReviewIconProp) => {
   const navigation = useNavigation<StackNavigationProp>();
+
   return (
     <TouchableOpacity style={{
       flexDirection: "row", alignItems: 'center', justifyContent: 'space-between', position: 'relative', left: -13
-    }} onPress={() => setState ? setState(!state) : navigation.navigate(name)} >
+    }} onPress={() => {
+      if (isLike) {
+        isLike(!state);
+        mutation?.mutate({ id, state: !state });
+      } else {
+        navigation.navigate(name);
+      }
+    }} >
       <Image
         source={!state ? imgSource(name)?.item : imgSource(name)?.colored}
         resizeMode="contain"
         style={{ width: 26, height: 26 }}
       />
-      <Text style={[{ fontSize: 12 }, !state ? styles.default : styles.clicked, { marginLeft: 9 }]}>15</Text>
+      <Text style={[{ fontSize: 12 }, !state ? styles.default : styles.clicked, { marginLeft: 9 }]}>{count}</Text>
     </TouchableOpacity >
   );
 };

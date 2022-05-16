@@ -4,7 +4,7 @@ import { heart, circle, bad } from "~/assets/icons";
 import theme from "~/styles/theme";
 
 interface ReviewIconProp {
-  review: "heart" | "triangle" | "bad";
+  review: "heart" | "general" | "bad";
   imageStyle?: ImageStyle
 }
 
@@ -16,7 +16,7 @@ const ReviewIcon = ({ review, imageStyle }: ReviewIconProp) => {
         resizeMode="contain"
         style={[{ width: 20, height: 20 }, imageStyle]}
       />
-      <Text style={[{ paddingLeft: 5, fontWeight: 'bold' }, review === 'heart' ? styles.heart : (review === 'triangle' ? styles.triangle : styles.default)]}>
+      <Text style={[{ paddingLeft: 5, fontWeight: 'bold' }, review === 'heart' ? styles.heart : (review === 'general' ? styles.triangle : styles.default)]}>
         {reviewItem(review)?.text}</Text>
     </View >
   );
@@ -26,7 +26,7 @@ const reviewItem = (review: string) => {
   switch (review) {
     case "heart":
       return { image: heart, text: '최고예요', };
-    case "triangle":
+    case "general":
       return { image: circle, text: '괜찮아요', };
     case "bad":
       return { image: bad, text: '별로예요', };
