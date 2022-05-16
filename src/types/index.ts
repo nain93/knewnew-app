@@ -26,9 +26,6 @@ export interface UserInfoType {
   tags: Array<string>
 }
 
-
-
-
 export interface InterestType {
   title: string;
   isClick: boolean;
@@ -45,4 +42,9 @@ export interface BadgeType {
     title: string;
     isClick: boolean;
   }>
+}
+
+export interface ReviewListType {
+  id: number,
+  author: string
 }

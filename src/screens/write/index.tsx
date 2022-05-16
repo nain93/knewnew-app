@@ -59,7 +59,7 @@ const Write = ({ navigation }: NavigationType) => {
           </TouchableOpacity>
           <TouchableOpacity style={styles.reviewIcon}>
             <Image source={graytriangle} style={{ width: d2p(20), height: h2p(20) }} />
-            <Text style={{ color: theme.color.grayscale.a09ca4, marginLeft: d2p(5) }}>그저그래요</Text>
+            <Text style={{ color: theme.color.grayscale.a09ca4, marginLeft: d2p(5) }}>괜찮아요</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.reviewIcon}>
             <Image source={grayclose} style={{ width: d2p(20), height: h2p(20) }} />

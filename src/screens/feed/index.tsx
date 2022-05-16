@@ -10,9 +10,14 @@ import { tagfilter } from '~/assets/icons';
 import RBSheet from "react-native-raw-bottom-sheet";
 import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
 import SelectLayout from '~/components/selectLayout';
-import { BadgeType } from '~/types';
+import { BadgeType, ReviewListType } from '~/types';
 import AlertPopup from '~/components/popup/alertPopup';
 import ReKnew from '~/components/review/reKnew';
+import { useQuery } from 'react-query';
+import { getReviewList } from '~/api/review';
+import { useRecoilValue } from 'recoil';
+import { tokenState } from '~/recoil/atoms';
+import Loading from '~/components/loading';
 
 function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
   return (
@@ -34,7 +39,13 @@ const Feed = () => {
     household: [],
     taste: []
   });
+  const token = useRecoilValue(tokenState);
 
+  const reviewListQuery = useQuery<ReviewListType, Error>(["reviewList", token], () => getReviewList(token), {
+    enabled: !!token
+  });
+
+  console.log(reviewListQuery.data, 'reviewListQuery');
   const [bottomSheetHeight, setBottomSheetHeight] = useState(0);
 
   const fadeIn = () => {
@@ -62,6 +73,9 @@ const Feed = () => {
     }
   }, [isPopupOpen, fadeAnim, scrollOffset]);
 
+  if (reviewListQuery.isLoading) {
+    return <Loading />;
+  }
 
   return (
     <>

@@ -8,6 +8,7 @@ import ReviewIcon from '../icon/reviewIcon';
 import ReactionIcon from '../icon/reactionIcon';
 import { tag } from '~/assets/icons';
 import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 
 interface FeedReviewProps {
   review: any,
@@ -15,7 +16,7 @@ interface FeedReviewProps {
 }
 
 const FeedReview = ({ review, isRetweet = false }: FeedReviewProps) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp>();
   const [like, setLike] = useState<boolean>(false);
   const [cart, setCart] = useState<boolean>(false);
 
