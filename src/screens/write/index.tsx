@@ -47,6 +47,8 @@ const Write = ({ navigation }: NavigationType) => {
   const addReviewMutation = useMutation(["addReview", token],
     (writeProps: WriteReviewType) => writeReview({ token, ...writeProps }));
 
+  const [selectMarket, setIsSelectMarket] = useState(false);
+
   const pickImage = () => {
     if (imageList.length >= 5) {
       return;
@@ -133,8 +135,12 @@ const Write = ({ navigation }: NavigationType) => {
           <TouchableOpacity
             onPress={() => marketRefRBSheet.current?.open()}
             style={styles.select}>
-            <Image source={(writeData.market ? maincart : cart)} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
-            <Text>{writeData.market ? writeData.market : "유통사 선택"}</Text>
+            <Image source={(writeData.market !== "선택 안함") ? maincart : cart} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
+            {selectMarket ?
+              <Text>{writeData.market ? writeData.market : "유통사 선택"}</Text>
+              :
+              <Text>유통사 선택</Text>
+            }
           </TouchableOpacity>
         </View>
 
@@ -232,6 +238,7 @@ const Write = ({ navigation }: NavigationType) => {
           {React.Children.toArray(marketList.map((market, marketIdx) =>
             <TouchableOpacity
               onPress={() => {
+                setIsSelectMarket(true);
                 setWriteData({ ...writeData, market });
                 marketRefRBSheet.current?.close();
               }}

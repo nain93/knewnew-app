@@ -42,10 +42,9 @@ const Feed = () => {
   const token = useRecoilValue(tokenState);
 
   const reviewListQuery = useQuery<ReviewListType, Error>(["reviewList", token], () => getReviewList(token), {
-    enabled: !!token
+    enabled: !!token,
   });
 
-  console.log(reviewListQuery.data, 'reviewListQuery');
   const [bottomSheetHeight, setBottomSheetHeight] = useState(0);
 
   const fadeIn = () => {
