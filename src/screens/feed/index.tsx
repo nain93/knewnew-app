@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, ViewStyle, ScrollView } from 'react-native';
-import React, { Fragment, useRef, useState } from 'react';
+import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, ViewStyle, ScrollView, Animated } from 'react-native';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import Header from '~/components/header';
@@ -12,7 +12,7 @@ import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
 import SelectLayout from '~/components/selectLayout';
 import { BadgeType } from '~/types';
 import AlertPopup from '~/components/popup/alertPopup';
-import ReReview from '~/components/review/reReview';
+import ReKnew from '~/components/review/reKnew';
 
 function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
   return (
@@ -25,6 +25,7 @@ function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
 }
 
 const Feed = () => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
   const [isPopupOpen, setIspopupOpen] = useState(false);
   const [scrollOffset, setScrollOffset] = useState(0);
   const tagRefRBSheet = useRef<RBSheet>(null);
@@ -36,6 +37,32 @@ const Feed = () => {
 
   const [bottomSheetHeight, setBottomSheetHeight] = useState(0);
 
+  const fadeIn = () => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 100,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const fadeOut = () => {
+    Animated.timing(fadeAnim, {
+      toValue: 0,
+      duration: 100,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  useEffect(() => {
+    if (scrollOffset >= h2p(130)) {
+      fadeIn();
+    }
+    else {
+      fadeOut();
+    }
+  }, [isPopupOpen, fadeAnim, scrollOffset]);
+
+
   return (
     <>
       {Platform.OS === "ios" &&
@@ -43,13 +70,16 @@ const Feed = () => {
       <Header
         viewStyle={isIphoneX() ? { marginTop: 0 } : {}}
         customRight={
-          scrollOffset >= h2p(130) ?
-            <TouchableOpacity
-              onPress={() => tagRefRBSheet.current?.open()}
-              style={[styles.filter, { marginRight: 0, marginBottom: 0 }]}>
-              <Image source={tagfilter} style={{ width: 11, height: 10, marginRight: d2p(10) }} />
-              <Text>태그 변경</Text>
-            </TouchableOpacity> : <View />}
+          <Animated.View style={{ opacity: fadeAnim ? fadeAnim : 1, zIndex: 10 }}>
+            {scrollOffset >= h2p(130) ?
+              <TouchableOpacity
+                onPress={() => tagRefRBSheet.current?.open()}
+                style={[styles.filter, { marginRight: 0, marginBottom: 0 }]}>
+                <Image source={tagfilter} style={{ width: 11, height: 10, marginRight: d2p(10) }} />
+                <Text>태그 변경</Text>
+              </TouchableOpacity> : <View />}
+          </Animated.View>
+        }
         headerLeft={scrollOffset >= h2p(130) ? <View /> : <Image source={mainLogo} resizeMode="contain" style={{ width: d2p(96), height: h2p(20) }} />}
         isBorder={scrollOffset >= h2p(130) ? true : false} bgColor={scrollOffset >= h2p(130) ? theme.color.white : theme.color.grayscale.f7f7fc}
       />
