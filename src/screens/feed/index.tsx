@@ -214,7 +214,7 @@ const data = [{
   id: 1,
   badge: '비건',
   title: '하림조각닭',
-  review: 'triangle',
+  review: 'circle',
   household: '애기가족',
   content: `오설록 초콜릿 쿠키도 맛있어요! 공부할때 하나씩 꺼내먹기 좋아용
 가격은 좀 ㅎㄷㄷ하지만 … 오설록이라서 찐해서 좋아욤`,
@@ -237,7 +237,7 @@ const data = [{
   id: 3,
   badge: '디저트러버',
   title: '',
-  review: 'triangle',
+  review: 'circle',
   household: '가족한끼',
   content: `유통사, 상품명 둘 다 입력안했을 경우에는 추천표식도 없습니다 (뉴뉴 심볼과 같이 그냥 글만 노출)`,
   date: '2022.04.26',

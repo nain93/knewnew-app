@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   heart: {
     color: theme.color.main
   },
-  triangle: {
+  circle: {
     color: theme.color.yellow
   }
 });

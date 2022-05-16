@@ -4,7 +4,7 @@ import Header from '~/components/header';
 import theme from '~/styles/theme';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import { BadgeType, NavigationType } from '~/types';
-import { cart, grayclose, grayheart, graytriangle, tag } from '~/assets/icons';
+import { blackclose, cart, circle, graycircle, grayclose, grayheart, heart, maincart, maintag, tag } from '~/assets/icons';
 import { photo, photoClose } from '~/assets/images';
 import { d2p, h2p } from '~/utils';
 
@@ -12,13 +12,25 @@ import ImageCropPicker from 'react-native-image-crop-picker';
 import RBSheet from "react-native-raw-bottom-sheet";
 import SelectLayout from '~/components/selectLayout';
 import CloseIcon from '~/components/icon/closeIcon';
+import { useMutation } from 'react-query';
+import { writeReview } from '~/api/write';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { popupState, tokenState } from '~/recoil/atoms';
+import { WriteReviewType } from '~/types/review';
 
-const marketList = ["선택 안함", "마켓컬리", "쿠팡프레시", "SSG", "B마트", "윙잇", "쿠캣마켓"];
+const marketList: Array<"선택 안함" | "마켓컬리" | "쿠팡프레시" | "SSG" | "B마트" | "윙잇" | "쿠캣마켓"> =
+  ["선택 안함", "마켓컬리", "쿠팡프레시", "SSG", "B마트", "윙잇", "쿠캣마켓"];
 
 const Write = ({ navigation }: NavigationType) => {
-  const [writeData, setWriteData] = useState<{ name: string, content: string }>({
-    name: "",
-    content: ""
+  const [writeData, setWriteData] = useState<WriteReviewType>({
+    images: [],
+    content: "",
+    satisfaction: "",
+    product: 0,
+    parent: 0,
+    cart: 0,
+    market: "선택 안함",
+    tags: []
   });
   const [userBadge, setUserBadge] = useState<BadgeType>({
     interest: [],
@@ -29,6 +41,11 @@ const Write = ({ navigation }: NavigationType) => {
   const tagRefRBSheet = useRef<RBSheet>(null);
   const marketRefRBSheet = useRef<RBSheet>(null);
   const [imageList, setImageList] = useState<string[]>([]);
+
+  const token = useRecoilValue(tokenState);
+  const setIspopupOpen = useSetRecoilState(popupState);
+  const addReviewMutation = useMutation(["addReview", token],
+    (writeProps: WriteReviewType) => writeReview({ token, ...writeProps }));
 
   const pickImage = () => {
     if (imageList.length >= 5) {
@@ -43,6 +60,23 @@ const Write = ({ navigation }: NavigationType) => {
       compressImageMaxHeight: 720
     }).then(v => setImageList(imageList.concat(`data:${v.mime};base64,${v.data}`)));
   };
+  const handleAddWrite = () => {
+    if (writeData.satisfaction === "") {
+      setIspopupOpen({ isOpen: true, content: "선호도를 표시해주세요" });
+      return;
+    }
+    if (writeData.content === "") {
+      setIspopupOpen({ isOpen: true, content: "내용을 입력해주세요" });
+      return;
+    }
+    if (writeData.tags.length === 0) {
+      setIspopupOpen({ isOpen: true, content: "태그를 선택해주세요" });
+      return;
+    }
+    // todo imagelist 넣어주기
+    // writeData.images
+    addReviewMutation.mutate({ ...writeData });
+  };
 
   return (
     <>
@@ -50,20 +84,27 @@ const Write = ({ navigation }: NavigationType) => {
         isBorder={true}
         headerLeft={<LeftArrowIcon onBackClick={() => navigation.goBack()} imageStyle={{ width: 11, height: 25 }} />}
         title="작성하기"
+        headerRightPress={handleAddWrite}
         headerRight={<Text style={{ color: theme.color.grayscale.a09ca4 }}>완료</Text>} />
       <View style={styles.container}>
         <View style={styles.reviewIconWrap}>
-          <TouchableOpacity style={styles.reviewIcon}>
-            <Image source={grayheart} style={{ width: d2p(20), height: h2p(20) }} />
-            <Text style={{ color: theme.color.grayscale.a09ca4, marginLeft: d2p(5) }}>최고에요</Text>
+          <TouchableOpacity
+            onPress={() => setWriteData({ ...writeData, satisfaction: "best" })}
+            style={styles.reviewIcon}>
+            <Image source={(writeData.satisfaction === "best") ? heart : grayheart} style={{ width: d2p(20), height: h2p(20) }} />
+            <Text style={{ color: (writeData.satisfaction === "best") ? theme.color.main : theme.color.grayscale.a09ca4, marginLeft: d2p(5) }}>최고에요</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.reviewIcon}>
-            <Image source={graytriangle} style={{ width: d2p(20), height: h2p(20) }} />
-            <Text style={{ color: theme.color.grayscale.a09ca4, marginLeft: d2p(5) }}>괜찮아요</Text>
+          <TouchableOpacity
+            onPress={() => setWriteData({ ...writeData, satisfaction: "good" })}
+            style={styles.reviewIcon}>
+            <Image source={(writeData.satisfaction === "good") ? circle : graycircle} style={{ width: d2p(20), height: h2p(20) }} />
+            <Text style={{ color: (writeData.satisfaction === "good") ? theme.color.yellow : theme.color.grayscale.a09ca4, marginLeft: d2p(5) }}>괜찮아요</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.reviewIcon}>
-            <Image source={grayclose} style={{ width: d2p(20), height: h2p(20) }} />
-            <Text style={{ color: theme.color.grayscale.a09ca4, marginLeft: d2p(5) }}>별로에요</Text>
+          <TouchableOpacity
+            onPress={() => setWriteData({ ...writeData, satisfaction: "bad" })}
+            style={styles.reviewIcon}>
+            <Image source={(writeData.satisfaction === "bad") ? blackclose : grayclose} style={{ width: d2p(20), height: h2p(20) }} />
+            <Text style={{ color: (writeData.satisfaction === "bad") ? theme.color.black : theme.color.grayscale.a09ca4, marginLeft: d2p(5) }}>별로에요</Text>
           </TouchableOpacity>
         </View>
         <TextInput
@@ -80,14 +121,20 @@ const Write = ({ navigation }: NavigationType) => {
           <TouchableOpacity
             onPress={() => tagRefRBSheet.current?.open()}
             style={[styles.select, { marginRight: d2p(10) }]}>
-            <Image source={tag} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
+            <View style={{ position: "relative" }}>
+              <Image source={(writeData.tags.length === 0) ? tag : maintag} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
+              {writeData.tags.length !== 0 &&
+                <Text style={{ fontSize: 8, color: theme.color.white, top: h2p(3), left: "22%", position: "absolute" }}>
+                  {writeData.tags.length}</Text>}
+            </View>
             <Text>태그 선택</Text>
+            <Text style={{ fontSize: 12, color: theme.color.main }}> *</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => marketRefRBSheet.current?.open()}
             style={styles.select}>
-            <Image source={cart} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
-            <Text>유통사 선택</Text>
+            <Image source={(writeData.market ? maincart : cart)} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
+            <Text>{writeData.market ? writeData.market : "유통사 선택"}</Text>
           </TouchableOpacity>
         </View>
 
@@ -139,7 +186,14 @@ const Write = ({ navigation }: NavigationType) => {
             imageStyle={{ width: d2p(15), height: h2p(15) }} />
           <Text style={{ fontSize: 16, fontWeight: "bold" }}>태그 선택</Text>
           <TouchableOpacity onPress={() => {
-            // todo 태그 상태 적용
+            const copy: { [index: string]: Array<{ isClick: boolean, title: string }> } = { ...userBadge };
+            const tags = Object.keys(copy).reduce<Array<string>>((acc, cur) => {
+              acc = acc.concat(copy[cur].filter(v => v.isClick).map(v => v.title));
+              return acc;
+            }, []);
+            setWriteData({
+              ...writeData, tags
+            });
             tagRefRBSheet.current?.close();
           }}>
             <Text style={{ color: theme.color.grayscale.ff5d5d }}>완료</Text>
@@ -178,6 +232,7 @@ const Write = ({ navigation }: NavigationType) => {
           {React.Children.toArray(marketList.map((market, marketIdx) =>
             <TouchableOpacity
               onPress={() => {
+                setWriteData({ ...writeData, market });
                 marketRefRBSheet.current?.close();
               }}
               style={{

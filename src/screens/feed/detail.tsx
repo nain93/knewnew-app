@@ -23,7 +23,7 @@ interface reviewProps {
   id: number;
   badge: string;
   title: string;
-  review: 'heart' | 'triangle' | 'bad';
+  review: 'heart' | 'circle' | 'bad';
   household: '자취생' | '애기가족' | '가족한끼' | '신혼부부';
   content: string;
   date: string;
@@ -168,8 +168,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
         </View>
       </KeyboardAwareScrollView>
     </Fragment>
-  )
-}
+  );
+};
 
 export default FeedDetail;
 

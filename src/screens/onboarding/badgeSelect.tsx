@@ -38,14 +38,15 @@ const BadgeSelect = ({ route, navigation }: BadgeSelectProps) => {
     }
 
     if (signupData) {
+      const copy: { [index: string]: Array<{ isClick: boolean, title: string }> } = { ...userBadge };
+      const tags = Object.keys(copy).reduce<Array<string>>((acc, cur) => {
+        acc = acc.concat(copy[cur].filter(v => v.isClick).map(v => v.title));
+        return acc;
+      }, []);
       const { accessToken, refreshToken } = await userSignup({
         ...signupData,
         representBadge: userBadge.interest.filter(v => v.masterBadge)[0].title,
-        tags: [
-          ...userBadge.interest.map(v => v.title),
-          ...userBadge.household.map(v => v.title),
-          ...userBadge.taste.map(v => v.title)
-        ]
+        tags
       });
       // todo 토큰 리코일, asynstoarge에 저장
       if (accessToken) {
