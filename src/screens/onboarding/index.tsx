@@ -70,7 +70,15 @@ const Onboarding = ({ navigation }: NavigationType) => {
         if (token) {
           const { accessToken } = token;
           const data = await userLogin({ token: accessToken, providerType: "naver" });
-          if (data) {
+          if (data.accessToken) {
+            // * 이미 가입된 유저
+            setToken(data.accessToken);
+            AsyncStorage.setItem("token", data.accessToken);
+            AsyncStorage.setItem("refreshToken", data.refreshToken);
+            //@ts-ignore
+            navigation.reset({ routes: [{ name: "TabNav" }] });
+          }
+          else {
             goToBadgeSelect(data);
           }
         }

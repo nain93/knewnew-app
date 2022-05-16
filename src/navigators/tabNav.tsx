@@ -45,7 +45,6 @@ const TabNavigator = () => {
       <Tabs.Screen
         name="피드"
         component={Feed}
-
         options={{
           tabBarIcon: ({ color, focused }) => (
             <Image

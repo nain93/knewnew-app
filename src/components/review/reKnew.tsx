@@ -10,7 +10,7 @@ interface FeedReviewProps {
   review: any
 }
 
-const ReReview = ({ review }: FeedReviewProps) => {
+const ReKnew = ({ review }: FeedReviewProps) => {
 
   return (
     <View style={styles.review}>
@@ -39,7 +39,7 @@ const ReReview = ({ review }: FeedReviewProps) => {
   );
 };
 
-export default ReReview;
+export default ReKnew;
 
 const styles = StyleSheet.create({
   review: {
