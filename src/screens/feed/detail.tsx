@@ -3,7 +3,6 @@ import React, { Fragment, useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import theme from '~/styles/theme';
-import { NavigationType, ReviewListType } from '~/types';
 import { d2p, h2p, simpleDate } from '~/utils';
 import ReviewIcon from '~/components/icon/reviewIcon';
 import MoreIcon from '~/components/icon/moreIcon';
@@ -18,6 +17,8 @@ import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import { getReviewDetail, likeReview } from '~/api/review';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { ReviewListType } from '~/types/review';
+import Loading from '~/components/loading';
 
 interface reviewProps {
   id: number;
@@ -77,8 +78,12 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const likeReviewMutation = useMutation('likeReview', ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state));
 
   useEffect(() => {
-    queryClient.invalidateQueries("reviewDetail")
-  }, [likeReviewMutation.data,])
+    queryClient.invalidateQueries("reviewDetail");
+  }, [likeReviewMutation.data,]);
+
+  if (reviewDetailQuery.isLoading) {
+    return <Loading />;
+  }
 
   return (
     <Fragment>
@@ -130,7 +135,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             <ReactionIcon name="cart" state={cart} setState={(isState: boolean) => setCart(isState)} />
             <View style={{ borderLeftWidth: 1, borderLeftColor: theme.color.grayscale.eae7ec, height: h2p(26) }} />
             <ReactionIcon name="like" count={reviewDetailQuery.data?.likeCount} state={like}
-              isLike={(isState: boolean) => { setLike(isState) }} mutation={likeReviewMutation} id={route.params?.id} />
+              isLike={(isState: boolean) => { setLike(isState); }} mutation={likeReviewMutation} id={route.params?.id} />
           </View>
           <Text style={{ marginTop: 20, fontSize: 12, color: theme.color.grayscale.C_79737e, fontWeight: 'bold', paddingBottom: h2p(20) }}>작성된 댓글 2개</Text>
           <View>

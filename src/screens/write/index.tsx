@@ -26,9 +26,6 @@ const Write = ({ navigation }: NavigationType) => {
     images: [],
     content: "",
     satisfaction: "",
-    product: 0,
-    parent: 0,
-    cart: 0,
     market: "선택 안함",
     tags: []
   });
@@ -75,9 +72,13 @@ const Write = ({ navigation }: NavigationType) => {
       setIspopupOpen({ isOpen: true, content: "태그를 선택해주세요" });
       return;
     }
-    // todo imagelist 넣어주기
-    // writeData.images
-    addReviewMutation.mutate({ ...writeData });
+
+    const images = imageList.reduce<Array<{ priority: number, image: string }>>((acc, cur, idx) => {
+      acc = acc.concat({ priority: idx, image: cur });
+      return acc;
+    }, []);
+
+    addReviewMutation.mutate({ ...writeData, images });
   };
 
   return (

@@ -9,9 +9,10 @@ import ReactionIcon from '../icon/reactionIcon';
 import { tag } from '~/assets/icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
+import { ReviewListType } from '~/types/review';
 
 interface FeedReviewProps {
-  review: any,
+  review: ReviewListType,
   isRetweet?: boolean
 }
 
@@ -52,7 +53,10 @@ const FeedReview = ({ review, isRetweet = false }: FeedReviewProps) => {
         <View style={styles.sign}>
           <Text style={styles.store}>{review.market}</Text>
         </View>}
-      {review.photo && <View style={{ backgroundColor: 'black', width: d2p(270), height: h2p(180), borderRadius: 18, marginRight: 5 }} />}
+      {review.images.length > 0 &&
+        <Image source={{ uri: review.images[0]?.image }}
+          style={{ borderRadius: 10, width: Dimensions.get("window").width - d2p(90), aspectRatio: 3 / 2 }} />
+      }
       <View style={styles.reactionContainer}>
         <ReactionIcon name="cart" state={cart} setState={(isState: boolean) => setCart(isState)} />
         <ReactionIcon name="comment" count={review.commentCount} />

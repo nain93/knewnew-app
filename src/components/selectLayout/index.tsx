@@ -1,7 +1,7 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useEffect } from 'react';
 import Badge from '~/components/badge';
-import { h2p } from '~/utils';
+import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import { initialize } from '~/assets/icons';
 import { BadgeType } from '~/types';
@@ -10,9 +10,10 @@ interface SelectLayoutProps {
   userBadge: BadgeType;
   setUserBadge: (badgeProp: BadgeType) => void;
   isInitial?: boolean;
+  type?: "filter"
 }
 
-const SelectLayout = ({ isInitial, userBadge, setUserBadge }: SelectLayoutProps) => {
+const SelectLayout = ({ isInitial, userBadge, setUserBadge, type }: SelectLayoutProps) => {
   const resetIsClick = () => {
     setUserBadge({
       interest: userBadge.interest.map(v => ({ title: v.title, isClick: false })),
@@ -41,29 +42,83 @@ const SelectLayout = ({ isInitial, userBadge, setUserBadge }: SelectLayoutProps)
 
   return (
     <>
-      <View style={{ flexDirection: 'row' }}><Text style={{ ...styles.menu, marginTop: 0 }}>관심사 </Text><Text style={{ color: theme.color.main }}>*</Text></View>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-        {React.Children.toArray(userBadge.interest.map((item, idx) => (
-          <Badge type="picker" badge="interest" text={item.title} idx={idx} isClick={userBadge.interest[idx].isClick}
-            userBadge={userBadge} setUserBadge={(interestProp) => setUserBadge({ ...userBadge, interest: interestProp })} />
-        )))}
+      <View style={{ flex: 1 }}>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={{ ...styles.menu, marginTop: 0 }}>관심사 </Text>
+          {type !== "filter" &&
+            <Text style={{ color: theme.color.main }}>*</Text>
+          }
+        </View>
+        <View
+          style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+          {React.Children.toArray(userBadge.interest.map((item, idx) => (
+            <Badge type="picker" layoutType={type} badge="interest" text={item.title} idx={idx} isClick={userBadge.interest[idx].isClick}
+              userBadge={userBadge} setUserBadge={(interestProp) => {
+                if (type === "filter") {
+                  setUserBadge({
+                    household: userBadge.household.map(v => ({ ...v, isClick: false })),
+                    taste: userBadge.taste.map(v => ({ ...v, isClick: false })),
+                    interest: interestProp
+                  });
+                }
+                else {
+                  setUserBadge({ ...userBadge, interest: interestProp });
+                }
+              }
+              } />
+          )))}
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', ...styles.menu }}>
+          <Text>가족구성 </Text>
+          {type !== "filter" &&
+            <>
+              <Text style={{ color: theme.color.main }}>*</Text>
+              <Text style={{ marginLeft: 15, color: theme.color.grayscale.a09ca4, fontSize: 12 }}>
+                1가지만 선택해주세요</Text>
+            </>
+          }
+        </View>
+        <View
+          style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+          {React.Children.toArray(userBadge.household.map((item, idx) => (
+            <Badge type="picker" layoutType={type} badge="household" text={item.title} idx={idx} isClick={userBadge.household[idx].isClick}
+              userBadge={userBadge} setUserBadge={(householdProp) => {
+                if (type === "filter") {
+                  setUserBadge({
+                    household: householdProp,
+                    taste: userBadge.taste.map(v => ({ ...v, isClick: false })),
+                    interest: userBadge.interest.map(v => ({ ...v, isClick: false }))
+                  });
+                }
+                else {
+                  setUserBadge({ ...userBadge, household: householdProp });
+                }
+              }} />
+          )))}
+        </View>
+        <View style={{ position: "absolute", bottom: h2p(20) }}>
+          <Text style={[styles.menu, { marginTop: 0 }]}>입맛</Text>
+          <View style={{ flexDirection: 'row', marginBottom: 'auto' }}>
+            {React.Children.toArray(userBadge.taste.map((item, idx) => (
+              <Badge type="picker" layoutType={type} badge="taste" text={item.title} idx={idx} isClick={userBadge.taste[idx].isClick}
+                userBadge={userBadge} setUserBadge={(tasteProp) => {
+                  if (type === "filter") {
+                    setUserBadge({
+                      household: userBadge.household.map(v => ({ ...v, isClick: false })),
+                      taste: tasteProp,
+                      interest: userBadge.interest.map(v => ({ ...v, isClick: false }))
+                    });
+                  }
+                  else {
+                    setUserBadge({ ...userBadge, taste: tasteProp });
+                  }
+                }}
+              />
+            )))}
+          </View>
+        </View>
       </View>
-      <View style={{ flexDirection: 'row', alignItems: 'center', ...styles.menu }}><Text>가족구성 </Text><Text style={{ color: theme.color.main }}>*</Text>
-        <Text style={{ marginLeft: 15, color: theme.color.grayscale.a09ca4, fontSize: 12 }}>1가지만 선택해주세요</Text></View>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-        {React.Children.toArray(userBadge.household.map((item, idx) => (
-          <Badge type="picker" badge="household" text={item.title} idx={idx} isClick={userBadge.household[idx].isClick}
-            userBadge={userBadge} setUserBadge={(householdProp) => setUserBadge({ ...userBadge, household: householdProp })} />
-        )))}
-      </View>
-      <Text style={styles.menu}>입맛</Text>
-      <View style={{ flexDirection: 'row', marginBottom: 'auto' }}>
-        {React.Children.toArray(userBadge.taste.map((item, idx) => (
-          <Badge type="picker" badge="taste" text={item.title} idx={idx} isClick={userBadge.taste[idx].isClick}
-            userBadge={userBadge} setUserBadge={(tasteProp) => setUserBadge({ ...userBadge, taste: tasteProp })}
-          />
-        )))}
-      </View>
+
       {isInitial &&
         <TouchableOpacity
           onPress={resetIsClick}
@@ -79,9 +134,6 @@ const SelectLayout = ({ isInitial, userBadge, setUserBadge }: SelectLayoutProps)
 export default SelectLayout;
 
 const styles = StyleSheet.create({
-  container: {
-
-  },
   menu: {
     marginTop: h2p(40),
     marginBottom: h2p(5)

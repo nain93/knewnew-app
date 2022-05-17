@@ -10,9 +10,6 @@ export const writeReview = async ({
     images,
     content,
     satisfaction,
-    product,
-    parent,
-    cart,
     tags
   }, {
     headers: {

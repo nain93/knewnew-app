@@ -10,7 +10,7 @@ import { Animated } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useQuery } from 'react-query';
 import { getMyProfile } from '~/api/user';
-import { MyPrfoileType } from '~/types';
+import { MyPrfoileType } from '~/types/user';
 
 const App = () => {
   const [isPopupOpen, setIsPopupOpen] = useRecoilState(popupState);

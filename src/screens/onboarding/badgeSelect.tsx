@@ -6,12 +6,13 @@ import BasicButton from '~/components/button/basicButton';
 import Badge from '~/components/badge';
 import { NavigationStackProp } from "react-navigation-stack";
 import { NavigationRoute } from "react-navigation";
-import { BadgeType, UserInfoType } from '~/types';
+import { BadgeType } from '~/types';
 import { userSignup } from '~/api/user';
 import { colorCheck } from '~/assets/icons';
 import { useSetRecoilState } from 'recoil';
 import { popupState, tokenState } from '~/recoil/atoms';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { UserInfoType } from '~/types/user';
 
 interface BadgeSelectProps {
   navigation: NavigationStackProp
