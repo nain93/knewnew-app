@@ -5,10 +5,11 @@ import theme from '~/styles/theme';
 import BasicButton from '~/components/button/basicButton';
 import { NavigationStackProp } from "react-navigation-stack";
 import { NavigationRoute } from "react-navigation";
-import { BadgeType, UserInfoType } from '~/types';
+import { BadgeType } from '~/types';
 import SelectLayout from '~/components/selectLayout';
 import { popupState } from '~/recoil/atoms';
 import { useSetRecoilState } from 'recoil';
+import { UserInfoType } from '~/types/user';
 
 interface BadgeSelectProps {
   navigation: NavigationStackProp

@@ -8,6 +8,7 @@ import { d2p, h2p } from "~/utils";
 interface BadgeProp {
   text: string,
   type: "picker" | "feed" | "mypage" | "unabled",
+  layoutType?: "filter",
   badge?: "interest" | "household" | "taste",
   isClick: boolean,
   idx: number,
@@ -16,28 +17,43 @@ interface BadgeProp {
   viewStyle?: ViewStyle
 }
 
-const Badge = ({ text, type, badge, isClick, idx, userBadge, setUserBadge, viewStyle }: BadgeProp) => {
+const Badge = ({ layoutType, text, type, badge, isClick, idx, userBadge, setUserBadge, viewStyle }: BadgeProp) => {
 
   switch (type) {
     case 'picker':
       return (
-
         <TouchableOpacity
           onPress={() => {
             if (badge) {
-              setUserBadge(
-                userBadge[badge].map((v, i) => {
-                  if (i === idx) {
-                    return { isClick: !v.isClick, title: v.title };
-                  }
-                  if (badge === "household") {
-                    return { isClick: false, title: v.title };
-                  }
-                  else {
-                    return v;
-                  }
-                })
-              );
+              // * 필터 ui 태그 하나만 석탠 할 수있슴
+              if (layoutType === "filter") {
+                setUserBadge(
+                  userBadge[badge].map((v, i) => {
+                    if (i === idx) {
+                      return { isClick: !v.isClick, title: v.title };
+                    }
+                    else {
+                      return { isClick: false, title: v.title };
+                    }
+                  })
+                );
+              }
+              // * 관심사, 입맛 여러개 선택가능
+              else {
+                setUserBadge(
+                  userBadge[badge].map((v, i) => {
+                    if (i === idx) {
+                      return { isClick: !v.isClick, title: v.title };
+                    }
+                    if (badge === "household") {
+                      return { isClick: false, title: v.title };
+                    }
+                    else {
+                      return v;
+                    }
+                  })
+                );
+              }
             }
           }} style={[styles.tag, !isClick ? styles.basic : styles.checked, viewStyle]}>
           {isClick && <Image source={colorCheck} resizeMode="contain" style={{ width: 10, height: 8, marginRight: 5 }} />}

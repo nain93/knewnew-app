@@ -1,6 +1,6 @@
 import axios from "axios";
 import { baseURL } from "~/api";
-import { UserInfoType } from "~/types";
+import { UserInfoType } from "~/types/user";
 
 export const getMyProfile = async (token: string) => {
   const res = await axios.get(baseURL + "user/", {
