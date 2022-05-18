@@ -10,7 +10,7 @@ interface ReviewIconProp {
   name: "like" | "cart" | "retweet" | "comment";
   count?: number;
   state?: boolean;
-  isLike?: (isState: boolean) => void;
+  isState?: (isState: boolean) => void;
   mutation?: UseMutationResult<any, unknown, {
     id: number;
     state: boolean;
@@ -18,15 +18,15 @@ interface ReviewIconProp {
   id: number;
 }
 
-const ReactionIcon = ({ name, count, state, isLike, mutation, id }: ReviewIconProp) => {
+const ReactionIcon = ({ name, count, state, isState, mutation, id }: ReviewIconProp) => {
   const navigation = useNavigation<StackNavigationProp>();
 
   return (
     <TouchableOpacity style={{
       flexDirection: "row", alignItems: 'center', justifyContent: 'space-between', position: 'relative', left: -13
     }} onPress={() => {
-      if (isLike) {
-        isLike(!state);
+      if (isState) {
+        isState(!state);
         mutation?.mutate({ id, state: !state });
       } else {
         navigation.navigate(name);
