@@ -13,7 +13,7 @@ import SelectLayout from '~/components/selectLayout';
 import { BadgeType } from '~/types';
 import AlertPopup from '~/components/popup/alertPopup';
 import ReKnew from '~/components/review/reKnew';
-import { useQuery, useQueryClient } from 'react-query';
+import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
 import { getReviewList } from '~/api/review';
 import { useRecoilValue } from 'recoil';
 import { tokenState } from '~/recoil/atoms';
@@ -47,28 +47,28 @@ const Feed = () => {
 
   const [filterBadge, setFilterBadge] = useState("");
 
-  // TODO useInfiniteQuery
-  const reviewListQuery = useQuery<ReviewListType[], Error>(["reviewList", token, filterBadge], async () => {
+  const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
+    enabled: !!token,
+    onSuccess: (data) => setFilterBadge(data.representBadge)
+  });
+
+  const reviewListQuery = useInfiniteQuery<ReviewListType[], Error>(["reviewList", token, filterBadge], async ({ pageParam = 0 }) => {
     // * 필터한 리뷰리스트
     if (filterBadge) {
-      const queryData = await getReviewList({ token, tag: filterBadge });
+      const queryData = await getReviewList({ token, tag: filterBadge, offset: pageParam });
       return queryData;
     }
     // * 전체 리뷰리스트
     else {
-      const queryData = getReviewList({ token });
+      const queryData = getReviewList({ token, tag: filterBadge, offset: pageParam });
       return queryData;
     }
   }, {
     enabled: !!token,
+    getNextPageParam: (next, all) => all.flat().length,
+    getPreviousPageParam: (prev) => (prev.length - 20) ?? undefined
   });
-
-  const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
-    enabled: !!token
-  });
-
   // const filteredMutation = useMutation(["filteredList", token], (badge: string) => getFilteredReview(token, badge));
-
   const fadeIn = () => {
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -125,12 +125,16 @@ const Feed = () => {
       />
       <View style={{ flex: 1, backgroundColor: theme.color.grayscale.f7f7fc }}>
         <FlatList
+          onEndReached={() => reviewListQuery.fetchNextPage()}
+          onEndReachedThreshold={0.3}
           refreshing={reviewListQuery.isLoading}
           onRefresh={() => {
-            setFilterBadge("");
+            if (getMyProfileQuery.data) {
+              setFilterBadge(getMyProfileQuery.data?.representBadge);
+            }
             queryClient.invalidateQueries("reviewList");
           }}
-          data={reviewListQuery.data}
+          data={reviewListQuery.data?.pages.flat()}
           ListHeaderComponent={() =>
             <Fragment>
               <View style={styles.main}>
@@ -154,6 +158,9 @@ const Feed = () => {
           renderItem={({ item }) =>
             <FeedReview review={item} />
             // <ReKnew review={item} />
+          }
+          ListFooterComponent={() =>
+            <View style={{ height: h2p(40) }} />
           }
           style={{ marginTop: 0, marginBottom: h2p(80) }}
           keyExtractor={(review) => String(review.id)}
@@ -219,6 +226,9 @@ const Feed = () => {
               }, "");
               setFilterBadge(badge);
               queryClient.invalidateQueries("reviewList");
+
+              // * 필터후 스크롤 offset초기화
+              setScrollOffset(0);
               tagRefRBSheet.current?.close();
             }}
             style={{

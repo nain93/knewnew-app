@@ -23,6 +23,11 @@ export interface BookmarkType {
   created: string
 }
 
+export interface userNormalType {
+  id: number,
+  nickname: string,
+  profileImage?: string
+}
 export interface MyPrfoileType {
   id: number,
   nickname: string,

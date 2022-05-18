@@ -50,7 +50,8 @@ const MypageTabView = () => {
             <Text style={{
               fontSize: 16, fontWeight: focused ? "bold" : "normal",
               color: focused ? theme.color.black : theme.color.grayscale.C_79737e
-            }}>{route.title}</Text>}
+            }}>{route.title}</Text>
+          }
         />}
     />
   );
