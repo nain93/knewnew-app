@@ -3,14 +3,13 @@ import React, { useState } from 'react';
 import theme from '~/styles/theme';
 import { d2p, h2p, simpleDate } from '~/utils';
 import Badge from '../badge';
-import MoreIcon from '~/components/icon/moreIcon';
 import ReviewIcon from '../icon/reviewIcon';
 import ReactionIcon from '../icon/reactionIcon';
 import { more, tag } from '~/assets/icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 import { ReviewListType } from '~/types/review';
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { tokenState } from '~/recoil/atoms';
 import { likeReview } from '~/api/review';
@@ -22,17 +21,12 @@ interface FeedReviewProps {
 
 const FeedReview = ({ review, isRetweet = false }: FeedReviewProps) => {
   const navigation = useNavigation<StackNavigationProp>();
-  const [like, setLike] = useState<boolean>(false);
+  const [like, setLike] = useState<boolean>(review.isLike);
   const [cart, setCart] = useState<boolean>(false);
-  const queryClient = useQueryClient();
   const token = useRecoilValue(tokenState);
   const [isMoreClick, setIsMoreClick] = useState<boolean>();
 
-  const likeReviewFeedMutation = useMutation('likeReviewFeed', ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state), {
-    onSuccess: () => {
-      queryClient.invalidateQueries("reviewList",);
-    }
-  });
+  const likeReviewFeedMutation = useMutation('likeReviewFeed', ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state));
 
   return (
     <View style={styles.review}>
@@ -41,7 +35,7 @@ const FeedReview = ({ review, isRetweet = false }: FeedReviewProps) => {
         <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', maxWidth: Dimensions.get('window').width - d2p(120) }}>
           <Text style={styles.title}>{review.author.nickname}</Text>
           <Badge type="feed" text={review.author.representBadge} />
-          <Text style={{ fontSize: 12, marginLeft: 5, color: theme.color.grayscale.a09ca4 }}>{review.household}</Text>
+          <Text style={{ fontSize: 12, marginLeft: 5, color: theme.color.grayscale.a09ca4 }}>{review.author.household}</Text>
         </View>
         <TouchableOpacity onPress={() => setIsMoreClick(!isMoreClick)}>
           <Image
@@ -60,7 +54,7 @@ const FeedReview = ({ review, isRetweet = false }: FeedReviewProps) => {
               <Pressable>
                 <Text style={{ color: theme.color.grayscale.C_443e49 }}>공유</Text>
               </Pressable>
-              <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }}></View>
+              <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
               <Pressable>
                 <Text style={{ color: theme.color.main }}>신고</Text>
               </Pressable>
@@ -90,7 +84,7 @@ const FeedReview = ({ review, isRetweet = false }: FeedReviewProps) => {
         <ReactionIcon name="cart" state={cart} isState={(isState: boolean) => setCart(isState)} />
         <ReactionIcon name="comment" count={review.commentCount} />
         <ReactionIcon name="like" count={review.likeCount} state={like}
-          isState={(isState: boolean) => { setLike(isState) }} mutation={likeReviewFeedMutation} id={review.id} />
+          isState={(isState: boolean) => { setLike(isState); }} mutation={likeReviewFeedMutation} id={review.id} />
         <ReactionIcon name="retweet" />
       </View>
     </View>

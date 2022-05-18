@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { like, retweet, comment, colorLike, cart, colorCart } from "~/assets/icons";
 import theme from "~/styles/theme";
@@ -20,6 +20,7 @@ interface ReviewIconProp {
 
 const ReactionIcon = ({ name, count, state, isState, mutation, id }: ReviewIconProp) => {
   const navigation = useNavigation<StackNavigationProp>();
+  const [reactCount, setReactCount] = useState(count);
 
   return (
     <TouchableOpacity style={{
@@ -28,6 +29,12 @@ const ReactionIcon = ({ name, count, state, isState, mutation, id }: ReviewIconP
       if (isState) {
         isState(!state);
         mutation?.mutate({ id, state: !state });
+        if (!state) {
+          setReactCount(prev => prev && (prev + 1));
+        }
+        else {
+          setReactCount(prev => prev && (prev - 1));
+        }
       } else {
         navigation.navigate(name);
       }
@@ -37,7 +44,7 @@ const ReactionIcon = ({ name, count, state, isState, mutation, id }: ReviewIconP
         resizeMode="contain"
         style={{ width: 26, height: 26 }}
       />
-      <Text style={[{ fontSize: 12 }, !state ? styles.default : styles.clicked, { marginLeft: 9 }]}>{count}</Text>
+      <Text style={[{ fontSize: 12 }, !state ? styles.default : styles.clicked, { marginLeft: 9 }]}>{reactCount}</Text>
     </TouchableOpacity >
   );
 };
