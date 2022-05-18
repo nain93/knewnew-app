@@ -37,5 +37,7 @@ export interface ReviewListType {
   parent: string | null,
   product: string | null,
   satisfaction: "best" | "good" | "bad",
-  tags: Array<string>
+  tags: Array<string>,
+  isLike: boolean,
+  isBookmark: boolean
 }

@@ -67,7 +67,6 @@ const Feed = () => {
     enabled: !!token
   });
 
-
   // const filteredMutation = useMutation(["filteredList", token], (badge: string) => getFilteredReview(token, badge));
 
   const fadeIn = () => {

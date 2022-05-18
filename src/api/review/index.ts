@@ -1,7 +1,7 @@
 import axios from "axios";
 import { baseURL } from "~/api";
 
-export const getReviewList = async ({ token, tag, offset }: { token: string, tag?: string, offset?: number }) => {
+export const getReviewList = async ({ token, tag = "", offset }: { token: string, tag?: string, offset?: number }) => {
   const res = await axios.get(baseURL + "review/", {
     params: {
       offset,
