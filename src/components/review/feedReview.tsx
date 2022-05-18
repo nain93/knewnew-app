@@ -1,4 +1,4 @@
-import { View, Text, Pressable, StyleSheet, Dimensions, Image, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Dimensions, Image, TouchableOpacity, Platform, ViewStyle } from 'react-native';
 import React, { useState } from 'react';
 import theme from '~/styles/theme';
 import { d2p, h2p, simpleDate } from '~/utils';
@@ -16,10 +16,11 @@ import { likeReview } from '~/api/review';
 
 interface FeedReviewProps {
   review: ReviewListType,
-  isRetweet?: boolean
+  isRetweet?: boolean,
+  viewStyle?: ViewStyle
 }
 
-const FeedReview = ({ review, isRetweet = false }: FeedReviewProps) => {
+const FeedReview = ({ review, viewStyle, isRetweet = false }: FeedReviewProps) => {
   const navigation = useNavigation<StackNavigationProp>();
   const [like, setLike] = useState<boolean>(review.isLike);
   const [cart, setCart] = useState<boolean>(false);
@@ -27,15 +28,15 @@ const FeedReview = ({ review, isRetweet = false }: FeedReviewProps) => {
   const [isMoreClick, setIsMoreClick] = useState<boolean>();
 
   const likeReviewFeedMutation = useMutation('likeReviewFeed', ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state));
-
   return (
-    <View style={styles.review}>
+    <Pressable onPress={() => navigation.navigate("FeedDetail", { id: review.id })}
+      style={[styles.review, viewStyle]}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-        <View style={{ backgroundColor: 'black', width: 40, height: 40, borderRadius: 20, marginRight: 5, position: 'absolute', left: -50 }} />
-        <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', maxWidth: Dimensions.get('window').width - d2p(120) }}>
+        <View style={{ backgroundColor: 'black', width: d2p(40), height: d2p(40), borderRadius: 40, marginRight: d2p(5), position: 'absolute', left: d2p(-50) }} />
+        <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', width: Dimensions.get('window').width - d2p(120) }}>
           <Text style={styles.title}>{review.author.nickname}</Text>
           <Badge type="feed" text={review.author.representBadge} />
-          <Text style={{ fontSize: 12, marginLeft: 5, color: theme.color.grayscale.a09ca4 }}>{review.author.household}</Text>
+          <Text style={{ fontSize: 12, marginLeft: d2p(5), color: theme.color.grayscale.a09ca4 }}>{review.author.household}</Text>
         </View>
         <TouchableOpacity onPress={() => setIsMoreClick(!isMoreClick)}>
           <Image
@@ -45,33 +46,29 @@ const FeedReview = ({ review, isRetweet = false }: FeedReviewProps) => {
           />
         </TouchableOpacity>
       </View>
-      <Pressable onPress={() => console.log('피드 상세')}>
-        <View style={styles.titleContainer}>
-          <ReviewIcon review={review.satisfaction} />
-          <Text style={{ fontSize: 10, color: theme.color.grayscale.a09ca4 }}>{simpleDate(review.created, ' 전')}</Text>
-          {isMoreClick &&
-            <View style={styles.clickBox}>
-              <Pressable>
-                <Text style={{ color: theme.color.grayscale.C_443e49 }}>공유</Text>
-              </Pressable>
-              <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-              <Pressable>
-                <Text style={{ color: theme.color.main }}>신고</Text>
-              </Pressable>
-            </View>}
-        </View>
-        <Pressable onPress={() => navigation.navigate("FeedDetail", { id: review.id })}>
-          <Text style={{ color: theme.color.black, marginBottom: 10 }}>{review.content}</Text>
-        </Pressable>
-        {!isRetweet &&
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Image source={tag} style={{ width: 10, height: 10, marginRight: 5 }} />
-            <Text style={{ fontSize: 12, color: theme.color.grayscale.C_79737e }}>
-              {React.Children.toArray(review?.tags?.map((v) => <Text>#{v} </Text>))}
-              <Text style={{ color: theme.color.main }}>#비건</Text>
-            </Text>
+      <View style={styles.titleContainer}>
+        <ReviewIcon review={review.satisfaction} />
+        <Text style={{ fontSize: 10, color: theme.color.grayscale.a09ca4 }}>{simpleDate(review.created, ' 전')}</Text>
+        {isMoreClick &&
+          <View style={styles.clickBox}>
+            <Pressable>
+              <Text style={{ color: theme.color.grayscale.C_443e49 }}>공유</Text>
+            </Pressable>
+            <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
+            <Pressable>
+              <Text style={{ color: theme.color.main }}>신고</Text>
+            </Pressable>
           </View>}
-      </Pressable>
+      </View>
+      <Text style={{ color: theme.color.black, marginBottom: 10 }}>{review.content}</Text>
+      {!isRetweet &&
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Image source={tag} style={{ width: 10, height: 10, marginRight: 5 }} />
+          <Text style={{ fontSize: 12, color: theme.color.grayscale.C_79737e }}>
+            {React.Children.toArray(review?.tags?.map((v) => <Text>#{v} </Text>))}
+            <Text style={{ color: theme.color.main }}>#비건</Text>
+          </Text>
+        </View>}
       {!isRetweet &&
         <View style={styles.sign}>
           <Text style={styles.store}>{review.market}</Text>
@@ -87,7 +84,7 @@ const FeedReview = ({ review, isRetweet = false }: FeedReviewProps) => {
           isState={(isState: boolean) => { setLike(isState); }} mutation={likeReviewFeedMutation} id={review.id} />
         <ReactionIcon name="retweet" />
       </View>
-    </View>
+    </Pressable>
   );
 };
 
@@ -97,8 +94,8 @@ const styles = StyleSheet.create({
   review: {
     backgroundColor: theme.color.white,
     width: Dimensions.get('window').width - d2p(20),
-    marginHorizontal: d2p(10), marginTop: h2p(20),
     borderRadius: 10,
+    marginHorizontal: d2p(10), marginTop: h2p(20),
     paddingRight: d2p(10), paddingLeft: d2p(60), paddingTop: d2p(15)
   },
   titleContainer: {
@@ -109,7 +106,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16, fontWeight: 'bold',
-    marginRight: 5
+    marginRight: d2p(10)
   },
   sign: {
     flexDirection: 'row',

@@ -74,3 +74,18 @@ export const userSignup = async ({
     }
   }
 };
+
+export const getSearchUserList = async ({ token, nickname, offset }: { token: string, nickname: string, offset: number }) => {
+  const res = await axios.get(baseURL + "search/user/", {
+    params: {
+      offset,
+      nickname
+    },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+  if (res) {
+    return res.data;
+  }
+};

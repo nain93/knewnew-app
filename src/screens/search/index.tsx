@@ -12,6 +12,13 @@ import { useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { NavigationRoute } from 'react-navigation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useInfiniteQuery } from 'react-query';
+import { ReviewListType } from '~/types/review';
+import { getSearchList } from '~/api/search';
+import { useRecoilValue } from 'recoil';
+import { tokenState } from '~/recoil/atoms';
+import { getSearchUserList } from '~/api/user';
+import { userNormalType } from '~/types/user';
 
 type SearchProps = {
   navigation: StackNavigationProp<any>
@@ -19,17 +26,56 @@ type SearchProps = {
 }
 
 const Search = ({ navigation }: SearchProps) => {
+  const [textForRefresh, setTextForRefresh] = useState(""); // * 검색 할때마다 query 리프레시용
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [keyword, setKeyword] = useState("");
   const [recentKeywords, setRecentKeyWords] = useState<Array<string>>([]);
 
-  const handleSearch = async () => {
-    const recentKeyword = await AsyncStorage.getItem("recentKeyword") || "[]";
-    AsyncStorage.setItem("recentKeyword", JSON.stringify((JSON.parse(recentKeyword)).concat(keyword)));
-    setRecentKeyWords((JSON.parse(recentKeyword)).concat(keyword));
+  const token = useRecoilValue(tokenState);
+
+  const searchListQuery = useInfiniteQuery<ReviewListType[], Error>(["searchList", token, textForRefresh], async ({ pageParam = 0 }) => {
+    const queryData = await getSearchList({ token, keyword, offset: pageParam });
+    return queryData;
+  }, {
+    enabled: !!textForRefresh,
+    getNextPageParam: (next, all) => all.flat().length,
+    getPreviousPageParam: (prev) => (prev.length - 20) ?? undefined,
+  });
+
+  const userListQuery = useInfiniteQuery<userNormalType[], Error>(["userList", token, textForRefresh], async ({ pageParam = 0 }) => {
+    const queryData = await getSearchUserList({ token, nickname: keyword, offset: pageParam });
+    return queryData;
+  }, {
+    enabled: !!textForRefresh,
+    getNextPageParam: (next, all) => all.flat().length,
+    getPreviousPageParam: (prev) => (prev.length - 20) ?? undefined,
+  });
+
+  const handleSearch = async (searchKeyword: string) => {
+    if (searchKeyword === "") {
+      return;
+    }
+
+    // * 최근검색어 중복일시 리스트에 넣지않음
+    if (!recentKeywords.every(v => v !== searchKeyword)) {
+    }
+
+    // * 최근검색어 갯수제한 10개, 10개 넘어가면 밀어내면서 10개 유지
+    else if (recentKeywords.length === 10) {
+      setRecentKeyWords([searchKeyword, ...recentKeywords].slice(0, recentKeywords.length));
+      AsyncStorage.setItem("recentKeyword", JSON.stringify([searchKeyword, ...recentKeywords].slice(0, recentKeywords.length)));
+    }
+    else {
+      setRecentKeyWords([searchKeyword, ...recentKeywords]);
+      AsyncStorage.setItem("recentKeyword", JSON.stringify([searchKeyword, ...recentKeywords]));
+    }
+    setTextForRefresh(searchKeyword);
     setIsSearchMode(true);
   };
 
+
+
+  // * 최근검색어 삭제
   const filterRecentKeyword = (filterIndex: number) => {
     AsyncStorage.setItem("recentKeyword", JSON.stringify(recentKeywords.filter((text, keywordIndex) => keywordIndex !== filterIndex)));
     setRecentKeyWords(recentKeywords.filter((text, keywordIndex) => keywordIndex !== filterIndex));
@@ -37,6 +83,7 @@ const Search = ({ navigation }: SearchProps) => {
 
   const handleBackClick = () => {
     if (isSearchMode) {
+      setKeyword("");
       setIsSearchMode(false);
     }
     else {
@@ -45,16 +92,16 @@ const Search = ({ navigation }: SearchProps) => {
   };
 
   // * 검색모드 초기화
-  useFocusEffect(
-    useCallback(() => {
-      setIsSearchMode(false);
-    }, []));
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     setIsSearchMode(false);
+  //   }, []));
 
   // * 최근 검색어 asyn스토리지에서 가져오기
   useEffect(() => {
     const getRecentKeyWords = async () => {
-      const recentKeyword = await AsyncStorage.getItem("recentKeyword") || "[]";
-      setRecentKeyWords(JSON.parse(recentKeyword));
+      const localKeyword = await AsyncStorage.getItem("recentKeyword") || "[]";
+      setRecentKeyWords(JSON.parse(localKeyword));
     };
     getRecentKeyWords();
   }, []);
@@ -80,11 +127,11 @@ const Search = ({ navigation }: SearchProps) => {
               }}
               value={keyword}
               onChangeText={(text) => setKeyword(text)}
-              onSubmitEditing={handleSearch}
+              onSubmitEditing={() => handleSearch(keyword)}
               placeholderTextColor={theme.color.grayscale.d3d0d5}
               placeholder="검색어를 입력하세요" />
             <TouchableOpacity
-              onPress={handleSearch}
+              onPress={() => handleSearch(keyword)}
               style={{ position: "absolute", right: d2p(10), top: d2p(6), }}>
               <Image source={isSearchMode ? mainSearchIcon : searchIcon}
                 style={{ width: d2p(16), height: d2p(16) }} />
@@ -93,7 +140,9 @@ const Search = ({ navigation }: SearchProps) => {
         }
       />
       {isSearchMode ?
-        <SearchTabView />
+        <SearchTabView
+          userList={userListQuery.data?.pages.flat()}
+          searchList={searchListQuery.data?.pages.flat()} />
         :
         <View style={styles.container}>
           <Text style={{ fontSize: 12, color: theme.color.grayscale.a09ca4 }}>최근 검색어</Text>
@@ -101,7 +150,10 @@ const Search = ({ navigation }: SearchProps) => {
             {React.Children.toArray(recentKeywords.map((recentKeyword, filterIndex) =>
               <View style={styles.recentKeyword}>
                 <TouchableOpacity
-                  onPress={() => console.log("keyword")}
+                  onPress={() => {
+                    setKeyword(recentKeyword);
+                    handleSearch(recentKeyword);
+                  }}
                   style={{ width: Dimensions.get("window").width - d2p(70) }}>
                   <Text style={{ fontSize: 16 }}>{recentKeyword}</Text>
                 </TouchableOpacity>

@@ -116,9 +116,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: theme.color.grayscale.f7f7fc,
     paddingVertical: h2p(3), paddingHorizontal: d2p(10),
-    marginRight: 'auto'
+    minWidth: d2p(55),
+    height: h2p(20),
+    justifyContent: "center",
+    alignItems: "center"
   },
   badgeText: {
-    fontSize: 10, color: theme.color.grayscale.C_443e49
+    fontSize: 10, color: theme.color.grayscale.C_443e49, fontWeight: "500"
   }
 });
