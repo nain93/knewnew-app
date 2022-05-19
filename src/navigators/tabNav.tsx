@@ -14,7 +14,6 @@ const Tabs = createBottomTabNavigator();
 const TabNavigator = () => {
   return (
     <Tabs.Navigator
-
       screenOptions={{
         tabBarLabelStyle: {
           backgroundColor: "transparent",
@@ -46,7 +45,7 @@ const TabNavigator = () => {
         name="피드"
         component={Feed}
         options={{
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <Image
               style={{ width: d2p(20), height: h2p(20) }}
               source={focused ? mainlogoIcon : graylogo}
@@ -56,10 +55,11 @@ const TabNavigator = () => {
       />
       <Tabs.Screen
         name="작성"
+        initialParams={{ type: "default" }}
         component={Write}
         options={{
           tabBarStyle: { display: "none" },
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: () => (
             <Image
               style={{ width: d2p(20), height: h2p(20) }}
               source={graywrite}
@@ -71,7 +71,7 @@ const TabNavigator = () => {
         name="검색"
         component={Search}
         options={{
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <Image
               style={{ width: d2p(20), height: h2p(20) }}
               source={focused ? mainSearchIcon : graysearch}
@@ -83,7 +83,7 @@ const TabNavigator = () => {
         name="마이페이지"
         component={Mypage}
         options={{
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <Image
               style={{ width: d2p(20), height: h2p(20) }}
               source={focused ? mainmypage : graymypage}
