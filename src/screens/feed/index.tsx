@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, Animated, Pressable } from 'react-native';
-import React, { Fragment, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import Header from '~/components/header';
@@ -22,6 +22,7 @@ import { getMyProfile } from '~/api/user';
 import { MyPrfoileType } from '~/types/user';
 import { ReviewListType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
+import { useFocusEffect } from '@react-navigation/native';
 
 function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
   return (
@@ -45,7 +46,7 @@ const Feed = ({ navigation }: NavigationType) => {
   });
   const token = useRecoilValue(tokenState);
   const queryClient = useQueryClient();
-  const [selectedIndex, setSelectedIndex] = useState(0)
+  const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const [filterBadge, setFilterBadge] = useState("");
 
@@ -98,6 +99,11 @@ const Feed = ({ navigation }: NavigationType) => {
     }
   }, [isPopupOpen, fadeAnim, scrollOffset]);
 
+  useFocusEffect(
+    useCallback(() => {
+      return () => setSelectedIndex(-1);
+    }, []));
+
   if (reviewListQuery.isLoading) {
     return <Loading />;
   }
@@ -144,9 +150,9 @@ const Feed = ({ navigation }: NavigationType) => {
               <View style={styles.main}>
                 <Text style={[styles.mainText, FONT.Bold]}>뉴뉴는 지금</Text>
                 <View style={{ flexDirection: 'row' }}>
-                  <Text style={[{ ...styles.mainText, color: theme.color.main },FONT.Bold]}>
+                  <Text style={[{ ...styles.mainText, color: theme.color.main }, FONT.Bold]}>
                     {filterBadge ? `#${filterBadge}` : `#${getMyProfileQuery.data?.representBadge}`} </Text>
-                   <Text style={[styles.mainText, FONT.Bold]}>관련 메뉴 추천 중 👀</Text>
+                  <Text style={[styles.mainText, FONT.Bold]}>관련 메뉴 추천 중 👀</Text>
                 </View>
               </View>
               <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
@@ -160,10 +166,14 @@ const Feed = ({ navigation }: NavigationType) => {
             </Fragment>
           }
           showsVerticalScrollIndicator={false}
-          renderItem={({ item }) =>
-            <Pressable onPress={() => navigation.navigate("FeedDetail", { id: item.id, badge: filterBadge, isLike: item.isLike })}
+          renderItem={({ item, index }) =>
+            <Pressable onPress={() =>
+              navigation.navigate("FeedDetail", { id: item.id, badge: filterBadge, isLike: item.isLike })}
               style={styles.review}>
-              <FeedReview review={item} filterBadge={filterBadge} />
+              <FeedReview idx={index}
+                selectedIndex={selectedIndex}
+                setSelectedIndex={(selectIdx: number) => setSelectedIndex(selectIdx)}
+                review={item} filterBadge={filterBadge} />
             </Pressable>
             // <ReKnew review={item} />
           }

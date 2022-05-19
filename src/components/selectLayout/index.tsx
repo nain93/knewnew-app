@@ -46,7 +46,7 @@ const SelectLayout = ({ isInitial, userBadge, setUserBadge, type = "normal" }: S
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
         <View style={{ flexDirection: 'row' }}>
           <Text style={[{ ...styles.menu, marginTop: 0 }, FONT.Regular]}>관심사 </Text>
-          {type !== ("write" && "filter") &&
+          {type === "normal" &&
             <Text style={{ color: theme.color.main }}>*</Text>
           }
         </View>
@@ -71,7 +71,7 @@ const SelectLayout = ({ isInitial, userBadge, setUserBadge, type = "normal" }: S
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', ...styles.menu }}>
           <Text style={FONT.Regular}>가족구성 </Text>
-          {type !== ("write" && "filter") &&
+          {type === "normal" &&
             <>
               <Text style={[{ color: theme.color.main }, FONT.Regular]}>*</Text>
               <Text style={[styles.guide, FONT.Regular]}>

@@ -1,4 +1,4 @@
-import { View, Text, Pressable, StyleSheet, Dimensions, Image, TouchableOpacity, Platform, ViewStyle } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Dimensions, Image, TouchableOpacity, Platform } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import theme from '~/styles/theme';
 import { d2p, h2p, simpleDate } from '~/utils';
@@ -19,9 +19,12 @@ interface FeedReviewProps {
   isRetweet?: boolean,
   filterBadge?: string
   type?: "reKnewWrite" | "normal"
+  setSelectedIndex: (idx: number) => void
+  idx: number
+  selectedIndex: number
 }
 
-const FeedReview = ({ type = "normal", filterBadge, review, isRetweet = false }: FeedReviewProps) => {
+const FeedReview = ({ selectedIndex, setSelectedIndex, idx, type = "normal", filterBadge, review, isRetweet = false }: FeedReviewProps) => {
   const navigation = useNavigation<StackNavigationProp>();
   const [isLike, setIsLike] = useState<boolean>(review.isLike);
   const [reactCount, setReactCount] = useState(review.likeCount);
@@ -60,7 +63,14 @@ const FeedReview = ({ type = "normal", filterBadge, review, isRetweet = false }:
           <Text style={[{ fontSize: 12, marginLeft: d2p(5), color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>{review.author.household}</Text>
         </View>
         {type === "normal" &&
-          <TouchableOpacity onPress={() => console.log("more")}>
+          <TouchableOpacity onPress={() => {
+            if (selectedIndex === idx) {
+              setSelectedIndex(-1);
+            }
+            else {
+              setSelectedIndex(idx);
+            }
+          }}>
             <Image
               source={more}
               resizeMode="contain"
@@ -72,27 +82,6 @@ const FeedReview = ({ type = "normal", filterBadge, review, isRetweet = false }:
         <ReviewIcon viewStyle={{ marginTop: h2p(14) }} review={review.satisfaction} />
         {type === "normal" &&
           <Text style={[{ fontSize: 10, color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>{simpleDate(review.created, ' 전')}</Text>
-        }
-        {review.author.id === myId ?
-          <View style={styles.clickBox}>
-            <Pressable>
-              <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
-            </Pressable>
-            <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-            <Pressable>
-              <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
-            </Pressable>
-          </View>
-          :
-          <View style={styles.clickBox}>
-            <Pressable>
-              <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
-            </Pressable>
-            <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-            <Pressable>
-              <Text style={[{ color: theme.color.main }, FONT.Regular]}>신고</Text>
-            </Pressable>
-          </View>
         }
       </View>
       <Text style={[{ color: theme.color.black, marginBottom: h2p(10), marginLeft: d2p(50) }, FONT.Regular]}>{review.content}</Text>
@@ -164,6 +153,30 @@ const FeedReview = ({ type = "normal", filterBadge, review, isRetweet = false }:
           </TouchableOpacity>
         </View>
       }
+      {
+        (selectedIndex === idx) &&
+        (
+          review.author.id === myId ?
+            <View style={styles.clickBox}>
+              <Pressable onPress={() => console.log("")}>
+                <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
+              </Pressable>
+              <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
+              <Pressable onPress={() => console.log("")}>
+                <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
+              </Pressable>
+            </View>
+            :
+            <View style={styles.clickBox}>
+              <Pressable onPress={() => console.log("")}>
+                <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
+              </Pressable>
+              <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
+              <Pressable onPress={() => console.log("")}>
+                <Text style={[{ color: theme.color.main }, FONT.Regular]}>신고</Text>
+              </Pressable>
+            </View>
+        )}
     </>
   );
 };
@@ -177,7 +190,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: "center",
     marginBottom: h2p(12),
-    marginLeft: d2p(50)
+    marginLeft: d2p(50),
   },
   title: {
     fontSize: 16, fontWeight: 'bold',
@@ -204,8 +217,8 @@ const styles = StyleSheet.create({
   },
   clickBox: {
     display: 'flex', justifyContent: 'space-evenly', alignItems: 'center',
-    width: 70, height: 70, borderRadius: 5,
-    position: 'absolute', right: d2p(36), top: 5,
+    width: d2p(70), height: d2p(70), borderRadius: 5,
+    position: 'absolute', right: d2p(36), top: h2p(5),
     shadowColor: '#000000',
     shadowOpacity: 0.27,
     shadowRadius: 4.65,
