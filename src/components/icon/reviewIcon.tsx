@@ -3,19 +3,21 @@ import { Image, ImageStyle, StyleSheet, Text, View, ViewStyle } from "react-nati
 import { heart, circle, bad } from "~/assets/icons";
 import { FONT } from "~/styles/fonts";
 import theme from "~/styles/theme";
+import { d2p } from "~/utils";
 
 interface ReviewIconProp {
   review: "best" | "good" | "bad";
-  imageStyle?: ImageStyle
+  imageStyle?: ImageStyle;
+  viewStyle?: ViewStyle
 }
 
-const ReviewIcon = ({ review, imageStyle }: ReviewIconProp) => {
+const ReviewIcon = ({ review, imageStyle, viewStyle }: ReviewIconProp) => {
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+    <View style={[{ flexDirection: 'row', alignItems: 'center' }, viewStyle]}>
       <Image
         source={reviewItem(review)?.image}
         resizeMode="contain"
-        style={[{ width: 20, height: 20 }, imageStyle]}
+        style={[{ width: d2p(20), height: d2p(20) }, imageStyle]}
       />
       <Text style={[{ paddingLeft: 5, fontWeight: 'bold' }, FONT.Bold, review === 'best' ? styles.best : (review === 'good' ? styles.good : styles.bad)]}>
         {reviewItem(review)?.text}</Text>

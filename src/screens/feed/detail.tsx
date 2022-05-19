@@ -1,4 +1,4 @@
-import { View, Text, Dimensions, StyleSheet, Pressable, Image, ScrollView, TextInput } from 'react-native';
+import { View, Text, Dimensions, StyleSheet, Pressable, Image, ScrollView, TextInput, TouchableOpacity, Platform } from 'react-native';
 import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
@@ -8,7 +8,7 @@ import ReviewIcon from '~/components/icon/reviewIcon';
 import MoreIcon from '~/components/icon/moreIcon';
 import Badge from '~/components/badge';
 import ReactionIcon from '~/components/icon/reactionIcon';
-import { comment, more, tag } from '~/assets/icons';
+import { more, tag } from '~/assets/icons';
 import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 import { useRecoilValue } from 'recoil';
 import { myIdState, tokenState } from '~/recoil/atoms';
@@ -50,7 +50,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [cart, setCart] = useState<boolean>(false);
   const queryClient = useQueryClient();
 
-  const [scrollHeight, setScrollHeight] = useState(0)
+  const [scrollHeight, setScrollHeight] = useState(0);
   const token = useRecoilValue(tokenState);
 
   const [isMoreClick, setIsMoreClick] = useState<boolean>();
@@ -120,14 +120,23 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                   </Pressable>
                 </View>
               )}
-            <View style={{ backgroundColor: 'black', width: 40, height: 40, borderRadius: 20, marginRight: 5, position: 'absolute', left: 0 }} />
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: d2p(50), flexWrap: 'wrap', maxWidth: Dimensions.get('window').width - d2p(120) }}>
-              <Text style={[styles.writer, FONT.Medium]}>{reviewDetailQuery.data?.author.nickname}</Text>
-              {reviewDetailQuery.data?.author.representBadge &&
-                <Badge type="feed" text={reviewDetailQuery.data?.author.representBadge} />}
-              <Text style={{ fontSize: 12, marginLeft: d2p(5), color: theme.color.grayscale.a09ca4 }}>{reviewDetailQuery.data?.author.household}</Text>
-
+            <View style={{ backgroundColor: 'black', width: d2p(40), height: d2p(40), borderRadius: 40 }} />
+            <View style={{
+              width: Dimensions.get('window').width - d2p(105),
+              paddingLeft: d2p(10)
+            }}>
+              <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap" }}>
+                <Text style={[styles.writer, FONT.Medium]}>{reviewDetailQuery.data?.author.nickname}</Text>
+                {reviewDetailQuery.data?.author.representBadge &&
+                  <Badge type="feed" text={reviewDetailQuery.data?.author.representBadge} />}
+                <Text style={{ fontSize: 12, marginLeft: d2p(5), color: theme.color.grayscale.a09ca4 }}>{reviewDetailQuery.data?.author.household}</Text>
+              </View>
+              <View style={{ marginTop: h2p(5) }}>
+                <Text style={[{ fontSize: 12, color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>
+                  {(reviewDetailQuery.data) && simpleDate(reviewDetailQuery.data?.created, ' 전')}</Text>
+              </View>
             </View>
+
             <TouchableOpacity onPress={() => setIsMoreClick(!isMoreClick)}>
               <Image
                 source={more}
@@ -136,30 +145,23 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
               />
             </TouchableOpacity>
           </View>
-
-          <Pressable onPress={() => console.log('피드 상세')}>
-            <View style={{ marginTop: h2p(5), marginLeft: d2p(50), }}>
-              <Text style={[{ fontSize: 12, color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>
-                {(reviewDetailQuery.data) && simpleDate(reviewDetailQuery.data?.created, ' 전')}</Text>
-            </View>
-            <View style={{ paddingTop: h2p(20) }}>
-              {reviewDetailQuery.data &&
-                <ReviewIcon review={reviewDetailQuery.data?.satisfaction} />}
-              <Text style={[styles.content, FONT.Regular]}>{reviewDetailQuery.data?.content}</Text>
-            </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Image source={tag} style={{ width: 10, height: 10, marginRight: 5 }} />
-              <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
-                 {React.Children.toArray(reviewDetailQuery.data?.tags.map((v) => {
-                  if (v === route.params?.badge) {
-                    return;
-                  }
-                  return <Text>#{v} </Text>;
-                }))}
-                <Text style={{ color: theme.color.main, fontSize: 12 }}>#{route.params?.badge}</Text>
-              </Text>
-            </View>
-          </Pressable>
+          <View style={{ paddingTop: h2p(20) }}>
+            {reviewDetailQuery.data &&
+              <ReviewIcon review={reviewDetailQuery.data?.satisfaction} />}
+            <Text style={[styles.content, FONT.Regular]}>{reviewDetailQuery.data?.content}</Text>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Image source={tag} style={{ width: 10, height: 10, marginRight: 5 }} />
+            <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
+              {React.Children.toArray(reviewDetailQuery.data?.tags.map((v) => {
+                if (v === route.params?.badge) {
+                  return;
+                }
+                return <Text>#{v} </Text>;
+              }))}
+              <Text style={{ color: theme.color.main, fontSize: 12 }}>#{route.params?.badge}</Text>
+            </Text>
+          </View>
 
           <View style={styles.sign}>
             <Text style={[styles.store, FONT.Regular]}>{reviewDetailQuery.data?.market}</Text>

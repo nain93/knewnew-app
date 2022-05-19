@@ -6,13 +6,13 @@ import Badge from '../badge';
 import ReviewIcon from '../icon/reviewIcon';
 import { retweetfrom, tag } from '~/assets/icons';
 import { FONT } from '~/styles/fonts';
+import { ReviewListType } from '~/types/review';
 
 interface FeedReviewProps {
-  review: any
+  review: ReviewListType
 }
 
 const ReKnew = ({ review }: FeedReviewProps) => {
-
   return (
     <View style={styles.review}>
       <View style={{ flexDirection: 'row' }}>
@@ -21,19 +21,19 @@ const ReKnew = ({ review }: FeedReviewProps) => {
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 3 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={[styles.title, FONT.Medium]}>{review.writer}</Text>
-          <Badge type="feed" text={review.badge} />
-          <Text style={[styles.household, FONT.Regular]}>{review.household}</Text>
+          <Text style={[styles.title, FONT.Medium]}>{review.author.nickname}</Text>
+          <Badge type="feed" text={review.author.representBadge} />
+          <Text style={[styles.household, FONT.Regular]}>{review.author.household}</Text>
         </View>
       </View>
       <View style={{ marginVertical: h2p(12), }}>
-        <ReviewIcon review={review.review} />
+        <ReviewIcon review={review.satisfaction} />
       </View>
       <Text style={[{ color: theme.color.black }, FONT.Regular]}>{review.content}</Text>
       <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
         <Image source={tag} style={{ width: 10, height: 10, marginRight: 5 }} />
-        <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e },FONT.Regular]}>
-          {React.Children.toArray(review?.tag?.map((v) => <Text>#{v} </Text>))}
+        <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
+          {React.Children.toArray(review.tags.map((v) => <Text>#{v} </Text>))}
           <Text style={{ color: theme.color.main }}>#비건</Text></Text>
       </View>
     </View>

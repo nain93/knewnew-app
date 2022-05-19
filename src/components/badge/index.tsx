@@ -9,7 +9,7 @@ import { d2p, h2p } from "~/utils";
 interface BadgeProp {
   text: string,
   type: "picker" | "feed" | "mypage" | "unabled",
-  layoutType?: "filter",
+  layoutType?: "filter" | "wrtie" | "normal",
   badge?: "interest" | "household" | "taste",
   isClick?: boolean,
   idx?: number,
@@ -18,7 +18,7 @@ interface BadgeProp {
   viewStyle?: ViewStyle
 }
 
-const Badge = ({ layoutType, text, type, badge, isClick, idx, userBadge, setUserBadge, viewStyle }: BadgeProp) => {
+const Badge = ({ layoutType = "normal", text, type, badge, isClick, idx, userBadge, setUserBadge, viewStyle }: BadgeProp) => {
 
   switch (type) {
     case 'picker':

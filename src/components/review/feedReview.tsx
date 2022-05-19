@@ -18,7 +18,7 @@ interface FeedReviewProps {
   review: ReviewListType,
   isRetweet?: boolean,
   filterBadge?: string
-  type: "reKnewWrite" | "normal"
+  type?: "reKnewWrite" | "normal"
 }
 
 const FeedReview = ({ type = "normal", filterBadge, review, isRetweet = false }: FeedReviewProps) => {
@@ -44,14 +44,23 @@ const FeedReview = ({ type = "normal", filterBadge, review, isRetweet = false }:
   return (
     <>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-        <View style={{ backgroundColor: 'black', width: d2p(40), height: d2p(40), borderRadius: 40, marginRight: d2p(5) }} />
-        <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', width: Dimensions.get('window').width - d2p(120) }}>
+        <View style={{
+          backgroundColor: 'black',
+          position: "absolute",
+          left: 0,
+          width: d2p(40), height: d2p(40), borderRadius: 40
+        }} />
+        <View style={{
+          flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap',
+          marginLeft: d2p(50),
+          width: Dimensions.get('window').width - d2p(120)
+        }}>
           <Text style={[styles.title, FONT.Medium]}>{review.author.nickname}</Text>
           <Badge type="feed" text={review.author.representBadge} />
           <Text style={[{ fontSize: 12, marginLeft: d2p(5), color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>{review.author.household}</Text>
         </View>
         {type === "normal" &&
-          <TouchableOpacity onPress={() => setIsMoreClick(!isMoreClick)}>
+          <TouchableOpacity onPress={() => console.log("more")}>
             <Image
               source={more}
               resizeMode="contain"
@@ -60,35 +69,37 @@ const FeedReview = ({ type = "normal", filterBadge, review, isRetweet = false }:
           </TouchableOpacity>}
       </View>
       <View style={styles.titleContainer}>
-        <ReviewIcon review={review.satisfaction} />
+        <ReviewIcon viewStyle={{ marginTop: h2p(14) }} review={review.satisfaction} />
         {type === "normal" &&
           <Text style={[{ fontSize: 10, color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>{simpleDate(review.created, ' 전')}</Text>
+        }
         {review.author.id === myId ?
-        <View style={styles.clickBox}>
-          <Pressable>
-            <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
-          </Pressable>
-          <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-          <Pressable>
-            <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
-          </Pressable>
-        </View>
-        :
-        <View style={styles.clickBox}>
-          <Pressable>
-            <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
-          </Pressable>
-          <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-          <Pressable>
-            <Text style={[{ color: theme.color.main }, FONT.Regular]}>신고</Text>
-          </Pressable>
-        </View>}
+          <View style={styles.clickBox}>
+            <Pressable>
+              <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
+            </Pressable>
+            <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
+            <Pressable>
+              <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
+            </Pressable>
+          </View>
+          :
+          <View style={styles.clickBox}>
+            <Pressable>
+              <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
+            </Pressable>
+            <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
+            <Pressable>
+              <Text style={[{ color: theme.color.main }, FONT.Regular]}>신고</Text>
+            </Pressable>
+          </View>
+        }
       </View>
-      <Text style={[{ color: theme.color.black, marginBottom: h2p(10), marginLeft: d2p(50) },FONT.Regular]}>{review.content}</Text>
+      <Text style={[{ color: theme.color.black, marginBottom: h2p(10), marginLeft: d2p(50) }, FONT.Regular]}>{review.content}</Text>
       {!isRetweet &&
         <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: d2p(10), marginLeft: d2p(50) }}>
           <Image source={tag} style={{ width: 10, height: 10, marginRight: d2p(5) }} />
-          <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e },FONT.Regular]}>
+          <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
             {React.Children.toArray(review?.tags?.map((v) => {
               if (v === badge) {
                 return;
