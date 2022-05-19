@@ -1,5 +1,5 @@
-import { View, Text, Dimensions, StyleSheet, Pressable, Image, ScrollView, TextInput, TouchableOpacity, Platform } from 'react-native';
-import React, { Fragment, useEffect, useRef, useState } from 'react';
+import { View, Text, Dimensions, StyleSheet, Pressable, Image, ScrollView, TextInput } from 'react-native';
+import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import theme from '~/styles/theme';
@@ -38,13 +38,16 @@ interface reviewProps {
 interface FeedDetailProps {
   navigation: NavigationStackProp
   route: NavigationRoute<{
-    id: number
+    id: number,
+    badge: string,
+    isLike: boolean
   }>;
 }
 
 const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
-  const [like, setLike] = useState<boolean>(false);
-  const [cart, setCart] = useState<boolean>(false)
+  const [review, setReview] = useState<reviewProps>();
+  const [like, setLike] = useState<boolean>(route.params?.isLike || false);
+  const [cart, setCart] = useState<boolean>(false);
   const queryClient = useQueryClient();
 
   const [scrollHeight, setScrollHeight] = useState(0)
@@ -67,7 +70,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
 
   useEffect(() => {
     queryClient.invalidateQueries("reviewDetail");
-  }, [likeReviewMutation.data,]);
+  }, [likeReviewMutation.data]);
 
   if (reviewDetailQuery.isLoading) {
     return <Loading />;
@@ -122,6 +125,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
               <Text style={[styles.writer, FONT.Medium]}>{reviewDetailQuery.data?.author.nickname}</Text>
               {reviewDetailQuery.data?.author.representBadge &&
                 <Badge type="feed" text={reviewDetailQuery.data?.author.representBadge} />}
+              <Text style={{ fontSize: 12, marginLeft: d2p(5), color: theme.color.grayscale.a09ca4 }}>{reviewDetailQuery.data?.author.household}</Text>
+
             </View>
             <TouchableOpacity onPress={() => setIsMoreClick(!isMoreClick)}>
               <Image
@@ -144,7 +149,14 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Image source={tag} style={{ width: 10, height: 10, marginRight: 5 }} />
-              <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>{React.Children.toArray(reviewDetailQuery.data?.tags?.map((v) => <Text>#{v} </Text>))}
+              <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
+                 {React.Children.toArray(reviewDetailQuery.data?.tags.map((v) => {
+                  if (v === route.params?.badge) {
+                    return;
+                  }
+                  return <Text>#{v} </Text>;
+                }))}
+                <Text style={{ color: theme.color.main, fontSize: 12 }}>#{route.params?.badge}</Text>
               </Text>
             </View>
           </Pressable>
@@ -210,7 +222,7 @@ const styles = StyleSheet.create({
   },
   writer: {
     fontSize: 16, fontWeight: 'bold',
-    marginRight: 5
+    marginRight: d2p(10)
   },
   sign: {
     flexDirection: 'row',

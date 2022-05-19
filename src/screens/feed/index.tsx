@@ -1,16 +1,16 @@
-import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, Animated, ButtonProperties } from 'react-native';
+import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, Animated, Pressable } from 'react-native';
 import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import Header from '~/components/header';
 import mainLogo from '~/assets/logo';
 import FeedReview from '~/components/review/feedReview';
-import { tagfilter } from '~/assets/icons';
+import { cart, comment, like, reKnew, tagfilter } from '~/assets/icons';
 
 import RBSheet from "react-native-raw-bottom-sheet";
 import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
 import SelectLayout from '~/components/selectLayout';
-import { BadgeType } from '~/types';
+import { BadgeType, NavigationType } from '~/types';
 import AlertPopup from '~/components/popup/alertPopup';
 import ReKnew from '~/components/review/reKnew';
 import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
@@ -33,7 +33,7 @@ function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
   );
 }
 
-const Feed = () => {
+const Feed = ({ navigation }: NavigationType) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [isPopupOpen, setIspopupOpen] = useState(false);
   const [scrollOffset, setScrollOffset] = useState(0);
@@ -47,8 +47,9 @@ const Feed = () => {
   const queryClient = useQueryClient();
   const [selectedIndex, setSelectedIndex] = useState(0)
 
-
   const [filterBadge, setFilterBadge] = useState("");
+
+  const [isLike, setIsLike] = useState<boolean>(false);
 
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
     enabled: !!token,
@@ -63,7 +64,7 @@ const Feed = () => {
     }
     // * 전체 리뷰리스트
     else {
-      const queryData = getReviewList({ token, tag: filterBadge, offset: pageParam });
+      const queryData = await getReviewList({ token, tag: filterBadge, offset: pageParam });
       return queryData;
     }
   }, {
@@ -143,8 +144,9 @@ const Feed = () => {
               <View style={styles.main}>
                 <Text style={[styles.mainText, FONT.Bold]}>뉴뉴는 지금</Text>
                 <View style={{ flexDirection: 'row' }}>
-                  <Text style={[{ ...styles.mainText, color: theme.color.main, lineHeight: 29 }, FONT.Bold]}>#비건 </Text>
-                  <Text style={[styles.mainText, FONT.Bold]}>관련 메뉴 추천 중 👀</Text>
+                  <Text style={[{ ...styles.mainText, color: theme.color.main },FONT.Bold]}>
+                    {filterBadge ? `#${filterBadge}` : `#${getMyProfileQuery.data?.representBadge}`} </Text>
+                   <Text style={[styles.mainText, FONT.Bold]}>관련 메뉴 추천 중 👀</Text>
                 </View>
               </View>
               <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
@@ -158,7 +160,11 @@ const Feed = () => {
             </Fragment>
           }
           showsVerticalScrollIndicator={false}
-          renderItem={({ item, index }) => <FeedReview review={item} />
+          renderItem={({ item }) =>
+            <Pressable onPress={() => navigation.navigate("FeedDetail", { id: item.id, badge: filterBadge, isLike: item.isLike })}
+              style={styles.review}>
+              <FeedReview review={item} filterBadge={filterBadge} />
+            </Pressable>
             // <ReKnew review={item} />
           }
           ListFooterComponent={() =>
@@ -254,6 +260,13 @@ const Feed = () => {
 export default Feed;
 
 const styles = StyleSheet.create({
+  review: {
+    backgroundColor: theme.color.white,
+    width: Dimensions.get('window').width - d2p(20),
+    borderRadius: 10,
+    marginHorizontal: d2p(10), marginTop: h2p(15),
+    paddingHorizontal: d2p(10), paddingVertical: d2p(15)
+  },
   main: {
     paddingTop: h2p(35),
     paddingBottom: h2p(18),

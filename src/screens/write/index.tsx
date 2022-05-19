@@ -1,9 +1,9 @@
-import { Dimensions, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import React, { useRef, useState } from 'react';
+import { Dimensions, Image, Keyboard, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import theme from '~/styles/theme';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
-import { BadgeType, NavigationType } from '~/types';
+import { BadgeType } from '~/types';
 import { blackclose, cart, circle, graycircle, grayclose, grayheart, heart, maincart, maintag, tag } from '~/assets/icons';
 import { photo, photoClose } from '~/assets/images';
 import { d2p, h2p } from '~/utils';
@@ -18,11 +18,21 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { popupState, tokenState } from '~/recoil/atoms';
 import { WriteReviewType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
+import { NavigationStackProp } from 'react-navigation-stack';
+import { NavigationRoute } from 'react-navigation';
+import { useFocusEffect } from '@react-navigation/native';
 
 const marketList: Array<"선택 안함" | "마켓컬리" | "쿠팡프레시" | "SSG" | "B마트" | "윙잇" | "쿠캣마켓"> =
   ["선택 안함", "마켓컬리", "쿠팡프레시", "SSG", "B마트", "윙잇", "쿠캣마켓"];
 
-const Write = ({ navigation }: NavigationType) => {
+interface WriteProp {
+  navigation: NavigationStackProp;
+  route: NavigationRoute<{
+    type?: "reKnew" | "default"
+  }>;
+}
+
+const Write = ({ navigation, route }: WriteProp) => {
   const [writeData, setWriteData] = useState<WriteReviewType>({
     images: [],
     content: "",
@@ -39,12 +49,16 @@ const Write = ({ navigation }: NavigationType) => {
   const tagRefRBSheet = useRef<RBSheet>(null);
   const marketRefRBSheet = useRef<RBSheet>(null);
   const [imageList, setImageList] = useState<string[]>([]);
+  const [keyboardHeight, setKeyBoardHeight] = useState(0);
 
   const token = useRecoilValue(tokenState);
   const setIspopupOpen = useSetRecoilState(popupState);
   const addReviewMutation = useMutation(["addReview", token],
-    (writeProps: WriteReviewType) => writeReview({ token, ...writeProps }));
-
+    (writeProps: WriteReviewType) => writeReview({ token, ...writeProps }), {
+    onSuccess: () => {
+      navigation.goBack();
+    }
+  });
   const [selectMarket, setIsSelectMarket] = useState(false);
 
   const pickImage = () => {
@@ -62,15 +76,15 @@ const Write = ({ navigation }: NavigationType) => {
   };
   const handleAddWrite = () => {
     if (writeData.satisfaction === "") {
-      setIspopupOpen({ isOpen: true, content: "선호도를 표시해주세요" });
+      setIspopupOpen({ isOpen: true, content: "선호도를 표시해주세요", popupStyle: { bottom: keyboardHeight + h2p(20) } });
       return;
     }
     if (writeData.content === "") {
-      setIspopupOpen({ isOpen: true, content: "내용을 입력해주세요" });
+      setIspopupOpen({ isOpen: true, content: "내용을 입력해주세요", popupStyle: { bottom: keyboardHeight + h2p(20) } });
       return;
     }
     if (writeData.tags.length === 0) {
-      setIspopupOpen({ isOpen: true, content: "태그를 선택해주세요" });
+      setIspopupOpen({ isOpen: true, content: "태그를 선택해주세요", popupStyle: { bottom: keyboardHeight + h2p(20) } });
       return;
     }
 
@@ -81,6 +95,25 @@ const Write = ({ navigation }: NavigationType) => {
 
     addReviewMutation.mutate({ ...writeData, images });
   };
+
+  useEffect(() => {
+    Keyboard.addListener("keyboardDidShow", (e) => {
+      if (Platform.OS === "ios") {
+        setKeyBoardHeight(e.endCoordinates.height);
+      }
+      else {
+        setKeyBoardHeight(0);
+      }
+    });
+    Keyboard.addListener("keyboardDidHide", (e) => {
+      if (Platform.OS === "ios") {
+        setKeyBoardHeight(e.endCoordinates.height);
+      }
+      else {
+        setKeyBoardHeight(h2p(20));
+      }
+    });
+  }, []);
 
   return (
     <>
@@ -183,13 +216,15 @@ const Write = ({ navigation }: NavigationType) => {
           container: {
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,
-            overflow: "visible"
+            paddingHorizontal: d2p(20),
+            paddingVertical: h2p(20)
+            // paddingTop: isIphoneX() ? getStatusBarHeight() + d2p(15) : d2p(15),
           }, draggableIcon: {
             display: "none"
           }
         }}
       >
-        <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: d2p(30), paddingVertical: h2p(20) }}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: d2p(10), marginBottom: h2p(34) }}>
           <CloseIcon onPress={() => tagRefRBSheet.current?.close()}
             imageStyle={{ width: d2p(15), height: h2p(15) }} />
           <Text style={[{ fontSize: 16, fontWeight: "bold" }, FONT.Bold]}>태그 선택</Text>
@@ -207,9 +242,7 @@ const Write = ({ navigation }: NavigationType) => {
             <Text style={[{ color: theme.color.grayscale.ff5d5d }, FONT.Regular]}>완료</Text>
           </TouchableOpacity>
         </View>
-        <View style={{ paddingHorizontal: d2p(20), marginTop: h2p(14) }}>
-          <SelectLayout isInitial={true} userBadge={userBadge} setUserBadge={setUserBadge} />
-        </View>
+        <SelectLayout type="write" isInitial={true} userBadge={userBadge} setUserBadge={setUserBadge} />
       </RBSheet>
 
       {/* 유통사 선택 바텀시트 */}

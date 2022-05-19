@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
-import { like, retweet, comment, colorLike, cart, colorCart } from "~/assets/icons";
+import { like, reKnew, comment, colorLike, cart, colorCart } from "~/assets/icons";
 import theme from "~/styles/theme";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "react-navigation-stack/lib/typescript/src/vendor/types";
 import { UseMutationResult } from "react-query";
 import { FONT } from "~/styles/fonts";
+import { ReviewListType } from "~/types/review";
 
 interface ReviewIconProp {
-  name: "like" | "cart" | "retweet" | "comment";
+  name: "like" | "cart" | "ReKnew" | "comment";
   count?: number;
   state?: boolean;
   isState?: (isState: boolean) => void;
@@ -17,9 +18,10 @@ interface ReviewIconProp {
     state: boolean;
   }>;
   id?: number;
+  review?: ReviewListType
 }
 
-const ReactionIcon = ({ name, count, state, isState, mutation, id }: ReviewIconProp) => {
+const ReactionIcon = ({ review, name, count, state, isState, mutation, id }: ReviewIconProp) => {
   const navigation = useNavigation<StackNavigationProp>();
   const [reactCount, setReactCount] = useState(count);
 
@@ -27,7 +29,7 @@ const ReactionIcon = ({ name, count, state, isState, mutation, id }: ReviewIconP
     <TouchableOpacity style={{
       flexDirection: "row", alignItems: 'center', justifyContent: 'space-between', position: 'relative', left: -13
     }} onPress={() => {
-      if (isState) {
+      if (isState && id) {
         isState(!state);
         mutation?.mutate({ id, state: !state });
         if (!state) {
@@ -40,6 +42,13 @@ const ReactionIcon = ({ name, count, state, isState, mutation, id }: ReviewIconP
         navigation.navigate("FeedDetail", { id });
       } else {
 
+        if (name === "ReKnew") {
+          console.log(review, 'review');
+          navigation.navigate(name, { review });
+        }
+        else {
+          navigation.navigate(name);
+        }
       }
     }} >
       <Image
@@ -58,8 +67,8 @@ const imgSource = (name: string) => {
       return { item: cart, colored: colorCart };
     case "like":
       return { item: like, colored: colorLike };
-    case "retweet":
-      return { item: retweet, colored: null };
+    case "ReKnew":
+      return { item: reKnew, colored: null };
     case "comment":
       return { item: comment, colored: null };
   }

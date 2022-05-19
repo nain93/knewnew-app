@@ -26,18 +26,16 @@ const ReKnew = ({ review }: FeedReviewProps) => {
           <Text style={[styles.household, FONT.Regular]}>{review.household}</Text>
         </View>
       </View>
-      <Pressable onPress={() => console.log('피드 상세')}>
-        <View style={{ marginVertical: h2p(12), }}>
-          <ReviewIcon review={review.review} />
-        </View>
-        <Text style={[{ color: theme.color.black }, FONT.Regular]}>{review.content}</Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
-          <Image source={tag} style={{ width: 10, height: 10, marginRight: 5 }} />
-          <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
-            {React.Children.toArray(review?.tag?.map((v: string) => <Text>#{v} </Text>))}
-          </Text>
-        </View>
-      </Pressable>
+      <View style={{ marginVertical: h2p(12), }}>
+        <ReviewIcon review={review.review} />
+      </View>
+      <Text style={[{ color: theme.color.black }, FONT.Regular]}>{review.content}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+        <Image source={tag} style={{ width: 10, height: 10, marginRight: 5 }} />
+        <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e },FONT.Regular]}>
+          {React.Children.toArray(review?.tag?.map((v) => <Text>#{v} </Text>))}
+          <Text style={{ color: theme.color.main }}>#비건</Text></Text>
+      </View>
     </View>
   );
 };

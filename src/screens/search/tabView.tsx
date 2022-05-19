@@ -1,4 +1,4 @@
-import { Dimensions, FlatList, Image, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { useState } from 'react';
 import { TabBar, TabView } from 'react-native-tab-view';
 import theme from '~/styles/theme';
@@ -9,6 +9,8 @@ import { userNormalType } from '~/types/user';
 import { noProfile } from '~/assets/images';
 import { leftArrow } from '~/assets/icons';
 import Loading from '~/components/loading';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 
 interface SearchTabViewProps {
   searchList?: ReviewListType[],
@@ -16,6 +18,7 @@ interface SearchTabViewProps {
 }
 
 const SearchTabView = ({ searchList, userList }: SearchTabViewProps) => {
+  const navigation = useNavigation<StackNavigationProp>();
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     { key: "menu", title: "메뉴" },
@@ -48,16 +51,18 @@ const SearchTabView = ({ searchList, userList }: SearchTabViewProps) => {
                     <Text style={{ textAlign: "center", marginTop: h2p(115), color: theme.color.grayscale.C_79737e }}>
                       검색결과가 없습니다.</Text>}
                   renderItem={(review) => {
-                    if (review.index === 0) {
-                      return <FeedReview viewStyle={{
-                        borderBottomWidth: 1,
-                        borderBottomColor: theme.color.grayscale.f7f7fc, marginTop: 0, paddingTop: 0
-                      }} review={review.item} />;
-                    }
-                    return <FeedReview viewStyle={{
-                      borderBottomWidth: 1,
-                      borderBottomColor: theme.color.grayscale.f7f7fc, paddingTop: 0, marginTop: h2p(25)
-                    }} review={review.item} />;
+                    return (
+                      <Pressable onPress={() => navigation.navigate("FeedDetail",
+                        { id: review.item.id, isLike: review.item.isLike })}
+                        style={{
+                          marginHorizontal: d2p(20), marginTop: h2p(25),
+                          paddingBottom: h2p(14.5),
+                          borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc
+                        }}
+                      >
+                        <FeedReview review={review.item} />
+                      </Pressable>
+                    );
                   }}
                   showsVerticalScrollIndicator={false}
                 />
@@ -125,7 +130,7 @@ const styles = StyleSheet.create({
   searchResult: {
     marginTop: h2p(25),
     marginHorizontal: d2p(20),
-    marginBottom: h2p(30),
+    marginBottom: h2p(5),
     color: theme.color.grayscale.a09ca4,
     fontSize: 12
   }
