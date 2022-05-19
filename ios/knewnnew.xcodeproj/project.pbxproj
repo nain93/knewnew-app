@@ -8,13 +8,21 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* knewnnewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* knewnnewTests.m */; };
+		09C0CBB3C2DD4A4EAC8DA2E3 /* SUIT-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8C3D724BFABF4BE99AE5215A /* SUIT-Medium.otf */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		171002C4D230BF401A99D74B /* libPods-knewnnew.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FC861E7D2E5CDCF68F4F7DEE /* libPods-knewnnew.a */; };
+		318DD4880F22437DAB9A78A3 /* SUIT-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DACD8C4D4A6F4EA193FC27FF /* SUIT-Bold.ttf */; };
+		3AFF09C2D19A4EF4800FBD34 /* SUIT-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 74E8A46D712A4575887E1968 /* SUIT-Regular.ttf */; };
 		6D1AE71628225DD30067F377 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6D1AE71528225DD30067F377 /* GoogleService-Info.plist */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		917C7F65473744EBAD49DC19 /* SUIT-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A9041C88C1674E81869FC3F4 /* SUIT-Medium.ttf */; };
+		C287252BFFFE4163A95E70B0 /* SUIT-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 77AD43A301654D7596CEC4CB /* SUIT-Regular.otf */; };
 		F9486E84BDE2752EAD4E4CFE /* libPods-knewnnew-knewnnewTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E43CDF0FB2B3BB6809F5A0E2 /* libPods-knewnnew-knewnnewTests.a */; };
+		FDC62677C4DC4294A84C0786 /* SUIT-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = C9817AF0450B4302809FBBE7 /* SUIT-Bold.otf */; };
+		A4E99D4EB28B431F8931D219 /* SUIT-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 86C2EFC1BB21408DB2BB2F9D /* SUIT-SemiBold.ttf */; };
+		58C2868856C84EE194C9C7FC /* SUIT-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = F94044C591CF4B68BC26FFB4 /* SUIT-SemiBold.otf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,13 +87,21 @@
 		6D23C556282101B0008D2205 /* libReact-RCTVibration.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libReact-RCTVibration.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D23C558282101B0008D2205 /* libReactCommon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReactCommon.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D8E1C4E281936A4002F2CF9 /* knewnnew-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "knewnnew-Bridging-Header.h"; sourceTree = "<group>"; };
+		74E8A46D712A4575887E1968 /* SUIT-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SUIT-Regular.ttf"; path = "../src/assets/fonts/SUIT-Regular.ttf"; sourceTree = "<group>"; };
+		77AD43A301654D7596CEC4CB /* SUIT-Regular.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SUIT-Regular.otf"; path = "../src/assets/fonts/SUIT-Regular.otf"; sourceTree = "<group>"; };
 		7A9820B3EADD0603DC5B2D28 /* Pods-knewnnew-knewnnewTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-knewnnew-knewnnewTests.debug.xcconfig"; path = "Target Support Files/Pods-knewnnew-knewnnewTests/Pods-knewnnew-knewnnewTests.debug.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = knewnnew/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		8C3D724BFABF4BE99AE5215A /* SUIT-Medium.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SUIT-Medium.otf"; path = "../src/assets/fonts/SUIT-Medium.otf"; sourceTree = "<group>"; };
 		8FF78B934A545B92A647E128 /* Pods-knewnnew-knewnnewTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-knewnnew-knewnnewTests.release.xcconfig"; path = "Target Support Files/Pods-knewnnew-knewnnewTests/Pods-knewnnew-knewnnewTests.release.xcconfig"; sourceTree = "<group>"; };
+		A9041C88C1674E81869FC3F4 /* SUIT-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SUIT-Medium.ttf"; path = "../src/assets/fonts/SUIT-Medium.ttf"; sourceTree = "<group>"; };
+		C9817AF0450B4302809FBBE7 /* SUIT-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SUIT-Bold.otf"; path = "../src/assets/fonts/SUIT-Bold.otf"; sourceTree = "<group>"; };
+		DACD8C4D4A6F4EA193FC27FF /* SUIT-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SUIT-Bold.ttf"; path = "../src/assets/fonts/SUIT-Bold.ttf"; sourceTree = "<group>"; };
 		E095DDDBEABE13B1C364EEAC /* Pods-knewnnew.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-knewnnew.debug.xcconfig"; path = "Target Support Files/Pods-knewnnew/Pods-knewnnew.debug.xcconfig"; sourceTree = "<group>"; };
 		E43CDF0FB2B3BB6809F5A0E2 /* libPods-knewnnew-knewnnewTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-knewnnew-knewnnewTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FC861E7D2E5CDCF68F4F7DEE /* libPods-knewnnew.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-knewnnew.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		86C2EFC1BB21408DB2BB2F9D /* SUIT-SemiBold.ttf */ = {isa = PBXFileReference; name = "SUIT-SemiBold.ttf"; path = "../src/assets/fonts/SUIT-SemiBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		F94044C591CF4B68BC26FFB4 /* SUIT-SemiBold.otf */ = {isa = PBXFileReference; name = "SUIT-SemiBold.otf"; path = "../src/assets/fonts/SUIT-SemiBold.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -205,6 +221,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				99AEC79D046A43DDB9954384 /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -218,6 +235,21 @@
 				00E356EE1AD99517003FC87E /* knewnnewTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		99AEC79D046A43DDB9954384 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				C9817AF0450B4302809FBBE7 /* SUIT-Bold.otf */,
+				DACD8C4D4A6F4EA193FC27FF /* SUIT-Bold.ttf */,
+				8C3D724BFABF4BE99AE5215A /* SUIT-Medium.otf */,
+				A9041C88C1674E81869FC3F4 /* SUIT-Medium.ttf */,
+				77AD43A301654D7596CEC4CB /* SUIT-Regular.otf */,
+				74E8A46D712A4575887E1968 /* SUIT-Regular.ttf */,
+				86C2EFC1BB21408DB2BB2F9D /* SUIT-SemiBold.ttf */,
+				F94044C591CF4B68BC26FFB4 /* SUIT-SemiBold.otf */,
+			);
+			name = Resources;
 			sourceTree = "<group>";
 		};
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
@@ -333,6 +365,14 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				6D1AE71628225DD30067F377 /* GoogleService-Info.plist in Resources */,
+				FDC62677C4DC4294A84C0786 /* SUIT-Bold.otf in Resources */,
+				318DD4880F22437DAB9A78A3 /* SUIT-Bold.ttf in Resources */,
+				09C0CBB3C2DD4A4EAC8DA2E3 /* SUIT-Medium.otf in Resources */,
+				917C7F65473744EBAD49DC19 /* SUIT-Medium.ttf in Resources */,
+				C287252BFFFE4163A95E70B0 /* SUIT-Regular.otf in Resources */,
+				3AFF09C2D19A4EF4800FBD34 /* SUIT-Regular.ttf in Resources */,
+				A4E99D4EB28B431F8931D219 /* SUIT-SemiBold.ttf in Resources */,
+				58C2868856C84EE194C9C7FC /* SUIT-SemiBold.otf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

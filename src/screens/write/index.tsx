@@ -17,6 +17,7 @@ import { writeReview } from '~/api/write';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { popupState, tokenState } from '~/recoil/atoms';
 import { WriteReviewType } from '~/types/review';
+import { FONT } from '~/styles/fonts';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import { useFocusEffect } from '@react-navigation/native';
@@ -121,26 +122,26 @@ const Write = ({ navigation, route }: WriteProp) => {
         headerLeft={<LeftArrowIcon onBackClick={() => navigation.goBack()} imageStyle={{ width: 11, height: 25 }} />}
         title="작성하기"
         headerRightPress={handleAddWrite}
-        headerRight={<Text style={{ color: theme.color.grayscale.a09ca4 }}>완료</Text>} />
+        headerRight={<Text style={[{ color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>완료</Text>} />
       <View style={styles.container}>
         <View style={styles.reviewIconWrap}>
           <TouchableOpacity
             onPress={() => setWriteData({ ...writeData, satisfaction: "best" })}
             style={styles.reviewIcon}>
             <Image source={(writeData.satisfaction === "best") ? heart : grayheart} style={{ width: d2p(20), height: h2p(20) }} />
-            <Text style={{ color: (writeData.satisfaction === "best") ? theme.color.main : theme.color.grayscale.a09ca4, marginLeft: d2p(5) }}>최고에요</Text>
+            <Text style={[{ color: (writeData.satisfaction === "best") ? theme.color.main : theme.color.grayscale.a09ca4, marginLeft: d2p(5) }, FONT.Bold]}>최고에요</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setWriteData({ ...writeData, satisfaction: "good" })}
             style={styles.reviewIcon}>
             <Image source={(writeData.satisfaction === "good") ? circle : graycircle} style={{ width: d2p(20), height: h2p(20) }} />
-            <Text style={{ color: (writeData.satisfaction === "good") ? theme.color.yellow : theme.color.grayscale.a09ca4, marginLeft: d2p(5) }}>괜찮아요</Text>
+            <Text style={[{ color: (writeData.satisfaction === "good") ? theme.color.yellow : theme.color.grayscale.a09ca4, marginLeft: d2p(5) }, FONT.Bold]}>괜찮아요</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setWriteData({ ...writeData, satisfaction: "bad" })}
             style={styles.reviewIcon}>
             <Image source={(writeData.satisfaction === "bad") ? blackclose : grayclose} style={{ width: d2p(20), height: h2p(20) }} />
-            <Text style={{ color: (writeData.satisfaction === "bad") ? theme.color.black : theme.color.grayscale.a09ca4, marginLeft: d2p(5) }}>별로에요</Text>
+            <Text style={[{ color: (writeData.satisfaction === "bad") ? theme.color.black : theme.color.grayscale.a09ca4, marginLeft: d2p(5) }, FONT.Bold]}>별로에요</Text>
           </TouchableOpacity>
         </View>
         <TextInput
@@ -150,7 +151,7 @@ const Write = ({ navigation, route }: WriteProp) => {
           multiline
           textAlignVertical="top"
           onChangeText={(e) => setWriteData({ ...writeData, content: e })}
-          style={styles.textInput}
+          style={[styles.textInput, FONT.Regular]}
           placeholder="내용을 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
 
         <View style={styles.selectWrap}>
@@ -163,17 +164,17 @@ const Write = ({ navigation, route }: WriteProp) => {
                 <Text style={{ fontSize: 8, color: theme.color.white, top: h2p(3), left: "22%", position: "absolute" }}>
                   {writeData.tags.length}</Text>}
             </View>
-            <Text>태그 선택</Text>
-            <Text style={{ fontSize: 12, color: theme.color.main }}> *</Text>
+            <Text style={FONT.Medium}>태그 선택</Text>
+            <Text style={[{ fontSize: 12, color: theme.color.main }, FONT.Medium]}> *</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => marketRefRBSheet.current?.open()}
             style={styles.select}>
             <Image source={(writeData.market !== "선택 안함") ? maincart : cart} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
             {selectMarket ?
-              <Text>{writeData.market ? writeData.market : "유통사 선택"}</Text>
+              <Text style={FONT.Medium}>{writeData.market ? writeData.market : "유통사 선택"}</Text>
               :
-              <Text>유통사 선택</Text>
+              <Text style={FONT.Medium}>유통사 선택</Text>
             }
           </TouchableOpacity>
         </View>
@@ -182,7 +183,7 @@ const Write = ({ navigation, route }: WriteProp) => {
           <Pressable onPress={pickImage} style={[styles.images, { marginLeft: d2p(20), marginRight: d2p(15) }]}>
             <View style={{ alignItems: "center" }}>
               <Image source={photo} style={{ width: d2p(20), height: h2p(20), marginTop: h2p(12) }} />
-              <Text style={{ fontSize: 12, color: theme.color.grayscale.d3d0d5, marginVertical: h2p(8) }}>{imageList.length}/5</Text>
+              <Text style={[{ fontSize: 12, color: theme.color.grayscale.d3d0d5, marginVertical: h2p(8) }, FONT.Regular]}>{imageList.length}/5</Text>
             </View>
           </Pressable>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -226,7 +227,7 @@ const Write = ({ navigation, route }: WriteProp) => {
         <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: d2p(10), marginBottom: h2p(34) }}>
           <CloseIcon onPress={() => tagRefRBSheet.current?.close()}
             imageStyle={{ width: d2p(15), height: h2p(15) }} />
-          <Text style={{ fontSize: 16, fontWeight: "bold" }}>태그 선택</Text>
+          <Text style={[{ fontSize: 16, fontWeight: "bold" }, FONT.Bold]}>태그 선택</Text>
           <TouchableOpacity onPress={() => {
             const copy: { [index: string]: Array<{ isClick: boolean, title: string }> } = { ...userBadge };
             const tags = Object.keys(copy).reduce<Array<string>>((acc, cur) => {
@@ -238,7 +239,7 @@ const Write = ({ navigation, route }: WriteProp) => {
             });
             tagRefRBSheet.current?.close();
           }}>
-            <Text style={{ color: theme.color.grayscale.ff5d5d }}>완료</Text>
+            <Text style={[{ color: theme.color.grayscale.ff5d5d }, FONT.Regular]}>완료</Text>
           </TouchableOpacity>
         </View>
         <SelectLayout type="write" isInitial={true} userBadge={userBadge} setUserBadge={setUserBadge} />
@@ -265,7 +266,7 @@ const Write = ({ navigation, route }: WriteProp) => {
         <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: d2p(30), paddingVertical: h2p(20) }}>
           <CloseIcon onPress={() => marketRefRBSheet.current?.close()}
             imageStyle={{ width: d2p(15), height: h2p(15) }} />
-          <Text style={{ fontSize: 16, fontWeight: "bold" }}>유통사 선택</Text>
+          <Text style={[{ fontSize: 16, fontWeight: "bold" }, FONT.Bold]}>유통사 선택</Text>
           <View />
         </View>
         <ScrollView style={{ paddingHorizontal: d2p(20) }}>
@@ -280,7 +281,7 @@ const Write = ({ navigation, route }: WriteProp) => {
                 paddingVertical: h2p(12.5), paddingHorizontal: d2p(10),
                 borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc
               }}>
-              <Text style={{ fontWeight: "500" }}>{market}</Text>
+              <Text style={[{ fontWeight: "500" }, FONT.Medium]}>{market}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>

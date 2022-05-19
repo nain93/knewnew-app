@@ -1,6 +1,7 @@
 import React from "react";
 import { Image, ImageStyle, StyleSheet, Text, View, ViewStyle } from "react-native";
 import { heart, circle, bad } from "~/assets/icons";
+import { FONT } from "~/styles/fonts";
 import theme from "~/styles/theme";
 
 interface ReviewIconProp {
@@ -16,7 +17,7 @@ const ReviewIcon = ({ review, imageStyle }: ReviewIconProp) => {
         resizeMode="contain"
         style={[{ width: 20, height: 20 }, imageStyle]}
       />
-      <Text style={[{ paddingLeft: 5, fontWeight: 'bold' }, review === 'best' ? styles.best : (review === 'good' ? styles.good : styles.bad)]}>
+      <Text style={[{ paddingLeft: 5, fontWeight: 'bold' }, FONT.Bold, review === 'best' ? styles.best : (review === 'good' ? styles.good : styles.bad)]}>
         {reviewItem(review)?.text}</Text>
     </View >
   );

@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, ViewStyle } from "react-native";
+import { FONT } from "~/styles/fonts";
 import theme from "~/styles/theme";
 import { d2p } from "~/utils";
 
@@ -16,7 +17,7 @@ const BasicButton = ({ text, bgColor, textColor, viewStyle, onPress }: BasicButt
     <TouchableOpacity onPress={onPress}>
       <View style={[styles.container, viewStyle, { backgroundColor: bgColor }, { borderColor: textColor }]}>
         <View style={styles.textContainer}>
-          <Text style={[styles.text, { color: textColor }]}>{text}</Text>
+          <Text style={[styles.text, { color: textColor }, FONT.Bold]}>{text}</Text>
         </View>
       </View>
     </TouchableOpacity>

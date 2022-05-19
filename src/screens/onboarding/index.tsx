@@ -20,6 +20,7 @@ import appleAuth from '@invertase/react-native-apple-authentication';
 import { tokenState } from '~/recoil/atoms';
 import { useSetRecoilState } from 'recoil';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { FONT } from '~/styles/fonts';
 
 const iosKeys = {
   kConsumerKey: Config.NAVER_KEY,
@@ -133,7 +134,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
   return (
     <View style={styles.container}>
       <View style={{ marginLeft: 20 }}>
-        <Text style={{ fontSize: 24, fontWeight: "600" }}>실패없는 장보기</Text>
+        <Text style={[{ fontSize: 24, fontWeight: "600" }, FONT.SemiBold]}>제대로 된 맛있는 발견</Text>
         <View style={styles.logo}>
           <Image source={mainLogo} style={{ width: d2p(215), height: d2p(35) }} />
         </View>
@@ -144,7 +145,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
         />
       </View>
       <View style={{ marginTop: d2p(60) }}>
-        <Text style={{ textAlign: "center", fontSize: 16, fontWeight: "bold" }}>SNS로 시작하기</Text>
+        <Text style={[{ textAlign: "center", fontSize: 16, fontWeight: "bold" }, FONT.Bold]}>SNS로 시작하기</Text>
         <View style={{ flexDirection: "row", marginTop: d2p(20), alignSelf: "center" }}>
           <TouchableOpacity onPress={handleKakaoLogin}>
             <Image source={kakaoImg} style={styles.snsImg} />

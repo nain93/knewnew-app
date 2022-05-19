@@ -5,6 +5,7 @@ import { h2p } from '~/utils';
 import theme from '~/styles/theme';
 import { initialize } from '~/assets/icons';
 import { BadgeType } from '~/types';
+import { FONT } from '~/styles/fonts';
 
 interface SelectLayoutProps {
   userBadge: BadgeType;
@@ -44,7 +45,7 @@ const SelectLayout = ({ isInitial, userBadge, setUserBadge, type }: SelectLayout
     <>
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
         <View style={{ flexDirection: 'row' }}>
-          <Text style={{ ...styles.menu, marginTop: 0 }}>관심사 </Text>
+         <Text style={[{ ...styles.menu, marginTop: 0 }, FONT.Regular]}>관심사 </Text>
           {type !== ("write" || "filter") &&
             <Text style={{ color: theme.color.main }}>*</Text>
           }
@@ -69,11 +70,11 @@ const SelectLayout = ({ isInitial, userBadge, setUserBadge, type }: SelectLayout
           )))}
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', ...styles.menu }}>
-          <Text>가족구성 </Text>
+          <Text style={FONT.Regular}>가족구성 </Text>
           {type !== ("write" || "filter") &&
             <>
-              <Text style={{ color: theme.color.main }}>*</Text>
-              <Text style={{ marginLeft: 15, color: theme.color.grayscale.a09ca4, fontSize: 12 }}>
+              <Text style={[{ color: theme.color.main }, FONT.Regular]}>*</Text>
+              <Text style={[styles.guide, FONT.Regular]}>
                 1가지만 선택해주세요</Text>
             </>
           }
@@ -96,7 +97,7 @@ const SelectLayout = ({ isInitial, userBadge, setUserBadge, type }: SelectLayout
               }} />
           )))}
         </View>
-        <Text style={styles.menu}>입맛</Text>
+        <Text style={[styles.menu, { marginTop: 0 }, FONT.Regular]}>입맛</Text>
         <View style={{ flexDirection: 'row' }}>
           {React.Children.toArray(userBadge.taste.map((item, idx) => (
             <Badge type="picker" layoutType={type} badge="taste" text={item.title} idx={idx} isClick={userBadge.taste[idx].isClick}
@@ -120,7 +121,7 @@ const SelectLayout = ({ isInitial, userBadge, setUserBadge, type }: SelectLayout
             onPress={resetIsClick}
             style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: h2p(50) }}>
             <Image source={initialize} resizeMode="contain" style={{ height: 12, width: 12, marginRight: 5 }} />
-            <Text style={{ color: theme.color.grayscale.a09ca4, fontWeight: 'bold', }}>초기화</Text>
+            <Text style={[{ color: theme.color.grayscale.a09ca4, fontWeight: 'bold' }, FONT.Bold]}>초기화</Text>
           </TouchableOpacity>
         }
       </ScrollView>
@@ -134,5 +135,10 @@ const styles = StyleSheet.create({
   menu: {
     marginTop: h2p(40),
     marginBottom: h2p(5)
+  },
+  guide: {
+    marginLeft: 15,
+    fontSize: 12,
+    color: theme.color.grayscale.a09ca4,
   }
 });

@@ -5,6 +5,7 @@ import { d2p, h2p } from '~/utils';
 import Badge from '../badge';
 import ReviewIcon from '../icon/reviewIcon';
 import { retweetfrom, tag } from '~/assets/icons';
+import { FONT } from '~/styles/fonts';
 
 interface FeedReviewProps {
   review: any
@@ -20,18 +21,18 @@ const ReKnew = ({ review }: FeedReviewProps) => {
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 3 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={styles.title}>{review.writer}</Text>
+          <Text style={[styles.title, FONT.Medium]}>{review.writer}</Text>
           <Badge type="feed" text={review.badge} />
-          <Text style={{ fontSize: 12, marginLeft: 5, color: theme.color.grayscale.a09ca4 }}>{review.household}</Text>
+          <Text style={[styles.household, FONT.Regular]}>{review.household}</Text>
         </View>
       </View>
       <View style={{ marginVertical: h2p(12), }}>
         <ReviewIcon review={review.review} />
       </View>
-      <Text style={{ color: theme.color.black }}>{review.content}</Text>
+      <Text style={[{ color: theme.color.black }, FONT.Regular]}>{review.content}</Text>
       <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
         <Image source={tag} style={{ width: 10, height: 10, marginRight: 5 }} />
-        <Text style={{ fontSize: 12, color: theme.color.grayscale.C_79737e }}>
+        <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e },FONT.Regular]}>
           {React.Children.toArray(review?.tag?.map((v) => <Text>#{v} </Text>))}
           <Text style={{ color: theme.color.main }}>#비건</Text></Text>
       </View>
@@ -53,5 +54,10 @@ const styles = StyleSheet.create({
     fontSize: 16, fontWeight: 'bold',
     marginRight: 5
   },
+  household: {
+    fontSize: 12,
+    marginLeft: 5,
+    color: theme.color.grayscale.a09ca4
+  }
 });
 

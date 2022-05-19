@@ -21,6 +21,7 @@ import Loading from '~/components/loading';
 import { getMyProfile } from '~/api/user';
 import { MyPrfoileType } from '~/types/user';
 import { ReviewListType } from '~/types/review';
+import { FONT } from '~/styles/fonts';
 
 function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
   return (
@@ -44,6 +45,8 @@ const Feed = ({ navigation }: NavigationType) => {
   });
   const token = useRecoilValue(tokenState);
   const queryClient = useQueryClient();
+  const [selectedIndex, setSelectedIndex] = useState(0)
+
   const [filterBadge, setFilterBadge] = useState("");
 
   const [isLike, setIsLike] = useState<boolean>(false);
@@ -85,7 +88,7 @@ const Feed = ({ navigation }: NavigationType) => {
       useNativeDriver: true,
     }).start();
   };
-
+  // console.log(reviewListQuery.data?.pages.flat(), ' data');
   useEffect(() => {
     if (scrollOffset >= h2p(130)) {
       fadeIn();
@@ -112,13 +115,13 @@ const Feed = ({ navigation }: NavigationType) => {
                 onPress={() => tagRefRBSheet.current?.open()}
                 style={[styles.filter, { marginRight: 0, marginBottom: 0 }]}>
                 <Image source={tagfilter} style={{ width: 11, height: 10, marginRight: d2p(10) }} />
-                <Text>태그 변경</Text>
+                <Text style={FONT.Medium}>태그 변경</Text>
               </TouchableOpacity> : <View />}
           </Animated.View>
         }
         headerLeft={scrollOffset >= h2p(130) ?
           <Animated.View style={{ opacity: fadeAnim ? fadeAnim : 1, zIndex: 10 }}>
-            <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+            <Text style={[{ fontSize: 16, fontWeight: "bold" }, FONT.Bold]}>
               {filterBadge ? `#${filterBadge}` : `#${getMyProfileQuery.data?.representBadge}`}
             </Text>
           </Animated.View> : <Image source={mainLogo} resizeMode="contain" style={{ width: d2p(96), height: h2p(20) }} />}
@@ -139,10 +142,11 @@ const Feed = ({ navigation }: NavigationType) => {
           ListHeaderComponent={() =>
             <Fragment>
               <View style={styles.main}>
-                <Text style={styles.mainText}>뉴뉴는 지금</Text>
+                <Text style={[styles.mainText, FONT.Bold]}>뉴뉴는 지금</Text>
                 <View style={{ flexDirection: 'row' }}>
-                  <Text style={{ ...styles.mainText, color: theme.color.main }}>{filterBadge ? `#${filterBadge}` : `#${getMyProfileQuery.data?.representBadge}`} </Text>
-                  <Text style={styles.mainText}>관련 메뉴 추천 중 👀</Text>
+                  <Text style={[{ ...styles.mainText, color: theme.color.main },FONT.Bold]}>
+                    {filterBadge ? `#${filterBadge}` : `#${getMyProfileQuery.data?.representBadge}`} </Text>
+                   <Text style={[styles.mainText, FONT.Bold]}>관련 메뉴 추천 중 👀</Text>
                 </View>
               </View>
               <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
@@ -150,7 +154,7 @@ const Feed = ({ navigation }: NavigationType) => {
                   onPress={() => tagRefRBSheet.current?.open()}
                   style={styles.filter}>
                   <Image source={tagfilter} style={{ width: 11, height: 10, marginRight: d2p(10) }} />
-                  <Text>태그 변경</Text>
+                  <Text style={FONT.Medium}>태그 변경</Text>
                 </TouchableOpacity>
               </View>
             </Fragment>
@@ -203,7 +207,7 @@ const Feed = ({ navigation }: NavigationType) => {
             justifyContent: "space-between",
             alignItems: "center", marginBottom: h2p(40)
           }}>
-          <Text style={{ color: theme.color.grayscale.C_79737e, fontWeight: "500" }}>
+          <Text style={[{ color: theme.color.grayscale.C_79737e, fontWeight: "500" }, FONT.Medium]}>
             보고싶은 태그를 하나만 선택해주세요
           </Text>
           <TouchableOpacity
@@ -241,7 +245,7 @@ const Feed = ({ navigation }: NavigationType) => {
               borderRadius: 5,
               width: d2p(100), height: h2p(30), backgroundColor: theme.color.main
             }}>
-            <Text style={{ color: theme.color.white, fontSize: 12, fontWeight: '500' }}>태그 적용</Text>
+            <Text style={[styles.tagBtn, FONT.Medium]}>태그 적용</Text>
           </TouchableOpacity>
         </View>
         <SelectLayout type="filter" userBadge={userBadge} setUserBadge={setUserBadge} />
@@ -284,5 +288,9 @@ const styles = StyleSheet.create({
     width: d2p(100),
     marginRight: d2p(20),
     marginBottom: h2p(20)
+  },
+  tagBtn: {
+    color: theme.color.white,
+    fontSize: 12, fontWeight: '500'
   }
 });

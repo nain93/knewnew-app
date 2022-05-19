@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { NavigationRoute } from 'react-navigation';
 import { NavigationStackProp } from 'react-navigation-stack';
 import BasicButton from '~/components/button/basicButton';
+import { FONT } from '~/styles/fonts';
 import theme from '~/styles/theme';
 import { InterestType } from '~/types';
 import { d2p, h2p } from '~/utils';
@@ -32,8 +33,8 @@ const Welcome = ({ navigation, route }: NavigationType) => {
   return (
     <View style={styles.container}>
       <View style={styles.main}>
-        <Text style={[styles.mainText, { color: theme.color.main }]}>여지아</Text>
-        <Text style={[styles.mainText, { lineHeight: 29 }]}>님 반가워요!</Text>
+        <Text style={[styles.mainText, { color: theme.color.main }, { lineHeight: 28 }, FONT.SemiBold]}>여지아</Text>
+        <Text style={[styles.mainText, { lineHeight: 29 }, FONT.SemiBold]}>님 반가워요!</Text>
       </View>
       <View style={{
         marginBottom: h2p(10),
@@ -43,12 +44,12 @@ const Welcome = ({ navigation, route }: NavigationType) => {
         borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
         paddingHorizontal: d2p(15), paddingVertical: h2p(5), height: h2p(28), borderRadius: 14
       }}>
-        <Text style={{ color: theme.color.black, fontWeight: "500" }}>{masterBadge}</Text>
+        <Text style={[{ color: theme.color.black, fontWeight: "500" }, FONT.Medium]}>{masterBadge}</Text>
       </View>
       <View style={{ flexDirection: "row" }}>
-        {React.Children.toArray(badge?.map(v => <Text style={{ color: theme.color.main, fontSize: 16, fontWeight: "600" }}>#{v} </Text>))}
+        {React.Children.toArray(badge?.map(v => <Text style={[styles.tag, FONT.SemiBold]}>#{v} </Text>))}
       </View>
-      <Text style={{ color: theme.color.grayscale.C_79737e, fontSize: 14, marginTop: d2p(10), marginBottom: "auto" }}>맛있는 정보 함께 나눠요.</Text>
+      <Text style={[styles.subText, FONT.Regular]}>맛있는 정보 함께 나눠요.</Text>
       <BasicButton onPress={handleSignIn} text="입장하기" bgColor={theme.color.main} textColor={theme.color.white} />
     </View >
   );
@@ -67,6 +68,15 @@ const styles = StyleSheet.create({
   mainText: {
     fontSize: 26,
     fontWeight: '600',
+  },
+  tag: {
+    color: theme.color.main,
+    fontSize: 16, fontWeight: "600"
+  },
+  subText: {
+    color: theme.color.grayscale.C_79737e,
+    fontSize: 14,
+    marginTop: d2p(10), marginBottom: "auto"
   }
 });
 
