@@ -15,6 +15,7 @@ import { useRecoilValue } from 'recoil';
 import { tokenState } from '~/recoil/atoms';
 import theme from '~/styles/theme';
 import FeedDetail from '~/screens/feed/detail';
+import ReKnewWrite from '~/screens/write/ReKnewWrite';
 
 const Stack = createStackNavigator();
 
@@ -75,6 +76,13 @@ const GlobalNav = () => {
         <Stack.Screen
           name="TabNav"
           component={TabNavigator}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="ReKnew"
+          component={ReKnewWrite}
           options={{
             headerShown: false
           }}

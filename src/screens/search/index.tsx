@@ -73,8 +73,6 @@ const Search = ({ navigation }: SearchProps) => {
     setIsSearchMode(true);
   };
 
-
-
   // * 최근검색어 삭제
   const filterRecentKeyword = (filterIndex: number) => {
     AsyncStorage.setItem("recentKeyword", JSON.stringify(recentKeywords.filter((text, keywordIndex) => keywordIndex !== filterIndex)));
@@ -122,6 +120,7 @@ const Search = ({ navigation }: SearchProps) => {
               autoFocus
               autoCapitalize="none"
               style={{
+                color: theme.color.black,
                 paddingLeft: d2p(10), paddingRight: d2p(40), paddingVertical: d2p(6),
                 includeFontPadding: false, fontSize: 14
               }}

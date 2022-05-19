@@ -1,5 +1,5 @@
 import { View, Text, Dimensions, StyleSheet, Pressable, Image, ScrollView, TextInput } from 'react-native';
-import React, { Fragment, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import theme from '~/styles/theme';
@@ -19,6 +19,7 @@ import { getReviewDetail, likeReview } from '~/api/review';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { ReviewListType } from '~/types/review';
 import Loading from '~/components/loading';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface reviewProps {
   id: number;
@@ -34,33 +35,19 @@ interface reviewProps {
   photo?: string;
 }
 
-const reviewContent = {
-  id: 0,
-  badge: '다이어터',
-  title: '하림조각닭',
-  review: 'heart',
-  household: '자취생',
-  content: `닭가슴살만 먹기 질려서 이거 사봤는데, 고구마 달달하니 맛있어요
-직장인 도시락으로도 괜찮고, 전자레인지에만 돌려도 되서 간편하네용
-단백질 + 식이섬유 한번에 챙길 수 있음!`,
-  date: '2022.04.26',
-  store: '마켓컬리',
-  writer: '열려라참깨',
-  tag: ['간편식', '한끼식사'],
-  photo: 'ss',
-};
 interface FeedDetailProps {
   navigation: NavigationStackProp
   route: NavigationRoute<{
-    id: number
+    id: number,
+    badge: string,
+    isLike: boolean
   }>;
 }
 
 const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [review, setReview] = useState<reviewProps>();
-  const [like, setLike] = useState<boolean>(false);
+  const [like, setLike] = useState<boolean>(route.params?.isLike || false);
   const [cart, setCart] = useState<boolean>(false);
-  const commentRef = useRef<TextInput>(null);
   const queryClient = useQueryClient();
 
   const token = useRecoilValue(tokenState);
@@ -79,7 +66,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
 
   useEffect(() => {
     queryClient.invalidateQueries("reviewDetail");
-  }, [likeReviewMutation.data,]);
+  }, [likeReviewMutation.data]);
 
   if (reviewDetailQuery.isLoading) {
     return <Loading />;
@@ -99,10 +86,11 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
       >
         <View style={{ paddingHorizontal: d2p(20) }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <View style={{ backgroundColor: 'black', width: 40, height: 40, borderRadius: 20, marginRight: 5, position: 'absolute', left: 0 }} />
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: d2p(50), flexWrap: 'wrap', maxWidth: Dimensions.get('window').width - d2p(120) }}>
+            <View style={{ backgroundColor: 'black', width: d2p(40), height: d2p(40), borderRadius: 40, marginRight: 5, position: 'absolute', left: 0 }} />
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: d2p(50), flexWrap: 'wrap', width: Dimensions.get('window').width - d2p(120) }}>
               <Text style={styles.writer}>{reviewDetailQuery.data?.author.nickname}</Text>
               <Badge type="feed" text={reviewDetailQuery.data?.author.representBadge} />
+              <Text style={{ fontSize: 12, marginLeft: d2p(5), color: theme.color.grayscale.a09ca4 }}>{reviewDetailQuery.data?.author.household}</Text>
             </View>
             <MoreIcon onPress={() => console.log('공유/신고')} viewStyle={{ position: 'relative', top: 10 }} />
           </View>
@@ -110,16 +98,22 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           <Pressable onPress={() => console.log('피드 상세')}>
             <View style={{ marginTop: h2p(5), marginLeft: d2p(50), }}>
               <Text style={{ fontSize: 12, color: theme.color.grayscale.a09ca4 }}>
-                {(reviewDetailQuery.data) && simpleDate(reviewDetailQuery.data?.created)} 전</Text>
+                {reviewDetailQuery.data && simpleDate(reviewDetailQuery.data?.created, ' 전')}</Text>
             </View>
             <View style={{ paddingTop: h2p(20) }}>
               <ReviewIcon review={reviewDetailQuery.data?.satisfaction} />
-              <Text style={{ color: theme.color.black, marginBottom: 10, paddingTop: h2p(15) }}>{reviewDetailQuery.data?.content}</Text>
+              <Text style={{ color: theme.color.black, marginBottom: h2p(10), paddingTop: h2p(15) }}>{reviewDetailQuery.data?.content}</Text>
             </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Image source={tag} style={{ width: 10, height: 10, marginRight: 5 }} />
-              <Text style={{ fontSize: 12, color: theme.color.grayscale.C_79737e }}>{React.Children.toArray(reviewDetailQuery.data?.tags?.map((v) => <Text>#{v} </Text>))}
-                <Text style={{ color: theme.color.main }}>#비건</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: d2p(20) }}>
+              <Image source={tag} style={{ width: 10, height: 10, marginRight: d2p(5) }} />
+              <Text style={{ fontSize: 12, color: theme.color.grayscale.C_79737e }}>
+                {React.Children.toArray(reviewDetailQuery.data?.tags.map((v) => {
+                  if (v === route.params?.badge) {
+                    return;
+                  }
+                  return <Text>#{v} </Text>;
+                }))}
+                <Text style={{ color: theme.color.main, fontSize: 12 }}>#{route.params?.badge}</Text>
               </Text>
             </View>
           </Pressable>
@@ -135,7 +129,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             <ReactionIcon name="cart" state={cart} setState={(isState: boolean) => setCart(isState)} />
             <View style={{ borderLeftWidth: 1, borderLeftColor: theme.color.grayscale.eae7ec, height: h2p(26) }} />
             <ReactionIcon name="like" count={reviewDetailQuery.data?.likeCount} state={like}
-              isLike={(isState: boolean) => { setLike(isState); }} mutation={likeReviewMutation} id={route.params?.id} />
+              isState={(isState: boolean) => { setLike(isState); }} mutation={likeReviewMutation} id={route.params?.id} />
           </View>
           <Text style={{ marginTop: 20, fontSize: 12, color: theme.color.grayscale.C_79737e, fontWeight: 'bold', paddingBottom: h2p(20) }}>작성된 댓글 2개</Text>
           <View>
@@ -186,7 +180,7 @@ const styles = StyleSheet.create({
   },
   writer: {
     fontSize: 16, fontWeight: 'bold',
-    marginRight: 5
+    marginRight: d2p(10)
   },
   sign: {
     flexDirection: 'row',

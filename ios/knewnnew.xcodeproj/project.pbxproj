@@ -596,7 +596,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 96DWRK7G38;
 				ENABLE_BITCODE = NO;
-				EXCLUDED_ARCHS = arm64;
+				EXCLUDED_ARCHS = "";
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				INFOPLIST_FILE = knewnnew/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -692,7 +692,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 96DWRK7G38;
-				EXCLUDED_ARCHS = arm64;
+				EXCLUDED_ARCHS = "";
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				INFOPLIST_FILE = knewnnew/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

@@ -1,7 +1,7 @@
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useEffect } from 'react';
 import Badge from '~/components/badge';
-import { d2p, h2p } from '~/utils';
+import { h2p } from '~/utils';
 import theme from '~/styles/theme';
 import { initialize } from '~/assets/icons';
 import { BadgeType } from '~/types';
@@ -10,7 +10,7 @@ interface SelectLayoutProps {
   userBadge: BadgeType;
   setUserBadge: (badgeProp: BadgeType) => void;
   isInitial?: boolean;
-  type?: "filter"
+  type?: "filter" | "write"
 }
 
 const SelectLayout = ({ isInitial, userBadge, setUserBadge, type }: SelectLayoutProps) => {
@@ -42,10 +42,10 @@ const SelectLayout = ({ isInitial, userBadge, setUserBadge, type }: SelectLayout
 
   return (
     <>
-      <View style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
         <View style={{ flexDirection: 'row' }}>
           <Text style={{ ...styles.menu, marginTop: 0 }}>관심사 </Text>
-          {type !== "filter" &&
+          {type !== ("write" || "filter") &&
             <Text style={{ color: theme.color.main }}>*</Text>
           }
         </View>
@@ -70,7 +70,7 @@ const SelectLayout = ({ isInitial, userBadge, setUserBadge, type }: SelectLayout
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', ...styles.menu }}>
           <Text>가족구성 </Text>
-          {type !== "filter" &&
+          {type !== ("write" || "filter") &&
             <>
               <Text style={{ color: theme.color.main }}>*</Text>
               <Text style={{ marginLeft: 15, color: theme.color.grayscale.a09ca4, fontSize: 12 }}>
@@ -96,37 +96,34 @@ const SelectLayout = ({ isInitial, userBadge, setUserBadge, type }: SelectLayout
               }} />
           )))}
         </View>
-        <View style={{ position: "absolute", bottom: h2p(20) }}>
-          <Text style={[styles.menu, { marginTop: 0 }]}>입맛</Text>
-          <View style={{ flexDirection: 'row', marginBottom: 'auto' }}>
-            {React.Children.toArray(userBadge.taste.map((item, idx) => (
-              <Badge type="picker" layoutType={type} badge="taste" text={item.title} idx={idx} isClick={userBadge.taste[idx].isClick}
-                userBadge={userBadge} setUserBadge={(tasteProp) => {
-                  if (type === "filter") {
-                    setUserBadge({
-                      household: userBadge.household.map(v => ({ ...v, isClick: false })),
-                      taste: tasteProp,
-                      interest: userBadge.interest.map(v => ({ ...v, isClick: false }))
-                    });
-                  }
-                  else {
-                    setUserBadge({ ...userBadge, taste: tasteProp });
-                  }
-                }}
-              />
-            )))}
-          </View>
+        <Text style={styles.menu}>입맛</Text>
+        <View style={{ flexDirection: 'row' }}>
+          {React.Children.toArray(userBadge.taste.map((item, idx) => (
+            <Badge type="picker" layoutType={type} badge="taste" text={item.title} idx={idx} isClick={userBadge.taste[idx].isClick}
+              userBadge={userBadge} setUserBadge={(tasteProp) => {
+                if (type === "filter") {
+                  setUserBadge({
+                    household: userBadge.household.map(v => ({ ...v, isClick: false })),
+                    taste: tasteProp,
+                    interest: userBadge.interest.map(v => ({ ...v, isClick: false }))
+                  });
+                }
+                else {
+                  setUserBadge({ ...userBadge, taste: tasteProp });
+                }
+              }}
+            />
+          )))}
         </View>
-      </View>
-
-      {isInitial &&
-        <TouchableOpacity
-          onPress={resetIsClick}
-          style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: h2p(40) }}>
-          <Image source={initialize} resizeMode="contain" style={{ height: 12, width: 12, marginRight: 5 }} />
-          <Text style={{ color: theme.color.grayscale.a09ca4, fontWeight: 'bold', }}>초기화</Text>
-        </TouchableOpacity>
-      }
+        {isInitial &&
+          <TouchableOpacity
+            onPress={resetIsClick}
+            style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: h2p(50) }}>
+            <Image source={initialize} resizeMode="contain" style={{ height: 12, width: 12, marginRight: 5 }} />
+            <Text style={{ color: theme.color.grayscale.a09ca4, fontWeight: 'bold', }}>초기화</Text>
+          </TouchableOpacity>
+        }
+      </ScrollView>
     </>
   );
 };
