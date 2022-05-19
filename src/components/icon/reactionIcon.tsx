@@ -5,6 +5,7 @@ import theme from "~/styles/theme";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "react-navigation-stack/lib/typescript/src/vendor/types";
 import { UseMutationResult } from "react-query";
+import { FONT } from "~/styles/fonts";
 
 interface ReviewIconProp {
   name: "like" | "cart" | "retweet" | "comment";
@@ -15,7 +16,7 @@ interface ReviewIconProp {
     id: number;
     state: boolean;
   }>;
-  id: number;
+  id?: number;
 }
 
 const ReactionIcon = ({ name, count, state, isState, mutation, id }: ReviewIconProp) => {
@@ -35,8 +36,10 @@ const ReactionIcon = ({ name, count, state, isState, mutation, id }: ReviewIconP
         else {
           setReactCount(prev => prev && (prev - 1));
         }
+      } else if (name === "comment") {
+        navigation.navigate("FeedDetail", { id });
       } else {
-        navigation.navigate(name);
+
       }
     }} >
       <Image
@@ -44,7 +47,7 @@ const ReactionIcon = ({ name, count, state, isState, mutation, id }: ReviewIconP
         resizeMode="contain"
         style={{ width: 26, height: 26 }}
       />
-      <Text style={[{ fontSize: 12 }, !state ? styles.default : styles.clicked, { marginLeft: 9 }]}>{reactCount}</Text>
+      <Text style={[{ fontSize: 12 }, !state ? styles.default : styles.clicked, { marginLeft: 9 }, FONT.Bold]}>{reactCount}</Text>
     </TouchableOpacity >
   );
 };

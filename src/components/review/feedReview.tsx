@@ -11,13 +11,14 @@ import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/v
 import { ReviewListType } from '~/types/review';
 import { useMutation } from 'react-query';
 import { useRecoilValue } from 'recoil';
-import { tokenState } from '~/recoil/atoms';
+import { myIdState, tokenState } from '~/recoil/atoms';
 import { likeReview } from '~/api/review';
+import { FONT } from '~/styles/fonts';
 
 interface FeedReviewProps {
   review: ReviewListType,
   isRetweet?: boolean,
-  viewStyle?: ViewStyle
+  viewStyle?: ViewStyle,
 }
 
 const FeedReview = ({ review, viewStyle, isRetweet = false }: FeedReviewProps) => {
@@ -25,20 +26,42 @@ const FeedReview = ({ review, viewStyle, isRetweet = false }: FeedReviewProps) =
   const [like, setLike] = useState<boolean>(review.isLike);
   const [cart, setCart] = useState<boolean>(false);
   const token = useRecoilValue(tokenState);
-  const [isMoreClick, setIsMoreClick] = useState<boolean>();
+  const myId = useRecoilValue(myIdState);
+
 
   const likeReviewFeedMutation = useMutation('likeReviewFeed', ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state));
+
   return (
     <Pressable onPress={() => navigation.navigate("FeedDetail", { id: review.id })}
       style={[styles.review, viewStyle]}>
+      {review.author.id === myId ?
+        <View style={styles.clickBox}>
+          <Pressable>
+            <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
+          </Pressable>
+          <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
+          <Pressable>
+            <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
+          </Pressable>
+        </View>
+        :
+        <View style={styles.clickBox}>
+          <Pressable>
+            <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
+          </Pressable>
+          <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
+          <Pressable>
+            <Text style={[{ color: theme.color.main }, FONT.Regular]}>신고</Text>
+          </Pressable>
+        </View>}
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <View style={{ backgroundColor: 'black', width: d2p(40), height: d2p(40), borderRadius: 40, marginRight: d2p(5), position: 'absolute', left: d2p(-50) }} />
         <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', width: Dimensions.get('window').width - d2p(120) }}>
-          <Text style={styles.title}>{review.author.nickname}</Text>
+          <Text style={[styles.title, FONT.Medium]}>{review.author.nickname}</Text>
           <Badge type="feed" text={review.author.representBadge} />
-          <Text style={{ fontSize: 12, marginLeft: d2p(5), color: theme.color.grayscale.a09ca4 }}>{review.author.household}</Text>
+          <Text style={[{ fontSize: 12, marginLeft: d2p(5), color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>{review.author.household}</Text>
         </View>
-        <TouchableOpacity onPress={() => setIsMoreClick(!isMoreClick)}>
+        <TouchableOpacity>
           <Image
             source={more}
             resizeMode="contain"
@@ -48,30 +71,19 @@ const FeedReview = ({ review, viewStyle, isRetweet = false }: FeedReviewProps) =
       </View>
       <View style={styles.titleContainer}>
         <ReviewIcon review={review.satisfaction} />
-        <Text style={{ fontSize: 10, color: theme.color.grayscale.a09ca4 }}>{simpleDate(review.created, ' 전')}</Text>
-        {isMoreClick &&
-          <View style={styles.clickBox}>
-            <Pressable>
-              <Text style={{ color: theme.color.grayscale.C_443e49 }}>공유</Text>
-            </Pressable>
-            <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-            <Pressable>
-              <Text style={{ color: theme.color.main }}>신고</Text>
-            </Pressable>
-          </View>}
+        <Text style={[{ fontSize: 10, color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>{simpleDate(review.created, ' 전')}</Text>
       </View>
-      <Text style={{ color: theme.color.black, marginBottom: 10 }}>{review.content}</Text>
+      <Text style={[{ color: theme.color.black, marginBottom: 10 }, FONT.Regular]}>{review.content}</Text>
       {!isRetweet &&
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Image source={tag} style={{ width: 10, height: 10, marginRight: 5 }} />
-          <Text style={{ fontSize: 12, color: theme.color.grayscale.C_79737e }}>
+          <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
             {React.Children.toArray(review?.tags?.map((v) => <Text>#{v} </Text>))}
-            <Text style={{ color: theme.color.main }}>#비건</Text>
           </Text>
         </View>}
       {!isRetweet &&
         <View style={styles.sign}>
-          <Text style={styles.store}>{review.market}</Text>
+          <Text style={[styles.store, FONT.Regular]}>{review.market}</Text>
         </View>}
       {review.images.length > 0 &&
         <Image source={{ uri: review.images[0]?.image }}
@@ -134,7 +146,7 @@ const styles = StyleSheet.create({
   clickBox: {
     display: 'flex', justifyContent: 'space-evenly', alignItems: 'center',
     width: 70, height: 70, borderRadius: 5,
-    position: 'absolute', right: d2p(26), top: -35,
+    position: 'absolute', right: d2p(36), top: 5,
     shadowColor: '#000000',
     shadowOpacity: 0.27,
     shadowRadius: 4.65,

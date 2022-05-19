@@ -3,6 +3,7 @@ import React from 'react';
 import { d2p, h2p } from '~/utils';
 import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
 import theme from '~/styles/theme';
+import { FONT } from '~/styles/fonts';
 
 interface HeaderProps {
   title?: string;
@@ -22,7 +23,7 @@ const Header = ({ headerRightPress, headerLeft, headerRight, customRight, title,
         style={{ position: "absolute", left: d2p(20) }}>
         {headerLeft}
       </View>
-      <Text style={{ fontSize: 16, color: theme.color.black }}>
+      <Text style={[{ fontSize: 16, color: theme.color.black }, FONT.Regular]}>
         {title}
       </Text>
       {headerRight ?

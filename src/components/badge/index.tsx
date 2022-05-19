@@ -1,6 +1,7 @@
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from "react-native";
 import { colorCheck } from "~/assets/icons";
+import { FONT } from "~/styles/fonts";
 import theme from "~/styles/theme";
 import { BadgeType } from "~/types";
 import { d2p, h2p } from "~/utils";
@@ -10,10 +11,10 @@ interface BadgeProp {
   type: "picker" | "feed" | "mypage" | "unabled",
   layoutType?: "filter",
   badge?: "interest" | "household" | "taste",
-  isClick: boolean,
-  idx: number,
-  userBadge: BadgeType,
-  setUserBadge: (badgeArr: Array<{ title: string, isClick: boolean }>) => void;
+  isClick?: boolean,
+  idx?: number,
+  userBadge?: BadgeType,
+  setUserBadge?: (badgeArr: Array<{ title: string, isClick: boolean }>) => void;
   viewStyle?: ViewStyle
 }
 
@@ -24,7 +25,7 @@ const Badge = ({ layoutType, text, type, badge, isClick, idx, userBadge, setUser
       return (
         <TouchableOpacity
           onPress={() => {
-            if (badge) {
+            if (badge && userBadge && setUserBadge) {
               // * 필터 ui 태그 하나만 석탠 할 수있슴
               if (layoutType === "filter") {
                 setUserBadge(
@@ -57,19 +58,19 @@ const Badge = ({ layoutType, text, type, badge, isClick, idx, userBadge, setUser
             }
           }} style={[styles.tag, !isClick ? styles.basic : styles.checked, viewStyle]}>
           {isClick && <Image source={colorCheck} resizeMode="contain" style={{ width: 10, height: 8, marginRight: 5 }} />}
-          <Text style={[styles.text, !isClick ? styles.blackText : styles.colorText]}>{text}</Text>
+          <Text style={[styles.text, !isClick ? styles.blackText : styles.colorText, FONT.Medium]}>{text}</Text>
         </TouchableOpacity>
       );
     case 'unabled':
       return (
         <View style={[styles.tag, styles.basic, styles.unabled, viewStyle]} >
-          <Text style={styles.unabledText}>{text}</Text>
+          <Text style={[styles.unabledText, FONT.Medium]}>{text}</Text>
         </View>
       );
     case 'feed':
       return (
         <View style={styles.badge}>
-          <Text style={styles.badgeText}>{text}</Text>
+          <Text style={[styles.badgeText, FONT.Medium]}>{text}</Text>
         </View>
       );
     case 'mypage':

@@ -10,6 +10,7 @@ import SelectLayout from '~/components/selectLayout';
 import { popupState } from '~/recoil/atoms';
 import { useSetRecoilState } from 'recoil';
 import { UserInfoType } from '~/types/user';
+import { FONT } from '~/styles/fonts';
 
 interface BadgeSelectProps {
   navigation: NavigationStackProp
@@ -44,15 +45,15 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
   return (
     <View style={styles.container}>
       <View style={{ marginBottom: h2p(40) }}>
-        <Text style={styles.title}>나를 소개하는 태그를</Text>
+        <Text style={[styles.title, FONT.SemiBold]}>나를 소개하는 태그를</Text>
         <View style={{ flexDirection: 'row' }}>
-          <Text style={[styles.title, { color: theme.color.main }]}>2가지 이상 </Text>
-          <Text style={styles.title}>선택해주세요.</Text></View>
+          <Text style={[styles.title, { color: theme.color.main }, FONT.SemiBold]}>2가지 이상 </Text>
+          <Text style={[styles.title, FONT.SemiBold]}>선택해주세요.</Text></View>
         <View style={{ flexDirection: 'row', marginTop: d2p(20) }}>
-          <Text style={{ fontWeight: 'bold' }}>나를 소개하는 태그</Text>
-          <Text>를 골라주세요.</Text>
+          <Text style={[{ fontWeight: 'bold' }, FONT.Bold]}>나를 소개하는 태그</Text>
+          <Text style={FONT.Regular}>를 골라주세요.</Text>
         </View>
-        <Text>최소 2개 최대 10개까지 고를 수 있어요.</Text>
+        <Text style={FONT.Regular}>최소 2개 최대 10개까지 고를 수 있어요.</Text>
       </View>
       <View style={{ flex: 1 }}>
         <SelectLayout userBadge={userBadge} setUserBadge={(badgeProp: BadgeType) => setUserBadge(badgeProp)} isInitial={true} />
