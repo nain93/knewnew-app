@@ -1,18 +1,17 @@
-import { View, Text, Dimensions, StyleSheet, Pressable, Image, ScrollView, TextInput, TouchableOpacity, Platform } from 'react-native';
-import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import { View, Text, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView, Keyboard } from 'react-native';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import theme from '~/styles/theme';
 import { d2p, h2p, simpleDate } from '~/utils';
 import ReviewIcon from '~/components/icon/reviewIcon';
-import MoreIcon from '~/components/icon/moreIcon';
 import Badge from '~/components/badge';
 import ReactionIcon from '~/components/icon/reactionIcon';
 import { more, tag } from '~/assets/icons';
 import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 import { useRecoilValue } from 'recoil';
 import { myIdState, tokenState } from '~/recoil/atoms';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import { getReviewDetail, likeReview } from '~/api/review';
@@ -45,13 +44,12 @@ interface FeedDetailProps {
 }
 
 const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
-  const [review, setReview] = useState<reviewProps>();
   const [like, setLike] = useState<boolean>(route.params?.isLike || false);
   const [cart, setCart] = useState<boolean>(false);
-  const queryClient = useQueryClient();
 
-  const [scrollHeight, setScrollHeight] = useState(0);
+  const [inputHeight, setInputHeight] = useState(0);
   const token = useRecoilValue(tokenState);
+  const inputRef = useRef<TextInput>(null);
 
   const [isMoreClick, setIsMoreClick] = useState<boolean>();
   const myId = useRecoilValue(myIdState);
@@ -63,16 +61,23 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     }
   }, {
     enabled: !!token,
-    // onSuccess:(data)=>setLike(data.isLike)
   });
 
   const likeReviewMutation = useMutation('likeReview', ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state));
 
+  // * 키보드 높이 컨트롤
   useEffect(() => {
-    queryClient.invalidateQueries("reviewDetail");
-  }, [likeReviewMutation.data]);
+    Keyboard.addListener("keyboardWillShow", (e) => {
+      setInputHeight(0);
+    });
+    Keyboard.addListener("keyboardWillHide", (e) => {
+      setInputHeight(getBottomSpace());
+    });
+  }, []);
 
-  if (reviewDetailQuery.isLoading) {
+
+
+  if (reviewDetailQuery.isLoading || reviewDetailQuery.isFetching) {
     return <Loading />;
   }
 
@@ -80,23 +85,20 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     <Fragment>
       <Header
         isBorder={true}
-        headerLeft={<LeftArrowIcon onBackClick={() => navigation.goBack()} imageStyle={{ width: 11, height: 25 }} />}
+        headerLeft={<LeftArrowIcon onBackClick={() => {
+          navigation.goBack();
+        }} imageStyle={{ width: 11, height: 25 }} />}
         title="리뷰 상세"
       />
       {/* <FeedReview review={review} /> */}
-      <KeyboardAwareScrollView
-        showsVerticalScrollIndicator={false}
-        style={{ flex: 1, paddingTop: h2p(20) }}
-        onKeyboardWillShow={o => {
-          // @ts-ignore
-          setScrollHeight(o.endCoordinates.height);
-        }}
-        onKeyboardDidHide={() => {
-          setScrollHeight(0);
-        }}
-      // keyboardShouldPersistTaps="always"
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
       >
-        <View style={{ paddingHorizontal: d2p(20), }}>
+        <ScrollView
+          contentContainerStyle={{ paddingBottom: h2p(30) }}
+          showsVerticalScrollIndicator={false}
+          style={{ paddingHorizontal: d2p(20), paddingTop: h2p(20), flex: 1 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
             {isMoreClick &&
               (myId === reviewDetailQuery.data?.author.id ?
@@ -166,10 +168,13 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           <View style={styles.sign}>
             <Text style={[styles.store, FONT.Regular]}>{reviewDetailQuery.data?.market}</Text>
           </View>
-          {reviewDetailQuery.data?.content && <View style={{
+
+          {/* TODO 이미지 있을떄 넣기 */}
+          <View style={{
             backgroundColor: 'black', width: Dimensions.get('window').width - d2p(40),
             height: Dimensions.get("window").height * (180 / 760), borderRadius: 18, marginRight: 5
-          }} />}
+          }} />
+
           <View style={styles.reactionContainer}>
             <ReactionIcon name="cart" state={cart} isState={(isState: boolean) => setCart(isState)} />
             <View style={{ borderLeftWidth: 1, borderLeftColor: theme.color.grayscale.eae7ec, height: h2p(26) }} />
@@ -195,21 +200,36 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             <Text style={[styles.commentContent, FONT.Regular]}>저도 이거 좋아해요!! 근데 염지가 많이 됐는지 저한테는 살짝 짜더라구요</Text>
             <View style={styles.commentLine} />
           </View>
-        </View>
-
-        <View style={{
-          borderTopColor: theme.color.grayscale.eae7ec, borderTopWidth: 1,
-          left: 0,
-          position: 'absolute', bottom: getBottomSpace(), width: Dimensions.get("window").width, backgroundColor: theme.color.white, paddingVertical: h2p(14), paddingHorizontal: d2p(20)
-        }}>
-          <TextInput style={{
-          }}
-            placeholder="댓글을 남겨보세요" placeholderTextColor={theme.color.grayscale.d3d0d5} />
-          <Pressable style={{ position: 'absolute', right: 20, top: 14 }}>
+        </ScrollView>
+        <Pressable
+          onPress={() => inputRef.current?.focus()}
+          style={{
+            borderTopColor: theme.color.grayscale.eae7ec,
+            borderTopWidth: 1,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: Dimensions.get("window").width,
+            marginBottom: inputHeight,
+            backgroundColor: theme.color.white, paddingVertical: h2p(14), paddingHorizontal: d2p(20)
+          }}>
+          <TextInput
+            ref={inputRef}
+            multiline
+            style={[{
+              color: theme.color.black,
+              includeFontPadding: false,
+              paddingTop: 0,
+              paddingBottom: 0,
+              width: Dimensions.get("window").width - d2p(84),
+            }, FONT.Regular]}
+            placeholder="댓글을 남겨보세요." placeholderTextColor={theme.color.grayscale.d3d0d5} />
+          <Pressable style={() => console.log("작성")}>
             <Text style={[{ color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>작성</Text>
           </Pressable>
-        </View>
-      </KeyboardAwareScrollView>
+        </Pressable>
+
+      </KeyboardAvoidingView>
     </Fragment >
   );
 };
@@ -217,11 +237,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
 export default FeedDetail;
 
 const styles = StyleSheet.create({
-  review: {
-    marginTop: h2p(20),
-    paddingBottom: isIphoneX() ? getBottomSpace() : 0,
-    flex: 1
-  },
   writer: {
     fontSize: 16, fontWeight: 'bold',
     marginRight: d2p(10)

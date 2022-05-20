@@ -19,12 +19,12 @@ interface FeedReviewProps {
   isRetweet?: boolean,
   filterBadge?: string
   type?: "reKnewWrite" | "normal"
-  setSelectedIndex: (idx: number) => void
-  idx: number
-  selectedIndex: number
+  setSelectedIndex?: (idx: number) => void
+  selectedIndex?: number
+  idx?: number
 }
 
-const FeedReview = ({ selectedIndex, setSelectedIndex, idx, type = "normal", filterBadge, review, isRetweet = false }: FeedReviewProps) => {
+const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1, type = "normal", filterBadge, review, isRetweet = false }: FeedReviewProps) => {
   const navigation = useNavigation<StackNavigationProp>();
   const [isLike, setIsLike] = useState<boolean>(review.isLike);
   const [reactCount, setReactCount] = useState(review.likeCount);
@@ -64,11 +64,13 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx, type = "normal", fil
         </View>
         {type === "normal" &&
           <TouchableOpacity onPress={() => {
-            if (selectedIndex === idx) {
-              setSelectedIndex(-1);
-            }
-            else {
-              setSelectedIndex(idx);
+            if (setSelectedIndex) {
+              if (selectedIndex === idx) {
+                setSelectedIndex(-1);
+              }
+              else {
+                setSelectedIndex(idx);
+              }
             }
           }}>
             <Image
@@ -154,7 +156,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx, type = "normal", fil
         </View>
       }
       {
-        (selectedIndex === idx) &&
+        (selectedIndex === idx && type === "normal") &&
         (
           review.author.id === myId ?
             <View style={styles.clickBox}>
