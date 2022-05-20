@@ -1,6 +1,5 @@
 import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { useRef } from 'react';
-import { NavigationType } from '~/types';
+import React, { useEffect, useRef, useState } from 'react';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import Header from '~/components/header';
 import theme from '~/styles/theme';
@@ -8,10 +7,38 @@ import { d2p, h2p } from '~/utils';
 import { plusIcon } from '~/assets/icons';
 import { TextInput } from 'react-native-gesture-handler';
 import BasicButton from '~/components/button/basicButton';
+import { NavigationStackProp } from 'react-navigation-stack';
+import { NavigationRoute } from 'react-navigation';
+import { noProfile } from '~/assets/images';
 
-const EditProfile = ({ navigation }: NavigationType) => {
+
+interface ProfileEditType {
+  nickname: string,
+  occupation: string,
+  profileImage: string
+}
+interface EditProfileProps {
+  navigation: NavigationStackProp;
+  route: NavigationRoute<{
+    profile: ProfileEditType
+  }>;
+}
+
+const EditProfile = ({ navigation, route }: EditProfileProps) => {
   const nameInputRef = useRef<TextInput>(null);
   const selfInputRef = useRef<TextInput>(null);
+
+  const [profileInfo, setProfileInfo] = useState<ProfileEditType>({
+    nickname: "",
+    occupation: "",
+    profileImage: ""
+  });
+
+  useEffect(() => {
+    if (route.params) {
+      setProfileInfo(route.params.profile);
+    }
+  }, [route.params]);
 
   return (
     <>
@@ -23,6 +50,8 @@ const EditProfile = ({ navigation }: NavigationType) => {
         headerRight={<Text style={{ color: theme.color.main }}>완료</Text>} />
       <View style={styles.container}>
         <TouchableOpacity style={styles.profileImage}>
+          <Image source={profileInfo.profileImage ? { uri: profileInfo.profileImage } : noProfile}
+            style={{ width: d2p(60), height: d2p(60), borderRadius: 60 }} />
           <Image source={plusIcon}
             style={{ width: d2p(18), height: h2p(18), position: "absolute", bottom: 0, right: 0 }} />
         </TouchableOpacity>
@@ -34,11 +63,15 @@ const EditProfile = ({ navigation }: NavigationType) => {
           </View>
           <Pressable onPress={() => nameInputRef.current?.focus()} style={styles.textInput}>
             <TextInput
+              value={profileInfo.nickname}
+              onChangeText={(e) => setProfileInfo({ ...profileInfo, nickname: e })}
               ref={nameInputRef}
               autoCapitalize="none"
               style={{ fontSize: 16, padding: 0, includeFontPadding: false }}
               placeholder="닉네임을 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
-            <Text style={{ fontSize: 12, color: theme.color.grayscale.ff5d5d }}> (필수)</Text>
+            {!profileInfo.nickname &&
+              <Text style={{ fontSize: 12, color: theme.color.grayscale.ff5d5d }}> (필수)</Text>
+            }
           </Pressable>
         </View>
 
@@ -49,16 +82,22 @@ const EditProfile = ({ navigation }: NavigationType) => {
           </View>
           <Pressable onPress={() => selfInputRef.current?.focus()} style={styles.textInput}>
             <TextInput
+              value={profileInfo.occupation}
+              onChangeText={e => setProfileInfo({ ...profileInfo, occupation: e })}
               ref={selfInputRef}
               autoCapitalize="none"
               style={{ fontSize: 16, padding: 0, includeFontPadding: false }}
               placeholder="자기소개를 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
-            <Text style={{ fontSize: 12, color: theme.color.grayscale.a09ca4 }}> (선택)</Text>
+            {!profileInfo.occupation &&
+              <Text style={{ fontSize: 12, color: theme.color.grayscale.a09ca4 }}> (선택)</Text>
+            }
           </Pressable>
         </View>
 
-        <BasicButton viewStyle={{ alignSelf: "center", marginTop: h2p(40) }} onPress={() => console.log("select")}
-          text="소개 태그 선택" textColor={theme.color.main} bgColor={theme.color.white} />
+        <View>
+          <BasicButton viewStyle={{ alignSelf: "center", marginTop: h2p(40) }} onPress={() => console.log("select")}
+            text="소개 태그 선택" textColor={theme.color.main} bgColor={theme.color.white} />
+        </View>
       </View>
     </>
   );

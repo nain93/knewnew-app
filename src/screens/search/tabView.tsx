@@ -24,6 +24,7 @@ const SearchTabView = ({ searchList, userList }: SearchTabViewProps) => {
     { key: "menu", title: "메뉴" },
     { key: "user", title: "회원" }
   ]);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
 
   if (!searchList) {
     return <Loading />;
@@ -60,7 +61,12 @@ const SearchTabView = ({ searchList, userList }: SearchTabViewProps) => {
                           borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc
                         }}
                       >
-                        <FeedReview review={review.item} />
+                        <FeedReview
+                          clickBoxStyle={{ right: d2p(26), top: h2p(-10) }}
+                          idx={review.index}
+                          selectedIndex={selectedIndex}
+                          setSelectedIndex={(selectIdx: number) => setSelectedIndex(selectIdx)}
+                          review={review.item} />
                       </Pressable>
                     );
                   }}
@@ -74,7 +80,7 @@ const SearchTabView = ({ searchList, userList }: SearchTabViewProps) => {
                 <Text style={[styles.searchResult, { marginBottom: h2p(30) }]}>검색결과 · {userList.length}건</Text>
                 <FlatList
                   style={{ marginBottom: h2p(80) }}
-                  contentContainerStyle={{ paddingBottom: d2p(40), paddingHorizontal: d2p(20), }}
+                  contentContainerStyle={{ paddingBottom: d2p(40), paddingHorizontal: d2p(20) }}
                   keyExtractor={(review) => String(review.id)}
                   data={userList}
                   ListEmptyComponent={() =>

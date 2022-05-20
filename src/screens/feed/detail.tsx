@@ -47,7 +47,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [like, setLike] = useState<boolean>(route.params?.isLike || false);
   const [cart, setCart] = useState<boolean>(false);
 
-  const [inputHeight, setInputHeight] = useState(0);
+  const [inputHeight, setInputHeight] = useState(getBottomSpace());
   const token = useRecoilValue(tokenState);
   const inputRef = useRef<TextInput>(null);
 
@@ -224,11 +224,10 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
               width: Dimensions.get("window").width - d2p(84),
             }, FONT.Regular]}
             placeholder="댓글을 남겨보세요." placeholderTextColor={theme.color.grayscale.d3d0d5} />
-          <Pressable style={() => console.log("작성")}>
+          <Pressable onPress={() => console.log("작성")}>
             <Text style={[{ color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>작성</Text>
           </Pressable>
         </Pressable>
-
       </KeyboardAvoidingView>
     </Fragment >
   );

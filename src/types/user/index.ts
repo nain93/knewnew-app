@@ -20,7 +20,9 @@ export interface BookmarkType {
   commentCount: number,
   likeCount: number,
   dislikeCount: number,
-  created: string
+  created: string,
+  isLike: boolean,
+  isBookmark: boolean
 }
 
 export interface userNormalType {
@@ -41,7 +43,7 @@ export interface MyPrfoileType {
   reviews: Array<ReviewListType>,
   reviewCount: number,
   bookmarkCount: number,
-  bookmarks: Array<BookmarkType>
+  bookmarks: Array<ReviewListType>
 }
 
 export interface UserInfoType {

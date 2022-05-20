@@ -1,7 +1,7 @@
-import { Dimensions, Image, StyleSheet, Text, View } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import { Dimensions, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React from 'react';
 import Header from '~/components/header';
-import { MyPrfoileType, NavigationType } from '~/types';
+import { NavigationType } from '~/types';
 import { d2p, h2p } from '~/utils';
 import { write } from '~/assets/icons';
 import theme from '~/styles/theme';
@@ -10,32 +10,49 @@ import { getMyProfile } from '~/api/user';
 import { useRecoilValue } from 'recoil';
 import { useQuery } from 'react-query';
 import MypageTabView from '~/screens/mypage/tabview';
+import { MyPrfoileType } from '~/types/user';
+import { noProfile } from '~/assets/images';
+import Loading from '~/components/loading';
+import { ReviewListType } from '~/types/review';
 
 const Mypage = ({ navigation }: NavigationType) => {
   const token = useRecoilValue(tokenState);
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
     enabled: !!token
   });
-  const [profile, setProfile] = useState<MyPrfoileType>();
 
-  useEffect(() => {
-    if (getMyProfileQuery.data) {
-      setProfile(getMyProfileQuery.data);
-    }
-  }, [getMyProfileQuery.data]);
+
+  if (getMyProfileQuery.isLoading) {
+    return (
+      <Loading />
+    );
+  }
 
   return (
     <>
       <Header
         title="마이페이지"
         headerRight={<Image source={write} style={{ width: d2p(15), height: h2p(15) }} />}
-        headerRightPress={() => navigation.navigate("editProfile")}
+        headerRightPress={() => navigation.navigate("editProfile",
+          {
+            profile:
+            {
+              nickname: getMyProfileQuery.data?.nickname,
+              occupation: getMyProfileQuery.data?.occupation,
+              profileImage: getMyProfileQuery.data?.profileImage
+            }
+          })}
       />
-      <View style={styles.container}>
-        <View style={styles.profileImage} />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={styles.container} >
+        <View style={styles.profileImage} >
+          <Image style={{ width: d2p(60), height: d2p(60), borderRadius: 60 }}
+            source={getMyProfileQuery.data?.profileImage ? { uri: getMyProfileQuery.data?.profileImage } : noProfile} />
+        </View>
         <View style={styles.profileInfo}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text style={{ fontSize: 24, fontWeight: "bold", marginRight: d2p(10) }}>{profile?.nickname}</Text>
+            <Text style={{ fontSize: 24, fontWeight: "bold", marginRight: d2p(10) }}>{getMyProfileQuery.data?.nickname}</Text>
             <View style={{
               height: h2p(20), minWidth: d2p(55),
               marginRight: d2p(5),
@@ -43,17 +60,25 @@ const Mypage = ({ navigation }: NavigationType) => {
               paddingHorizontal: d2p(10), paddingVertical: h2p(3),
               borderRadius: 10, backgroundColor: theme.color.grayscale.f7f7fc, borderWidth: 1, borderColor: theme.color.grayscale.d2d0d5
             }}>
-              <Text style={{ fontSize: 10, fontWeight: '500' }}>다이어터</Text>
+              <Text style={{ fontSize: 10, fontWeight: '500' }}>{getMyProfileQuery.data?.representBadge}</Text>
             </View>
-            <Text style={{ fontSize: 12, color: theme.color.grayscale.a09ca4 }}>자취생</Text>
+            <Text style={{ fontSize: 12, color: theme.color.grayscale.a09ca4 }}>{getMyProfileQuery.data?.household}</Text>
           </View>
           <View style={styles.occupation}>
-            <Text style={{ fontWeight: "500" }}>{profile?.occupation}</Text>
+            <Text style={{ fontWeight: "500" }}>{getMyProfileQuery.data?.occupation}</Text>
           </View>
-          <Text style={{ fontSize: 12, color: theme.color.grayscale.a09ca4 }}>#비건 #간편식 #한끼식사 #애주가</Text>
+          {React.Children.toArray(getMyProfileQuery.data?.tags.map(v =>
+            <Text style={{ fontSize: 12, color: theme.color.grayscale.a09ca4 }}>#{v}</Text>
+          ))}
         </View>
-        <MypageTabView />
-      </View>
+        {getMyProfileQuery.data &&
+          <View>
+            <MypageTabView
+              reviews={getMyProfileQuery.data.reviews}
+              bookmarks={getMyProfileQuery.data.bookmarks} />
+          </View>
+        }
+      </ScrollView>
     </>
   );
 };
@@ -62,8 +87,7 @@ export default Mypage;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    paddingTop: h2p(30)
+    paddingTop: h2p(30),
   },
   profileImage: {
     width: d2p(60),

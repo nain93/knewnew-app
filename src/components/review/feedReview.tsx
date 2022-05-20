@@ -1,11 +1,11 @@
-import { View, Text, Pressable, StyleSheet, Dimensions, Image, TouchableOpacity, Platform } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import { View, Text, Pressable, StyleSheet, Dimensions, Image, TouchableOpacity, Platform, ViewStyle } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
 import theme from '~/styles/theme';
 import { d2p, h2p, simpleDate } from '~/utils';
 import Badge from '../badge';
 import ReviewIcon from '../icon/reviewIcon';
 import { cart, colorLike, comment, like, more, reKnew, tag } from '~/assets/icons';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 import { ReviewListType } from '~/types/review';
 import { useMutation } from 'react-query';
@@ -22,9 +22,12 @@ interface FeedReviewProps {
   setSelectedIndex?: (idx: number) => void
   selectedIndex?: number
   idx?: number
+  clickBoxStyle?: ViewStyle
 }
 
-const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1, type = "normal", filterBadge, review, isRetweet = false }: FeedReviewProps) => {
+const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
+  clickBoxStyle,
+  type = "normal", filterBadge, review, isRetweet = false }: FeedReviewProps) => {
   const navigation = useNavigation<StackNavigationProp>();
   const [isLike, setIsLike] = useState<boolean>(review.isLike);
   const [reactCount, setReactCount] = useState(review.likeCount);
@@ -41,6 +44,13 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1, type = "normal"
       setBadge(review.author.representBadge);
     }
   }, [filterBadge]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (setSelectedIndex) {
+        return () => setSelectedIndex(-1);
+      }
+    }, []));
 
   const likeReviewFeedMutation = useMutation('likeReviewFeed',
     ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state));
@@ -124,13 +134,13 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1, type = "normal"
             onPress={() => console.log("zz")}
             style={styles.reviewIcon}>
             <Image source={cart} style={styles.reviewImg} />
-            <Text style={styles.reviewCount}>12</Text>
+            <Text style={styles.reviewCount}>{review.bookmarkCount}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => console.log("zz")}
             style={styles.reviewIcon}>
             <Image source={comment} style={styles.reviewImg} />
-            <Text style={styles.reviewCount}>5</Text>
+            <Text style={styles.reviewCount}>{review.commentCount}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -151,7 +161,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1, type = "normal"
             onPress={() => navigation.navigate("ReKnew", { review })}
             style={styles.reviewIcon}>
             <Image source={reKnew} style={styles.reviewImg} />
-            <Text style={styles.reviewCount}>2</Text>
+            <Text style={styles.reviewCount}>{review.childCount}</Text>
           </TouchableOpacity>
         </View>
       }
@@ -159,7 +169,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1, type = "normal"
         (selectedIndex === idx && type === "normal") &&
         (
           review.author.id === myId ?
-            <View style={styles.clickBox}>
+            <View style={[styles.clickBox, clickBoxStyle]}>
               <Pressable onPress={() => console.log("")}>
                 <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
               </Pressable>
@@ -169,7 +179,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1, type = "normal"
               </Pressable>
             </View>
             :
-            <View style={styles.clickBox}>
+            <View style={[styles.clickBox, clickBoxStyle]}>
               <Pressable onPress={() => console.log("")}>
                 <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
               </Pressable>
