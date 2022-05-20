@@ -5,7 +5,7 @@ import theme from '~/styles/theme';
 import Header from '~/components/header';
 import mainLogo from '~/assets/logo';
 import FeedReview from '~/components/review/feedReview';
-import { cart, comment, like, reKnew, tagfilter } from '~/assets/icons';
+import { tagfilter } from '~/assets/icons';
 
 import RBSheet from "react-native-raw-bottom-sheet";
 import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
@@ -47,10 +47,7 @@ const Feed = ({ navigation }: NavigationType) => {
   const token = useRecoilValue(tokenState);
   const queryClient = useQueryClient();
   const [selectedIndex, setSelectedIndex] = useState(-1);
-
   const [filterBadge, setFilterBadge] = useState("");
-
-  const [isLike, setIsLike] = useState<boolean>(false);
 
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
     enabled: !!token,

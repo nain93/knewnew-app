@@ -39,6 +39,7 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
 
   const [imageList, setImageList] = useState<string[]>([]);
   const [keyboardHeight, setKeyBoardHeight] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const token = useRecoilValue(tokenState);
   const setIspopupOpen = useSetRecoilState(popupState);
@@ -141,7 +142,8 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
             borderRadius: 5
           }}>
             {route.params &&
-              <FeedReview type="reKnewWrite" review={route.params?.review} />
+              <FeedReview
+                type="reKnewWrite" review={route.params?.review} />
             }
           </View>
           <TextInput

@@ -71,7 +71,7 @@ const SearchTabView = ({ searchList, userList }: SearchTabViewProps) => {
           case "user":
             return (
               <View style={styles.container}>
-                <Text style={styles.searchResult}>검색결과 · {userList.length}건</Text>
+                <Text style={[styles.searchResult, { marginBottom: h2p(30) }]}>검색결과 · {userList.length}건</Text>
                 <FlatList
                   style={{ marginBottom: h2p(80) }}
                   contentContainerStyle={{ paddingBottom: d2p(40), paddingHorizontal: d2p(20), }}
