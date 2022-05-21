@@ -10,7 +10,8 @@ export const writeReview = async ({
     images,
     content,
     satisfaction,
-    tags
+    tags,
+    parent
   }, {
     headers: {
       Authorization: `Bearer ${token}`,

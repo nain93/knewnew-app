@@ -2,7 +2,7 @@ import {
   Dimensions, Image, Keyboard, Platform, Pressable, ScrollView,
   StyleSheet, Text, TextInput, TouchableOpacity, View
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import theme from '~/styles/theme';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
@@ -33,19 +33,19 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
     images: [],
     content: "",
     satisfaction: "",
-    market: "선택 안함",
-    tags: []
+    parent: route.params?.review.id
   });
 
   const [imageList, setImageList] = useState<string[]>([]);
   const [keyboardHeight, setKeyBoardHeight] = useState(0);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
 
+  const inputRef = useRef<TextInput>(null);
   const token = useRecoilValue(tokenState);
   const setIspopupOpen = useSetRecoilState(popupState);
   const addReviewMutation = useMutation(["addReview", token],
     (writeProps: WriteReviewType) => writeReview({ token, ...writeProps }), {
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log(data, 'data');
       navigation.goBack();
     }
   });
@@ -103,7 +103,8 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
     <>
       <Header
         isBorder={true}
-        headerLeft={<LeftArrowIcon onBackClick={() => navigation.goBack()} imageStyle={{ width: 11, height: 25 }} />}
+        headerLeft={<LeftArrowIcon onBackClick={() => navigation.goBack()}
+          imageStyle={{ width: 11, height: 25 }} />}
         title="작성하기"
         headerRightPress={handleAddWrite}
         headerRight={<Text style={{ color: theme.color.grayscale.a09ca4 }}>완료</Text>} />
@@ -128,10 +129,11 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
             <Text style={{ color: (writeData.satisfaction === "bad") ? theme.color.black : theme.color.grayscale.a09ca4, marginLeft: d2p(5) }}>별로에요</Text>
           </TouchableOpacity>
         </View>
-
+        {/* height: h2p(506), */}
         <ScrollView
+          bounces={false}
           showsVerticalScrollIndicator={false}
-          style={{ marginTop: h2p(30), paddingHorizontal: d2p(20), height: h2p(506) }}>
+          style={{ marginTop: h2p(30), paddingHorizontal: d2p(20) }}>
           <Text style={{ color: theme.color.grayscale.C_443e49 }}>이 글을 인용하고 있어요.</Text>
           <View style={{
             borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
@@ -139,18 +141,26 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
             paddingTop: h2p(15),
             paddingBottom: h2p(10),
             marginVertical: h2p(15),
-            borderRadius: 5
+            borderRadius: 5,
           }}>
             {route.params &&
               <FeedReview
                 type="reKnewWrite" review={route.params?.review} />
             }
           </View>
-          <TextInput
-            multiline
-            placeholder={`${route.params?.review.author.nickname}님은 어떻게 생각하세요?`}
-            placeholderTextColor={theme.color.grayscale.a09ca4}
-            style={{ paddingTop: 0, fontSize: 16 }} />
+          <Pressable
+            onPress={() => inputRef.current?.focus()}
+            style={{ height: h2p(295) }}>
+            <TextInput
+              value={writeData.content}
+              onChangeText={(e) => setWriteData({ ...writeData, content: e })}
+              autoCapitalize="none"
+              ref={inputRef}
+              multiline
+              placeholder={`${route.params?.review.author.nickname}님은 어떻게 생각하세요?`}
+              placeholderTextColor={theme.color.grayscale.a09ca4}
+              style={{ paddingTop: 0, fontSize: 16 }} />
+          </Pressable>
         </ScrollView>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Pressable onPress={pickImage} style={[styles.images, { marginLeft: d2p(20), marginRight: d2p(15) }]}>

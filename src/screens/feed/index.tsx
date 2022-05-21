@@ -96,11 +96,7 @@ const Feed = ({ navigation }: NavigationType) => {
     }
   }, [isPopupOpen, fadeAnim, scrollOffset]);
 
-  useFocusEffect(
-    useCallback(() => {
-      return () => setSelectedIndex(-1);
-    }, []));
-
+  console.log(reviewListQuery.data?.pages.flat(), 'reviewListQuery.data.');
   if (reviewListQuery.isLoading) {
     return <Loading />;
   }
