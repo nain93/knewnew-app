@@ -119,7 +119,7 @@ const SelectLayout = ({ isInitial, userBadge, setUserBadge, type = "normal" }: S
         {isInitial &&
           <TouchableOpacity
             onPress={resetIsClick}
-            style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: h2p(50) }}>
+            style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: h2p(40) }}>
             <Image source={initialize} resizeMode="contain" style={{ height: 12, width: 12, marginRight: 5 }} />
             <Text style={[{ color: theme.color.grayscale.a09ca4, fontWeight: 'bold' }, FONT.Bold]}>초기화</Text>
           </TouchableOpacity>

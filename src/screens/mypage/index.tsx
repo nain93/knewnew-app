@@ -50,16 +50,17 @@ const Mypage = ({ navigation }: NavigationType) => {
           zIndex: 999,
           width: Dimensions.get("window").width
         }}>
-        <View style={{
-          width: "100%",
-          height: getStatusBarHeight(),
-          backgroundColor: theme.color.white,
-        }} />
+        {isIphoneX() &&
+          <View style={{
+            width: "100%",
+            height: getStatusBarHeight(),
+            backgroundColor: theme.color.white,
+          }} />}
         <Header
           title="마이페이지"
           bgColor={theme.color.white}
           viewStyle={{
-            marginTop: isIphoneX() ? 0 : "inherit",
+            marginTop: 0,
           }}
           headerRight={<Image source={write} style={{ width: d2p(15), height: h2p(15) }} />}
           headerRightPress={() => navigation.navigate("editProfile",

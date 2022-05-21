@@ -12,8 +12,8 @@ import com.facebook.soloader.SoLoader;
 import com.knewnnew.newarchitecture.MainApplicationReactNativeHost;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import com.facebook.react.bridge.JSIModulePackage; // <- add
-import com.swmansion.reanimated.ReanimatedJSIModulePackage; // <- add
+import com.facebook.react.bridge.JSIModulePackage; // reanimated2 라이브러리
+import com.swmansion.reanimated.ReanimatedJSIModulePackage; // reanimated2 라이브러리
 
 
 public class MainApplication extends Application implements ReactApplication {
@@ -40,7 +40,7 @@ public class MainApplication extends Application implements ReactApplication {
         }
         @Override
         protected JSIModulePackage getJSIModulePackage() {
-          return new ReanimatedJSIModulePackage(); // <- add
+          return new ReanimatedJSIModulePackage(); // reanimated2 라이브러리
       }
       };
 

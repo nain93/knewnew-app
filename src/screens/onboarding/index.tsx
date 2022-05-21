@@ -133,18 +133,17 @@ const Onboarding = ({ navigation }: NavigationType) => {
 
   return (
     <View style={styles.container}>
-      <View style={{ marginLeft: 20 }}>
-        <Text style={[{ fontSize: 24, fontWeight: "600" }, FONT.SemiBold]}>제대로 된 맛있는 발견</Text>
-        <View style={styles.logo}>
-          <Image source={mainLogo} style={{ width: d2p(215), height: d2p(35) }} />
-        </View>
-        <Image
+      <View style={{ marginBottom: "auto" }}>
+        <Text style={[{ fontSize: 20, fontWeight: "600", textAlign: "center" }, FONT.SemiBold]}>
+          제대로 된 맛있는 발견</Text>
+        <Image source={mainLogo} style={styles.logo} />
+      </View>
+      {/* <Image
           source={onboardingImg}
           resizeMode="contain"
           style={styles.onboardingImg}
-        />
-      </View>
-      <View style={{ marginTop: d2p(60) }}>
+        /> */}
+      <View style={{ marginBottom: h2p(145) }}>
         <Text style={[{ textAlign: "center", fontSize: 16, fontWeight: "bold" }, FONT.Bold]}>SNS로 시작하기</Text>
         <View style={{ flexDirection: "row", marginTop: d2p(20), alignSelf: "center" }}>
           <TouchableOpacity onPress={handleKakaoLogin}>
@@ -169,11 +168,12 @@ const Onboarding = ({ navigation }: NavigationType) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: h2p(102)
+    paddingTop: h2p(250),
+    alignItems: "center"
   },
   logo: {
-    width: d2p(260),
-    height: d2p(80),
+    width: d2p(215),
+    height: d2p(35),
     marginTop: d2p(10)
   },
   onboardingImg: {

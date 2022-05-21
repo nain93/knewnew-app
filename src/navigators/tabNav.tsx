@@ -47,7 +47,7 @@ const TabNavigator = () => {
         options={{
           tabBarIcon: ({ focused }) => (
             <Image
-              style={{ width: d2p(20), height: h2p(20) }}
+              style={{ width: d2p(20), height: d2p(20) }}
               source={focused ? mainlogoIcon : graylogo}
             />
           )
@@ -61,7 +61,7 @@ const TabNavigator = () => {
           tabBarStyle: { display: "none" },
           tabBarIcon: () => (
             <Image
-              style={{ width: d2p(20), height: h2p(20) }}
+              style={{ width: d2p(20), height: d2p(20) }}
               source={graywrite}
             />
           )
@@ -73,7 +73,7 @@ const TabNavigator = () => {
         options={{
           tabBarIcon: ({ focused }) => (
             <Image
-              style={{ width: d2p(20), height: h2p(20) }}
+              style={{ width: d2p(20), height: d2p(20) }}
               source={focused ? mainSearchIcon : graysearch}
             />
           )
@@ -85,7 +85,7 @@ const TabNavigator = () => {
         options={{
           tabBarIcon: ({ focused }) => (
             <Image
-              style={{ width: d2p(20), height: h2p(20) }}
+              style={{ width: d2p(20), height: d2p(20) }}
               source={focused ? mainmypage : graymypage}
             />
           )

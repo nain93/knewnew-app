@@ -1,4 +1,4 @@
-import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import Header from '~/components/header';
@@ -10,6 +10,12 @@ import BasicButton from '~/components/button/basicButton';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import { noProfile } from '~/assets/images';
+import RBSheet from 'react-native-raw-bottom-sheet';
+import CloseIcon from '~/components/icon/closeIcon';
+import SelectLayout from '~/components/selectLayout';
+import { FONT } from '~/styles/fonts';
+import { WriteReviewType } from '~/types/review';
+import { BadgeType } from '~/types';
 
 
 interface ProfileEditType {
@@ -27,12 +33,27 @@ interface EditProfileProps {
 const EditProfile = ({ navigation, route }: EditProfileProps) => {
   const nameInputRef = useRef<TextInput>(null);
   const selfInputRef = useRef<TextInput>(null);
-
+  const tagRefRBSheet = useRef<RBSheet>(null);
   const [profileInfo, setProfileInfo] = useState<ProfileEditType>({
     nickname: "",
     occupation: "",
     profileImage: ""
   });
+
+  const [writeData, setWriteData] = useState<WriteReviewType>({
+    images: [],
+    content: "",
+    satisfaction: "",
+    market: "선택 안함",
+    tags: []
+  });
+  const [userBadge, setUserBadge] = useState<BadgeType>({
+    interest: [],
+    household: [],
+    taste: []
+  });
+
+  const [isBadgeNext, setIsBadgeNext] = useState(false);
 
   useEffect(() => {
     if (route.params) {
@@ -56,7 +77,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
             style={{ width: d2p(18), height: h2p(18), position: "absolute", bottom: 0, right: 0 }} />
         </TouchableOpacity>
 
-        <View style={styles.inputForm}>
+        <View>
           <View style={{ flexDirection: "row", paddingHorizontal: d2p(20), marginBottom: d2p(10) }}>
             <Text style={styles.inputTitle}>닉네임</Text>
             <Text style={styles.inputText}>(0/40자)</Text>
@@ -75,7 +96,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
           </Pressable>
         </View>
 
-        <View style={[styles.inputForm, { marginTop: h2p(40) }]}>
+        <View style={{ marginTop: h2p(40) }}>
           <View style={{ flexDirection: "row", paddingHorizontal: d2p(20), marginBottom: d2p(10) }}>
             <Text style={styles.inputTitle}>자기소개</Text>
             <Text style={styles.inputText}>(0/140자)</Text>
@@ -95,10 +116,74 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
         </View>
 
         <View>
-          <BasicButton viewStyle={{ alignSelf: "center", marginTop: h2p(40) }} onPress={() => console.log("select")}
+          <BasicButton viewStyle={{ alignSelf: "center", marginTop: h2p(40) }}
+            onPress={() => tagRefRBSheet.current?.open()}
             text="소개 태그 선택" textColor={theme.color.main} bgColor={theme.color.white} />
         </View>
       </View>
+      <RBSheet
+        animationType="fade"
+        ref={tagRefRBSheet}
+        closeOnDragDown
+        dragFromTopOnly
+        onClose={() => setIsBadgeNext(false)}
+        height={Dimensions.get("window").height - h2p(200)}
+        openDuration={250}
+        customStyles={{
+          container: {
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
+            paddingHorizontal: d2p(20),
+            paddingVertical: h2p(20)
+            // paddingTop: isIphoneX() ? getStatusBarHeight() + d2p(15) : d2p(15),
+          }, draggableIcon: {
+            display: "none"
+          }
+        }}
+      >
+        <View style={{
+          flexDirection: "row", justifyContent: "space-between",
+          paddingHorizontal: d2p(10), marginBottom: h2p(30)
+        }}>
+          <CloseIcon onPress={() => tagRefRBSheet.current?.close()}
+            imageStyle={{ width: d2p(15), height: h2p(15) }} />
+          <Text style={[{ fontSize: 16, fontWeight: "bold" }, FONT.Bold]}>
+            {isBadgeNext ? "대표뱃지 선택" : "태그 선택"}
+          </Text>
+          <TouchableOpacity onPress={() => {
+            if (!isBadgeNext) {
+              setIsBadgeNext(true);
+            }
+            else {
+              // todo 선택한tag 상태 저장
+              tagRefRBSheet.current?.close();
+            }
+          }}>
+            <Text style={[{ color: theme.color.grayscale.ff5d5d }, FONT.Regular]}>
+              {isBadgeNext ? "완료" : "다음"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+        {isBadgeNext ?
+          <View style={{ marginBottom: h2p(40) }}>
+            <Text style={[styles.subTitle, FONT.Regular]}>선택하신 관심사 중에서</Text>
+            <View style={{ flexDirection: 'row' }}>
+              <Text style={[{ fontWeight: 'bold' }, FONT.Bold]}>나를 대표하는 뱃지 1개</Text>
+              <Text style={FONT.Regular}>를 선택해주세요.</Text>
+            </View>
+            <Text style={[styles.badgeGuide, FONT.Regular]}>대표 뱃지는 저장 후 7일동안 다시 변경할 수 없습니다.</Text>
+          </View>
+          :
+          <View style={{ marginBottom: h2p(40) }}>
+            <View style={{ flexDirection: 'row' }}>
+              <Text style={[{ fontWeight: 'bold' }, FONT.Bold]}>나를 소개하는 태그</Text>
+              <Text style={FONT.Regular}>를 골라주세요.</Text>
+            </View>
+            <Text style={FONT.Regular}>최소 2개 최대 10개까지 고를 수 있어요.</Text>
+          </View>
+        }
+        <SelectLayout isInitial={isBadgeNext ? false : true} userBadge={userBadge} setUserBadge={setUserBadge} />
+      </RBSheet>
     </>
   );
 };
@@ -119,9 +204,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     borderColor: theme.color.grayscale.eae7ec
   },
-  inputForm: {
 
-  },
   inputTitle: {
     fontSize: 16,
     fontWeight: "bold",
@@ -136,5 +219,19 @@ const styles = StyleSheet.create({
     paddingVertical: h2p(15),
     flexDirection: "row", alignItems: "center", borderWidth: 1,
     borderColor: theme.color.grayscale.eae7ec
-  }
+  },
+  title: {
+    color: theme.color.black,
+    fontSize: 26,
+    fontWeight: '600',
+  },
+  badgeGuide: {
+    color: theme.color.main,
+    marginTop: h2p(20),
+    fontSize: 12
+  },
+  subTitle: {
+    fontSize: 14,
+    color: theme.color.black,
+  },
 });
