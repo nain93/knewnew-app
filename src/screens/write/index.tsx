@@ -83,7 +83,7 @@ const Write = ({ navigation, route }: WriteProp) => {
       setIspopupOpen({ isOpen: true, content: "내용을 입력해주세요", popupStyle: { bottom: keyboardHeight + h2p(20) } });
       return;
     }
-    if (writeData.tags.length === 0) {
+    if (writeData.tags?.length === 0) {
       setIspopupOpen({ isOpen: true, content: "태그를 선택해주세요", popupStyle: { bottom: keyboardHeight + h2p(20) } });
       return;
     }
@@ -159,10 +159,10 @@ const Write = ({ navigation, route }: WriteProp) => {
             onPress={() => tagRefRBSheet.current?.open()}
             style={[styles.select, { marginRight: d2p(10) }]}>
             <View style={{ position: "relative" }}>
-              <Image source={(writeData.tags.length === 0) ? tag : maintag} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
-              {writeData.tags.length !== 0 &&
+              <Image source={(writeData.tags?.length === 0) ? tag : maintag} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
+              {writeData.tags?.length !== 0 &&
                 <Text style={{ fontSize: 8, color: theme.color.white, top: h2p(3), left: "22%", position: "absolute" }}>
-                  {writeData.tags.length}</Text>}
+                  {writeData.tags?.length}</Text>}
             </View>
             <Text style={FONT.Medium}>태그 선택</Text>
             <Text style={[{ fontSize: 12, color: theme.color.main }, FONT.Medium]}> *</Text>
@@ -210,7 +210,7 @@ const Write = ({ navigation, route }: WriteProp) => {
         ref={tagRefRBSheet}
         closeOnDragDown
         dragFromTopOnly
-        height={Dimensions.get("window").height - d2p(264)}
+        height={Dimensions.get("window").height - h2p(264)}
         openDuration={250}
         customStyles={{
           container: {
@@ -251,7 +251,7 @@ const Write = ({ navigation, route }: WriteProp) => {
         ref={marketRefRBSheet}
         closeOnDragDown
         dragFromTopOnly
-        height={Dimensions.get("window").height - d2p(380)}
+        height={Dimensions.get("window").height - h2p(380)}
         openDuration={250}
         customStyles={{
           container: {

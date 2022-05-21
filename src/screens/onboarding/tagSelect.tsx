@@ -56,7 +56,8 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
         <Text style={FONT.Regular}>최소 2개 최대 10개까지 고를 수 있어요.</Text>
       </View>
       <View style={{ flex: 1 }}>
-        <SelectLayout userBadge={userBadge} setUserBadge={(badgeProp: BadgeType) => setUserBadge(badgeProp)} isInitial={true} />
+        <SelectLayout userBadge={userBadge} setUserBadge={(badgeProp: BadgeType) => setUserBadge(badgeProp)}
+          isInitial={true} />
         <BasicButton onPress={handleNext} text="다음으로" bgColor={theme.color.white}
           textColor={theme.color.main}
           viewStyle={{
@@ -78,7 +79,6 @@ const styles = StyleSheet.create({
     color: theme.color.black,
     fontSize: 26,
     fontWeight: '600',
-
   },
   select: {
     borderWidth: 1, borderColor: theme.color.grayscale.eae7ec,
