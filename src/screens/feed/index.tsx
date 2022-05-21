@@ -96,7 +96,7 @@ const Feed = ({ navigation }: NavigationType) => {
     }
   }, [isPopupOpen, fadeAnim, scrollOffset]);
 
-
+  console.log(reviewListQuery.data?.pages.flat(), 'reviewListQuery.data.');
   if (reviewListQuery.isLoading) {
     return <Loading />;
   }
