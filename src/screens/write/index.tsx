@@ -28,7 +28,7 @@ const marketList: Array<"선택 안함" | "마켓컬리" | "쿠팡프레시" | "
 interface WriteProp {
   navigation: NavigationStackProp;
   route: NavigationRoute<{
-    type?: "reKnew" | "default" | "edit"
+    type?: "reKnew" | "default" | "edit",
     review?: ReviewListType
   }>;
 }
@@ -41,11 +41,13 @@ const Write = ({ navigation, route }: WriteProp) => {
     market: "선택 안함",
     tags: []
   });
+
   const [userBadge, setUserBadge] = useState<BadgeType>({
     interest: [],
     household: [],
     taste: []
   });
+
   const inputRef = useRef<TextInput>(null);
   const tagRefRBSheet = useRef<RBSheet>(null);
   const marketRefRBSheet = useRef<RBSheet>(null);
@@ -132,6 +134,11 @@ const Write = ({ navigation, route }: WriteProp) => {
       }
     });
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => navigation.setParams({ type: "default" });
+    }, []));
 
   return (
     <>

@@ -4,15 +4,16 @@ import theme from '~/styles/theme';
 import { d2p, h2p, simpleDate } from '~/utils';
 import Badge from '../badge';
 import ReviewIcon from '../icon/reviewIcon';
-import { cart, colorLike, comment, like, more, reKnew, tag } from '~/assets/icons';
+import { cart, colorCart, colorLike, comment, like, more, reKnew, tag } from '~/assets/icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 import { ReviewListType } from '~/types/review';
 import { useMutation } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { myIdState, tokenState } from '~/recoil/atoms';
-import { likeReview } from '~/api/review';
+import { bookmarkReview, likeReview } from '~/api/review';
 import { FONT } from '~/styles/fonts';
+import { noProfile } from '~/assets/images';
 
 interface FeedReviewProps {
   review: ReviewListType,
@@ -31,7 +32,8 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
   const navigation = useNavigation<StackNavigationProp>();
   const [isLike, setIsLike] = useState<boolean>(review.isLike);
   const [reactCount, setReactCount] = useState(review.likeCount);
-  const [isCart, setIsCart] = useState<boolean>(false);
+  const [isBookmarkState, setIsBookmarkState] = useState<boolean>(review.isBookmark);
+  const [bookmarkCount, setBookmarkCount] = useState(review.bookmarkCount);
   const token = useRecoilValue(tokenState);
   const myId = useRecoilValue(myIdState);
   const [badge, setBadge] = useState("");
@@ -52,17 +54,30 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
       }
     }, []));
 
+  const boomarkMutation = useMutation("bookmark",
+    ({ id, isBookmark }: { id: number, isBookmark: boolean }) => bookmarkReview(token, id, isBookmark));
+
   const likeReviewFeedMutation = useMutation('likeReviewFeed',
     ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state));
+
   return (
     <>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-        <View style={{
-          backgroundColor: 'black',
-          position: "absolute",
-          left: 0,
-          width: d2p(40), height: d2p(40), borderRadius: 40
-        }} />
+        <TouchableOpacity
+          // onPress={() => navigation.navigate("UserProfile", { id: review.id })}
+          onPress={() => navigation.navigate("마이페이지", { id: review.id })}
+          style={{
+            position: "absolute",
+            left: 0,
+            borderRadius: 40,
+            borderColor: theme.color.grayscale.e9e7ec,
+            borderWidth: 1
+          }}>
+          <Image source={review.author.profileImage ? { uri: review.author.profileImage } : noProfile}
+            style={{
+              width: d2p(40), height: d2p(40)
+            }} />
+        </TouchableOpacity>
         <View style={{
           flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap',
           marginLeft: d2p(50),
@@ -131,10 +146,19 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
       {type === "normal" &&
         <View style={styles.reactionContainer}>
           <TouchableOpacity
-            onPress={() => console.log("zz")}
+            onPress={() => {
+              setIsBookmarkState(!isBookmarkState);
+              boomarkMutation.mutate({ id: review.id, isBookmark: !isBookmarkState });
+              if (!isBookmarkState) {
+                setBookmarkCount(prev => prev + 1);
+              }
+              else {
+                setBookmarkCount(prev => prev - 1);
+              }
+            }}
             style={styles.reviewIcon}>
-            <Image source={cart} style={styles.reviewImg} />
-            <Text style={styles.reviewCount}>{review.bookmarkCount}</Text>
+            <Image source={isBookmarkState ? colorCart : cart} style={styles.reviewImg} />
+            <Text style={styles.reviewCount}>{bookmarkCount}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => console.log("zz")}

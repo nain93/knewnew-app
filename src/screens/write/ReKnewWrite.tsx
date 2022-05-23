@@ -11,7 +11,7 @@ import { photo, photoClose } from '~/assets/images';
 import { d2p, h2p } from '~/utils';
 
 import ImageCropPicker from 'react-native-image-crop-picker';
-import { useMutation } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { writeReview } from '~/api/write';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { popupState, tokenState } from '~/recoil/atoms';
@@ -19,6 +19,8 @@ import { ReviewListType, WriteReviewType } from '~/types/review';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import FeedReview from '~/components/review/feedReview';
+import { MyPrfoileType } from '~/types/user';
+import { getMyProfile } from '~/api/user';
 
 
 interface ReKnewProp {
@@ -49,6 +51,11 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
       navigation.goBack();
     }
   });
+
+  const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
+    enabled: !!token
+  });
+
   const pickImage = () => {
     if (imageList.length >= 5) {
       return;
@@ -157,7 +164,7 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
               autoCapitalize="none"
               ref={inputRef}
               multiline
-              placeholder={`${route.params?.review.author.nickname}님은 어떻게 생각하세요?`}
+              placeholder={`${getMyProfileQuery.data?.nickname}님은 어떻게 생각하세요?`}
               placeholderTextColor={theme.color.grayscale.a09ca4}
               style={{ paddingTop: 0, fontSize: 16 }} />
           </Pressable>

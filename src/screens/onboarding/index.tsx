@@ -122,6 +122,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
     if (credentialState === appleAuth.State.AUTHORIZED) {
       const token = appleAuthRequestResponse.identityToken;
       if (token) {
+        console.log(token, 'token');
         const data = await userLogin({ token, providerType: "apple" });
         console.log(data, 'data');
         if (data) {

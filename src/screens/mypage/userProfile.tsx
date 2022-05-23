@@ -1,46 +1,41 @@
 import { Dimensions, Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { useState } from 'react';
-import Header from '~/components/header';
-import { NavigationType } from '~/types';
-import { d2p, h2p } from '~/utils';
-import theme from '~/styles/theme';
-import { tokenState } from '~/recoil/atoms';
-import { getMyProfile } from '~/api/user';
 import { useRecoilValue } from 'recoil';
-import { useQuery } from 'react-query';
-import { MyPrfoileType } from '~/types/user';
-import { noProfile } from '~/assets/images';
-import Loading from '~/components/loading';
-import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
-import FeedReview from '~/components/review/feedReview';
-import { FONT } from '~/styles/fonts';
-import { write } from '~/assets/icons';
+import { tokenState } from '~/recoil/atoms';
 import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
+import theme from '~/styles/theme';
+import Header from '~/components/header';
+import { MaterialTabBar, Tabs } from 'react-native-collapsible-tab-view';
+import { d2p, h2p } from '~/utils';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
+import FeedReview from '~/components/review/feedReview';
+import { useQuery } from 'react-query';
+import { MyPrfoileType } from '~/types/user';
+import { getUserProfile } from '~/api/user';
+import { FONT } from '~/styles/fonts';
+import { noProfile } from '~/assets/images';
+import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 
-interface MypageProps {
-  navigation: NavigationStackProp;
+interface UserProfileProps {
+  navigation: NavigationStackProp
   route: NavigationRoute<{
-    id?: number
+    id: number,
   }>;
 }
 
-const Mypage = ({ navigation, route }: MypageProps) => {
+const UserProfile = ({ navigation, route }: UserProfileProps) => {
   const token = useRecoilValue(tokenState);
-  const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
-    enabled: !!token
-  });
+  const getUserProfileQuery = useQuery<MyPrfoileType, Error>(["userProfile", token, route.params?.id], async () => {
+    if (route.params) {
+      const queryData = await getUserProfile(token, route.params?.id);
+      return queryData;
+    }
+  }
+    , { enabled: !!token });
+
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [headerHeight, setHeaderHeight] = useState(0);
-
-  if (getMyProfileQuery.isLoading) {
-    return (
-      <Loading />
-    );
-  }
-  console.log(route.params?.id, 'route.p');
-  // console.log(getMyProfileQuery.data?.bookmarks[2], 'getMyProfileQuery');
 
   return (
     <>
@@ -67,21 +62,15 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             backgroundColor: theme.color.white,
           }} />}
         <Header
-          title="마이페이지"
+          title="회원 프로필"
+          isBorder={true}
+          headerLeft={<LeftArrowIcon onBackClick={() => {
+            navigation.goBack();
+          }} imageStyle={{ width: 11, height: 25 }} />}
           bgColor={theme.color.white}
           viewStyle={{
             marginTop: 0,
           }}
-          headerRight={<Image source={write} style={{ width: d2p(15), height: h2p(15) }} />}
-          headerRightPress={() => navigation.navigate("editProfile",
-            {
-              profile:
-              {
-                nickname: getMyProfileQuery.data?.nickname,
-                occupation: getMyProfileQuery.data?.occupation,
-                profileImage: getMyProfileQuery.data?.profileImage
-              }
-            })}
         />
       </View>
       <Tabs.Container
@@ -108,11 +97,11 @@ const Mypage = ({ navigation, route }: MypageProps) => {
           <View pointerEvents="none">
             <View style={styles.profileImage} >
               <Image style={{ width: d2p(60), height: d2p(60), borderRadius: 60 }}
-                source={getMyProfileQuery.data?.profileImage ? { uri: getMyProfileQuery.data?.profileImage } : noProfile} />
+                source={getUserProfileQuery.data?.profileImage ? { uri: getUserProfileQuery.data?.profileImage } : noProfile} />
             </View>
             <View style={styles.profileInfo}>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Text style={{ fontSize: 24, fontWeight: "bold", marginRight: d2p(10) }}>{getMyProfileQuery.data?.nickname}</Text>
+                <Text style={{ fontSize: 24, fontWeight: "bold", marginRight: d2p(10) }}>{getUserProfileQuery.data?.nickname}</Text>
                 <View style={{
                   height: h2p(20), minWidth: d2p(55),
                   marginRight: d2p(5),
@@ -120,14 +109,14 @@ const Mypage = ({ navigation, route }: MypageProps) => {
                   paddingHorizontal: d2p(10), paddingVertical: h2p(3),
                   borderRadius: 10, backgroundColor: theme.color.grayscale.f7f7fc, borderWidth: 1, borderColor: theme.color.grayscale.d2d0d5
                 }}>
-                  <Text style={{ fontSize: 10, fontWeight: '500' }}>{getMyProfileQuery.data?.representBadge}</Text>
+                  <Text style={{ fontSize: 10, fontWeight: '500' }}>{getUserProfileQuery.data?.representBadge}</Text>
                 </View>
-                <Text style={{ fontSize: 12, color: theme.color.grayscale.a09ca4 }}>{getMyProfileQuery.data?.household}</Text>
+                <Text style={{ fontSize: 12, color: theme.color.grayscale.a09ca4 }}>{getUserProfileQuery.data?.household}</Text>
               </View>
               <View style={styles.occupation}>
-                <Text style={{ fontWeight: "500" }}>{getMyProfileQuery.data?.occupation}</Text>
+                <Text style={{ fontWeight: "500" }}>{getUserProfileQuery.data?.occupation}</Text>
               </View>
-              {React.Children.toArray(getMyProfileQuery.data?.tags.map(v =>
+              {React.Children.toArray(getUserProfileQuery.data?.tags.map(v =>
                 <Text style={{ fontSize: 12, color: theme.color.grayscale.a09ca4 }}>#{v}</Text>
               ))}
             </View>
@@ -135,11 +124,11 @@ const Mypage = ({ navigation, route }: MypageProps) => {
         )}
       >
         <Tabs.Tab
-          name={`작성 글 ${getMyProfileQuery.data?.reviews.length}`}>
+          name={`작성 글 ${getUserProfileQuery.data?.reviews.length}`}>
           <Tabs.FlatList
             contentContainerStyle={{ paddingBottom: h2p(100), paddingTop: Platform.OS === "ios" ? h2p(90) : h2p(370) }}
             showsVerticalScrollIndicator={false}
-            data={getMyProfileQuery.data?.reviews}
+            data={getUserProfileQuery.data?.reviews}
             renderItem={(review) => (
               <Pressable
                 onPress={() => navigation.navigate("FeedDetail",
@@ -157,11 +146,11 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             keyExtractor={(v) => String(v.id)}
           />
         </Tabs.Tab>
-        <Tabs.Tab name={`담은 글 ${getMyProfileQuery.data?.bookmarks.length}`}>
+        <Tabs.Tab name={`담은 글 ${getUserProfileQuery.data?.bookmarks.length}`}>
           <Tabs.FlatList
             contentContainerStyle={{ paddingBottom: h2p(100), paddingTop: Platform.OS === "ios" ? h2p(90) : h2p(370) }}
             showsVerticalScrollIndicator={false}
-            data={getMyProfileQuery.data?.bookmarks}
+            data={getUserProfileQuery.data?.bookmarks}
             renderItem={(bookmarks) => (
               <Pressable
                 onPress={() => navigation.navigate("FeedDetail",
@@ -184,7 +173,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
   );
 };
 
-export default Mypage;
+export default UserProfile;
 
 const styles = StyleSheet.create({
   container: {

@@ -78,7 +78,7 @@ const Feed = ({ navigation }: NavigationType) => {
       useNativeDriver: true,
     }).start();
   };
-  // console.log(reviewListQuery.data?.pages.flat(), ' data');
+
   useEffect(() => {
     if (scrollOffset >= h2p(130)) {
       fadeIn();
@@ -88,7 +88,6 @@ const Feed = ({ navigation }: NavigationType) => {
     }
   }, [isPopupOpen, fadeAnim, scrollOffset]);
 
-  // console.log(reviewListQuery.data?.pages.flat(), 'reviewListQuery.data.');
   if (reviewListQuery.isLoading) {
     return <Loading />;
   }

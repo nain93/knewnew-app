@@ -15,25 +15,9 @@ import { useMutation, useQuery } from 'react-query';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import { getReviewDetail, likeReview } from '~/api/review';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { ReviewListType } from '~/types/review';
 import Loading from '~/components/loading';
 import { FONT } from '~/styles/fonts';
-
-interface reviewProps {
-  id: number;
-  badge: string;
-  title: string;
-  review: 'heart' | 'circle' | 'bad';
-  household: '자취생' | '애기가족' | '가족한끼' | '신혼부부';
-  content: string;
-  date: string;
-  store: string;
-  writer: string;
-  tag: Array<string>;
-  photo?: string;
-}
-
 interface FeedDetailProps {
   navigation: NavigationStackProp
   route: NavigationRoute<{
