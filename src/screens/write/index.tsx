@@ -4,7 +4,7 @@ import Header from '~/components/header';
 import theme from '~/styles/theme';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import { BadgeType } from '~/types';
-import { blackclose, cart, circle, graycircle, grayclose, grayheart, heart, maincart, maintag, tag } from '~/assets/icons';
+import { bad, blackclose, cart, circle, graycircle, grayclose, grayheart, heart, maincart, maintag, tag } from '~/assets/icons';
 import { photo, photoClose } from '~/assets/images';
 import { d2p, h2p } from '~/utils';
 
@@ -28,7 +28,7 @@ const marketList: Array<"선택 안함" | "마켓컬리" | "쿠팡프레시" | "
 interface WriteProp {
   navigation: NavigationStackProp;
   route: NavigationRoute<{
-    type: "reKnew" | "edit" | "default",
+    type?: "reKnew" | "default" | "edit",
     review?: ReviewListType
   }>;
 }
@@ -53,6 +53,23 @@ const Write = ({ navigation, route }: WriteProp) => {
   const marketRefRBSheet = useRef<RBSheet>(null);
   const [imageList, setImageList] = useState<string[]>([]);
   const [keyboardHeight, setKeyBoardHeight] = useState(0);
+
+  useEffect(() => {
+    // console.log(route.params?.review);
+    if (route.params?.review) {
+      setWriteData({
+        ...writeData, content: route.params.review.content, satisfaction: route.params.review.satisfaction,
+        market: route.params.review.market === null ? '선택 안함' : route.params.review.market, tags: route.params.review.tags
+      })
+    }
+  }, []);
+
+  // console.log(userBadge);
+
+  useEffect(() => {
+
+
+  }, []);
 
   const token = useRecoilValue(tokenState);
   const setIspopupOpen = useSetRecoilState(popupState);
@@ -218,6 +235,50 @@ const Write = ({ navigation, route }: WriteProp) => {
         ref={tagRefRBSheet}
         closeOnDragDown
         dragFromTopOnly
+        onOpen={() => {
+          if (route.params?.review) {
+            const copy: { [index: string]: Array<{ isClick: boolean, title: string }> } = { ...userBadge };
+            const tags = Object.keys(userBadge).reduce<BadgeType>((acc, cur, idx) => {
+              const badges: BadgeType = {
+                interest: [],
+                household: [],
+                taste: []
+              }
+              if (idx === 0) {
+                badges.interest = copy[cur].map(v => {
+                  if (route.params?.review?.tags.includes(v.title)) {
+                    return { ...v, isClick: true }
+                  }
+                  return { ...v, isClick: false }
+                })
+              }
+              if (idx === 1) {
+                badges.household = copy[cur].map(v => {
+                  if (route.params?.review?.tags.includes(v.title)) {
+                    return { ...v, isClick: true }
+                  }
+                  return { ...v, isClick: false }
+                })
+              }
+              else {
+                badges.taste = copy[cur].map(v => {
+                  if (route.params?.review?.tags.includes(v.title)) {
+                    return { ...v, isClick: true }
+                  }
+                  return { ...v, isClick: false }
+                })
+              }
+
+              return badges
+            }, {
+              interest: [],
+              household: [],
+              taste: []
+            });
+            setUserBadge(tags)
+
+          }
+        }}
         height={Dimensions.get("window").height - h2p(264)}
         openDuration={250}
         customStyles={{
@@ -250,7 +311,7 @@ const Write = ({ navigation, route }: WriteProp) => {
             <Text style={[{ color: theme.color.grayscale.ff5d5d }, FONT.Regular]}>완료</Text>
           </TouchableOpacity>
         </View>
-        <SelectLayout type="write" isInitial={true} userBadge={userBadge} setUserBadge={setUserBadge} />
+        <SelectLayout type="edit" isInitial={true} userBadge={userBadge} setUserBadge={setUserBadge} />
       </RBSheet>
 
       {/* 유통사 선택 바텀시트 */}

@@ -4,14 +4,15 @@ import { WriteReviewType } from "~/types/review";
 
 export const writeReview = async ({
   token, images, content,
-  satisfaction,
+  satisfaction, market,
   product, parent, cart, tags }: { token: string } & WriteReviewType) => {
   const res = await axios.post(baseURL + "review/", {
     images,
     content,
     satisfaction,
     tags,
-    parent
+    parent,
+    market
   }, {
     headers: {
       Authorization: `Bearer ${token}`,

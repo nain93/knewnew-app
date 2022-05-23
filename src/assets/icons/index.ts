@@ -6,6 +6,7 @@ import circle from './circle.png';
 import like from './like.png';
 import reKnew from './reKnew.png';
 import comment from './comment.png';
+import commentMore from './commentmore.png';
 import searchIcon from "./searchIcon.png";
 import mainSearchIcon from "./mainSearchIcon.png";
 import colorLike from './colorLike.png';
@@ -34,7 +35,7 @@ import maincart from "./maincart.png";
 import maintag from "./maintag.png";
 
 export {
-  close, leftArrow, more, heart, like, reKnew, comment, circle, maincart, maintag,
+  close, leftArrow, more, heart, like, reKnew, comment, commentMore, circle, maincart, maintag,
   searchIcon, mainSearchIcon, colorLike, tagfilter, tag, cart, colorCart, retweetfrom,
   colorCheck, initialize, grayclose, graytriangle, grayheart, bad, graycircle, blackclose,
   graywrite, graylogo, graymypage, graysearch, mainmypage, mainlogoIcon, write, plusIcon
