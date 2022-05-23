@@ -11,7 +11,7 @@ interface SelectLayoutProps {
   userBadge: BadgeType;
   setUserBadge: (badgeProp: BadgeType) => void;
   isInitial?: boolean;
-  type?: "filter" | "write" | "normal"
+  type?: "filter" | "write" | "normal" | "edit"
 }
 
 const SelectLayout = ({ isInitial, userBadge, setUserBadge, type = "normal" }: SelectLayoutProps) => {
@@ -28,6 +28,7 @@ const SelectLayout = ({ isInitial, userBadge, setUserBadge, type = "normal" }: S
       || userBadge.interest.length === 0
       || userBadge.taste.length === 0
     ) {
+      // if (type !== "edit") {
       setUserBadge({
         interest:
           [{ title: "빵식가", isClick: false }, { title: "애주가", isClick: false }, { title: "디저트러버", isClick: false },
@@ -38,6 +39,7 @@ const SelectLayout = ({ isInitial, userBadge, setUserBadge, type = "normal" }: S
         taste:
           [{ title: "맵찔이", isClick: false }, { title: "맵고수", isClick: false }, { title: "느끼만렙", isClick: false }]
       });
+      // }
     }
   }, []);
 

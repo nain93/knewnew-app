@@ -170,7 +170,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
         (
           review.author.id === myId ?
             <View style={[styles.clickBox, clickBoxStyle]}>
-              <Pressable onPress={() => console.log("")}>
+              <Pressable onPress={() => navigation.navigate("작성", { review })}>
                 <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
               </Pressable>
               <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />

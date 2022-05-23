@@ -7,7 +7,7 @@ import { d2p, h2p, simpleDate } from '~/utils';
 import ReviewIcon from '~/components/icon/reviewIcon';
 import Badge from '~/components/badge';
 import ReactionIcon from '~/components/icon/reactionIcon';
-import { more, tag } from '~/assets/icons';
+import { commentMore, more, tag } from '~/assets/icons';
 import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 import { useRecoilValue } from 'recoil';
 import { myIdState, tokenState } from '~/recoil/atoms';
@@ -53,6 +53,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
 
   const [isMoreClick, setIsMoreClick] = useState<boolean>();
   const myId = useRecoilValue(myIdState);
+
+  const [commentSelectedIdx, setCommentSelectedIdx] = useState<number>(-1);
 
   const reviewDetailQuery = useQuery<ReviewListType, Error>(["reviewDetail", token], async () => {
     if (route.params) {
@@ -182,24 +184,53 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
               isState={(isState: boolean) => { setLike(isState); }} mutation={likeReviewMutation} id={route.params?.id} />
           </View>
           <Text style={[styles.commentMeta, FONT.Bold]}>작성된 댓글 2개</Text>
-          <View>
-            <View style={styles.commentImg} />
-            <View style={styles.commentContainer}>
-              <Text style={[{ fontWeight: '500' }, FONT.Medium]}>어쩌구참깨</Text>
-              <Text style={[styles.commentDate, FONT.Regular]}>2022.04.26 10:56</Text>
-            </View>
-            <Text style={[styles.commentContent, FONT.Regular]}>저도 이거 좋아해요!! 근데 염지가 많이 됐는지 저한테는 살짝 짜더라구요</Text>
-            <View style={styles.commentLine} />
-          </View>
-          <View>
-            <View style={styles.commentImg} />
-            <View style={styles.commentContainer}>
-              <Text style={[{ fontWeight: '500' }, FONT.Medium]}>어쩌구참깨</Text>
-              <Text style={[styles.commentDate, FONT.Regular]}>2022.04.26 10:56</Text>
-            </View>
-            <Text style={[styles.commentContent, FONT.Regular]}>저도 이거 좋아해요!! 근데 염지가 많이 됐는지 저한테는 살짝 짜더라구요</Text>
-            <View style={styles.commentLine} />
-          </View>
+          {comments.map((comment, idx) =>
+            <View>
+              <View style={styles.commentImg} />
+              <View style={styles.commentContainer}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Text style={[{ fontWeight: '500' }, FONT.Medium]}>{comment.name}</Text>
+                  <Text style={[styles.commentDate, FONT.Regular]}>{comment.date}</Text>
+                </View>
+                <TouchableOpacity onPress={() => {
+                  if (commentSelectedIdx === idx) {
+                    setCommentSelectedIdx(-1);
+                  } else {
+                    setCommentSelectedIdx(idx);
+                  }
+                }}>
+                  <Image
+                    source={commentMore}
+                    resizeMode="contain"
+                    style={{ width: 12, height: 16, paddingRight: d2p(15) }}
+                  />
+                </TouchableOpacity>
+              </View>
+              <Text style={[styles.commentContent, FONT.Regular]}>{comment.content}</Text>
+              <View style={styles.commentLine} />
+              {commentSelectedIdx === idx &&
+                (true ?
+                  <View style={[styles.clickBox, { right: d2p(15) }]}>
+                    <Pressable>
+                      <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
+                    </Pressable>
+                    <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
+                    <Pressable>
+                      <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
+                    </Pressable>
+                  </View>
+                  :
+                  <View style={[styles.clickBox, { right: d2p(15) }]}>
+                    <Pressable>
+                      <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
+                    </Pressable>
+                    <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
+                    <Pressable>
+                      <Text style={[{ color: theme.color.main }, FONT.Regular]}>신고</Text>
+                    </Pressable>
+                  </View>
+                )}
+            </View>)}
         </ScrollView>
         <Pressable
           onPress={() => inputRef.current?.focus()}
@@ -234,6 +265,10 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
 };
 
 export default FeedDetail;
+
+const comments = [{ name: '어쩌구참깨', content: '저도 이거 좋아해요!! 근데 염지가 많이 됐는지 저한테는 살짝 짜더라구요', date: '2022.04.26 10:56', },
+{ name: '열려라참깨', content: '저도 이거 좋아해요!! 근데 염지가 많이 됐는지 저한테는 살짝 짜더라구요', date: '2022.04.26 10:56', },
+{ name: '참깨참깨', content: '저는 이거 좋아해요!! 근데 염지가 적게 됐는지 저한테는 살짝 짜더라구요', date: '2022.04.26 10:56', }];
 
 const styles = StyleSheet.create({
   writer: {
@@ -280,7 +315,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   commentContainer: {
-    flexDirection: 'row', alignItems: 'center',
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     position: 'relative', top: 6,
     marginLeft: d2p(38),
   },
@@ -306,6 +341,5 @@ const styles = StyleSheet.create({
     },
     elevation: (Platform.OS === 'android') ? 3 : 0,
     backgroundColor: theme.color.white,
-    zIndex: 999,
   },
 });

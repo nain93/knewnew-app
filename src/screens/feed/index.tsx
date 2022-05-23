@@ -55,16 +55,8 @@ const Feed = ({ navigation }: NavigationType) => {
   });
 
   const reviewListQuery = useInfiniteQuery<ReviewListType[], Error>(["reviewList", token, filterBadge], async ({ pageParam = 0 }) => {
-    // * 필터한 리뷰리스트
-    if (filterBadge) {
-      const queryData = await getReviewList({ token, tag: filterBadge, offset: pageParam });
-      return queryData;
-    }
-    // * 전체 리뷰리스트
-    else {
-      const queryData = await getReviewList({ token, tag: filterBadge, offset: pageParam });
-      return queryData;
-    }
+    const queryData = await getReviewList({ token, tag: filterBadge, offset: pageParam });
+    return queryData;
   }, {
     enabled: !!token,
     getNextPageParam: (next, all) => all.flat().length,
@@ -96,7 +88,7 @@ const Feed = ({ navigation }: NavigationType) => {
     }
   }, [isPopupOpen, fadeAnim, scrollOffset]);
 
-  console.log(reviewListQuery.data?.pages.flat(), 'reviewListQuery.data.');
+  // console.log(reviewListQuery.data?.pages.flat(), 'reviewListQuery.data.');
   if (reviewListQuery.isLoading) {
     return <Loading />;
   }
