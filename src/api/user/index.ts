@@ -13,6 +13,17 @@ export const getMyProfile = async (token: string) => {
   }
 };
 
+export const getUserProfile = async (token: string, id: number) => {
+  const res = await axios.get(baseURL + `user/profile/${id}/`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+  if (res) {
+    return res.data;
+  }
+};
+
 interface UserLoginType {
   token: string,
   providerType: "kakao" | "naver" | "google" | "apple"
@@ -24,7 +35,8 @@ export const userLogin = async ({ token, providerType }: UserLoginType) => {
       providerType,
     }, {
       headers: {
-        Authorization: token,
+        "Content-Type": "application/json",
+        "Authorization": token,
       }
     });
     if (res) {
@@ -32,6 +44,7 @@ export const userLogin = async ({ token, providerType }: UserLoginType) => {
     }
   }
   catch (error) {
+    console.log(error, 'error');
     if (axios.isAxiosError(error) && error.response) {
       console.log(error.response.data);
     }
