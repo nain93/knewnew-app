@@ -8,32 +8,16 @@ import ReviewIcon from '~/components/icon/reviewIcon';
 import Badge from '~/components/badge';
 import ReactionIcon from '~/components/icon/reactionIcon';
 import { more, tag } from '~/assets/icons';
-import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
+import { getBottomSpace } from 'react-native-iphone-x-helper';
 import { useRecoilValue } from 'recoil';
 import { myIdState, tokenState } from '~/recoil/atoms';
 import { useMutation, useQuery } from 'react-query';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import { getReviewDetail, likeReview } from '~/api/review';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { ReviewListType } from '~/types/review';
 import Loading from '~/components/loading';
 import { FONT } from '~/styles/fonts';
-
-interface reviewProps {
-  id: number;
-  badge: string;
-  title: string;
-  review: 'heart' | 'circle' | 'bad';
-  household: '자취생' | '애기가족' | '가족한끼' | '신혼부부';
-  content: string;
-  date: string;
-  store: string;
-  writer: string;
-  tag: Array<string>;
-  photo?: string;
-}
-
 interface FeedDetailProps {
   navigation: NavigationStackProp
   route: NavigationRoute<{

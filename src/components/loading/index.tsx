@@ -1,7 +1,7 @@
-import { ActivityIndicator, Dimensions, StyleSheet, View, ViewStyle } from 'react-native';
+import { Dimensions, Image, StyleSheet, View, ViewStyle } from 'react-native';
 import React from 'react';
-import { h2p } from '~/utils';
-import theme from '~/styles/theme';
+import { d2p, h2p } from '~/utils';
+import { loading } from '~/assets/gif';
 
 interface LoadingProps {
   viewStyle?: ViewStyle;
@@ -10,7 +10,7 @@ interface LoadingProps {
 const Loading = (props: LoadingProps) => {
   return (
     <View style={[styles.container, props.viewStyle]}>
-      <ActivityIndicator size="large" color={theme.color.main} />
+      <Image source={loading} style={{ width: d2p(70), height: d2p(70) }} />
     </View>
   );
 };

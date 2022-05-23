@@ -55,7 +55,6 @@ const TabNavigator = () => {
       />
       <Tabs.Screen
         name="작성"
-        initialParams={{ type: "default" }}
         component={Write}
         options={{
           tabBarStyle: { display: "none" },

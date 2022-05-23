@@ -16,7 +16,7 @@ import { useMutation } from 'react-query';
 import { writeReview } from '~/api/write';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { popupState, tokenState } from '~/recoil/atoms';
-import { WriteReviewType } from '~/types/review';
+import { ReviewListType, WriteReviewType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
@@ -28,7 +28,8 @@ const marketList: Array<"선택 안함" | "마켓컬리" | "쿠팡프레시" | "
 interface WriteProp {
   navigation: NavigationStackProp;
   route: NavigationRoute<{
-    type?: "reKnew" | "default"
+    type: "reKnew" | "edit" | "default",
+    review?: ReviewListType
   }>;
 }
 
@@ -40,11 +41,13 @@ const Write = ({ navigation, route }: WriteProp) => {
     market: "선택 안함",
     tags: []
   });
+
   const [userBadge, setUserBadge] = useState<BadgeType>({
     interest: [],
     household: [],
     taste: []
   });
+
   const inputRef = useRef<TextInput>(null);
   const tagRefRBSheet = useRef<RBSheet>(null);
   const marketRefRBSheet = useRef<RBSheet>(null);
@@ -114,6 +117,11 @@ const Write = ({ navigation, route }: WriteProp) => {
       }
     });
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => navigation.setParams({ type: "default" });
+    }, []));
 
   return (
     <>
