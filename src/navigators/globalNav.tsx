@@ -17,6 +17,7 @@ import theme from '~/styles/theme';
 import FeedDetail from '~/screens/feed/detail';
 import reKnewWrite from '~/screens/write/reKnewWrite';
 import UserProfile from '~/screens/mypage/userProfile';
+import EditReview from '~/screens/write/edit';
 
 const Stack = createStackNavigator();
 
@@ -82,13 +83,6 @@ const GlobalNav = () => {
           }}
         />
         <Stack.Screen
-          name="ReKnew"
-          component={reKnewWrite}
-          options={{
-            headerShown: false
-          }}
-        />
-        <Stack.Screen
           name="FeedDetail"
           options={{
             title: "",
@@ -105,6 +99,20 @@ const GlobalNav = () => {
         <Stack.Screen
           name="editProfile"
           component={EditProfile}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="ReKnew"
+          component={reKnewWrite}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="editReview"
+          component={EditReview}
           options={{
             headerShown: false
           }}

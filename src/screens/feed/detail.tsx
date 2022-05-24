@@ -8,7 +8,7 @@ import ReviewIcon from '~/components/icon/reviewIcon';
 import Badge from '~/components/badge';
 import ReactionIcon from '~/components/icon/reactionIcon';
 import { commentMore, more, tag } from '~/assets/icons';
-import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
+import { getBottomSpace } from 'react-native-iphone-x-helper';
 import { useRecoilValue } from 'recoil';
 import { myIdState, tokenState } from '~/recoil/atoms';
 import { useMutation, useQuery } from 'react-query';
@@ -39,7 +39,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const myId = useRecoilValue(myIdState);
 
   const [commentSelectedIdx, setCommentSelectedIdx] = useState<number>(-1);
-
   const reviewDetailQuery = useQuery<ReviewListType, Error>(["reviewDetail", token], async () => {
     if (route.params) {
       const detail = await getReviewDetail(token, route.params.id);

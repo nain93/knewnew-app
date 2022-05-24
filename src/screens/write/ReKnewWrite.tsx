@@ -12,7 +12,7 @@ import { d2p, h2p } from '~/utils';
 
 import ImageCropPicker from 'react-native-image-crop-picker';
 import { useMutation, useQuery } from 'react-query';
-import { writeReview } from '~/api/write';
+
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { popupState, tokenState } from '~/recoil/atoms';
 import { ReviewListType, WriteReviewType } from '~/types/review';
@@ -21,12 +21,14 @@ import { NavigationRoute } from 'react-navigation';
 import FeedReview from '~/components/review/feedReview';
 import { MyPrfoileType } from '~/types/user';
 import { getMyProfile } from '~/api/user';
+import { writeReview } from '~/api/review';
 
 
 interface ReKnewProp {
   navigation: NavigationStackProp;
   route: NavigationRoute<{
-    review: ReviewListType
+    review: ReviewListType,
+    nickname: string
   }>;
 }
 
@@ -35,11 +37,13 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
     images: [],
     content: "",
     satisfaction: "",
+    market: "선택 안함",
     parent: route.params?.review.id
   });
 
   const [imageList, setImageList] = useState<string[]>([]);
   const [keyboardHeight, setKeyBoardHeight] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const inputRef = useRef<TextInput>(null);
   const token = useRecoilValue(tokenState);
@@ -50,10 +54,6 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
       console.log(data, 'data');
       navigation.goBack();
     }
-  });
-
-  const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
-    enabled: !!token
   });
 
   const pickImage = () => {
@@ -152,6 +152,7 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
           }}>
             {route.params &&
               <FeedReview
+                setSelectedIndex={setSelectedIndex}
                 type="reKnewWrite" review={route.params?.review} />
             }
           </View>
@@ -164,7 +165,7 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
               autoCapitalize="none"
               ref={inputRef}
               multiline
-              placeholder={`${getMyProfileQuery.data?.nickname}님은 어떻게 생각하세요?`}
+              placeholder={`${route.params?.nickname}님은 어떻게 생각하세요?`}
               placeholderTextColor={theme.color.grayscale.a09ca4}
               style={{ paddingTop: 0, fontSize: 16 }} />
           </Pressable>

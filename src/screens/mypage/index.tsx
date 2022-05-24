@@ -1,7 +1,6 @@
 import { Dimensions, Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { useState } from 'react';
 import Header from '~/components/header';
-import { NavigationType } from '~/types';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import { tokenState } from '~/recoil/atoms';
@@ -21,26 +20,23 @@ import { NavigationRoute } from 'react-navigation';
 
 interface MypageProps {
   navigation: NavigationStackProp;
-  route: NavigationRoute<{
-    id?: number
-  }>;
+  route: NavigationRoute;
 }
 
-const Mypage = ({ navigation, route }: MypageProps) => {
+const Mypage = ({ navigation }: MypageProps) => {
   const token = useRecoilValue(tokenState);
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
     enabled: !!token
   });
   const [selectedIndex, setSelectedIndex] = useState(-1);
-  const [headerHeight, setHeaderHeight] = useState(0);
+  const [headerHeight, setHeaderHeight] = useState(h2p(60));
+  const [index, setIndex] = useState(0);
 
-  if (getMyProfileQuery.isLoading) {
+  if (getMyProfileQuery.isLoading || getMyProfileQuery.isFetching) {
     return (
       <Loading />
     );
   }
-  console.log(route.params?.id, 'route.p');
-  // console.log(getMyProfileQuery.data?.bookmarks[2], 'getMyProfileQuery');
 
   return (
     <>
@@ -79,12 +75,16 @@ const Mypage = ({ navigation, route }: MypageProps) => {
               {
                 nickname: getMyProfileQuery.data?.nickname,
                 occupation: getMyProfileQuery.data?.occupation,
-                profileImage: getMyProfileQuery.data?.profileImage
+                profileImage: getMyProfileQuery.data?.profileImage,
+                tags: getMyProfileQuery.data?.tags,
+                representBadge: getMyProfileQuery.data?.representBadge
               }
             })}
         />
       </View>
       <Tabs.Container
+        lazy
+        onIndexChange={setIndex}
         containerStyle={styles.container}
         headerContainerStyle={{ marginTop: headerHeight }}
         renderTabBar={(props) => <MaterialTabBar
@@ -93,14 +93,14 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             height: 2,
             backgroundColor: theme.color.black,
             marginBottom: d2p(-1),
-          }} TabItemComponent={({ label, index }) => (
+          }} TabItemComponent={(tabs) => (
             <Pressable
-              onPress={() => props.onTabPress(label)}
+              onPress={() => props.onTabPress(tabs.label)}
               style={{ width: Dimensions.get("window").width / 2 }}>
               <Text style={[{
                 fontSize: 16,
                 textAlign: "center"
-              }, FONT.Bold]}>{label}
+              }, tabs.index === index ? FONT.Bold : FONT.Regular]}>{tabs.label}
               </Text>
             </Pressable>
           )} {...props} />}
@@ -112,7 +112,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             </View>
             <View style={styles.profileInfo}>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Text style={{ fontSize: 24, fontWeight: "bold", marginRight: d2p(10) }}>{getMyProfileQuery.data?.nickname}</Text>
+                <Text style={[FONT.Bold, { fontSize: 24, marginRight: d2p(10) }]}>{getMyProfileQuery.data?.nickname}</Text>
                 <View style={{
                   height: h2p(20), minWidth: d2p(55),
                   marginRight: d2p(5),
@@ -120,16 +120,18 @@ const Mypage = ({ navigation, route }: MypageProps) => {
                   paddingHorizontal: d2p(10), paddingVertical: h2p(3),
                   borderRadius: 10, backgroundColor: theme.color.grayscale.f7f7fc, borderWidth: 1, borderColor: theme.color.grayscale.d2d0d5
                 }}>
-                  <Text style={{ fontSize: 10, fontWeight: '500' }}>{getMyProfileQuery.data?.representBadge}</Text>
+                  <Text style={[FONT.Medium, { fontSize: 10, fontWeight: '500' }]}>{getMyProfileQuery.data?.representBadge}</Text>
                 </View>
-                <Text style={{ fontSize: 12, color: theme.color.grayscale.a09ca4 }}>{getMyProfileQuery.data?.household}</Text>
+                <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>{getMyProfileQuery.data?.household}</Text>
               </View>
               <View style={styles.occupation}>
-                <Text style={{ fontWeight: "500" }}>{getMyProfileQuery.data?.occupation}</Text>
+                <Text style={[FONT.Medium, { fontWeight: "500" }]}>{getMyProfileQuery.data?.occupation}</Text>
               </View>
-              {React.Children.toArray(getMyProfileQuery.data?.tags.map(v =>
-                <Text style={{ fontSize: 12, color: theme.color.grayscale.a09ca4 }}>#{v}</Text>
-              ))}
+              <View style={{ flexDirection: "row" }}>
+                {React.Children.toArray(getMyProfileQuery.data?.tags.map(v =>
+                  <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>#{v} </Text>
+                ))}
+              </View>
             </View>
           </View>
         )}

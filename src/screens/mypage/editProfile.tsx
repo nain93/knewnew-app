@@ -4,7 +4,7 @@ import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import Header from '~/components/header';
 import theme from '~/styles/theme';
 import { d2p, h2p } from '~/utils';
-import { plusIcon } from '~/assets/icons';
+import { plusIcon, tag } from '~/assets/icons';
 import { TextInput } from 'react-native-gesture-handler';
 import BasicButton from '~/components/button/basicButton';
 import { NavigationStackProp } from 'react-navigation-stack';
@@ -16,12 +16,20 @@ import SelectLayout from '~/components/selectLayout';
 import { FONT } from '~/styles/fonts';
 import { WriteReviewType } from '~/types/review';
 import { BadgeType } from '~/types';
+import { initialBadgeData } from '~/utils/data';
+import OnepickLayout from '~/components/onepickLayout';
+import { useMutation, useQueryClient } from 'react-query';
+import { editUserProfile } from '~/api/user';
+import { useRecoilValue } from 'recoil';
+import { myIdState, tokenState } from '~/recoil/atoms';
 
 
 interface ProfileEditType {
   nickname: string,
   occupation: string,
-  profileImage: string
+  profileImage: string,
+  tags: Array<string>,
+  representBadge: string
 }
 interface EditProfileProps {
   navigation: NavigationStackProp;
@@ -34,32 +42,59 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
   const nameInputRef = useRef<TextInput>(null);
   const selfInputRef = useRef<TextInput>(null);
   const tagRefRBSheet = useRef<RBSheet>(null);
-  const [profileInfo, setProfileInfo] = useState<ProfileEditType>({
+  const [profileInfo, setProfileInfo] = useState<ProfileEditType>(route.params?.profile || {
     nickname: "",
     occupation: "",
-    profileImage: ""
+    profileImage: "",
+    tags: [],
+    representBadge: ""
   });
 
-  const [writeData, setWriteData] = useState<WriteReviewType>({
-    images: [],
-    content: "",
-    satisfaction: "",
-    market: "선택 안함",
-    tags: []
-  });
-  const [userBadge, setUserBadge] = useState<BadgeType>({
-    interest: [],
-    household: [],
-    taste: []
-  });
-
+  const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
   const [isBadgeNext, setIsBadgeNext] = useState(false);
+  const token = useRecoilValue(tokenState);
+  const myId = useRecoilValue(myIdState);
+  const queryClient = useQueryClient();
 
+  const editProfileMutation = useMutation(["editprofile", token],
+    (profile: ProfileEditType) => editUserProfile({ token, id: myId, profile }));
+
+  console.log(userBadge, 'userBadge');
   useEffect(() => {
-    if (route.params) {
-      setProfileInfo(route.params.profile);
-    }
-  }, [route.params]);
+    // setUserBadge({
+    //   interest: userBadge.interest.reduce<Array<{ title: string, isClick: boolean, masterBadge?: boolean }>>((acc, cur) => {
+    //     acc = acc.concat(profileInfo.tags.map(v => {
+    //       if (v === cur.title) {
+    //         return { title: cur.title, isClick: true };
+    //       }
+    //       else if (cur.title === profileInfo.representBadge) {
+    //         return { title: profileInfo.representBadge, isClick: true, masterBadge: true };
+    //       }
+    //       return { title: cur.title, isClick: false };
+    //     }));
+    //     return acc;
+    //   }, []),
+    //   household: userBadge.household.reduce<Array<{ title: string, isClick: boolean }>>((acc, cur) => {
+    //     acc = acc.concat(profileInfo.tags.map(v => {
+    //       if (v === cur.title) {
+    //         return { title: cur.title, isClick: true };
+    //       }
+    //       return { title: cur.title, isClick: false };
+    //     }));
+    //     return acc;
+    //   }, []),
+    //   taste: userBadge.taste.reduce<Array<{ title: string, isClick: boolean }>>((acc, cur) => {
+    //     acc = acc.concat(profileInfo.tags.map(v => {
+    //       if (v === cur.title) {
+    //         return { title: cur.title, isClick: true };
+    //       }
+    //       return { title: cur.title, isClick: false };
+    //     }));
+    //     return acc;
+    //   }, [])
+    // });
+  }, []);
+
 
   return (
     <>
@@ -67,7 +102,21 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
         isBorder={true}
         headerLeft={<LeftArrowIcon onBackClick={() => navigation.goBack()} imageStyle={{ width: d2p(11), height: h2p(25) }} />}
         title="프로필 수정"
-        headerRightPress={() => console.log("complete")}
+        headerRightPress={() => {
+          // todo api타입수정후 수정
+          const copy: { [index: string]: Array<{ isClick: boolean, title: string }> } = { ...userBadge };
+          const tags = Object.keys(copy).reduce<Array<string>>((acc, cur) => {
+            acc = acc.concat(copy[cur].filter(v => v.isClick).map(v => v.title));
+            return acc;
+          }, []);
+          editProfileMutation.mutate({
+            ...profileInfo,
+            representBadge: userBadge.interest.filter(v => v.masterBadge)[0].title,
+            tags
+          });
+          queryClient.invalidateQueries("myProfile");
+          navigation.goBack();
+        }}
         headerRight={<Text style={{ color: theme.color.main }}>완료</Text>} />
       <View style={styles.container}>
         <TouchableOpacity style={styles.profileImage}>
@@ -143,7 +192,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
       >
         <View style={{
           flexDirection: "row", justifyContent: "space-between",
-          paddingHorizontal: d2p(10), marginBottom: h2p(30)
+          paddingHorizontal: d2p(10), marginBottom: h2p(10)
         }}>
           <CloseIcon onPress={() => tagRefRBSheet.current?.close()}
             imageStyle={{ width: d2p(15), height: h2p(15) }} />
@@ -155,7 +204,6 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
               setIsBadgeNext(true);
             }
             else {
-              // todo 선택한tag 상태 저장
               tagRefRBSheet.current?.close();
             }
           }}>
@@ -165,24 +213,19 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
           </TouchableOpacity>
         </View>
         {isBadgeNext ?
-          <View style={{ marginBottom: h2p(40) }}>
-            <Text style={[styles.subTitle, FONT.Regular]}>선택하신 관심사 중에서</Text>
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={[{ fontWeight: 'bold' }, FONT.Bold]}>나를 대표하는 뱃지 1개</Text>
-              <Text style={FONT.Regular}>를 선택해주세요.</Text>
-            </View>
-            <Text style={[styles.badgeGuide, FONT.Regular]}>대표 뱃지는 저장 후 7일동안 다시 변경할 수 없습니다.</Text>
-          </View>
+          <OnepickLayout userBadge={userBadge} setUserBadge={(badge: BadgeType) => setUserBadge(badge)} />
           :
-          <View style={{ marginBottom: h2p(40) }}>
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={[{ fontWeight: 'bold' }, FONT.Bold]}>나를 소개하는 태그</Text>
-              <Text style={FONT.Regular}>를 골라주세요.</Text>
+          <>
+            <View style={{ marginBottom: h2p(40), marginTop: h2p(20) }}>
+              <View style={{ flexDirection: 'row' }}>
+                <Text style={[{ fontWeight: 'bold' }, FONT.Bold]}>나를 소개하는 태그</Text>
+                <Text style={FONT.Regular}>를 골라주세요.</Text>
+              </View>
+              <Text style={FONT.Regular}>최소 2개 최대 10개까지 고를 수 있어요.</Text>
             </View>
-            <Text style={FONT.Regular}>최소 2개 최대 10개까지 고를 수 있어요.</Text>
-          </View>
+            <SelectLayout isInitial={isBadgeNext ? false : true} userBadge={userBadge} setUserBadge={(badge: BadgeType) => setUserBadge(badge)} />
+          </>
         }
-        <SelectLayout isInitial={isBadgeNext ? false : true} userBadge={userBadge} setUserBadge={setUserBadge} />
       </RBSheet>
     </>
   );
