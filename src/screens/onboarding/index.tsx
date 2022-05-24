@@ -57,7 +57,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
       AsyncStorage.setItem("token", data.accessToken);
       AsyncStorage.setItem("refreshToken", data.refreshToken);
       //@ts-ignore
-      navigation.reset({ routes: [{ name: "TabNav" }] });
+      navigation.reset({ index: 0, routes: [{ name: "TabNav" }] });
     }
     else {
       // * 새 유저

@@ -11,6 +11,7 @@ import { popupState } from '~/recoil/atoms';
 import { useSetRecoilState } from 'recoil';
 import { UserInfoType } from '~/types/user';
 import { FONT } from '~/styles/fonts';
+import { initialBadgeData } from '~/utils/data';
 
 interface BadgeSelectProps {
   navigation: NavigationStackProp
@@ -21,11 +22,7 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
 
   const [userInfo, setUserInfo] = useState<UserInfoType>();
 
-  const [userBadge, setUserBadge] = useState<BadgeType>({
-    interest: [],
-    household: [],
-    taste: []
-  });
+  const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
 
   const setIspopupOpen = useSetRecoilState(popupState);
 

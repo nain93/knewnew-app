@@ -4,7 +4,7 @@ import Header from '~/components/header';
 import theme from '~/styles/theme';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import { BadgeType } from '~/types';
-import { bad, blackclose, cart, circle, graycircle, grayclose, grayheart, heart, maincart, maintag, tag } from '~/assets/icons';
+import { blackclose, cart, circle, graycircle, grayclose, grayheart, heart, maincart, maintag, tag } from '~/assets/icons';
 import { photo, photoClose } from '~/assets/images';
 import { d2p, h2p } from '~/utils';
 
@@ -20,7 +20,7 @@ import { FONT } from '~/styles/fonts';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import { useFocusEffect } from '@react-navigation/native';
-import { writeReview } from '~/api/review';
+import { editReview, writeReview } from '~/api/review';
 import { initialBadgeData } from '~/utils/data';
 
 const marketList: Array<"선택 안함" | "마켓컬리" | "쿠팡프레시" | "SSG" | "B마트" | "윙잇" | "쿠캣마켓"> =
@@ -29,12 +29,11 @@ const marketList: Array<"선택 안함" | "마켓컬리" | "쿠팡프레시" | "
 interface WriteProp {
   navigation: NavigationStackProp;
   route: NavigationRoute<{
-    type?: "reKnew" | "default",
-    review?: ReviewListType
+    review: ReviewListType
   }>;
 }
 
-const Write = ({ navigation, route }: WriteProp) => {
+const EditReview = ({ navigation, route }: WriteProp) => {
   const [writeData, setWriteData] = useState<WriteReviewType>({
     images: [],
     content: "",
@@ -52,30 +51,12 @@ const Write = ({ navigation, route }: WriteProp) => {
   const [keyboardHeight, setKeyBoardHeight] = useState(0);
   const queryClient = useQueryClient();
 
-  useFocusEffect(
-    useCallback(() => {
-      if (route.params?.review) {
-        setWriteData({
-          ...writeData, content: route.params.review.content, satisfaction: route.params.review.satisfaction,
-          market: route.params.review.market ? route.params.review.market : "선택 안함", tags: route.params.review.tags
-        });
-      }
-      else {
-        setWriteData({
-          images: [],
-          content: "",
-          satisfaction: "",
-          market: "선택 안함",
-          tags: []
-        });
-      }
-    }, []));
-
   const token = useRecoilValue(tokenState);
   const setIspopupOpen = useSetRecoilState(popupState);
-  const addReviewMutation = useMutation(["addReview", token],
-    (writeProps: WriteReviewType) => writeReview({ token, ...writeProps }), {
-    onSuccess: () => {
+  const editReviewMutation = useMutation(["editReview", token],
+    ({ writeProps, id }: { writeProps: WriteReviewType } & { id: number }) => editReview({ token, id, ...writeProps }), {
+    onSuccess: (data) => {
+      console.log(data, 'data');
       queryClient.invalidateQueries("reviewList");
       navigation.goBack();
     }
@@ -113,7 +94,10 @@ const Write = ({ navigation, route }: WriteProp) => {
       acc = acc.concat({ priority: idx, image: cur });
       return acc;
     }, []);
-    addReviewMutation.mutate({ ...writeData, images });
+
+    if (route.params) {
+      editReviewMutation.mutate({ writeProps: { ...writeData, images }, id: route.params.review.id });
+    }
   };
 
   useEffect(() => {
@@ -135,6 +119,40 @@ const Write = ({ navigation, route }: WriteProp) => {
     });
   }, []);
 
+  useFocusEffect(useCallback(() => {
+    if (route.params) {
+      // * 수정화면 초기 데이터 설정
+      setImageList(route.params.review.images.map(v => v.image));
+      setWriteData({
+        content: route.params.review.content,
+        satisfaction: route.params.review.satisfaction,
+        market: route.params.review.market,
+        tags: route.params.review.tags
+      });
+
+      // * 수정화면 초기 뱃지 선택 활성화
+      setUserBadge({
+        interest: userBadge.interest.map(v => {
+          if (route.params?.review.tags.includes(v.title)) {
+            return { ...v, isClick: true };
+          }
+          return { ...v, isClick: false };
+        }),
+        household: userBadge.household.map(v => {
+          if (route.params?.review.tags.includes(v.title)) {
+            return { ...v, isClick: true };
+          }
+          return { ...v, isClick: false };
+        }),
+        taste: userBadge.taste.map(v => {
+          if (route.params?.review.tags.includes(v.title)) {
+            return { ...v, isClick: true };
+          }
+          return { ...v, isClick: false };
+        }),
+      });
+    }
+  }, [route.params]));
 
   return (
     <>
@@ -213,13 +231,11 @@ const Write = ({ navigation, route }: WriteProp) => {
             {React.Children.toArray(imageList.map((image, idx) => {
               return (
                 <View style={[styles.images, { marginRight: (idx === imageList.length - 1) ? d2p(20) : d2p(5) }]}>
-                  <View style={{ alignItems: "center" }}>
-                    <Image source={{ uri: image }} style={{ width: d2p(96), height: h2p(64), borderRadius: 4 }} />
-                    <Pressable onPress={() => setImageList(imageList.filter((_, filterIdx) => idx !== filterIdx))}
-                      style={{ position: "absolute", right: 0, top: 0 }}>
-                      <Image source={photoClose} style={{ width: d2p(16), height: h2p(16) }} />
-                    </Pressable>
-                  </View>
+                  <Image source={{ uri: image }} style={{ width: d2p(96), height: d2p(64), borderRadius: 4 }} />
+                  <Pressable onPress={() => setImageList(imageList.filter((_, filterIdx) => idx !== filterIdx))}
+                    style={{ position: "absolute", right: 0, top: 0 }}>
+                    <Image source={photoClose} style={{ width: d2p(16), height: h2p(16) }} />
+                  </Pressable>
                 </View>
               );
             }))}
@@ -316,7 +332,7 @@ const Write = ({ navigation, route }: WriteProp) => {
   );
 };
 
-export default Write;
+export default EditReview;
 
 const styles = StyleSheet.create({
   container: {

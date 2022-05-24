@@ -24,6 +24,32 @@ export const getUserProfile = async (token: string, id: number) => {
   }
 };
 
+interface EditPrfoileType {
+  token: string,
+  id: number,
+  profile: {
+    nickname: string,
+    profileImage: string,
+    occupation: string,
+    representBadge: string,
+    tags: Array<string>
+  }
+}
+
+export const editUserProfile = async ({ token, id, profile }: EditPrfoileType) => {
+  const res = await axios.patch(baseURL + `user/profile/${id}/`, {
+    ...profile,
+    profileImage: null
+  }, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+  if (res) {
+    return res.data;
+  }
+};
+
 interface UserLoginType {
   token: string,
   providerType: "kakao" | "naver" | "google" | "apple"

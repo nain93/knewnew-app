@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, Animated, Pressable } from 'react-native';
-import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import Header from '~/components/header';
@@ -22,7 +22,7 @@ import { getMyProfile } from '~/api/user';
 import { MyPrfoileType } from '~/types/user';
 import { ReviewListType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
-import { useFocusEffect } from '@react-navigation/native';
+import { initialBadgeData } from '~/utils/data';
 
 function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
   return (
@@ -39,11 +39,7 @@ const Feed = ({ navigation }: NavigationType) => {
   const [isPopupOpen, setIspopupOpen] = useState(false);
   const [scrollOffset, setScrollOffset] = useState(0);
   const tagRefRBSheet = useRef<RBSheet>(null);
-  const [userBadge, setUserBadge] = useState<BadgeType>({
-    interest: [],
-    household: [],
-    taste: []
-  });
+  const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
   const token = useRecoilValue(tokenState);
   const queryClient = useQueryClient();
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -51,7 +47,20 @@ const Feed = ({ navigation }: NavigationType) => {
 
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
     enabled: !!token,
-    onSuccess: (data) => setFilterBadge(data.representBadge)
+    onSuccess: (data) => {
+      // * 최초 유저 대표뱃지로 필터링 설정
+      setFilterBadge(data.representBadge);
+      setUserBadge({
+        interest: userBadge.interest.map(v => {
+          if (v.title === data.representBadge) {
+            return { title: v.title, isClick: true };
+          }
+          return { title: v.title, isClick: false };
+        }),
+        household: userBadge.household.map(v => ({ title: v.title, isClick: false })),
+        taste: userBadge.taste.map(v => ({ title: v.title, isClick: false })),
+      });
+    }
   });
 
   const reviewListQuery = useInfiniteQuery<ReviewListType[], Error>(["reviewList", token, filterBadge], async ({ pageParam = 0 }) => {
@@ -60,7 +69,7 @@ const Feed = ({ navigation }: NavigationType) => {
   }, {
     enabled: !!token,
     getNextPageParam: (next, all) => all.flat().length,
-    getPreviousPageParam: (prev) => (prev.length - 20) ?? undefined
+    getPreviousPageParam: (prev) => (prev.length - 20) ?? undefined,
   });
   // const filteredMutation = useMutation(["filteredList", token], (badge: string) => getFilteredReview(token, badge));
   const fadeIn = () => {
@@ -88,7 +97,7 @@ const Feed = ({ navigation }: NavigationType) => {
     }
   }, [isPopupOpen, fadeAnim, scrollOffset]);
 
-  if (reviewListQuery.isLoading) {
+  if (reviewListQuery.isLoading && reviewListQuery.isFetching) {
     return <Loading />;
   }
 
@@ -126,6 +135,19 @@ const Feed = ({ navigation }: NavigationType) => {
             if (getMyProfileQuery.data) {
               setFilterBadge(getMyProfileQuery.data?.representBadge);
             }
+
+            // * 대표 뱃지로 선택상태 초기화
+            setUserBadge({
+              interest: userBadge.interest.map(v => {
+                if (v.title === getMyProfileQuery.data?.representBadge) {
+                  return { title: v.title, isClick: true };
+                }
+                return { title: v.title, isClick: false };
+              }),
+              household: userBadge.household.map(v => ({ title: v.title, isClick: false })),
+              taste: userBadge.taste.map(v => ({ title: v.title, isClick: false })),
+            });
+
             queryClient.invalidateQueries("reviewList");
           }}
           data={reviewListQuery.data?.pages.flat()}
@@ -154,10 +176,14 @@ const Feed = ({ navigation }: NavigationType) => {
             <Pressable onPress={() =>
               navigation.navigate("FeedDetail", { id: item.id, badge: filterBadge, isLike: item.isLike })}
               style={styles.review}>
-              <FeedReview idx={index}
+              <FeedReview
+                nickname={getMyProfileQuery.data?.nickname}
+                idx={index}
                 selectedIndex={selectedIndex}
                 setSelectedIndex={(selectIdx: number) => setSelectedIndex(selectIdx)}
-                review={item} filterBadge={filterBadge} />
+                review={item}
+                filterBadge={filterBadge}
+              />
             </Pressable>
             // <ReKnew review={item} />
           }
@@ -227,7 +253,6 @@ const Feed = ({ navigation }: NavigationType) => {
                 return acc;
               }, "");
               setFilterBadge(badge);
-              queryClient.invalidateQueries("reviewList");
 
               // * 필터후 스크롤 offset초기화
               setScrollOffset(0);
