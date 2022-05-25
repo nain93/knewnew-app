@@ -70,7 +70,6 @@ export const userLogin = async ({ token, providerType }: UserLoginType) => {
     }
   }
   catch (error) {
-    console.log(error, 'error');
     if (axios.isAxiosError(error) && error.response) {
       console.log(error.response.data);
     }
@@ -120,6 +119,17 @@ export const getSearchUserList = async ({ token, nickname, offset }: { token: st
       offset,
       nickname
     },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+  if (res) {
+    return res.data;
+  }
+};
+
+export const deleteUser = async ({ token, id }: { token: string, id: number }) => {
+  const res = await axios.delete(baseURL + `user/${id}/profile/`, {
     headers: {
       Authorization: `Bearer ${token}`,
     }

@@ -22,7 +22,6 @@ const App = () => {
   });
 
   useEffect(() => {
-    // AsyncStorage.removeItem("token");
     const getToken = async () => {
       // TODO refresh api
       const storageToken = await AsyncStorage.getItem("token");

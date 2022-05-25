@@ -38,7 +38,12 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
     content: "",
     satisfaction: "",
     market: "선택 안함",
-    parent: route.params?.review.id
+    parent: route.params?.review.id,
+    tags: {
+      interest: [],
+      household: [],
+      taste: []
+    }
   });
 
   const [imageList, setImageList] = useState<string[]>([]);

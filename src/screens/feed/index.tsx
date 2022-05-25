@@ -67,11 +67,11 @@ const Feed = ({ navigation }: NavigationType) => {
     const queryData = await getReviewList({ token, tag: filterBadge, offset: pageParam });
     return queryData;
   }, {
-    enabled: !!token,
+    enabled: !!filterBadge,
     getNextPageParam: (next, all) => all.flat().length,
     getPreviousPageParam: (prev) => (prev.length - 20) ?? undefined,
   });
-  // const filteredMutation = useMutation(["filteredList", token], (badge: string) => getFilteredReview(token, badge));
+  // console.log(reviewListQuery.data?.pages.flat()[0], 'reviewListQuery.data?.pages.flat()[0]');
   const fadeIn = () => {
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -97,6 +97,7 @@ const Feed = ({ navigation }: NavigationType) => {
     }
   }, [isPopupOpen, fadeAnim, scrollOffset]);
 
+  console.log(reviewListQuery.data?.pages.flat()[1], 'reviewListQuery.data?.pages.flat(');
   if (reviewListQuery.isLoading && reviewListQuery.isFetching) {
     return <Loading />;
   }
@@ -174,7 +175,10 @@ const Feed = ({ navigation }: NavigationType) => {
           showsVerticalScrollIndicator={false}
           renderItem={({ item, index }) =>
             <Pressable onPress={() =>
-              navigation.navigate("FeedDetail", { id: item.id, badge: filterBadge, isLike: item.isLike })}
+              navigation.navigate("FeedDetail", {
+                id: item.id, badge: filterBadge,
+                isLike: item.isLike, isBookmark: item.isBookmark
+              })}
               style={styles.review}>
               <FeedReview
                 nickname={getMyProfileQuery.data?.nickname}

@@ -1,4 +1,4 @@
-import { View, Text, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView, Keyboard } from 'react-native';
+import { View, Text, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView, Keyboard, FlatList } from 'react-native';
 import React, { Fragment, useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
@@ -18,19 +18,20 @@ import { getReviewDetail, likeReview } from '~/api/review';
 import { ReviewListType } from '~/types/review';
 import Loading from '~/components/loading';
 import { FONT } from '~/styles/fonts';
+import { noProfile } from '~/assets/images';
 interface FeedDetailProps {
   navigation: NavigationStackProp
   route: NavigationRoute<{
     id: number,
     badge: string,
-    isLike: boolean
+    isLike: boolean,
+    isBookmark: boolean
   }>;
 }
 
 const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [like, setLike] = useState<boolean>(route.params?.isLike || false);
-  const [cart, setCart] = useState<boolean>(false);
-
+  const [cart, setCart] = useState<boolean>(route.params?.isBookmark || false);
   const [inputHeight, setInputHeight] = useState(getBottomSpace());
   const token = useRecoilValue(tokenState);
   const inputRef = useRef<TextInput>(null);
@@ -39,16 +40,19 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const myId = useRecoilValue(myIdState);
 
   const [commentSelectedIdx, setCommentSelectedIdx] = useState<number>(-1);
-  const reviewDetailQuery = useQuery<ReviewListType, Error>(["reviewDetail", token], async () => {
-    if (route.params) {
-      const detail = await getReviewDetail(token, route.params.id);
-      return detail;
-    }
-  }, {
-    enabled: !!token,
+  const reviewDetailQuery = useQuery<ReviewListType, Error>(["reviewDetail", token, route.params?.id],
+    async () => {
+      if (route.params) {
+        const detail = await getReviewDetail(token, route.params.id);
+        return detail;
+      }
+    }, {
+    enabled: !!route.params?.id,
+    onError: (error) => console.log(error, 'error')
   });
 
-  const likeReviewMutation = useMutation('likeReview', ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state));
+  const likeReviewMutation = useMutation('likeReview',
+    ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state));
 
   // * 키보드 높이 컨트롤
   useEffect(() => {
@@ -60,9 +64,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     });
   }, []);
 
-
-
-  if (reviewDetailQuery.isLoading || reviewDetailQuery.isFetching) {
+  if (reviewDetailQuery.isLoading) {
     return <Loading />;
   }
 
@@ -107,7 +109,15 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                   </Pressable>
                 </View>
               )}
-            <View style={{ backgroundColor: 'black', width: d2p(40), height: d2p(40), borderRadius: 40 }} />
+            <View style={{
+              borderRadius: 40,
+              borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec
+            }}>
+              <Image source={reviewDetailQuery.data?.author.profileImage ?
+                { uri: reviewDetailQuery.data?.author.profileImage } : noProfile}
+                style={{ width: d2p(40), height: d2p(40), borderRadius: 40 }}
+              />
+            </View>
             <View style={{
               width: Dimensions.get('window').width - d2p(105),
               paddingLeft: d2p(10)
@@ -140,7 +150,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Image source={tag} style={{ width: 10, height: 10, marginRight: 5 }} />
             <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
-              {React.Children.toArray(reviewDetailQuery.data?.tags.map((v) => {
+              {React.Children.toArray(reviewDetailQuery.data?.tags.interest.map((v) => {
                 if (v === route.params?.badge) {
                   return;
                 }
@@ -153,21 +163,38 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           <View style={styles.sign}>
             <Text style={[styles.store, FONT.Regular]}>{reviewDetailQuery.data?.market}</Text>
           </View>
-
+          {
+            console.log(reviewDetailQuery.data, 'reviewDetailQuery.data?.images')
+          }
           {/* TODO 이미지 있을떄 넣기 */}
-          <View style={{
+          <FlatList
+            data={reviewDetailQuery.data?.images}
+            keyExtractor={(v) => String(v.id)}
+            renderItem={(image) =>
+              <>
+                <Text>dddd</Text>
+                <Image
+                  style={{
+                    width: Dimensions.get('window').width - d2p(40),
+                    height: Dimensions.get("window").height * (180 / 760), borderRadius: 18, marginRight: 5
+                  }}
+                  source={{ uri: image.item.image }} />
+              </>
+            }
+          />
+          {/* <View style={{
             backgroundColor: 'black', width: Dimensions.get('window').width - d2p(40),
             height: Dimensions.get("window").height * (180 / 760), borderRadius: 18, marginRight: 5
-          }} />
+          }} /> */}
 
           <View style={styles.reactionContainer}>
-            <ReactionIcon name="cart" state={cart} isState={(isState: boolean) => setCart(isState)} />
+            <ReactionIcon name="cart" state={cart} count={reviewDetailQuery.data?.bookmarkCount} isState={(isState: boolean) => setCart(isState)} />
             <View style={{ borderLeftWidth: 1, borderLeftColor: theme.color.grayscale.eae7ec, height: h2p(26) }} />
             <ReactionIcon name="like" count={reviewDetailQuery.data?.likeCount} state={like}
               isState={(isState: boolean) => { setLike(isState); }} mutation={likeReviewMutation} id={route.params?.id} />
           </View>
           <Text style={[styles.commentMeta, FONT.Bold]}>작성된 댓글 2개</Text>
-          {comments.map((comment, idx) =>
+          {React.Children.toArray(comments.map((comment, idx) =>
             <View>
               <View style={styles.commentImg} />
               <View style={styles.commentContainer}>
@@ -213,7 +240,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                     </Pressable>
                   </View>
                 )}
-            </View>)}
+            </View>))}
         </ScrollView>
         <Pressable
           onPress={() => inputRef.current?.focus()}
@@ -285,17 +312,17 @@ const styles = StyleSheet.create({
     marginTop: h2p(14), marginBottom: h2p(10)
   },
   commentMeta: {
-    marginTop: 20,
+    marginTop: h2p(20),
     paddingBottom: h2p(20),
     fontSize: 12, fontWeight: 'bold',
     color: theme.color.grayscale.C_79737e,
   },
   commentImg: {
     backgroundColor: 'black',
-    width: 30, height: 30,
+    width: d2p(30), height: d2p(30),
     position: 'absolute', left: 0,
     borderRadius: 15,
-    marginRight: 5,
+    marginRight: d2p(5),
   },
   commentContainer: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
@@ -305,7 +332,7 @@ const styles = StyleSheet.create({
   commentDate: {
     fontSize: 12,
     color: theme.color.grayscale.a09ca4,
-    marginLeft: 10
+    marginLeft: d2p(10)
   },
   commentContent: {
     color: theme.color.grayscale.C_443e49,
@@ -313,7 +340,7 @@ const styles = StyleSheet.create({
   },
   clickBox: {
     display: 'flex', justifyContent: 'space-evenly', alignItems: 'center',
-    width: 70, height: 70, borderRadius: 5,
+    width: d2p(70), height: d2p(70), borderRadius: 5,
     position: 'absolute', right: d2p(30), top: 0,
     shadowColor: '#000000',
     shadowOpacity: 0.27,

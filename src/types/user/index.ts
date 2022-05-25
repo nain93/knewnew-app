@@ -14,7 +14,11 @@ export interface BookmarkType {
   },
   content: string,
   satisfaction: "best" | "good" | "bad",
-  tags: Array<string>,
+  tags: {
+    interest: Array<string>,
+    household: Array<string>,
+    taste: Array<string>
+  },
   bookmarkCount: number,
   childCount: number,
   commentCount: number,
@@ -56,5 +60,9 @@ export interface UserInfoType {
   profileImage?: string,
   occupation?: string,
   representBadge: string,
-  tags: Array<string>
+  tags: {
+    interest: Array<string>,
+    household: Array<string>,
+    taste: Array<string>
+  }
 }
