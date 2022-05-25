@@ -24,6 +24,7 @@ import { useRecoilValue } from 'recoil';
 import { myIdState, tokenState } from '~/recoil/atoms';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import { getBottomSpace } from 'react-native-iphone-x-helper';
+import Loading from '~/components/loading';
 
 
 interface ProfileEditType {
@@ -59,7 +60,13 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
   const queryClient = useQueryClient();
 
   const editProfileMutation = useMutation(["editprofile", token],
-    (profile: ProfileEditType) => editUserProfile({ token, id: myId, profile }));
+    (profile: ProfileEditType) => editUserProfile({ token, id: myId, profile }), {
+    onSuccess: () => {
+      queryClient.invalidateQueries("myProfile");
+      // todo 수정완료 alert
+      // navigation.goBack()
+    }
+  });
   const deleteUserMutation = useMutation("deleteUser", () => deleteUser({ token, id: myId }));
 
   useEffect(() => {
@@ -98,6 +105,10 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
     }).then(v => setProfileInfo({ ...profileInfo, profileImage: `data:${v.mime};base64,${v.data}` }));
   };
 
+  if (editProfileMutation.isLoading) {
+    return <Loading />;
+  }
+
   return (
     <>
       <Header
@@ -117,8 +128,6 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
             representBadge: userBadge.interest.filter(v => v.masterBadge)[0]?.title || profileInfo.representBadge,
             tags
           });
-          queryClient.invalidateQueries("myProfile");
-          // navigation.goBack();
         }}
         headerRight={<Text style={{ color: theme.color.main }}>완료</Text>} />
       <View style={styles.container}>

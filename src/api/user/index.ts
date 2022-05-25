@@ -14,7 +14,7 @@ export const getMyProfile = async (token: string) => {
 };
 
 export const getUserProfile = async (token: string, id: number) => {
-  const res = await axios.get(baseURL + `user/profile/${id}/`, {
+  const res = await axios.get(baseURL + `user/${id}/profile/`, {
     headers: {
       Authorization: `Bearer ${token}`,
     }
@@ -37,7 +37,7 @@ interface EditPrfoileType {
 }
 
 export const editUserProfile = async ({ token, id, profile }: EditPrfoileType) => {
-  const res = await axios.patch(baseURL + `user/profile/${id}/`, {
+  const res = await axios.patch(baseURL + `user/${id}/profile/`, {
     ...profile,
     profileImage: null
   }, {

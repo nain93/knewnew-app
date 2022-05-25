@@ -29,7 +29,6 @@ const Mypage = ({ navigation }: MypageProps) => {
   const [token, setToken] = useRecoilState(tokenState);
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile"], () => getMyProfile(token), {
     enabled: !!token,
-    onSuccess: (data) => console.log(data, "data")
   });
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [headerHeight, setHeaderHeight] = useState(h2p(60));
