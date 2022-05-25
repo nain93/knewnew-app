@@ -1,11 +1,11 @@
-import { Dimensions, Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
-import React, { useState } from 'react';
+import { Dimensions, Image, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
 import Header from '~/components/header';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import { tokenState } from '~/recoil/atoms';
 import { getMyProfile } from '~/api/user';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useQuery } from 'react-query';
 import { MyPrfoileType } from '~/types/user';
 import { noProfile } from '~/assets/images';
@@ -13,10 +13,12 @@ import Loading from '~/components/loading';
 import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
 import FeedReview from '~/components/review/feedReview';
 import { FONT } from '~/styles/fonts';
-import { write } from '~/assets/icons';
-import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
+import { more, write } from '~/assets/icons';
+import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface MypageProps {
   navigation: NavigationStackProp;
@@ -24,13 +26,27 @@ interface MypageProps {
 }
 
 const Mypage = ({ navigation }: MypageProps) => {
-  const token = useRecoilValue(tokenState);
-  const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
-    enabled: !!token
+  const [token, setToken] = useRecoilState(tokenState);
+  const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile"], () => getMyProfile(token), {
+    enabled: !!token,
   });
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [headerHeight, setHeaderHeight] = useState(h2p(60));
   const [index, setIndex] = useState(0);
+  const [openMore, setOpenMore] = useState(false);
+
+  useEffect(() => {
+    // * 로그아웃시 온보딩화면으로
+    if (!token) {
+      //@ts-ignore
+      navigation.reset({ index: 0, routes: [{ name: "OnBoarding" }] });
+    }
+  }, [token]);
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => setOpenMore(false);
+    }, []));
 
   if (getMyProfileQuery.isLoading || getMyProfileQuery.isFetching) {
     return (
@@ -53,7 +69,7 @@ const Mypage = ({ navigation }: MypageProps) => {
           position: 'absolute',
           top: 0,
           left: 0,
-          zIndex: 999,
+          zIndex: 10,
           width: Dimensions.get("window").width
         }}>
         {isIphoneX() &&
@@ -68,20 +84,39 @@ const Mypage = ({ navigation }: MypageProps) => {
           viewStyle={{
             marginTop: 0,
           }}
-          headerRight={<Image source={write} style={{ width: d2p(15), height: h2p(15) }} />}
-          headerRightPress={() => navigation.navigate("editProfile",
-            {
-              profile:
-              {
-                nickname: getMyProfileQuery.data?.nickname,
-                occupation: getMyProfileQuery.data?.occupation,
-                profileImage: getMyProfileQuery.data?.profileImage,
-                tags: getMyProfileQuery.data?.tags,
-                representBadge: getMyProfileQuery.data?.representBadge
-              }
-            })}
+          // headerRight={<Image source={write} style={{ width: d2p(15), height: h2p(15) }} />}
+          headerRight={<Image source={more} style={{ width: d2p(26), height: h2p(16) }} />}
+          headerRightPress={() => setOpenMore(!openMore)}
         />
       </View>
+      {openMore &&
+        <View style={styles.clickBox}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("editProfile",
+              {
+                profile:
+                {
+                  nickname: getMyProfileQuery.data?.nickname,
+                  occupation: getMyProfileQuery.data?.occupation,
+                  profileImage: getMyProfileQuery.data?.profileImage,
+                  tags: getMyProfileQuery.data?.tags,
+                  representBadge: getMyProfileQuery.data?.representBadge
+                }
+              })}
+            style={{ width: d2p(90), height: h2p(35), justifyContent: "center", alignItems: "center" }}>
+            <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>프로필 수정</Text>
+          </TouchableOpacity>
+          <View style={{ borderWidth: 1, width: d2p(70), alignSelf: "center", borderColor: theme.color.grayscale.e9e7ec }} />
+          <TouchableOpacity
+            onPress={() => {
+              AsyncStorage.removeItem("token");
+              setToken("");
+            }}
+            style={{ width: d2p(90), height: h2p(35), justifyContent: "center", alignItems: "center" }}>
+            <Text style={[FONT.Regular, { color: theme.color.main }]}>로그아웃</Text>
+          </TouchableOpacity>
+        </View>
+      }
       <Tabs.Container
         lazy
         onIndexChange={setIndex}
@@ -229,5 +264,19 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginHorizontal: d2p(10), marginTop: h2p(15),
     paddingHorizontal: d2p(10), paddingVertical: d2p(15)
-  }
+  },
+  clickBox: {
+    borderRadius: 5,
+    position: 'absolute', right: d2p(46), top: getBottomSpace() + h2p(20),
+    shadowColor: '#000000',
+    shadowOpacity: 0.27,
+    shadowRadius: 4.65,
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    elevation: (Platform.OS === 'android') ? 3 : 0,
+    backgroundColor: theme.color.white,
+    zIndex: 11
+  },
 });

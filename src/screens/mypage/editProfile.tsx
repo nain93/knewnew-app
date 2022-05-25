@@ -19,9 +19,12 @@ import { BadgeType } from '~/types';
 import { initialBadgeData } from '~/utils/data';
 import OnepickLayout from '~/components/onepickLayout';
 import { useMutation, useQueryClient } from 'react-query';
-import { editUserProfile } from '~/api/user';
+import { deleteUser, editUserProfile } from '~/api/user';
 import { useRecoilValue } from 'recoil';
 import { myIdState, tokenState } from '~/recoil/atoms';
+import ImageCropPicker from 'react-native-image-crop-picker';
+import { getBottomSpace } from 'react-native-iphone-x-helper';
+import Loading from '~/components/loading';
 
 
 interface ProfileEditType {
@@ -57,44 +60,54 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
   const queryClient = useQueryClient();
 
   const editProfileMutation = useMutation(["editprofile", token],
-    (profile: ProfileEditType) => editUserProfile({ token, id: myId, profile }));
+    (profile: ProfileEditType) => editUserProfile({ token, id: myId, profile }), {
+    onSuccess: () => {
+      queryClient.invalidateQueries("myProfile");
+      // todo 수정완료 alert
+      // navigation.goBack()
+    }
+  });
+  const deleteUserMutation = useMutation("deleteUser", () => deleteUser({ token, id: myId }));
 
-  console.log(userBadge, 'userBadge');
   useEffect(() => {
-    // setUserBadge({
-    //   interest: userBadge.interest.reduce<Array<{ title: string, isClick: boolean, masterBadge?: boolean }>>((acc, cur) => {
-    //     acc = acc.concat(profileInfo.tags.map(v => {
-    //       if (v === cur.title) {
-    //         return { title: cur.title, isClick: true };
-    //       }
-    //       else if (cur.title === profileInfo.representBadge) {
-    //         return { title: profileInfo.representBadge, isClick: true, masterBadge: true };
-    //       }
-    //       return { title: cur.title, isClick: false };
-    //     }));
-    //     return acc;
-    //   }, []),
-    //   household: userBadge.household.reduce<Array<{ title: string, isClick: boolean }>>((acc, cur) => {
-    //     acc = acc.concat(profileInfo.tags.map(v => {
-    //       if (v === cur.title) {
-    //         return { title: cur.title, isClick: true };
-    //       }
-    //       return { title: cur.title, isClick: false };
-    //     }));
-    //     return acc;
-    //   }, []),
-    //   taste: userBadge.taste.reduce<Array<{ title: string, isClick: boolean }>>((acc, cur) => {
-    //     acc = acc.concat(profileInfo.tags.map(v => {
-    //       if (v === cur.title) {
-    //         return { title: cur.title, isClick: true };
-    //       }
-    //       return { title: cur.title, isClick: false };
-    //     }));
-    //     return acc;
-    //   }, [])
-    // });
+    setUserBadge({
+      interest: userBadge.interest.map(v => {
+        if (v.title === profileInfo.representBadge) {
+          return { ...v, isClick: true, masterBadge: true };
+        }
+        if (profileInfo.tags.includes(v.title)) {
+          return { ...v, isClick: true };
+        }
+        return v;
+      }),
+      household: userBadge.household.map(v => {
+        if (profileInfo.tags.includes(v.title)) {
+          return { ...v, isClick: true };
+        }
+        return v;
+      }),
+      taste: userBadge.taste.map(v => {
+        if (profileInfo.tags.includes(v.title)) {
+          return { ...v, isClick: true };
+        }
+        return v;
+      })
+    });
   }, []);
 
+  const pickImage = () => {
+    ImageCropPicker.openPicker({
+      mediaType: "photo",
+      crop: "true",
+      includeBase64: true,
+      compressImageMaxWidth: 720,
+      compressImageMaxHeight: 720
+    }).then(v => setProfileInfo({ ...profileInfo, profileImage: `data:${v.mime};base64,${v.data}` }));
+  };
+
+  if (editProfileMutation.isLoading) {
+    return <Loading />;
+  }
 
   return (
     <>
@@ -109,17 +122,16 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
             acc = acc.concat(copy[cur].filter(v => v.isClick).map(v => v.title));
             return acc;
           }, []);
+          // todo profileImage api연결
           editProfileMutation.mutate({
             ...profileInfo,
-            representBadge: userBadge.interest.filter(v => v.masterBadge)[0].title,
+            representBadge: userBadge.interest.filter(v => v.masterBadge)[0]?.title || profileInfo.representBadge,
             tags
           });
-          queryClient.invalidateQueries("myProfile");
-          navigation.goBack();
         }}
         headerRight={<Text style={{ color: theme.color.main }}>완료</Text>} />
       <View style={styles.container}>
-        <TouchableOpacity style={styles.profileImage}>
+        <TouchableOpacity onPress={pickImage} style={styles.profileImage}>
           <Image source={profileInfo.profileImage ? { uri: profileInfo.profileImage } : noProfile}
             style={{ width: d2p(60), height: d2p(60), borderRadius: 60 }} />
           <Image source={plusIcon}
@@ -128,38 +140,60 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
 
         <View>
           <View style={{ flexDirection: "row", paddingHorizontal: d2p(20), marginBottom: d2p(10) }}>
-            <Text style={styles.inputTitle}>닉네임</Text>
-            <Text style={styles.inputText}>(0/40자)</Text>
+            <Text style={[styles.inputTitle, FONT.Bold]}>닉네임</Text>
+            <Text style={[styles.inputText, FONT.Regular, {
+              color: profileInfo.nickname.length >= 40 ? theme.color.main : theme.color.grayscale.d3d0d5
+            }]}>{`(${profileInfo.nickname.length}/40자)`}</Text>
           </View>
           <Pressable onPress={() => nameInputRef.current?.focus()} style={styles.textInput}>
             <TextInput
+              multiline
               value={profileInfo.nickname}
-              onChangeText={(e) => setProfileInfo({ ...profileInfo, nickname: e })}
+              maxLength={41}
+              onChangeText={(e) => {
+                if (e.length > 40) {
+                  setProfileInfo({ ...profileInfo, nickname: e.slice(0, e.length - 1) });
+                }
+                else {
+                  setProfileInfo({ ...profileInfo, nickname: e });
+                }
+              }}
               ref={nameInputRef}
               autoCapitalize="none"
-              style={{ fontSize: 16, padding: 0, includeFontPadding: false }}
+              style={[FONT.Regular, { fontSize: 16, padding: 0, includeFontPadding: false, paddingTop: 0 }]}
               placeholder="닉네임을 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
             {!profileInfo.nickname &&
-              <Text style={{ fontSize: 12, color: theme.color.grayscale.ff5d5d }}> (필수)</Text>
+              <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.ff5d5d }]}> (필수)</Text>
             }
           </Pressable>
         </View>
 
         <View style={{ marginTop: h2p(40) }}>
           <View style={{ flexDirection: "row", paddingHorizontal: d2p(20), marginBottom: d2p(10) }}>
-            <Text style={styles.inputTitle}>자기소개</Text>
-            <Text style={styles.inputText}>(0/140자)</Text>
+            <Text style={[styles.inputTitle, FONT.Bold]}>자기소개</Text>
+            <Text style={[styles.inputText, FONT.Regular,
+            { color: profileInfo.occupation.length >= 140 ? theme.color.main : theme.color.grayscale.d3d0d5 }]}>
+              {`(${profileInfo.occupation.length}/140자)`}</Text>
           </View>
           <Pressable onPress={() => selfInputRef.current?.focus()} style={styles.textInput}>
             <TextInput
+              multiline
+              maxLength={141}
               value={profileInfo.occupation}
-              onChangeText={e => setProfileInfo({ ...profileInfo, occupation: e })}
+              onChangeText={e => {
+                if (e.length > 140) {
+                  setProfileInfo({ ...profileInfo, occupation: e.slice(0, e.length - 1) });
+                }
+                else {
+                  setProfileInfo({ ...profileInfo, occupation: e });
+                }
+              }}
               ref={selfInputRef}
               autoCapitalize="none"
-              style={{ fontSize: 16, padding: 0, includeFontPadding: false }}
+              style={[FONT.Regular, { fontSize: 16, padding: 0, includeFontPadding: false }]}
               placeholder="자기소개를 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
             {!profileInfo.occupation &&
-              <Text style={{ fontSize: 12, color: theme.color.grayscale.a09ca4 }}> (선택)</Text>
+              <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}> (선택)</Text>
             }
           </Pressable>
         </View>
@@ -169,6 +203,20 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
             onPress={() => tagRefRBSheet.current?.open()}
             text="소개 태그 선택" textColor={theme.color.main} bgColor={theme.color.white} />
         </View>
+        <TouchableOpacity
+          onPress={() => deleteUserMutation.mutate()}
+          style={{
+            marginTop: "auto",
+            marginLeft: "auto",
+            marginRight: d2p(20),
+            marginBottom: getBottomSpace() + h2p(25),
+          }}
+        >
+          <Text style={[FONT.Bold,
+          { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
+            회원탈퇴
+          </Text>
+        </TouchableOpacity>
       </View>
       <RBSheet
         animationType="fade"
@@ -250,12 +298,10 @@ const styles = StyleSheet.create({
 
   inputTitle: {
     fontSize: 16,
-    fontWeight: "bold",
     marginRight: d2p(10)
   },
   inputText: {
     fontSize: 12,
-    color: theme.color.grayscale.d3d0d5
   },
   textInput: {
     paddingHorizontal: d2p(20),

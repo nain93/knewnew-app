@@ -13,7 +13,6 @@ interface OnepickLayoutProps {
 }
 
 const OnepickLayout = ({ userBadge, setUserBadge }: OnepickLayoutProps) => {
-  console.log(userBadge, 'userBsssssadge');
 
   return (
     <>

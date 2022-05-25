@@ -4,7 +4,7 @@ import Header from '~/components/header';
 import theme from '~/styles/theme';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import { BadgeType } from '~/types';
-import { bad, blackclose, cart, circle, graycircle, grayclose, grayheart, heart, maincart, maintag, tag } from '~/assets/icons';
+import { blackclose, cart, circle, graycircle, grayclose, grayheart, heart, maincart, maintag, tag } from '~/assets/icons';
 import { photo, photoClose } from '~/assets/images';
 import { d2p, h2p } from '~/utils';
 
@@ -40,7 +40,11 @@ const Write = ({ navigation, route }: WriteProp) => {
     content: "",
     satisfaction: "",
     market: "선택 안함",
-    tags: []
+    tags: {
+      interest: [],
+      household: [],
+      taste: []
+    }
   });
 
   const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
@@ -66,7 +70,11 @@ const Write = ({ navigation, route }: WriteProp) => {
           content: "",
           satisfaction: "",
           market: "선택 안함",
-          tags: []
+          tags: {
+            interest: [],
+            household: [],
+            taste: []
+          }
         });
       }
     }, []));
@@ -104,7 +112,8 @@ const Write = ({ navigation, route }: WriteProp) => {
       setIspopupOpen({ isOpen: true, content: "내용을 입력해주세요", popupStyle: { bottom: keyboardHeight + h2p(20) } });
       return;
     }
-    if (writeData.tags?.length === 0) {
+    if (writeData.tags.interest.length === 0 ||
+      writeData.tags.household.length === 0) {
       setIspopupOpen({ isOpen: true, content: "태그를 선택해주세요", popupStyle: { bottom: keyboardHeight + h2p(20) } });
       return;
     }
@@ -182,10 +191,17 @@ const Write = ({ navigation, route }: WriteProp) => {
             onPress={() => tagRefRBSheet.current?.open()}
             style={[styles.select, { marginRight: d2p(10) }]}>
             <View style={{ position: "relative" }}>
-              <Image source={(writeData.tags?.length === 0) ? tag : maintag} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
-              {writeData.tags?.length !== 0 &&
+              <Image source={((
+                writeData.tags.interest.length +
+                writeData.tags.household.length +
+                writeData.tags.taste.length) === 0) ? tag : maintag} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
+              {(writeData.tags.interest.length +
+                writeData.tags.household.length +
+                writeData.tags.taste.length) !== 0 &&
                 <Text style={{ fontSize: 8, color: theme.color.white, top: h2p(3), left: "22%", position: "absolute" }}>
-                  {writeData.tags?.length}</Text>}
+                  {(writeData.tags.interest.length +
+                    writeData.tags.household.length +
+                    writeData.tags.taste.length)}</Text>}
             </View>
             <Text style={FONT.Medium}>태그 선택</Text>
             <Text style={[{ fontSize: 12, color: theme.color.main }, FONT.Medium]}> *</Text>
@@ -255,13 +271,12 @@ const Write = ({ navigation, route }: WriteProp) => {
             imageStyle={{ width: d2p(15), height: h2p(15) }} />
           <Text style={[{ fontSize: 16, fontWeight: "bold" }, FONT.Bold]}>태그 선택</Text>
           <TouchableOpacity onPress={() => {
-            const copy: { [index: string]: Array<{ isClick: boolean, title: string }> } = { ...userBadge };
-            const tags = Object.keys(copy).reduce<Array<string>>((acc, cur) => {
-              acc = acc.concat(copy[cur].filter(v => v.isClick).map(v => v.title));
-              return acc;
-            }, []);
             setWriteData({
-              ...writeData, tags
+              ...writeData, tags: {
+                interest: userBadge.interest.filter(v => v.isClick).map(v => v.title),
+                household: userBadge.household.filter(v => v.isClick).map(v => v.title),
+                taste: userBadge.taste.filter(v => v.isClick).map(v => v.title)
+              }
             });
             tagRefRBSheet.current?.close();
           }}>

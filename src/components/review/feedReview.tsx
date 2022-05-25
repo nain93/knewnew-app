@@ -113,7 +113,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
         <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: d2p(10), marginLeft: d2p(50) }}>
           <Image source={tag} style={{ width: 10, height: 10, marginRight: d2p(5) }} />
           <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
-            {React.Children.toArray(review.tags.map((v) => {
+            {React.Children.toArray(review.tags.interest?.map((v) => {
               if (v === filterBadge) {
                 return;
               }
