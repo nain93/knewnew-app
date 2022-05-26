@@ -249,24 +249,24 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
                 onPress={() => navigation.navigate("editReview", { review })}
               // onPress={() => navigation.navigate("작성", { review })}
               >
-                <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
+                <Text style={[styles.click,{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
               </Pressable>
               <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
               <Pressable style={styles.clickBtn}
                 onPress={() => deleteMutation.mutate(review.id)}>
-                <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
+                <Text style={[styles.click,{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
               </Pressable>
             </View>
             :
             <View style={[styles.clickBox, clickBoxStyle]}>
               <Pressable style={styles.clickBtn}
                 onPress={() => console.log("")}>
-                <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
+                <Text style={[styles.click,{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
               </Pressable>
               <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
               <Pressable style={styles.clickBtn}
                 onPress={() => console.log("")}>
-                <Text style={[{ color: theme.color.main }, FONT.Regular]}>신고</Text>
+                <Text style={[styles.click,{ color: theme.color.main }, FONT.Regular]}>신고</Text>
               </Pressable>
             </View>
         )}
@@ -310,6 +310,7 @@ const styles = StyleSheet.create({
   },
   clickBox: {
     display: 'flex', justifyContent: 'space-evenly', alignItems: 'center',
+    width: d2p(70),
     borderRadius: 5,
     position: 'absolute', right: d2p(36), top: h2p(5),
     shadowColor: '#000000',
@@ -322,6 +323,10 @@ const styles = StyleSheet.create({
     elevation: (Platform.OS === 'android') ? 3 : 0,
     backgroundColor: theme.color.white,
     zIndex: 999,
+  },
+  click: {
+    color: theme.color.grayscale.C_443e49,
+    paddingHorizontal: d2p(23), paddingTop: h2p(8), paddingBottom: h2p(8)
   },
   clickBtn: {
     width: d2p(70),

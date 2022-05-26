@@ -1,17 +1,17 @@
-import { View, Text, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView, Keyboard, FlatList } from 'react-native';
-import React, { Fragment, useEffect, useRef, useState } from 'react';
+import { View, Text, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView, Keyboard, FlatList, LayoutRectangle } from 'react-native';
+import React, { Fragment, RefObject, useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import theme from '~/styles/theme';
-import { d2p, h2p, simpleDate } from '~/utils';
+import { d2p, dateCommentFormat, h2p, simpleDate } from '~/utils';
 import ReviewIcon from '~/components/icon/reviewIcon';
 import Badge from '~/components/badge';
 import ReactionIcon from '~/components/icon/reactionIcon';
-import { commentMore, more, tag } from '~/assets/icons';
+import {  commentMore, more, tag } from '~/assets/icons';
 import { getBottomSpace } from 'react-native-iphone-x-helper';
 import { useRecoilValue } from 'recoil';
 import { myIdState, tokenState } from '~/recoil/atoms';
-import { useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import { getReviewDetail, likeReview } from '~/api/review';
@@ -19,6 +19,8 @@ import { ReviewListType } from '~/types/review';
 import Loading from '~/components/loading';
 import { FONT } from '~/styles/fonts';
 import { noProfile } from '~/assets/images';
+import { addReviewComment, deleteReviewComment, editReviewComment, getReviewComment } from '~/api/comment';
+import { min } from 'react-native-reanimated';
 interface FeedDetailProps {
   navigation: NavigationStackProp
   route: NavigationRoute<{
@@ -38,7 +40,17 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
 
   const [isMoreClick, setIsMoreClick] = useState<boolean>();
   const myId = useRecoilValue(myIdState);
+  const queryClient = useQueryClient();
 
+  const [commentIsEdit, setCommentIsEdit] = useState<boolean>();
+  const [modifyingIdx, setModifyingIdx] = useState(-1);
+  const [editCommentId, setEditCommentId] = useState<number>(-1);
+
+  // const flatListRef = useRef<RefObject<FlatList<CommentListType>>>();
+  const flatListRef = useRef<FlatList>(null);
+  const [commentPosition, setCommentPosition] = useState<number>(0);
+
+  const [content, setContent] = useState<string>("");
   const [commentSelectedIdx, setCommentSelectedIdx] = useState<number>(-1);
   const reviewDetailQuery = useQuery<ReviewListType, Error>(["reviewDetail", token, route.params?.id],
     async () => {
@@ -51,8 +63,50 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     onError: (error) => console.log(error, 'error')
   });
 
+interface CommentListType {
+    id: number;
+    author: { 
+      id: number;
+      nickname: string;
+      profileImage: string;
+    };
+    content: string;
+    created: string;
+    likeCount: string;
+  }
+
   const likeReviewMutation = useMutation('likeReview',
     ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state));
+
+  const commentListQuery = useQuery<CommentListType[], Error>(['getCommentList', token, route.params?.id], async () => {
+    if (route.params){
+      const comments = await getReviewComment(token, route.params?.id);
+      return comments;
+    }
+  }, {
+    enabled: !!route.params?.id
+  });
+console.log(commentListQuery.data, ' comment data');
+// console.log(route.params?.id, ' review id');
+// console.log(content, ' conetennt');
+
+ const addCommentMutation = useMutation('addComment', ({rid, comment}: {rid: number, comment: string}) => addReviewComment(token, rid, comment), {
+   onSuccess: () => {
+     queryClient.invalidateQueries('getCommentList');
+   }
+ });
+
+ const editCommentMutation = useMutation('editComment', ({rId, cId, comment}: {rId: number, cId: number, comment: string})=> editReviewComment(token, rId, cId, comment), {
+  onSuccess: () => {
+    queryClient.invalidateQueries('getCommentList');
+  }
+ });
+
+ const deleteCommentMutation = useMutation('deleteComment', (id: number) => deleteReviewComment(token, id), {
+   onSuccess: () => {
+     queryClient.invalidateQueries('getCommentList');
+   }
+ });
 
   // * 키보드 높이 컨트롤
   useEffect(() => {
@@ -61,8 +115,15 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     });
     Keyboard.addListener("keyboardWillHide", (e) => {
       setInputHeight(getBottomSpace());
+      setCommentIsEdit(false);
     });
   }, []);
+
+  useEffect(()=>{
+    if (!commentIsEdit){
+      setContent('');
+    }
+  },[commentIsEdit]);
 
   if (reviewDetailQuery.isLoading) {
     return <Loading />;
@@ -85,7 +146,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
         <ScrollView
           contentContainerStyle={{ paddingBottom: h2p(30) }}
           showsVerticalScrollIndicator={false}
-          style={{ paddingHorizontal: d2p(20), paddingTop: h2p(20), flex: 1 }}>
+          style={{ paddingHorizontal: d2p(20), paddingTop: h2p(20), flex: 1 }}
+          >
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
             {isMoreClick &&
               (myId === reviewDetailQuery.data?.author.id ?
@@ -163,9 +225,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           <View style={styles.sign}>
             <Text style={[styles.store, FONT.Regular]}>{reviewDetailQuery.data?.market}</Text>
           </View>
-          {
-            console.log(reviewDetailQuery.data, 'reviewDetailQuery.data?.images')
-          }
           {/* TODO 이미지 있을떄 넣기 */}
           <FlatList
             data={reviewDetailQuery.data?.images}
@@ -193,14 +252,99 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             <ReactionIcon name="like" count={reviewDetailQuery.data?.likeCount} state={like}
               isState={(isState: boolean) => { setLike(isState); }} mutation={likeReviewMutation} id={route.params?.id} />
           </View>
-          <Text style={[styles.commentMeta, FONT.Bold]}>작성된 댓글 2개</Text>
-          {React.Children.toArray(comments.map((comment, idx) =>
+          <Text style={[styles.commentMeta, FONT.Bold]}>작성된 댓글 {commentListQuery.data?.length}개</Text>
+          
+          <Pressable onPress={()=>{
+            setCommentSelectedIdx(-1);
+            }}>
+
+            <FlatList
+            // ref={(ref) => {flatListRef = ref;}}
+            ref={flatListRef}
+            data={commentListQuery.data}
+            renderItem={({item,index})=> (
+              <View onLayout={e => {setCommentPosition(e.nativeEvent.layout.height);
+              console.log(commentPosition);}}>
+                    <View style={index === modifyingIdx && commentIsEdit ? { backgroundColor: "#F7F7FC"} : null}>
+                      <TouchableOpacity
+                        onPress={() => navigation.navigate("UserProfile", { id: item.author.id })}
+                        style={styles.commentProfileLine}>
+                        <Image source={item.author.profileImage ? { uri: item.author.profileImage } : noProfile}
+                            style={styles.commentImg} /> 
+                      </TouchableOpacity>
+                        <View style={styles.commentContainer}>
+                              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Text style={[{ fontWeight: '500' }, FONT.Medium]}>{item.author.nickname}</Text>
+                                <Text style={[styles.commentDate, FONT.Regular]}>{dateCommentFormat(item.created)}</Text>
+                              </View>
+                          <TouchableOpacity onPress={() => {
+                            if (commentSelectedIdx === index) {
+                              setCommentSelectedIdx(-1);
+                            } else {
+                              setCommentSelectedIdx(index);
+                            }
+                          }}>
+                            <Image
+                              source={commentMore}
+                              resizeMode="contain"
+                              style={{ width: 12, height: 16, paddingRight: d2p(15) }}
+                            />
+                          </TouchableOpacity>
+                        </View>
+                        <Text style={[styles.commentContent, FONT.Regular]}>{item.content}</Text>
+                    </View>
+                <View style={styles.commentLine} />
+              {commentSelectedIdx === index &&
+                (myId === item.author.id ?
+                      <View style={[styles.clickBox, { right: d2p(15) }]}>
+                        <Pressable onPress={()=> {
+                          setContent(item.content);
+                          setCommentIsEdit(true);
+                          setModifyingIdx(commentSelectedIdx);
+                          setEditCommentId(item.id);
+                          setCommentSelectedIdx(-1);
+                          // TODO 포커싱 시 댓글로 스크롤 돼야 함
+                          flatListRef.current?.scrollToOffset({offset: 100, animated: true});
+                          // inputRef.current?.focus();
+                          }}>
+                          <Text style={[styles.click,{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
+                        </Pressable>
+                        <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
+                        <Pressable onPress={() =>{
+                          deleteCommentMutation.mutate(item.id);
+                          setCommentSelectedIdx(-1);
+                          }}>
+                          <Text style={[styles.click,{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
+                        </Pressable>
+                      </View>
+                  :
+                      <View style={[styles.clickBox, { right: d2p(15) }]}>
+                        <Pressable>
+                          <Text style={[styles.click,{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
+                        </Pressable>
+                        <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
+                        <Pressable>
+                          <Text style={[styles.click,{ color: theme.color.main }, FONT.Regular]}>신고</Text>
+                        </Pressable>
+                      </View>
+                )}
+            </View>)}
+            // ))}
+            keyExtractor={(item)=>String(item.id)} />
+
+          {/* {React.Children.toArray(commentListQuery.data?.map((comment, idx) =>
             <View>
-              <View style={styles.commentImg} />
+              <View style={idx === modifyingIdx && commentIsEdit ? { backgroundColor: "#F7F7FC"} : null}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("UserProfile", { id: comment.author.id })}
+              style={styles.commentProfileLine}>
+              <Image source={comment.author.profileImage ? { uri: comment.author.profileImage } : noProfile}
+                  style={styles.commentImg} /> 
+            </TouchableOpacity>
               <View style={styles.commentContainer}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Text style={[{ fontWeight: '500' }, FONT.Medium]}>{comment.name}</Text>
-                  <Text style={[styles.commentDate, FONT.Regular]}>{comment.date}</Text>
+                  <Text style={[{ fontWeight: '500' }, FONT.Medium]}>{comment.author.nickname}</Text>
+                  <Text style={[styles.commentDate, FONT.Regular]}>{dateCommentFormat(comment.created)}</Text>
                 </View>
                 <TouchableOpacity onPress={() => {
                   if (commentSelectedIdx === idx) {
@@ -217,30 +361,43 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                 </TouchableOpacity>
               </View>
               <Text style={[styles.commentContent, FONT.Regular]}>{comment.content}</Text>
+              </View>
               <View style={styles.commentLine} />
               {commentSelectedIdx === idx &&
-                (true ?
+                (myId === comment.author.id ?
                   <View style={[styles.clickBox, { right: d2p(15) }]}>
-                    <Pressable>
-                      <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
+                    <Pressable onPress={()=> {
+                      setContent(comment.content);
+                      setCommentIsEdit(true);
+                      setModifyingIdx(commentSelectedIdx);
+                      setEditCommentId(comment.id);
+                      setCommentSelectedIdx(-1);
+                      inputRef.current?.focus();
+                      }}>
+                      <Text style={[styles.click,{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
                     </Pressable>
                     <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-                    <Pressable>
-                      <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
+                    <Pressable onPress={() =>{
+                      deleteCommentMutation.mutate(comment.id);
+                      setCommentSelectedIdx(-1);
+                      }}>
+                      <Text style={[styles.click,{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
                     </Pressable>
                   </View>
                   :
                   <View style={[styles.clickBox, { right: d2p(15) }]}>
                     <Pressable>
-                      <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
+                      <Text style={[styles.click,{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
                     </Pressable>
                     <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
                     <Pressable>
-                      <Text style={[{ color: theme.color.main }, FONT.Regular]}>신고</Text>
+                      <Text style={[styles.click,{ color: theme.color.main }, FONT.Regular]}>신고</Text>
                     </Pressable>
                   </View>
                 )}
-            </View>))}
+            </View>))} */}
+            </Pressable>
+
         </ScrollView>
         <Pressable
           onPress={() => inputRef.current?.focus()}
@@ -264,9 +421,23 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
               paddingBottom: 0,
               width: Dimensions.get("window").width - d2p(84),
             }, FONT.Regular]}
+            value={content}
+            onChangeText={(e)=>setContent(e)}
             placeholder="댓글을 남겨보세요." placeholderTextColor={theme.color.grayscale.d3d0d5} />
-          <Pressable onPress={() => console.log("작성")}>
-            <Text style={[{ color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>작성</Text>
+          <Pressable onPress={() => {
+            if (route.params){
+              if (!commentIsEdit){
+                addCommentMutation.mutate({rid: route.params?.id, comment: content});
+                setContent("");
+              } else {
+                editCommentMutation.mutate({rId: route.params?.id, cId: editCommentId, comment: content});
+                Keyboard.dismiss();
+                setCommentIsEdit(false);
+                setContent("");
+              }
+            }
+          }}>
+            <Text style={[{ color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>{!commentIsEdit ? "작성" : "수정"}</Text>
           </Pressable>
         </Pressable>
       </KeyboardAvoidingView>
@@ -275,10 +446,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
 };
 
 export default FeedDetail;
-
-const comments = [{ name: '어쩌구참깨', content: '저도 이거 좋아해요!! 근데 염지가 많이 됐는지 저한테는 살짝 짜더라구요', date: '2022.04.26 10:56', },
-{ name: '열려라참깨', content: '저도 이거 좋아해요!! 근데 염지가 많이 됐는지 저한테는 살짝 짜더라구요', date: '2022.04.26 10:56', },
-{ name: '참깨참깨', content: '저는 이거 좋아해요!! 근데 염지가 적게 됐는지 저한테는 살짝 짜더라구요', date: '2022.04.26 10:56', }];
 
 const styles = StyleSheet.create({
   writer: {
@@ -298,13 +465,13 @@ const styles = StyleSheet.create({
   reactionContainer: {
     flexDirection: 'row',
     alignItems: 'center', justifyContent: 'space-evenly',
-    paddingTop: 20, paddingBottom: h2p(10.5),
+    paddingTop: h2p(20), paddingBottom: h2p(10.5),
     borderBottomWidth: 1,
     borderBottomColor: theme.color.grayscale.eae7ec
   },
   content: {
     color: theme.color.black,
-    marginBottom: 10, paddingTop: h2p(15)
+    marginBottom: h2p(10), paddingTop: h2p(15)
   },
   commentLine: {
     borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc,
@@ -318,11 +485,14 @@ const styles = StyleSheet.create({
     color: theme.color.grayscale.C_79737e,
   },
   commentImg: {
-    backgroundColor: 'black',
+    position: 'absolute', left: -1, top:-2,
+    width: d2p(30), height: d2p(30), 
+    borderRadius: d2p(15), 
+  },
+  commentProfileLine: {
+    position: "absolute", left: 0,
+    borderRadius: d2p(15), borderColor: theme.color.grayscale.e9e7ec, borderWidth: 1,
     width: d2p(30), height: d2p(30),
-    position: 'absolute', left: 0,
-    borderRadius: 15,
-    marginRight: d2p(5),
   },
   commentContainer: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
@@ -340,8 +510,9 @@ const styles = StyleSheet.create({
   },
   clickBox: {
     display: 'flex', justifyContent: 'space-evenly', alignItems: 'center',
-    width: d2p(70), height: d2p(70), borderRadius: 5,
-    position: 'absolute', right: d2p(30), top: 0,
+    width: d2p(70),
+    borderRadius: 5,
+    position: 'absolute', right: d2p(36), top: h2p(5),
     shadowColor: '#000000',
     shadowOpacity: 0.27,
     shadowRadius: 4.65,
@@ -351,5 +522,10 @@ const styles = StyleSheet.create({
     },
     elevation: (Platform.OS === 'android') ? 3 : 0,
     backgroundColor: theme.color.white,
+    zIndex: 999,
+  },
+  click: {
+    color: theme.color.grayscale.C_443e49,
+    paddingHorizontal: d2p(23), paddingTop: h2p(8), paddingBottom: h2p(8)
   },
 });
