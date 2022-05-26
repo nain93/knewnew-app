@@ -48,7 +48,6 @@ const BadgeSelect = ({ route, navigation }: BadgeSelectProps) => {
         representBadge: userBadge.interest.filter(v => v.masterBadge)[0].title,
         tags
       });
-      // todo 토큰 리코일, asynstoarge에 저장
       if (accessToken) {
         setToken(accessToken);
         AsyncStorage.setItem("token", accessToken);

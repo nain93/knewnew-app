@@ -28,7 +28,8 @@ interface ReKnewProp {
   navigation: NavigationStackProp;
   route: NavigationRoute<{
     review: ReviewListType,
-    nickname: string
+    nickname: string,
+    filterBadge: string
   }>;
 }
 
@@ -56,7 +57,6 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
   const addReviewMutation = useMutation(["addReview", token],
     (writeProps: WriteReviewType) => writeReview({ token, ...writeProps }), {
     onSuccess: (data) => {
-      console.log(data, 'data');
       navigation.goBack();
     }
   });
@@ -157,6 +157,7 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
           }}>
             {route.params &&
               <FeedReview
+                filterBadge={route.params.filterBadge}
                 setSelectedIndex={setSelectedIndex}
                 type="reKnewWrite" review={route.params?.review} />
             }

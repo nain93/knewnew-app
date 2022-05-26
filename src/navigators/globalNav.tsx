@@ -64,15 +64,6 @@ const GlobalNav = () => {
                 headerShadowVisible: false,
               }}
               component={BadgeSelect} />
-            <Stack.Screen
-              name="Welcome"
-              options={{
-                title: "",
-                headerLeft: () => <CloseIcon onPress={() => console.log("close")} />,
-                headerLeftContainerStyle: { paddingLeft: d2p(20) },
-                headerShadowVisible: false,
-              }}
-              component={Welcome} />
           </>
         }
         <Stack.Screen
@@ -117,6 +108,15 @@ const GlobalNav = () => {
             headerShown: false
           }}
         />
+        <Stack.Screen
+          name="Welcome"
+          options={{
+            title: "",
+            headerLeft: () => <CloseIcon onPress={() => console.log("close")} />,
+            headerLeftContainerStyle: { paddingLeft: d2p(20) },
+            headerShadowVisible: false,
+          }}
+          component={Welcome} />
       </Stack.Navigator>
     </NavigationContainer>
   );

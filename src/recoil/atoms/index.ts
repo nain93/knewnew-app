@@ -26,3 +26,20 @@ export const popupState = atom<popupStateProps>({
     popupStyle: {}
   }
 });
+
+interface okPopupStateProps {
+  isOpen: boolean;
+  content: string;
+  popupStyle?: ViewStyle;
+  okButton: () => void
+}
+
+export const okPopupState = atom<okPopupStateProps>({
+  key: "okPopupState",
+  default: {
+    isOpen: false,
+    content: "",
+    okButton: () => null,
+    popupStyle: {}
+  }
+});
