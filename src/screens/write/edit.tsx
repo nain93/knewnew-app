@@ -59,13 +59,11 @@ const EditReview = ({ navigation, route }: WriteProp) => {
   const setIspopupOpen = useSetRecoilState(popupState);
   const editReviewMutation = useMutation(["editReview", token],
     ({ writeProps, id }: { writeProps: WriteReviewType } & { id: number }) => editReview({ token, id, ...writeProps }), {
-    onSuccess: (data) => {
-      console.log(data, 'data');
+    onSuccess: () => {
       queryClient.invalidateQueries("reviewList");
       navigation.goBack();
     }
   });
-  const [selectMarket, setIsSelectMarket] = useState(false);
 
   const pickImage = () => {
     if (imageList.length >= 5) {
@@ -223,17 +221,15 @@ const EditReview = ({ navigation, route }: WriteProp) => {
           <TouchableOpacity
             onPress={() => marketRefRBSheet.current?.open()}
             style={styles.select}>
-            <Image source={(writeData.market !== "선택 안함") ? maincart : cart} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
-            {selectMarket ?
-              <Text style={FONT.Medium}>{writeData.market ? writeData.market : "유통사 선택"}</Text>
-              :
-              <Text style={FONT.Medium}>유통사 선택</Text>
-            }
+            <Image source={(writeData.market !== "선택 안함" && writeData.market !== null) ? maincart : cart} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
+            <Text style={FONT.Medium}>{writeData.market ? writeData.market : "유통사 선택"}</Text>
           </TouchableOpacity>
         </View>
 
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Pressable onPress={pickImage} style={[styles.images, { marginLeft: d2p(20), marginRight: d2p(15) }]}>
+          <Pressable
+            onPress={pickImage}
+            style={[styles.images, { marginLeft: d2p(20), marginRight: d2p(15) }]}>
             <View style={{ alignItems: "center" }}>
               <Image source={photo} style={{ width: d2p(20), height: h2p(20), marginTop: h2p(12) }} />
               <Text style={[{ fontSize: 12, color: theme.color.grayscale.d3d0d5, marginVertical: h2p(8) }, FONT.Regular]}>{imageList.length}/5</Text>
@@ -326,7 +322,6 @@ const EditReview = ({ navigation, route }: WriteProp) => {
           {React.Children.toArray(marketList.map((market, marketIdx) =>
             <TouchableOpacity
               onPress={() => {
-                setIsSelectMarket(true);
                 setWriteData({ ...writeData, market });
                 marketRefRBSheet.current?.close();
               }}

@@ -3,9 +3,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Header from '~/components/header';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
-import { tokenState } from '~/recoil/atoms';
+import { okPopupState, tokenState } from '~/recoil/atoms';
 import { getMyProfile } from '~/api/user';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { useQuery } from 'react-query';
 import { MyPrfoileType } from '~/types/user';
 import { noProfile } from '~/assets/images';
@@ -34,6 +34,7 @@ const Mypage = ({ navigation }: MypageProps) => {
   const [headerHeight, setHeaderHeight] = useState(h2p(60));
   const [index, setIndex] = useState(0);
   const [openMore, setOpenMore] = useState(false);
+  const setModalOpen = useSetRecoilState(okPopupState);
 
   useEffect(() => {
     // * 로그아웃시 온보딩화면으로
@@ -109,8 +110,15 @@ const Mypage = ({ navigation }: MypageProps) => {
           <View style={{ borderWidth: 1, width: d2p(70), alignSelf: "center", borderColor: theme.color.grayscale.e9e7ec }} />
           <TouchableOpacity
             onPress={() => {
-              AsyncStorage.removeItem("token");
-              setToken("");
+              setModalOpen({
+                isOpen: true,
+                content: "로그아웃 하시겠습니까?",
+                okButton: () => {
+                  AsyncStorage.removeItem("token");
+                  setToken("");
+                }
+              });
+              setOpenMore(false);
             }}
             style={{ width: d2p(90), height: h2p(35), justifyContent: "center", alignItems: "center" }}>
             <Text style={[FONT.Regular, { color: theme.color.main }]}>로그아웃</Text>
@@ -160,9 +168,17 @@ const Mypage = ({ navigation }: MypageProps) => {
                 <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>{getMyProfileQuery.data?.household}</Text>
               </View>
               <View style={styles.occupation}>
-                <Text style={[FONT.Medium, { fontWeight: "500" }]}>{getMyProfileQuery.data?.occupation}</Text>
+                <Text style={[FONT.Medium, {
+                  fontWeight: "500",
+                  color: getMyProfileQuery.data?.occupation ? theme.color.black : theme.color.grayscale.a09ca4
+                }]}>
+                  {getMyProfileQuery.data?.occupation ? getMyProfileQuery.data?.occupation : "자기소개를 입력해주세요."}</Text>
               </View>
-              <View style={{ flexDirection: "row" }}>
+              <View style={{
+                flexDirection: "row", flexWrap: "wrap",
+                justifyContent: "center",
+                width: Dimensions.get("window").width - d2p(40)
+              }}>
                 {React.Children.toArray(getMyProfileQuery.data?.tags.map(v =>
                   <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>#{v} </Text>
                 ))}

@@ -11,14 +11,14 @@ const AppHoc = () => {
     queryCache: new QueryCache({
       onError: (error) => {
         if (axios.isAxiosError(error) && error.response) {
-          console.log(error.response.data);
+          console.log(JSON.stringify(error.response.data));
         }
       }
     }),
     mutationCache: new MutationCache({
       onError: (error) => {
         if (axios.isAxiosError(error) && error.response) {
-          console.log(error.response.data);
+          console.log(JSON.stringify(error.response.data));
         }
       }
     })

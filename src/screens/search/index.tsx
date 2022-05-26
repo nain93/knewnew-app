@@ -140,6 +140,7 @@ const Search = ({ navigation }: SearchProps) => {
       />
       {isSearchMode ?
         <SearchTabView
+          keyword={keyword}
           userList={userListQuery.data?.pages.flat()}
           searchList={searchListQuery.data?.pages.flat()} />
         :

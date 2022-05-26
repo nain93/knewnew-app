@@ -4,7 +4,7 @@ import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import Header from '~/components/header';
 import theme from '~/styles/theme';
 import { d2p, h2p } from '~/utils';
-import { plusIcon, tag } from '~/assets/icons';
+import { plusIcon } from '~/assets/icons';
 import { TextInput } from 'react-native-gesture-handler';
 import BasicButton from '~/components/button/basicButton';
 import { NavigationStackProp } from 'react-navigation-stack';
@@ -20,17 +20,18 @@ import { initialBadgeData } from '~/utils/data';
 import OnepickLayout from '~/components/onepickLayout';
 import { useMutation, useQueryClient } from 'react-query';
 import { deleteUser, editUserProfile } from '~/api/user';
-import { useRecoilValue } from 'recoil';
-import { myIdState, tokenState } from '~/recoil/atoms';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { myIdState, okPopupState, tokenState } from '~/recoil/atoms';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import { getBottomSpace } from 'react-native-iphone-x-helper';
 import Loading from '~/components/loading';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 interface ProfileEditType {
   nickname: string,
   occupation: string,
-  profileImage: string,
+  profileImage?: string,
   tags: Array<string>,
   representBadge: string
 }
@@ -45,18 +46,26 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
   const nameInputRef = useRef<TextInput>(null);
   const selfInputRef = useRef<TextInput>(null);
   const tagRefRBSheet = useRef<RBSheet>(null);
-  const [profileInfo, setProfileInfo] = useState<ProfileEditType>(route.params?.profile || {
+  const { nickname, occupation, profileImage, tags, representBadge } = route.params?.profile || {
     nickname: "",
     occupation: "",
     profileImage: "",
     tags: [],
     representBadge: ""
+  };
+  const [profileInfo, setProfileInfo] = useState<ProfileEditType>({
+    nickname: nickname ? nickname : "",
+    occupation: occupation ? occupation : "",
+    profileImage: profileImage ? profileImage : "",
+    tags: tags ? tags : [],
+    representBadge: representBadge ? representBadge : ""
   });
 
   const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
   const [isBadgeNext, setIsBadgeNext] = useState(false);
-  const token = useRecoilValue(tokenState);
+  const [token, setToken] = useRecoilState(tokenState);
   const myId = useRecoilValue(myIdState);
+  const setModalOpen = useSetRecoilState(okPopupState);
   const queryClient = useQueryClient();
 
   const editProfileMutation = useMutation(["editprofile", token],
@@ -117,18 +126,25 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
         headerLeft={<LeftArrowIcon onBackClick={() => navigation.goBack()} imageStyle={{ width: d2p(11), height: h2p(25) }} />}
         title="프로필 수정"
         headerRightPress={() => {
-          // todo api타입수정후 수정
           const copy: { [index: string]: Array<{ isClick: boolean, title: string }> } = { ...userBadge };
           const tags = Object.keys(copy).reduce<Array<string>>((acc, cur) => {
             acc = acc.concat(copy[cur].filter(v => v.isClick).map(v => v.title));
             return acc;
           }, []);
-          // todo profileImage api연결
-          editProfileMutation.mutate({
-            ...profileInfo,
-            representBadge: userBadge.interest.filter(v => v.masterBadge)[0]?.title || profileInfo.representBadge,
-            tags
-          });
+          if (profileInfo.profileImage?.includes("https")) {
+            editProfileMutation.mutate({
+              nickname: profileInfo.nickname,
+              occupation: profileInfo.occupation,
+              representBadge: userBadge.interest.filter(v => v.masterBadge)[0]?.title || profileInfo.representBadge,
+              tags
+            });
+          } else {
+            editProfileMutation.mutate({
+              ...profileInfo,
+              representBadge: userBadge.interest.filter(v => v.masterBadge)[0]?.title || profileInfo.representBadge,
+              tags
+            });
+          }
         }}
         headerRight={<Text style={{ color: theme.color.main }}>완료</Text>} />
       <View style={styles.container}>
@@ -205,7 +221,17 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
             text="소개 태그 선택" textColor={theme.color.main} bgColor={theme.color.white} />
         </View>
         <TouchableOpacity
-          onPress={() => deleteUserMutation.mutate()}
+          onPress={() => {
+            setModalOpen({
+              isOpen: true,
+              content: `탈퇴 후 재가입시 데이터는 복구되지 않습니다.\n 정말 탈퇴하시겠습니까?`,
+              okButton: () => {
+                deleteUserMutation.mutate();
+                AsyncStorage.removeItem("token");
+                setToken("");
+              }
+            });
+          }}
           style={{
             marginTop: "auto",
             marginLeft: "auto",

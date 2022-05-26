@@ -36,14 +36,10 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
   const [reactCount, setReactCount] = useState(review.likeCount);
   const [isBookmarkState, setIsBookmarkState] = useState<boolean>(review.isBookmark);
   const [bookmarkCount, setBookmarkCount] = useState(review.bookmarkCount);
+  const [tags, setTags] = useState<Array<string>>([]);
   const token = useRecoilValue(tokenState);
   const myId = useRecoilValue(myIdState);
   const queryClient = useQueryClient();
-
-  useFocusEffect(
-    useCallback(() => {
-      return () => setSelectedIndex(-1);
-    }, []));
 
   const boomarkMutation = useMutation("bookmark",
     ({ id, isBookmark }: { id: number, isBookmark: boolean }) => bookmarkReview(token, id, isBookmark));
@@ -58,13 +54,28 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
     }
   });
 
+  useFocusEffect(
+    useCallback(() => {
+      return () => setSelectedIndex(-1);
+    }, []));
+
+  useEffect(() => {
+    const copy: { [index: string]: Array<string> }
+      = { ...review.tags };
+    setTags(
+      Object.keys(copy).reduce<Array<string>>((acc, cur) => {
+        acc = acc.concat(copy[cur]);
+        return acc;
+      }, [])
+    );
+  }, []);
+
 
   return (
     <>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <TouchableOpacity
           onPress={() => navigation.navigate("UserProfile", { id: review.id })}
-          // onPress={() => navigation.navigate("마이페이지", { id: review.id })}
           style={{
             position: "absolute",
             left: 0,
@@ -74,7 +85,8 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           }}>
           <Image source={review.author.profileImage ? { uri: review.author.profileImage } : noProfile}
             style={{
-              width: d2p(40), height: d2p(40)
+              width: d2p(40), height: d2p(40),
+              borderRadius: 40
             }} />
         </TouchableOpacity>
         <View style={{
@@ -113,7 +125,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
         <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: d2p(10), marginLeft: d2p(50) }}>
           <Image source={tag} style={{ width: 10, height: 10, marginRight: d2p(5) }} />
           <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
-            {React.Children.toArray(review.tags.interest?.map((v) => {
+            {React.Children.toArray(tags.map((v) => {
               if (v === filterBadge) {
                 return;
               }
@@ -165,7 +177,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             default:
               return (
                 <View style={[styles.imageWrap, { borderWidth: 0, flexDirection: "row" }]}>
-                  {React.Children.toArray(review.images.map((v, i) => (
+                  {React.Children.toArray(review.images.slice(0, 3).map((v, i) => (
                     <View>
                       <Image source={{ uri: v.image }} style={{
                         marginRight: i !== 2 ? d2p(5) : 0,
@@ -233,7 +245,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             <Text style={styles.reviewCount}>{reactCount}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => navigation.navigate("ReKnew", { review, nickname })}
+            onPress={() => navigation.navigate("ReKnew", { review, nickname, filterBadge })}
             style={styles.reviewIcon}>
             <Image source={reKnew} style={styles.reviewImg} />
             <Text style={styles.reviewCount}>{review.childCount}</Text>

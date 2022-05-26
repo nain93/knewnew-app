@@ -85,7 +85,7 @@ export const editReview = async ({
     satisfaction,
     tags,
     parent,
-    market
+    market: market === "선택 안함" ? null : market
   }, {
     headers: {
       Authorization: `Bearer ${token}`,
