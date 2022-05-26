@@ -29,7 +29,7 @@ interface EditPrfoileType {
   id: number,
   profile: {
     nickname: string,
-    profileImage: string,
+    profileImage?: string,
     occupation: string,
     representBadge: string,
     tags: Array<string>
@@ -39,7 +39,6 @@ interface EditPrfoileType {
 export const editUserProfile = async ({ token, id, profile }: EditPrfoileType) => {
   const res = await axios.patch(baseURL + `user/${id}/profile/`, {
     ...profile,
-    profileImage: null
   }, {
     headers: {
       Authorization: `Bearer ${token}`,

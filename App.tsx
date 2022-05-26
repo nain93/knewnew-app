@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import GlobalNav from './src/navigators/globalNav';
 import AlertPopup from '~/components/popup/alertPopup';
-import { myIdState, popupState, tokenState } from '~/recoil/atoms';
+import { myIdState, okPopupState, popupState, tokenState } from '~/recoil/atoms';
 
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -11,9 +11,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useQuery } from 'react-query';
 import { getMyProfile } from '~/api/user';
 import { MyPrfoileType } from '~/types/user';
+import OkPopup from '~/components/popup/okPopup';
 
 const App = () => {
   const [isPopupOpen, setIsPopupOpen] = useRecoilState(popupState);
+  const [modalOpen, setModalOpen] = useRecoilState(okPopupState);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [token, setToken] = useRecoilState(tokenState);
   const setMyId = useSetRecoilState(myIdState);
@@ -71,6 +73,10 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <GlobalNav />
+      <OkPopup title={modalOpen.content}
+        handleOkayButton={modalOpen.okButton}
+        modalOpen={modalOpen.isOpen}
+        setModalOpen={(isModalOpen: boolean) => setModalOpen({ ...modalOpen, isOpen: isModalOpen })} />
       {isPopupOpen.isOpen &&
         <Animated.View style={{ opacity: fadeAnim ? fadeAnim : 1, zIndex: fadeAnim ? fadeAnim : -1 }}>
           <AlertPopup text={isPopupOpen.content} popupStyle={isPopupOpen.popupStyle} />

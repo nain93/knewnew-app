@@ -35,6 +35,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [inputHeight, setInputHeight] = useState(getBottomSpace());
   const token = useRecoilValue(tokenState);
   const inputRef = useRef<TextInput>(null);
+  const [scrollIdx, setScrollIdx] = React.useState(0);
 
   const [isMoreClick, setIsMoreClick] = useState<boolean>();
   const myId = useRecoilValue(myIdState);
@@ -163,29 +164,43 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           <View style={styles.sign}>
             <Text style={[styles.store, FONT.Regular]}>{reviewDetailQuery.data?.market}</Text>
           </View>
-          {
-            console.log(reviewDetailQuery.data, 'reviewDetailQuery.data?.images')
-          }
+
           {/* TODO 이미지 있을떄 넣기 */}
-          <FlatList
-            data={reviewDetailQuery.data?.images}
-            keyExtractor={(v) => String(v.id)}
-            renderItem={(image) =>
-              <>
-                <Text>dddd</Text>
-                <Image
-                  style={{
-                    width: Dimensions.get('window').width - d2p(40),
-                    height: Dimensions.get("window").height * (180 / 760), borderRadius: 18, marginRight: 5
-                  }}
-                  source={{ uri: image.item.image }} />
-              </>
+          <View>
+            <FlatList
+              data={reviewDetailQuery.data?.images}
+              horizontal
+              pagingEnabled
+              onScroll={e =>
+                setScrollIdx(Math.min(
+                  reviewDetailQuery.data?.images.length ?? 0,
+                  Math.max(0, Math.round(e.nativeEvent.contentOffset.x / (Dimensions.get("window").width - d2p(40))))))}
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(v) => String(v.id)}
+              style={{ borderRadius: 18 }}
+              renderItem={(image) =>
+                <>
+                  <Image
+                    style={{
+                      width: Dimensions.get('window').width - d2p(40),
+                      height: Dimensions.get("window").height * (180 / 760), borderRadius: 18
+                    }}
+                    source={{ uri: image.item.image }} />
+                </>
+              }
+            />
+            {(reviewDetailQuery.data?.images.length || 0) > 1 &&
+              <View style={{
+                position: "absolute", backgroundColor: theme.color.white.concat("bb"),
+                borderRadius: 5,
+                paddingHorizontal: d2p(5),
+                paddingVertical: h2p(2),
+                right: d2p(10), bottom: d2p(10)
+              }}>
+                <Text>{scrollIdx + 1} / {reviewDetailQuery.data?.images.length}</Text>
+              </View>
             }
-          />
-          {/* <View style={{
-            backgroundColor: 'black', width: Dimensions.get('window').width - d2p(40),
-            height: Dimensions.get("window").height * (180 / 760), borderRadius: 18, marginRight: 5
-          }} /> */}
+          </View>
 
           <View style={styles.reactionContainer}>
             <ReactionIcon name="cart" state={cart} count={reviewDetailQuery.data?.bookmarkCount} isState={(isState: boolean) => setCart(isState)} />

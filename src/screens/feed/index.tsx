@@ -156,7 +156,7 @@ const Feed = ({ navigation }: NavigationType) => {
               <View style={styles.main}>
                 <Text style={[styles.mainText, FONT.Bold]}>뉴뉴는 지금</Text>
                 <View style={{ flexDirection: 'row' }}>
-                  <Text style={[{ ...styles.mainText, color: theme.color.main }, FONT.Bold]}>
+                  <Text style={[styles.mainText, { color: theme.color.main, marginTop: h2p(2) }, FONT.Bold]}>
                     {filterBadge ? `#${filterBadge}` : `#${getMyProfileQuery.data?.representBadge}`} </Text>
                   <Text style={[styles.mainText, FONT.Bold]}>관련 메뉴 추천 중 👀</Text>
                 </View>
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   mainText: {
-    fontSize: 20, fontWeight: 'bold'
+    fontSize: 20
   },
   filter: {
     flexDirection: 'row',

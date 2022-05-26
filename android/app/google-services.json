@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:1025814485939:android:ac2e22f2df095e369a49c6",
         "android_client_info": {
-          "package_name": "com.knewnnew"
+          "package_name": "com.mealing.knewnnew"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "1025814485939-bkg1dgq34foqppunv5582h02onuicnj0.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.knewnnew",
+            "package_name": "com.mealing.knewnnew",
             "certificate_hash": "b96f7a0d601e2e3d85dfe9a19b241e6b831f3566"
           }
         },
@@ -42,7 +42,7 @@
               "client_id": "1025814485939-hebcl4c1tmq4bqt9q0ifng6mq7amltnf.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "org.name.knewnew"
+                "bundle_id": "com.mealing.knewnnew"
               }
             }
           ]

@@ -60,9 +60,5 @@ export interface UserInfoType {
   profileImage?: string,
   occupation?: string,
   representBadge: string,
-  tags: {
-    interest: Array<string>,
-    household: Array<string>,
-    taste: Array<string>
-  }
+  tags: Array<string>
 }

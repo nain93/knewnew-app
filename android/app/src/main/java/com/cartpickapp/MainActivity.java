@@ -1,4 +1,4 @@
-package com.knewnnew;
+package com.mealing.knewnnew;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;

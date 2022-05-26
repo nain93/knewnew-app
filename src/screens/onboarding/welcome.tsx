@@ -2,10 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { NavigationRoute } from 'react-navigation';
 import { NavigationStackProp } from 'react-navigation-stack';
+import { useQuery } from 'react-query';
+import { useRecoilValue } from 'recoil';
+import { getMyProfile } from '~/api/user';
 import BasicButton from '~/components/button/basicButton';
+import Loading from '~/components/loading';
+import { tokenState } from '~/recoil/atoms';
 import { FONT } from '~/styles/fonts';
 import theme from '~/styles/theme';
 import { InterestType } from '~/types';
+import { MyPrfoileType } from '~/types/user';
 import { d2p, h2p } from '~/utils';
 
 export interface NavigationType {
@@ -16,6 +22,11 @@ export interface NavigationType {
 const Welcome = ({ navigation, route }: NavigationType) => {
   const [masterBadge, setMasterBadge] = useState("");
   const [badge, setBadge] = useState<Array<string>>();
+  const token = useRecoilValue(tokenState);
+
+  const { data, isLoading } = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
+    enabled: !!token
+  });
 
   const handleSignIn = () => {
     // todo sigin api 연결
@@ -30,10 +41,14 @@ const Welcome = ({ navigation, route }: NavigationType) => {
     }
   }, [route?.params]);
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.main}>
-        <Text style={[styles.mainText, { color: theme.color.main }, { lineHeight: 28 }, FONT.SemiBold]}>여지아</Text>
+        <Text style={[styles.mainText, { color: theme.color.main }, { lineHeight: 28 }, FONT.SemiBold]}>{data?.nickname}</Text>
         <Text style={[styles.mainText, { lineHeight: 29 }, FONT.SemiBold]}>님 반가워요!</Text>
       </View>
       <View style={{
