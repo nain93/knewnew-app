@@ -81,6 +81,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
   useEffect(() => {
     setUserBadge({
       interest: userBadge.interest.map(v => {
+        console.log(v, 'badge');
         if (v.title === profileInfo.representBadge) {
           return { ...v, isClick: true, masterBadge: true };
         }

@@ -36,3 +36,7 @@ export function simpleDate(date: string, suffix?: string): string {
 
   return `${formatDate.getFullYear()}.${formatDate.getMonth() + 1}.${formatDate.getDate()}`;
 }
+
+export function dateCommentFormat(date: string) {
+  return date.slice(0,4) + '.' + date.slice(5,7) + '.' + date.slice(8,10) + ' ' + date.slice(11,16);
+}
