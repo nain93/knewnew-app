@@ -175,6 +175,7 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
           </Pressable>
         </View>
         <View style={{ flexDirection: "row", alignItems: "center", marginBottom: getBottomSpace() }}>
+
           <Pressable onPress={pickImage} style={[styles.images, { marginLeft: d2p(20), marginRight: d2p(15) }]}>
             <View style={{ alignItems: "center" }}>
               <Image source={photo} style={{ width: d2p(20), height: h2p(20), marginTop: h2p(12) }} />
