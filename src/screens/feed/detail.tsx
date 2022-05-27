@@ -7,7 +7,7 @@ import { d2p, dateCommentFormat, h2p, simpleDate } from '~/utils';
 import ReviewIcon from '~/components/icon/reviewIcon';
 import Badge from '~/components/badge';
 import ReactionIcon from '~/components/icon/reactionIcon';
-import {  commentMore, more, tag } from '~/assets/icons';
+import { commentMore, more, tag } from '~/assets/icons';
 import { getBottomSpace } from 'react-native-iphone-x-helper';
 import { useRecoilValue } from 'recoil';
 import { myIdState, tokenState } from '~/recoil/atoms';
@@ -46,6 +46,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [commentIsEdit, setCommentIsEdit] = useState<boolean>();
   const [modifyingIdx, setModifyingIdx] = useState(-1);
   const [editCommentId, setEditCommentId] = useState<number>(-1);
+  const [tags, setTags] = useState<Array<string>>([]);
 
   // const flatListRef = useRef<RefObject<FlatList<CommentListType>>>();
   const flatListRef = useRef<FlatList>(null);
@@ -61,12 +62,11 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
       }
     }, {
     enabled: !!route.params?.id,
-    onError: (error) => console.log(error, 'error')
   });
 
-interface CommentListType {
+  interface CommentListType {
     id: number;
-    author: { 
+    author: {
       id: number;
       nickname: string;
       profileImage: string;
@@ -80,34 +80,31 @@ interface CommentListType {
     ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state));
 
   const commentListQuery = useQuery<CommentListType[], Error>(['getCommentList', token, route.params?.id], async () => {
-    if (route.params){
+    if (route.params) {
       const comments = await getReviewComment(token, route.params?.id);
       return comments;
     }
   }, {
     enabled: !!route.params?.id
   });
-console.log(commentListQuery.data, ' comment data');
-// console.log(route.params?.id, ' review id');
-// console.log(content, ' conetennt');
 
- const addCommentMutation = useMutation('addComment', ({rid, comment}: {rid: number, comment: string}) => addReviewComment(token, rid, comment), {
-   onSuccess: () => {
-     queryClient.invalidateQueries('getCommentList');
-   }
- });
+  const addCommentMutation = useMutation('addComment', ({ rid, comment }: { rid: number, comment: string }) => addReviewComment(token, rid, comment), {
+    onSuccess: () => {
+      queryClient.invalidateQueries('getCommentList');
+    }
+  });
 
- const editCommentMutation = useMutation('editComment', ({rId, cId, comment}: {rId: number, cId: number, comment: string})=> editReviewComment(token, rId, cId, comment), {
-  onSuccess: () => {
-    queryClient.invalidateQueries('getCommentList');
-  }
- });
+  const editCommentMutation = useMutation('editComment', ({ rId, cId, comment }: { rId: number, cId: number, comment: string }) => editReviewComment(token, rId, cId, comment), {
+    onSuccess: () => {
+      queryClient.invalidateQueries('getCommentList');
+    }
+  });
 
- const deleteCommentMutation = useMutation('deleteComment', (id: number) => deleteReviewComment(token, id), {
-   onSuccess: () => {
-     queryClient.invalidateQueries('getCommentList');
-   }
- });
+  const deleteCommentMutation = useMutation('deleteComment', (id: number) => deleteReviewComment(token, id), {
+    onSuccess: () => {
+      queryClient.invalidateQueries('getCommentList');
+    }
+  });
 
   // * 키보드 높이 컨트롤
   useEffect(() => {
@@ -120,11 +117,22 @@ console.log(commentListQuery.data, ' comment data');
     });
   }, []);
 
-  useEffect(()=>{
-    if (!commentIsEdit){
+  useEffect(() => {
+    if (!commentIsEdit) {
       setContent('');
     }
-  },[commentIsEdit]);
+  }, [commentIsEdit]);
+
+  useEffect(() => {
+    const copy: { [index: string]: Array<string> }
+      = { ...reviewDetailQuery.data?.tags };
+    setTags(
+      Object.keys(copy).reduce<Array<string>>((acc, cur) => {
+        acc = acc.concat(copy[cur]);
+        return acc;
+      }, [])
+    );
+  }, []);
 
   if (reviewDetailQuery.isLoading) {
     return <Loading />;
@@ -139,7 +147,6 @@ console.log(commentListQuery.data, ' comment data');
         }} imageStyle={{ width: 11, height: 25 }} />}
         title="리뷰 상세"
       />
-      {/* <FeedReview review={review} /> */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={{ flex: 1 }}
@@ -147,9 +154,9 @@ console.log(commentListQuery.data, ' comment data');
         <ScrollView
           contentContainerStyle={{ paddingBottom: h2p(30) }}
           showsVerticalScrollIndicator={false}
-          style={{ paddingHorizontal: d2p(20), paddingTop: h2p(20), flex: 1 }}
-          >
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          style={{ paddingTop: h2p(20), flex: 1 }}
+        >
+          <View style={{ paddingHorizontal: d2p(20), flexDirection: 'row', justifyContent: 'space-between' }}>
             {isMoreClick &&
               (myId === reviewDetailQuery.data?.author.id ?
                 <View style={styles.clickBox}>
@@ -174,6 +181,8 @@ console.log(commentListQuery.data, ' comment data');
               )}
             <View style={{
               borderRadius: 40,
+              height: d2p(40),
+              width: d2p(40),
               borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec
             }}>
               <Image source={reviewDetailQuery.data?.author.profileImage ?
@@ -205,15 +214,15 @@ console.log(commentListQuery.data, ' comment data');
               />
             </TouchableOpacity>
           </View>
-          <View style={{ paddingTop: h2p(20) }}>
+          <View style={{ paddingTop: h2p(20), paddingHorizontal: d2p(20) }}>
             {reviewDetailQuery.data &&
               <ReviewIcon review={reviewDetailQuery.data?.satisfaction} />}
             <Text style={[styles.content, FONT.Regular]}>{reviewDetailQuery.data?.content}</Text>
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: d2p(20) }}>
             <Image source={tag} style={{ width: 10, height: 10, marginRight: 5 }} />
             <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
-              {React.Children.toArray(reviewDetailQuery.data?.tags.interest.map((v) => {
+              {React.Children.toArray(tags.map((v) => {
                 if (v === route.params?.badge) {
                   return;
                 }
@@ -227,8 +236,7 @@ console.log(commentListQuery.data, ' comment data');
             <Text style={[styles.store, FONT.Regular]}>{reviewDetailQuery.data?.market}</Text>
           </View>
 
-          {/* TODO 이미지 있을떄 넣기 */}
-          <View>
+          <View >
             <FlatList
               data={reviewDetailQuery.data?.images}
               horizontal
@@ -239,11 +247,13 @@ console.log(commentListQuery.data, ' comment data');
                   Math.max(0, Math.round(e.nativeEvent.contentOffset.x / (Dimensions.get("window").width - d2p(40))))))}
               showsHorizontalScrollIndicator={false}
               keyExtractor={(v) => String(v.id)}
-              style={{ borderRadius: 18 }}
               renderItem={(image) =>
                 <>
                   <Image
                     style={{
+                      marginHorizontal: d2p(20),
+                      borderWidth: 1,
+                      borderColor: theme.color.grayscale.e9e7ec,
                       width: Dimensions.get('window').width - d2p(40),
                       height: Dimensions.get("window").height * (180 / 760), borderRadius: 18
                     }}
@@ -253,6 +263,7 @@ console.log(commentListQuery.data, ' comment data');
             />
             {(reviewDetailQuery.data?.images.length || 0) > 1 &&
               <View style={{
+                marginHorizontal: d2p(20),
                 position: "absolute", backgroundColor: theme.color.white.concat("bb"),
                 borderRadius: 5,
                 paddingHorizontal: d2p(5),
@@ -270,152 +281,97 @@ console.log(commentListQuery.data, ' comment data');
             <ReactionIcon name="like" count={reviewDetailQuery.data?.likeCount} state={like}
               isState={(isState: boolean) => { setLike(isState); }} mutation={likeReviewMutation} id={route.params?.id} />
           </View>
-          <Text style={[styles.commentMeta, FONT.Bold]}>작성된 댓글 {commentListQuery.data?.length}개</Text>
-          
-          <Pressable onPress={()=>{
+          <Pressable onPress={() => {
             setCommentSelectedIdx(-1);
-            }}>
-
+          }}>
             <FlatList
-            // ref={(ref) => {flatListRef = ref;}}
-            ref={flatListRef}
-            data={commentListQuery.data}
-            renderItem={({item,index})=> (
-              <View onLayout={e => {setCommentPosition(e.nativeEvent.layout.height);
-              console.log(commentPosition);}}>
-                    <View style={index === modifyingIdx && commentIsEdit ? { backgroundColor: "#F7F7FC"} : null}>
-                      <TouchableOpacity
-                        onPress={() => navigation.navigate("UserProfile", { id: item.author.id })}
-                        style={styles.commentProfileLine}>
-                        <Image source={item.author.profileImage ? { uri: item.author.profileImage } : noProfile}
-                            style={styles.commentImg} /> 
-                      </TouchableOpacity>
-                        <View style={styles.commentContainer}>
-                              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <Text style={[{ fontWeight: '500' }, FONT.Medium]}>{item.author.nickname}</Text>
-                                <Text style={[styles.commentDate, FONT.Regular]}>{dateCommentFormat(item.created)}</Text>
-                              </View>
-                          <TouchableOpacity onPress={() => {
-                            if (commentSelectedIdx === index) {
-                              setCommentSelectedIdx(-1);
-                            } else {
-                              setCommentSelectedIdx(index);
-                            }
-                          }}>
-                            <Image
-                              source={commentMore}
-                              resizeMode="contain"
-                              style={{ width: 12, height: 16, paddingRight: d2p(15) }}
-                            />
-                          </TouchableOpacity>
+              ref={flatListRef}
+              data={commentListQuery.data}
+              ListHeaderComponent={() =>
+                <Text style={[styles.commentMeta, FONT.Bold]}>작성된 댓글 {commentListQuery.data?.length}개</Text>}
+              renderItem={({ item, index }) => (
+                <View
+                  style={{
+                    paddingHorizontal: d2p(20),
+                    paddingTop: h2p(10),
+                    backgroundColor: index === (modifyingIdx && commentIsEdit) ? "#F7F7FC" : theme.color.white
+                  }}
+                  onLayout={e => setCommentPosition(e.nativeEvent.layout.height)}>
+                  <View style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}>
+                    <TouchableOpacity onPress={() => navigation.navigate("UserProfile", { id: item.author.id })}
+                      style={styles.commentProfileLine}
+                    >
+                      <Image source={item.author.profileImage ? { uri: item.author.profileImage } : noProfile}
+                        style={styles.commentImg} />
+                    </TouchableOpacity>
+                    <View style={{
+                      flexDirection: "row", justifyContent: "space-between",
+                      width: Dimensions.get("window").width - d2p(70),
+                    }}>
+                      <View style={{ marginLeft: d2p(10) }}>
+                        <View style={{ flexDirection: "row" }}>
+                          <Text style={FONT.Medium}>{item.author.nickname}</Text>
+                          <Text style={[styles.commentDate, FONT.Regular]}>{dateCommentFormat(item.created)}</Text>
                         </View>
-                        <Text style={[styles.commentContent, FONT.Regular]}>{item.content}</Text>
+                      </View>
+                      <TouchableOpacity onPress={() => {
+                        if (commentSelectedIdx === index) {
+                          setCommentSelectedIdx(-1);
+                        } else {
+                          setCommentSelectedIdx(index);
+                        }
+                      }}>
+                        <Image
+                          source={commentMore}
+                          resizeMode="contain"
+                          style={{ width: d2p(12), height: d2p(16) }}
+                        />
+                      </TouchableOpacity>
                     </View>
-                <View style={styles.commentLine} />
-              {commentSelectedIdx === index &&
-                (myId === item.author.id ?
+                  </View>
+                  <Text style={[styles.commentContent, FONT.Regular]}>{item.content}</Text>
+                  <View style={styles.commentLine} />
+                  {commentSelectedIdx === index &&
+                    (myId === item.author.id ?
                       <View style={[styles.clickBox, { right: d2p(15) }]}>
-                        <Pressable onPress={()=> {
+                        <Pressable onPress={() => {
                           setContent(item.content);
                           setCommentIsEdit(true);
                           setModifyingIdx(commentSelectedIdx);
                           setEditCommentId(item.id);
                           setCommentSelectedIdx(-1);
                           // TODO 포커싱 시 댓글로 스크롤 돼야 함
-                          flatListRef.current?.scrollToOffset({offset: 100, animated: true});
+                          flatListRef.current?.scrollToOffset({ offset: 100, animated: true });
                           // inputRef.current?.focus();
-                          }}>
-                          <Text style={[styles.click,{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
+                        }}>
+                          <Text style={[styles.click, { color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
                         </Pressable>
                         <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-                        <Pressable onPress={() =>{
+                        <Pressable onPress={() => {
                           deleteCommentMutation.mutate(item.id);
                           setCommentSelectedIdx(-1);
-                          }}>
-                          <Text style={[styles.click,{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
+                        }}>
+                          <Text style={[styles.click, { color: theme.color.main }, FONT.Regular]}>삭제</Text>
                         </Pressable>
                       </View>
-                  :
+                      :
                       <View style={[styles.clickBox, { right: d2p(15) }]}>
                         <Pressable>
-                          <Text style={[styles.click,{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
+                          <Text style={[styles.click, { color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
                         </Pressable>
                         <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
                         <Pressable>
-                          <Text style={[styles.click,{ color: theme.color.main }, FONT.Regular]}>신고</Text>
+                          <Text style={[styles.click, { color: theme.color.main }, FONT.Regular]}>신고</Text>
                         </Pressable>
                       </View>
-                )}
-            </View>)}
-            // ))}
-            keyExtractor={(item)=>String(item.id)} />
-
-          {/* {React.Children.toArray(commentListQuery.data?.map((comment, idx) =>
-            <View>
-              <View style={idx === modifyingIdx && commentIsEdit ? { backgroundColor: "#F7F7FC"} : null}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("UserProfile", { id: comment.author.id })}
-              style={styles.commentProfileLine}>
-              <Image source={comment.author.profileImage ? { uri: comment.author.profileImage } : noProfile}
-                  style={styles.commentImg} /> 
-            </TouchableOpacity>
-              <View style={styles.commentContainer}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Text style={[{ fontWeight: '500' }, FONT.Medium]}>{comment.author.nickname}</Text>
-                  <Text style={[styles.commentDate, FONT.Regular]}>{dateCommentFormat(comment.created)}</Text>
+                    )}
                 </View>
-                <TouchableOpacity onPress={() => {
-                  if (commentSelectedIdx === idx) {
-                    setCommentSelectedIdx(-1);
-                  } else {
-                    setCommentSelectedIdx(idx);
-                  }
-                }}>
-                  <Image
-                    source={commentMore}
-                    resizeMode="contain"
-                    style={{ width: 12, height: 16, paddingRight: d2p(15) }}
-                  />
-                </TouchableOpacity>
-              </View>
-              <Text style={[styles.commentContent, FONT.Regular]}>{comment.content}</Text>
-              </View>
-              <View style={styles.commentLine} />
-              {commentSelectedIdx === idx &&
-                (myId === comment.author.id ?
-                  <View style={[styles.clickBox, { right: d2p(15) }]}>
-                    <Pressable onPress={()=> {
-                      setContent(comment.content);
-                      setCommentIsEdit(true);
-                      setModifyingIdx(commentSelectedIdx);
-                      setEditCommentId(comment.id);
-                      setCommentSelectedIdx(-1);
-                      inputRef.current?.focus();
-                      }}>
-                      <Text style={[styles.click,{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
-                    </Pressable>
-                    <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-                    <Pressable onPress={() =>{
-                      deleteCommentMutation.mutate(comment.id);
-                      setCommentSelectedIdx(-1);
-                      }}>
-                      <Text style={[styles.click,{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
-                    </Pressable>
-                  </View>
-                  :
-                  <View style={[styles.clickBox, { right: d2p(15) }]}>
-                    <Pressable>
-                      <Text style={[styles.click,{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
-                    </Pressable>
-                    <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-                    <Pressable>
-                      <Text style={[styles.click,{ color: theme.color.main }, FONT.Regular]}>신고</Text>
-                    </Pressable>
-                  </View>
-                )}
-            </View>))} */}
-            </Pressable>
-
+              )}
+              keyExtractor={(item) => String(item.id)} />
+          </Pressable>
         </ScrollView>
         <Pressable
           onPress={() => inputRef.current?.focus()}
@@ -440,15 +396,15 @@ console.log(commentListQuery.data, ' comment data');
               width: Dimensions.get("window").width - d2p(84),
             }, FONT.Regular]}
             value={content}
-            onChangeText={(e)=>setContent(e)}
+            onChangeText={(e) => setContent(e)}
             placeholder="댓글을 남겨보세요." placeholderTextColor={theme.color.grayscale.d3d0d5} />
           <Pressable onPress={() => {
-            if (route.params){
-              if (!commentIsEdit){
-                addCommentMutation.mutate({rid: route.params?.id, comment: content});
+            if (route.params) {
+              if (!commentIsEdit) {
+                addCommentMutation.mutate({ rid: route.params?.id, comment: content });
                 setContent("");
               } else {
-                editCommentMutation.mutate({rId: route.params?.id, cId: editCommentId, comment: content});
+                editCommentMutation.mutate({ rId: route.params?.id, cId: editCommentId, comment: content });
                 Keyboard.dismiss();
                 setCommentIsEdit(false);
                 setContent("");
@@ -478,7 +434,7 @@ const styles = StyleSheet.create({
   store: {
     fontSize: 12,
     color: theme.color.grayscale.a09ca4,
-    marginRight: d2p(10)
+    marginRight: d2p(20)
   },
   reactionContainer: {
     flexDirection: 'row',
@@ -498,18 +454,17 @@ const styles = StyleSheet.create({
   },
   commentMeta: {
     marginTop: h2p(20),
-    paddingBottom: h2p(20),
+    paddingBottom: h2p(10),
+    marginLeft: d2p(20),
     fontSize: 12, fontWeight: 'bold',
     color: theme.color.grayscale.C_79737e,
   },
   commentImg: {
-    position: 'absolute', left: -1, top:-2,
-    width: d2p(30), height: d2p(30), 
-    borderRadius: d2p(15), 
+    width: d2p(30), height: d2p(30),
+    borderRadius: 30,
   },
   commentProfileLine: {
-    position: "absolute", left: 0,
-    borderRadius: d2p(15), borderColor: theme.color.grayscale.e9e7ec, borderWidth: 1,
+    borderRadius: 30, borderColor: theme.color.grayscale.e9e7ec, borderWidth: 1,
     width: d2p(30), height: d2p(30),
   },
   commentContainer: {
@@ -524,7 +479,7 @@ const styles = StyleSheet.create({
   },
   commentContent: {
     color: theme.color.grayscale.C_443e49,
-    paddingLeft: d2p(38), marginTop: h2p(10)
+    marginLeft: d2p(40)
   },
   clickBox: {
     display: 'flex', justifyContent: 'space-evenly', alignItems: 'center',

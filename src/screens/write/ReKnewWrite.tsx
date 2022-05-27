@@ -22,6 +22,7 @@ import FeedReview from '~/components/review/feedReview';
 import { MyPrfoileType } from '~/types/user';
 import { getMyProfile } from '~/api/user';
 import { writeReview } from '~/api/review';
+import { getBottomSpace } from 'react-native-iphone-x-helper';
 
 
 interface ReKnewProp {
@@ -141,11 +142,8 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
             <Text style={{ color: (writeData.satisfaction === "bad") ? theme.color.black : theme.color.grayscale.a09ca4, marginLeft: d2p(5) }}>별로에요</Text>
           </TouchableOpacity>
         </View>
-        {/* height: h2p(506), */}
-        <ScrollView
-          bounces={false}
-          showsVerticalScrollIndicator={false}
-          style={{ marginTop: h2p(30), paddingHorizontal: d2p(20) }}>
+        <View
+          style={{ marginTop: h2p(30), paddingHorizontal: d2p(20), marginBottom: "auto" }}>
           <Text style={{ color: theme.color.grayscale.C_443e49 }}>이 글을 인용하고 있어요.</Text>
           <View style={{
             borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
@@ -162,9 +160,9 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
                 type="reKnewWrite" review={route.params?.review} />
             }
           </View>
-          <Pressable
-            onPress={() => inputRef.current?.focus()}
-            style={{ height: h2p(295) }}>
+          <Pressable onPress={() => inputRef.current?.focus()}
+            style={{ height: h2p(290) }}
+          >
             <TextInput
               value={writeData.content}
               onChangeText={(e) => setWriteData({ ...writeData, content: e })}
@@ -173,17 +171,18 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
               multiline
               placeholder={`${route.params?.nickname}님은 어떻게 생각하세요?`}
               placeholderTextColor={theme.color.grayscale.a09ca4}
-              style={{ paddingTop: 0, fontSize: 16 }} />
+              style={{ paddingTop: 0, fontSize: 16, }} />
           </Pressable>
-        </ScrollView>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
+        </View>
+        <View style={{ flexDirection: "row", alignItems: "center", marginBottom: getBottomSpace() }}>
           <Pressable onPress={pickImage} style={[styles.images, { marginLeft: d2p(20), marginRight: d2p(15) }]}>
             <View style={{ alignItems: "center" }}>
               <Image source={photo} style={{ width: d2p(20), height: h2p(20), marginTop: h2p(12) }} />
               <Text style={{ fontSize: 12, color: theme.color.grayscale.d3d0d5, marginVertical: h2p(8) }}>{imageList.length}/5</Text>
             </View>
           </Pressable>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <ScrollView
+            horizontal showsHorizontalScrollIndicator={false}>
             {React.Children.toArray(imageList.map((image, idx) => {
               return (
                 <View style={[styles.images, { marginRight: (idx === imageList.length - 1) ? d2p(20) : d2p(5) }]}>
@@ -199,7 +198,7 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
             }))}
           </ScrollView>
         </View>
-      </View >
+      </View>
     </>
   );
 };
@@ -208,6 +207,7 @@ export default ReKnewWrite;
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
   },
   textInput: {
     paddingHorizontal: d2p(20),

@@ -105,6 +105,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
     });
   }, []);
 
+
   const pickImage = () => {
     ImageCropPicker.openPicker({
       mediaType: "photo",
@@ -114,6 +115,15 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
       compressImageMaxHeight: 720
     }).then(v => setProfileInfo({ ...profileInfo, profileImage: `data:${v.mime};base64,${v.data}` }));
   };
+
+  useEffect(() => {
+    // * 회원탈퇴시 온보딩화면으로
+    if (!token) {
+      //@ts-ignore
+      navigation.reset({ index: 0, routes: [{ name: "OnBoarding" }] });
+    }
+  }, [token]);
+
 
   if (editProfileMutation.isLoading) {
     return <Loading />;
