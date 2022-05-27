@@ -261,24 +261,24 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
                 onPress={() => navigation.navigate("editReview", { review })}
               // onPress={() => navigation.navigate("작성", { review })}
               >
-                <Text style={[styles.click,{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
+                <Text style={[styles.click, { color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
               </Pressable>
               <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
               <Pressable style={styles.clickBtn}
                 onPress={() => deleteMutation.mutate(review.id)}>
-                <Text style={[styles.click,{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
+                <Text style={[styles.click, { color: theme.color.main }, FONT.Regular]}>삭제</Text>
               </Pressable>
             </View>
             :
             <View style={[styles.clickBox, clickBoxStyle]}>
               <Pressable style={styles.clickBtn}
                 onPress={() => console.log("")}>
-                <Text style={[styles.click,{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
+                <Text style={[styles.click, { color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
               </Pressable>
               <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
               <Pressable style={styles.clickBtn}
                 onPress={() => console.log("")}>
-                <Text style={[styles.click,{ color: theme.color.main }, FONT.Regular]}>신고</Text>
+                <Text style={[styles.click, { color: theme.color.main }, FONT.Regular]}>신고</Text>
               </Pressable>
             </View>
         )}
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     },
     elevation: (Platform.OS === 'android') ? 3 : 0,
     backgroundColor: theme.color.white,
-    zIndex: 999,
+    zIndex: 10,
   },
   click: {
     color: theme.color.grayscale.C_443e49,
