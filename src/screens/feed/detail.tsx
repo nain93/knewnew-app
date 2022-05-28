@@ -47,11 +47,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [modifyingIdx, setModifyingIdx] = useState(-1);
   const [editCommentId, setEditCommentId] = useState<number>(-1);
   const [tags, setTags] = useState<Array<string>>([]);
-
-  // const flatListRef = useRef<RefObject<FlatList<CommentListType>>>();
-  const flatListRef = useRef<FlatList>(null);
-  const [commentPosition, setCommentPosition] = useState<number>(0);
-
   const [content, setContent] = useState<string>("");
   const [commentSelectedIdx, setCommentSelectedIdx] = useState<number>(-1);
   const reviewDetailQuery = useQuery<ReviewListType, Error>(["reviewDetail", token, route.params?.id],
@@ -105,6 +100,19 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
       queryClient.invalidateQueries('getCommentList');
     }
   });
+
+  const handleWriteComment = () => {
+    if (route.params) {
+      if (!commentIsEdit) {
+        addCommentMutation.mutate({ rid: route.params?.id, comment: content });
+      } else {
+        editCommentMutation.mutate({ rId: route.params?.id, cId: editCommentId, comment: content });
+        Keyboard.dismiss();
+        setCommentIsEdit(false);
+      }
+      setContent("");
+    }
+  };
 
   // * 키보드 높이 컨트롤
   useEffect(() => {
@@ -236,7 +244,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             <Text style={[styles.store, FONT.Regular]}>{reviewDetailQuery.data?.market}</Text>
           </View>
 
-          <View >
+          <View>
             <FlatList
               data={reviewDetailQuery.data?.images}
               horizontal
@@ -244,17 +252,17 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
               onScroll={e =>
                 setScrollIdx(Math.min(
                   reviewDetailQuery.data?.images.length ?? 0,
-                  Math.max(0, Math.round(e.nativeEvent.contentOffset.x / (Dimensions.get("window").width - d2p(40))))))}
+                  Math.max(0, Math.round(e.nativeEvent.contentOffset.x / (Dimensions.get("window").width - d2p(30))))))}
               showsHorizontalScrollIndicator={false}
               keyExtractor={(v) => String(v.id)}
               renderItem={(image) =>
                 <>
                   <Image
                     style={{
-                      marginHorizontal: d2p(20),
+                      marginHorizontal: d2p(15),
                       borderWidth: 1,
                       borderColor: theme.color.grayscale.e9e7ec,
-                      width: Dimensions.get('window').width - d2p(40),
+                      width: Dimensions.get('window').width - d2p(30),
                       height: Dimensions.get("window").height * (180 / 760), borderRadius: 18
                     }}
                     source={{ uri: image.item.image }} />
@@ -263,12 +271,14 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             />
             {(reviewDetailQuery.data?.images.length || 0) > 1 &&
               <View style={{
-                marginHorizontal: d2p(20),
+                marginHorizontal: d2p(15),
                 position: "absolute", backgroundColor: theme.color.white.concat("bb"),
                 borderRadius: 5,
                 paddingHorizontal: d2p(5),
                 paddingVertical: h2p(2),
-                right: d2p(10), bottom: d2p(10)
+                right: d2p(10), bottom: d2p(10),
+                borderWidth: 1,
+                borderColor: theme.color.grayscale.e9e7ec
               }}>
                 <Text>{scrollIdx + 1} / {reviewDetailQuery.data?.images.length}</Text>
               </View>
@@ -285,7 +295,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             setCommentSelectedIdx(-1);
           }}>
             <FlatList
-              ref={flatListRef}
               data={commentListQuery.data}
               ListHeaderComponent={() =>
                 <Text style={[styles.commentMeta, FONT.Bold]}>작성된 댓글 {commentListQuery.data?.length}개</Text>}
@@ -294,9 +303,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                   style={{
                     paddingHorizontal: d2p(20),
                     paddingTop: h2p(10),
-                    backgroundColor: index === (modifyingIdx && commentIsEdit) ? "#F7F7FC" : theme.color.white
-                  }}
-                  onLayout={e => setCommentPosition(e.nativeEvent.layout.height)}>
+                    backgroundColor: (index === modifyingIdx) && commentIsEdit ? "#F7F7FC" : theme.color.white
+                  }}>
                   <View style={{
                     flexDirection: "row",
                     alignItems: "center",
@@ -343,9 +351,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                           setModifyingIdx(commentSelectedIdx);
                           setEditCommentId(item.id);
                           setCommentSelectedIdx(-1);
-                          // TODO 포커싱 시 댓글로 스크롤 돼야 함
-                          flatListRef.current?.scrollToOffset({ offset: 100, animated: true });
-                          // inputRef.current?.focus();
                         }}>
                           <Text style={[styles.click, { color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
                         </Pressable>
@@ -386,8 +391,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             backgroundColor: theme.color.white, paddingVertical: h2p(14), paddingHorizontal: d2p(20)
           }}>
           <TextInput
+            autoCapitalize="none"
             ref={inputRef}
-            multiline
             style={[{
               color: theme.color.black,
               includeFontPadding: false,
@@ -396,21 +401,10 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
               width: Dimensions.get("window").width - d2p(84),
             }, FONT.Regular]}
             value={content}
+            onSubmitEditing={handleWriteComment}
             onChangeText={(e) => setContent(e)}
             placeholder="댓글을 남겨보세요." placeholderTextColor={theme.color.grayscale.d3d0d5} />
-          <Pressable onPress={() => {
-            if (route.params) {
-              if (!commentIsEdit) {
-                addCommentMutation.mutate({ rid: route.params?.id, comment: content });
-                setContent("");
-              } else {
-                editCommentMutation.mutate({ rId: route.params?.id, cId: editCommentId, comment: content });
-                Keyboard.dismiss();
-                setCommentIsEdit(false);
-                setContent("");
-              }
-            }
-          }}>
+          <Pressable onPress={handleWriteComment}>
             <Text style={[{ color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>{!commentIsEdit ? "작성" : "수정"}</Text>
           </Pressable>
         </Pressable>

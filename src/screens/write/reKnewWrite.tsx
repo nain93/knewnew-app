@@ -11,7 +11,7 @@ import { photo, photoClose } from '~/assets/images';
 import { d2p, h2p } from '~/utils';
 
 import ImageCropPicker from 'react-native-image-crop-picker';
-import { useMutation, useQuery } from 'react-query';
+import { useMutation } from 'react-query';
 
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { popupState, tokenState } from '~/recoil/atoms';
@@ -19,8 +19,6 @@ import { ReviewListType, WriteReviewType } from '~/types/review';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import FeedReview from '~/components/review/feedReview';
-import { MyPrfoileType } from '~/types/user';
-import { getMyProfile } from '~/api/user';
 import { writeReview } from '~/api/review';
 import { getBottomSpace } from 'react-native-iphone-x-helper';
 

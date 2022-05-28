@@ -1,6 +1,6 @@
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
-import React, { useState } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import React from 'react';
+import { useRecoilValue } from 'recoil';
 import { myIdState } from '~/recoil/atoms';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';

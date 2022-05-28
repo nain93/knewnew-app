@@ -4,17 +4,19 @@ import theme from '~/styles/theme';
 import { d2p, h2p, simpleDate } from '~/utils';
 import Badge from '../badge';
 import ReviewIcon from '../icon/reviewIcon';
-import { cart, colorCart, colorLike, comment, heart, like, more, reKnew, tag } from '~/assets/icons';
+import { cart, colorCart, colorLike, comment, like, more, reKnew, tag } from '~/assets/icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 import { ReviewListType } from '~/types/review';
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { myIdState, tokenState } from '~/recoil/atoms';
 import { bookmarkReview, deleteReview, likeReview } from '~/api/review';
 import { FONT } from '~/styles/fonts';
 import { noProfile } from '~/assets/images';
 import Loading from '~/components/loading';
+import { MyPrfoileType } from '~/types/user';
+import { getMyProfile } from '~/api/user';
 
 interface FeedReviewProps {
   review: ReviewListType,
@@ -25,11 +27,10 @@ interface FeedReviewProps {
   idx?: number
   clickBoxStyle?: ViewStyle
   filterBadge?: string,
-  nickname?: string
 }
 
 const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
-  clickBoxStyle, nickname,
+  clickBoxStyle,
   type = "normal", filterBadge, review, isRetweet = false }: FeedReviewProps) => {
   const navigation = useNavigation<StackNavigationProp>();
   const [isLike, setIsLike] = useState<boolean>(review.isLike);
@@ -52,6 +53,10 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
     onSuccess: () => {
       queryClient.invalidateQueries("reviewList");
     }
+  });
+
+  const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
+    enabled: !!token
   });
 
   useFocusEffect(
@@ -131,7 +136,9 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
               }
               return <Text>#{v} </Text>;
             }))}
-            <Text style={{ color: theme.color.main, fontSize: 12 }}>#{filterBadge}</Text>
+            {filterBadge &&
+              <Text style={{ color: theme.color.main, fontSize: 12 }}>#{filterBadge}</Text>
+            }
           </Text>
         </View>}
       {(!isRetweet && type === "normal") &&
@@ -167,7 +174,11 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
                       borderRadius: 10,
                       borderWidth: 1,
                       borderColor: theme.color.grayscale.d3d0d5,
-                      width: Dimensions.get("window").width - d2p(230), aspectRatio: 3 / 2,
+                      width:
+                        type === "reKnewWrite" ?
+                          Dimensions.get("window").width - d2p(245)
+                          :
+                          Dimensions.get("window").width - d2p(230), aspectRatio: 3 / 2,
                     }} />
                   )))}
                 </View>
@@ -184,7 +195,11 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
                         borderRadius: 10,
                         borderWidth: 1,
                         borderColor: theme.color.grayscale.d3d0d5,
-                        width: Dimensions.get("window").width - d2p(276), aspectRatio: 3 / 2,
+                        width:
+                          type === "reKnewWrite" ?
+                            Dimensions.get("window").width - d2p(283.5)
+                            :
+                            Dimensions.get("window").width - d2p(276), aspectRatio: 3 / 2,
                       }} />
                       {i === 2 &&
                         <View style={{
@@ -205,7 +220,6 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           }
         })()
       }
-
       {type === "normal" &&
         <View style={styles.reactionContainer}>
           <TouchableOpacity
@@ -223,12 +237,11 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             <Image source={isBookmarkState ? colorCart : cart} style={styles.reviewImg} />
             <Text style={styles.reviewCount}>{bookmarkCount}</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => console.log("zz")}
+          <Pressable
             style={styles.reviewIcon}>
             <Image source={comment} style={styles.reviewImg} />
             <Text style={styles.reviewCount}>{review.commentCount}</Text>
-          </TouchableOpacity>
+          </Pressable>
           <TouchableOpacity
             onPress={() => {
               setIsLike(!isLike);
@@ -245,7 +258,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             <Text style={styles.reviewCount}>{reactCount}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => navigation.navigate("ReKnew", { review, nickname, filterBadge })}
+            onPress={() => navigation.navigate("ReKnew", { review, nickname: getMyProfileQuery.data?.nickname, filterBadge })}
             style={styles.reviewIcon}>
             <Image source={reKnew} style={styles.reviewImg} />
             <Text style={styles.reviewCount}>{review.childCount}</Text>
