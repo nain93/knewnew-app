@@ -180,7 +180,6 @@ const Feed = ({ navigation }: NavigationType) => {
               })}
               style={styles.review}>
               <FeedReview
-                nickname={getMyProfileQuery.data?.nickname}
                 idx={index}
                 selectedIndex={selectedIndex}
                 setSelectedIndex={(selectIdx: number) => setSelectedIndex(selectIdx)}

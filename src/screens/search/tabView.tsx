@@ -15,10 +15,9 @@ import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/v
 interface SearchTabViewProps {
   searchList?: ReviewListType[],
   userList?: userNormalType[],
-  keyword: string
 }
 
-const SearchTabView = ({ searchList, userList, keyword }: SearchTabViewProps) => {
+const SearchTabView = ({ searchList, userList }: SearchTabViewProps) => {
   const navigation = useNavigation<StackNavigationProp>();
   const [index, setIndex] = useState(0);
   const [routes] = useState([
@@ -63,7 +62,6 @@ const SearchTabView = ({ searchList, userList, keyword }: SearchTabViewProps) =>
                         }}
                       >
                         <FeedReview
-                          filterBadge={keyword}
                           clickBoxStyle={{ right: d2p(26), top: h2p(-10) }}
                           idx={review.index}
                           selectedIndex={selectedIndex}

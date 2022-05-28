@@ -130,7 +130,10 @@ const EditReview = ({ navigation, route }: WriteProp) => {
         content: route.params.review.content,
         satisfaction: route.params.review.satisfaction,
         market: route.params.review.market,
-        tags: route.params.review.tags
+        tags: {
+          ...route.params.review.tags,
+          taste: route.params.review.tags.taste || []
+        }
       });
 
       // * 수정화면 초기 뱃지 선택 활성화
@@ -148,7 +151,7 @@ const EditReview = ({ navigation, route }: WriteProp) => {
           return { ...v, isClick: false };
         }),
         taste: userBadge.taste.map(v => {
-          if (route.params?.review.tags.taste.includes(v.title)) {
+          if (route.params?.review.tags.taste?.includes(v.title)) {
             return { ...v, isClick: true };
           }
           return { ...v, isClick: false };
@@ -197,7 +200,6 @@ const EditReview = ({ navigation, route }: WriteProp) => {
           onChangeText={(e) => setWriteData({ ...writeData, content: e })}
           style={[styles.textInput, FONT.Regular]}
           placeholder="내용을 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
-
         <View style={styles.selectWrap}>
           <TouchableOpacity
             onPress={() => tagRefRBSheet.current?.open()}

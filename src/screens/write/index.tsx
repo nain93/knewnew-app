@@ -30,7 +30,6 @@ interface WriteProp {
   navigation: NavigationStackProp;
   route: NavigationRoute<{
     type?: "reKnew" | "default",
-    review?: ReviewListType
   }>;
 }
 
@@ -55,30 +54,6 @@ const Write = ({ navigation, route }: WriteProp) => {
   const [imageList, setImageList] = useState<string[]>([]);
   const [keyboardHeight, setKeyBoardHeight] = useState(0);
   const queryClient = useQueryClient();
-
-  useFocusEffect(
-    useCallback(() => {
-      if (route.params?.review) {
-        setWriteData({
-          ...writeData, content: route.params.review.content, satisfaction: route.params.review.satisfaction,
-          market: route.params.review.market ? route.params.review.market : "선택 안함", tags: route.params.review.tags
-        });
-      }
-      else {
-        setWriteData({
-          images: [],
-          content: "",
-          satisfaction: "",
-          market: "선택 안함",
-          tags: {
-            interest: [],
-            household: [],
-            taste: []
-          }
-        });
-      }
-    }, []));
-
   const token = useRecoilValue(tokenState);
   const setIspopupOpen = useSetRecoilState(popupState);
   const addReviewMutation = useMutation(["addReview", token],
@@ -124,6 +99,22 @@ const Write = ({ navigation, route }: WriteProp) => {
     }, []);
     addReviewMutation.mutate({ ...writeData, images });
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      setImageList([]);
+      setWriteData({
+        images: [],
+        content: "",
+        satisfaction: "",
+        market: "선택 안함",
+        tags: {
+          interest: [],
+          household: [],
+          taste: []
+        }
+      });
+    }, []));
 
   useEffect(() => {
     Keyboard.addListener("keyboardDidShow", (e) => {
