@@ -155,7 +155,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
             });
           }
         }}
-        headerRight={<Text style={{ color: theme.color.main }}>완료</Text>} />
+        headerRight={<Text style={[{ color: theme.color.main }, FONT.Regular]}>완료</Text>} />
       <View style={styles.container}>
         <TouchableOpacity onPress={pickImage} style={styles.profileImage}>
           <Image source={profileInfo.profileImage ? { uri: profileInfo.profileImage } : noProfile}

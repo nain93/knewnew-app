@@ -21,6 +21,7 @@ import { NavigationRoute } from 'react-navigation';
 import FeedReview from '~/components/review/feedReview';
 import { writeReview } from '~/api/review';
 import { getBottomSpace } from 'react-native-iphone-x-helper';
+import { FONT } from '~/styles/fonts';
 
 
 interface ReKnewProp {
@@ -125,24 +126,27 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
             onPress={() => setWriteData({ ...writeData, satisfaction: "best" })}
             style={styles.reviewIcon}>
             <Image source={(writeData.satisfaction === "best") ? heart : grayheart} style={{ width: d2p(20), height: h2p(20) }} />
-            <Text style={{ color: (writeData.satisfaction === "best") ? theme.color.main : theme.color.grayscale.a09ca4, marginLeft: d2p(5) }}>최고에요</Text>
+            <Text style={[{ color: (writeData.satisfaction === "best") ? theme.color.main : theme.color.grayscale.a09ca4, marginLeft: d2p(5) },
+                (writeData.satisfaction === "best") ? FONT.Bold : FONT.Regular]}>최고에요</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setWriteData({ ...writeData, satisfaction: "good" })}
             style={styles.reviewIcon}>
             <Image source={(writeData.satisfaction === "good") ? circle : graycircle} style={{ width: d2p(20), height: h2p(20) }} />
-            <Text style={{ color: (writeData.satisfaction === "good") ? theme.color.yellow : theme.color.grayscale.a09ca4, marginLeft: d2p(5) }}>괜찮아요</Text>
+            <Text style={[{ color: (writeData.satisfaction === "good") ? theme.color.yellow : theme.color.grayscale.a09ca4, marginLeft: d2p(5) },
+                (writeData.satisfaction === "good") ? FONT.Bold : FONT.Regular]}>괜찮아요</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setWriteData({ ...writeData, satisfaction: "bad" })}
             style={styles.reviewIcon}>
             <Image source={(writeData.satisfaction === "bad") ? blackclose : grayclose} style={{ width: d2p(20), height: h2p(20) }} />
-            <Text style={{ color: (writeData.satisfaction === "bad") ? theme.color.black : theme.color.grayscale.a09ca4, marginLeft: d2p(5) }}>별로에요</Text>
+            <Text style={[{ color: (writeData.satisfaction === "bad") ? theme.color.black : theme.color.grayscale.a09ca4, marginLeft: d2p(5) },
+                (writeData.satisfaction === "bad") ? FONT.Bold : FONT.Regular]}>별로에요</Text>
           </TouchableOpacity>
         </View>
         <View
           style={{ marginTop: h2p(30), paddingHorizontal: d2p(20), marginBottom: "auto" }}>
-          <Text style={{ color: theme.color.grayscale.C_443e49 }}>이 글을 인용하고 있어요.</Text>
+          <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>이 글을 인용하고 있어요.</Text>
           <View style={{
             borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
             paddingHorizontal: d2p(15),
@@ -169,7 +173,7 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
               multiline
               placeholder={`${route.params?.nickname}님은 어떻게 생각하세요?`}
               placeholderTextColor={theme.color.grayscale.a09ca4}
-              style={{ paddingTop: 0, fontSize: 16, }} />
+              style={[{ paddingTop: 0, fontSize: 16, }, FONT.Regular]} />
           </Pressable>
         </View>
         <View style={{ flexDirection: "row", alignItems: "center", marginBottom: getBottomSpace() }}>
@@ -177,7 +181,7 @@ const ReKnewWrite = ({ navigation, route }: ReKnewProp) => {
           <Pressable onPress={pickImage} style={[styles.images, { marginLeft: d2p(20), marginRight: d2p(15) }]}>
             <View style={{ alignItems: "center" }}>
               <Image source={photo} style={{ width: d2p(20), height: h2p(20), marginTop: h2p(12) }} />
-              <Text style={{ fontSize: 12, color: theme.color.grayscale.d3d0d5, marginVertical: h2p(8) }}>{imageList.length}/5</Text>
+              <Text style={[{ fontSize: 12, color: theme.color.grayscale.d3d0d5, marginVertical: h2p(8) }, FONT.Regular]}>{imageList.length}/5</Text>
             </View>
           </Pressable>
           <ScrollView

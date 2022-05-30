@@ -2,6 +2,7 @@ import { Dimensions, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import React from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
+import { FONT } from '~/styles/fonts';
 
 interface AlertPopupProps {
   popupStyle?: ViewStyle,
@@ -11,7 +12,7 @@ interface AlertPopupProps {
 const AlertPopup = ({ popupStyle, text }: AlertPopupProps) => {
   return (
     <View style={[styles.container, popupStyle]}>
-      <Text style={styles.text}>{text}</Text>
+      <Text style={[styles.text, FONT.Regular]}>{text}</Text>
     </View>
   );
 };
