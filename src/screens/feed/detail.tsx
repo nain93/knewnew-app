@@ -14,7 +14,7 @@ import { myIdState, tokenState } from '~/recoil/atoms';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
-import { getReviewDetail, likeReview } from '~/api/review';
+import { deleteReview, getReviewDetail, likeReview } from '~/api/review';
 import { ReviewListType } from '~/types/review';
 import Loading from '~/components/loading';
 import { FONT } from '~/styles/fonts';
@@ -29,18 +29,6 @@ interface FeedDetailProps {
     isLike: boolean,
     isBookmark: boolean
   }>;
-}
-
-interface CommentListType {
-  id: number;
-  author: {
-    id: number;
-    nickname: string;
-    profileImage: string;
-  };
-  content: string;
-  created: string;
-  likeCount: string;
 }
 
 const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
@@ -71,8 +59,24 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     enabled: !!route.params?.id,
   });
 
+  interface CommentListType {
+    id: number;
+    author: {
+      id: number;
+      nickname: string;
+      profileImage: string;
+    };
+    content: string;
+    created: string;
+    likeCount: string;
+  }
+
   const likeReviewMutation = useMutation('likeReview',
-    ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state));
+    ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state), {
+      onSuccess: () => {
+        queryClient.invalidateQueries("reviewList");
+      }
+    });
 
   const commentListQuery = useQuery<CommentListType[], Error>(['getCommentList', token, route.params?.id], async () => {
     if (route.params) {
@@ -86,6 +90,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const addCommentMutation = useMutation('addComment', ({ rid, comment }: { rid: number, comment: string }) => addReviewComment(token, rid, comment), {
     onSuccess: () => {
       queryClient.invalidateQueries('getCommentList');
+      queryClient.invalidateQueries("reviewList");
     }
   });
 
@@ -98,8 +103,16 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const deleteCommentMutation = useMutation('deleteComment', (id: number) => deleteReviewComment(token, id), {
     onSuccess: () => {
       queryClient.invalidateQueries('getCommentList');
+      queryClient.invalidateQueries("reviewList");
     }
   });
+
+  const deleteMutation = useMutation("deleteReview",
+  (id: number) => deleteReview(token, id), {
+  onSuccess: () => {
+    queryClient.invalidateQueries("reviewList");
+  }
+});
 
   const handleWriteComment = () => {
     if (route.params) {
@@ -140,7 +153,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
         return acc;
       }, [])
     );
-  }, []);
+  }, [reviewDetailQuery.data]);
 
   if (reviewDetailQuery.isLoading) {
     return <Loading />;
@@ -168,22 +181,33 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             {isMoreClick &&
               (myId === reviewDetailQuery.data?.author.id ?
                 <View style={styles.clickBox}>
-                  <Pressable>
-                    <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
+                  <Pressable onPress={() => {
+                    navigation.navigate("editReview", { review: reviewDetailQuery.data });
+                    setIsMoreClick(false);
+                  }}>
+                    <Text style={[styles.click, { color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
                   </Pressable>
                   <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-                  <Pressable>
-                    <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
+                  <Pressable onPress={() => {
+                    navigation.goBack();
+                    // console.log('삭제 밖');
+                    // navigation.navigate("editReview",{ review: reviewDetailQuery.data });
+                    // if (route.params){
+                    //   deleteMutation.mutate(route.params?.id);
+                    //   console.log('삭제 ', route.params.id);
+                    // }
+                    }}>
+                    <Text style={[styles.click, { color: theme.color.main }, FONT.Regular]}>삭제</Text>
                   </Pressable>
                 </View>
                 :
                 <View style={styles.clickBox}>
                   <Pressable>
-                    <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
+                    <Text style={[styles.click, { color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
                   </Pressable>
                   <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
                   <Pressable>
-                    <Text style={[{ color: theme.color.main }, FONT.Regular]}>신고</Text>
+                    <Text style={[styles.click, { color: theme.color.main }, FONT.Regular]}>신고</Text>
                   </Pressable>
                 </View>
               )}
