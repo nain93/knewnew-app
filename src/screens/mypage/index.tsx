@@ -150,7 +150,11 @@ const Mypage = ({ navigation }: MypageProps) => {
         renderHeader={() => (
           <View pointerEvents="none">
             <View style={styles.profileImage} >
-              <Image style={{ width: d2p(60), height: d2p(60), borderRadius: 60 }}
+              <Image style={{
+                width: d2p(60), height: d2p(60), borderRadius: 60,
+                borderWidth: 1,
+                borderColor: theme.color.grayscale.eae7ec
+              }}
                 source={getMyProfileQuery.data?.profileImage ? { uri: getMyProfileQuery.data?.profileImage } : noProfile} />
             </View>
             <View style={styles.profileInfo}>
@@ -252,9 +256,7 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     marginBottom: h2p(25),
     marginTop: h2p(30),
-    borderWidth: 1,
-    alignSelf: "center",
-    borderColor: theme.color.grayscale.eae7ec
+    alignSelf: "center"
   },
   profileInfo: {
     alignItems: "center",

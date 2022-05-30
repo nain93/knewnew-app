@@ -20,7 +20,7 @@ import Loading from '~/components/loading';
 import { FONT } from '~/styles/fonts';
 import { noProfile } from '~/assets/images';
 import { addReviewComment, deleteReviewComment, editReviewComment, getReviewComment } from '~/api/comment';
-import { min } from 'react-native-reanimated';
+import ReKnew from '~/components/review/reKnew';
 interface FeedDetailProps {
   navigation: NavigationStackProp
   route: NavigationRoute<{
@@ -251,23 +251,25 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
               <ReviewIcon review={reviewDetailQuery.data?.satisfaction} />}
             <Text style={[styles.content, FONT.Regular]}>{reviewDetailQuery.data?.content}</Text>
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: d2p(20) }}>
-            <Image source={tag} style={{ width: 10, height: 10, marginRight: 5 }} />
-            <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
-              {React.Children.toArray(tags.map((v) => {
-                if (v === route.params?.badge) {
-                  return;
-                }
-                return <Text>#{v} </Text>;
-              }))}
-              <Text style={{ color: theme.color.main, fontSize: 12 }}>#{route.params?.badge}</Text>
-            </Text>
-          </View>
-
-          <View style={styles.sign}>
-            <Text style={[styles.store, FONT.Regular]}>{reviewDetailQuery.data?.market}</Text>
-          </View>
-
+          {!reviewDetailQuery.data?.parent &&
+            <>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: d2p(20) }}>
+                <Image source={tag} style={{ width: 10, height: 10, marginRight: 5 }} />
+                <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
+                  {React.Children.toArray(tags.map((v) => {
+                    if (v === route.params?.badge) {
+                      return;
+                    }
+                    return <Text>#{v} </Text>;
+                  }))}
+                  <Text style={{ color: theme.color.main, fontSize: 12 }}>#{route.params?.badge}</Text>
+                </Text>
+              </View>
+              <View style={styles.sign}>
+                <Text style={[styles.store, FONT.Regular]}>{reviewDetailQuery.data?.market}</Text>
+              </View>
+            </>
+          }
           <View>
             <FlatList
               data={reviewDetailQuery.data?.images}
@@ -308,9 +310,20 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
               </View>
             }
           </View>
-
-          <View style={styles.reactionContainer}>
-            <ReactionIcon name="cart" state={cart} count={reviewDetailQuery.data?.bookmarkCount} isState={(isState: boolean) => setCart(isState)} id={route.params?.id}/>
+          {reviewDetailQuery.data?.parent &&
+            <View style={{
+              marginHorizontal: d2p(20),
+              borderTopWidth: 1, borderColor: theme.color.grayscale.eae7ec
+            }}>
+              <ReKnew review={{
+                ...reviewDetailQuery.data.parent,
+                tags: reviewDetailQuery.data.tags
+              }}
+              />
+            </View>
+          }
+          <View style={[styles.reactionContainer, { paddingTop: reviewDetailQuery.data?.parent ? 0 : h2p(10) }]}>
+            <ReactionIcon name="cart" state={cart} count={reviewDetailQuery.data?.bookmarkCount} isState={(isState: boolean) => setCart(isState)} />
             <View style={{ borderLeftWidth: 1, borderLeftColor: theme.color.grayscale.eae7ec, height: h2p(26) }} />
             <ReactionIcon name="like" count={reviewDetailQuery.data?.likeCount} state={like}
               isState={(isState: boolean) => { setLike(isState); }} mutation={likeReviewMutation} id={route.params?.id} />
@@ -447,7 +460,7 @@ const styles = StyleSheet.create({
   sign: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginTop: h2p(10), marginBottom: h2p(14.5),
+    marginVertical: h2p(10),
   },
   store: {
     fontSize: 12,
@@ -457,7 +470,7 @@ const styles = StyleSheet.create({
   reactionContainer: {
     flexDirection: 'row',
     alignItems: 'center', justifyContent: 'space-evenly',
-    paddingTop: h2p(20), paddingBottom: h2p(10.5),
+    paddingBottom: h2p(10.5),
     borderBottomWidth: 1,
     borderBottomColor: theme.color.grayscale.eae7ec
   },
