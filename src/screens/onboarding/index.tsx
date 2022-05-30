@@ -94,20 +94,21 @@ const Onboarding = ({ navigation }: NavigationType) => {
 
   const handleGoogleLogin = async () => {
     // * 추후 개발
-    navigation.navigate("TagSelect");
-    // GoogleSignin.configure({
-    //   webClientId: "1025814485939-95vtu3p4iqb7qp23henp85c1nd2d2i3c.apps.googleusercontent.com",
-    //   iosClientId: "1025814485939-hebcl4c1tmq4bqt9q0ifng6mq7amltnf.apps.googleusercontent.com"
-    // });
-    // const userInfo = await GoogleSignin.signIn();
-    // const { idToken } = userInfo;
-    // if (idToken) {
-    //   const data = await userLogin({ token: idToken, providerType: "google" });
-    //   console.log(data, 'data');
-    //   if (data) {
-    //     goToBadgeSelect();
-    //   }
-    // }
+    // navigation.navigate("TagSelect");
+    GoogleSignin.configure({
+      webClientId: "1025814485939-95vtu3p4iqb7qp23henp85c1nd2d2i3c.apps.googleusercontent.com",
+      iosClientId: "1025814485939-hebcl4c1tmq4bqt9q0ifng6mq7amltnf.apps.googleusercontent.com"
+    });
+    const userInfo = await GoogleSignin.signIn();
+    const { idToken } = userInfo;
+    console.log(idToken, 'idToken');
+    if (idToken) {
+      // const data = await userLogin({ token: idToken, providerType: "google" });
+      // console.log(data, 'data');
+      // if (data) {
+      //   goToBadgeSelect(data);
+      // }
+    }
   };
 
   const handleAppleLogin = async () => {

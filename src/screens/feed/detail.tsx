@@ -31,6 +31,18 @@ interface FeedDetailProps {
   }>;
 }
 
+interface CommentListType {
+  id: number;
+  author: {
+    id: number;
+    nickname: string;
+    profileImage: string;
+  };
+  content: string;
+  created: string;
+  likeCount: string;
+}
+
 const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [like, setLike] = useState<boolean>(route.params?.isLike || false);
   const [cart, setCart] = useState<boolean>(route.params?.isBookmark || false);
@@ -58,18 +70,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     }, {
     enabled: !!route.params?.id,
   });
-
-  interface CommentListType {
-    id: number;
-    author: {
-      id: number;
-      nickname: string;
-      profileImage: string;
-    };
-    content: string;
-    created: string;
-    likeCount: string;
-  }
 
   const likeReviewMutation = useMutation('likeReview',
     ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state));

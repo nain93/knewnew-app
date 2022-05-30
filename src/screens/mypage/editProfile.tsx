@@ -81,7 +81,6 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
   useEffect(() => {
     setUserBadge({
       interest: userBadge.interest.map(v => {
-        console.log(v, 'badge');
         if (v.title === profileInfo.representBadge) {
           return { ...v, isClick: true, masterBadge: true };
         }
@@ -137,7 +136,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
         title="프로필 수정"
         headerRightPress={() => {
           const copy: { [index: string]: Array<{ isClick: boolean, title: string }> } = { ...userBadge };
-          const tags = Object.keys(copy).reduce<Array<string>>((acc, cur) => {
+          const reduceTags = Object.keys(copy).reduce<Array<string>>((acc, cur) => {
             acc = acc.concat(copy[cur].filter(v => v.isClick).map(v => v.title));
             return acc;
           }, []);
@@ -146,13 +145,13 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
               nickname: profileInfo.nickname,
               occupation: profileInfo.occupation,
               representBadge: userBadge.interest.filter(v => v.masterBadge)[0]?.title || profileInfo.representBadge,
-              tags
+              tags: reduceTags
             });
           } else {
             editProfileMutation.mutate({
               ...profileInfo,
               representBadge: userBadge.interest.filter(v => v.masterBadge)[0]?.title || profileInfo.representBadge,
-              tags
+              tags: reduceTags
             });
           }
         }}
@@ -187,7 +186,10 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
               }}
               ref={nameInputRef}
               autoCapitalize="none"
-              style={[FONT.Regular, { fontSize: 16, padding: 0, includeFontPadding: false, paddingTop: 0 }]}
+              style={[FONT.Regular, {
+                color: theme.color.black,
+                fontSize: 16, padding: 0, includeFontPadding: false, paddingTop: 0
+              }]}
               placeholder="닉네임을 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
             {!profileInfo.nickname &&
               <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.ff5d5d }]}> (필수)</Text>
@@ -217,19 +219,19 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
               }}
               ref={selfInputRef}
               autoCapitalize="none"
-              style={[FONT.Regular, { fontSize: 16, padding: 0, includeFontPadding: false }]}
+              style={[FONT.Regular, {
+                color: theme.color.black,
+                fontSize: 16, padding: 0, paddingTop: 0, includeFontPadding: false,
+              }]}
               placeholder="자기소개를 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
             {!profileInfo.occupation &&
               <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}> (선택)</Text>
             }
           </Pressable>
         </View>
-
-        <View>
-          <BasicButton viewStyle={{ alignSelf: "center", marginTop: h2p(40) }}
-            onPress={() => tagRefRBSheet.current?.open()}
-            text="소개 태그 선택" textColor={theme.color.main} bgColor={theme.color.white} />
-        </View>
+        <BasicButton viewStyle={{ alignSelf: "center", marginTop: h2p(40) }}
+          onPress={() => tagRefRBSheet.current?.open()}
+          text="소개 태그 선택" textColor={theme.color.main} bgColor={theme.color.white} />
         <TouchableOpacity
           onPress={() => {
             setModalOpen({
