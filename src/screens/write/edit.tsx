@@ -61,6 +61,7 @@ const EditReview = ({ navigation, route }: WriteProp) => {
     ({ writeProps, id }: { writeProps: WriteReviewType } & { id: number }) => editReview({ token, id, ...writeProps }), {
     onSuccess: () => {
       queryClient.invalidateQueries("reviewList");
+      queryClient.invalidateQueries("reviewDetail");
       navigation.goBack();
     }
   });
