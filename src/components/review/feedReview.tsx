@@ -17,6 +17,7 @@ import { noProfile } from '~/assets/images';
 import Loading from '~/components/loading';
 import { MyPrfoileType } from '~/types/user';
 import { getMyProfile } from '~/api/user';
+import ReKnew from '~/components/review/reKnew';
 
 interface FeedReviewProps {
   review: ReviewListType,
@@ -31,7 +32,7 @@ interface FeedReviewProps {
 
 const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
   clickBoxStyle,
-  type = "normal", filterBadge, review, isRetweet = false }: FeedReviewProps) => {
+  type = "normal", filterBadge, review }: FeedReviewProps) => {
   const navigation = useNavigation<StackNavigationProp>();
   const [isLike, setIsLike] = useState<boolean>(review.isLike);
   const [reactCount, setReactCount] = useState(review.likeCount);
@@ -75,10 +76,9 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
     );
   }, []);
 
-
   return (
     <>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: h2p(20) }}>
         <TouchableOpacity
           onPress={() => navigation.navigate("UserProfile", { id: review.id })}
           style={{
@@ -86,7 +86,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             left: 0,
             borderRadius: 40,
             borderColor: theme.color.grayscale.e9e7ec,
-            borderWidth: 1
+            borderWidth: 1,
           }}>
           <Image source={review.author.profileImage ? { uri: review.author.profileImage } : noProfile}
             style={{
@@ -120,13 +120,13 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           </TouchableOpacity>}
       </View>
       <View style={styles.titleContainer}>
-        <ReviewIcon viewStyle={{ marginTop: h2p(14) }} review={review.satisfaction} />
+        <ReviewIcon viewStyle={{ marginTop: h2p(15), marginBottom: h2p(10) }} review={review.satisfaction} />
         {type === "normal" &&
           <Text style={[{ fontSize: 10, color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>{simpleDate(review.created, ' 전')}</Text>
         }
       </View>
       <Text style={[{ color: theme.color.black, marginBottom: h2p(10), marginLeft: d2p(50) }, FONT.Regular]}>{review.content}</Text>
-      {!isRetweet &&
+      {!review.parent &&
         <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: d2p(10), marginLeft: d2p(50) }}>
           <Image source={tag} style={{ width: 10, height: 10, marginRight: d2p(5) }} />
           <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
@@ -141,7 +141,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             }
           </Text>
         </View>}
-      {(!isRetweet && type === "normal") &&
+      {(!review.parent && type === "normal") &&
         <View style={styles.sign}>
           <Text style={[styles.store, FONT.Regular]}>{review.market}</Text>
         </View>}
@@ -257,13 +257,19 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             <Image source={isLike ? colorLike : like} style={styles.reviewImg} />
             <Text style={styles.reviewCount}>{reactCount}</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("ReKnew", { review, nickname: getMyProfileQuery.data?.nickname, filterBadge })}
-            style={styles.reviewIcon}>
-            <Image source={reKnew} style={styles.reviewImg} />
-            <Text style={styles.reviewCount}>{review.childCount}</Text>
-          </TouchableOpacity>
+          {/* 인용글에서는 리트윗 아이콘 삭제 */}
+          {!review.parent &&
+            <TouchableOpacity
+              onPress={() => navigation.navigate("ReKnew", { review, nickname: getMyProfileQuery.data?.nickname, filterBadge })}
+              style={styles.reviewIcon}>
+              <Image source={reKnew} style={styles.reviewImg} />
+              <Text style={styles.reviewCount}>{review.childCount}</Text>
+            </TouchableOpacity>
+          }
         </View>
+      }
+      {review.parent &&
+        <ReKnew review={{ ...review.parent, tags: review.tags }} filterBadge={filterBadge ? filterBadge : ""} />
       }
       {
         (selectedIndex === idx && type === "normal") &&
@@ -272,7 +278,6 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             <View style={[styles.clickBox, clickBoxStyle]}>
               <Pressable style={styles.clickBtn}
                 onPress={() => navigation.navigate("editReview", { review })}
-              // onPress={() => navigation.navigate("작성", { review })}
               >
                 <Text style={[styles.click, { color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
               </Pressable>
@@ -302,12 +307,10 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
 export default FeedReview;
 
 const styles = StyleSheet.create({
-
   titleContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: "center",
-    marginBottom: h2p(12),
     marginLeft: d2p(50),
   },
   title: {
@@ -362,6 +365,8 @@ const styles = StyleSheet.create({
   reactionContainer: {
     marginLeft: d2p(50),
     marginTop: h2p(5),
+    marginRight: d2p(40),
+    justifyContent: "space-between",
     flexDirection: 'row',
   },
   reviewIcon: {
@@ -374,7 +379,6 @@ const styles = StyleSheet.create({
     marginRight: d2p(10)
   },
   reviewCount: {
-    marginRight: d2p(20),
     fontSize: 12,
     color: theme.color.grayscale.C_79737e
   },
