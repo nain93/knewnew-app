@@ -72,7 +72,11 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   }
 
   const likeReviewMutation = useMutation('likeReview',
-    ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state));
+    ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state), {
+      onSuccess: () => {
+        queryClient.invalidateQueries("reviewList");
+      }
+    });
 
   const commentListQuery = useQuery<CommentListType[], Error>(['getCommentList', token, route.params?.id], async () => {
     if (route.params) {
@@ -149,7 +153,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
         return acc;
       }, [])
     );
-  }, []);
+  }, [reviewDetailQuery.data]);
 
   if (reviewDetailQuery.isLoading) {
     return <Loading />;
@@ -306,7 +310,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           </View>
 
           <View style={styles.reactionContainer}>
-            <ReactionIcon name="cart" state={cart} count={reviewDetailQuery.data?.bookmarkCount} isState={(isState: boolean) => setCart(isState)} />
+            <ReactionIcon name="cart" state={cart} count={reviewDetailQuery.data?.bookmarkCount} isState={(isState: boolean) => setCart(isState)} id={route.params?.id}/>
             <View style={{ borderLeftWidth: 1, borderLeftColor: theme.color.grayscale.eae7ec, height: h2p(26) }} />
             <ReactionIcon name="like" count={reviewDetailQuery.data?.likeCount} state={like}
               isState={(isState: boolean) => { setLike(isState); }} mutation={likeReviewMutation} id={route.params?.id} />

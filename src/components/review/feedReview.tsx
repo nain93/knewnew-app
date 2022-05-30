@@ -73,8 +73,8 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
         return acc;
       }, [])
     );
-  }, []);
-
+    // setIsLike(review.isLike);
+  }, [review]);
 
   return (
     <>
