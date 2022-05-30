@@ -152,19 +152,22 @@ const Write = ({ navigation, route }: WriteProp) => {
             onPress={() => setWriteData({ ...writeData, satisfaction: "best" })}
             style={styles.reviewIcon}>
             <Image source={(writeData.satisfaction === "best") ? heart : grayheart} style={{ width: d2p(20), height: h2p(20) }} />
-            <Text style={[{ color: (writeData.satisfaction === "best") ? theme.color.main : theme.color.grayscale.a09ca4, marginLeft: d2p(5) }, FONT.Bold]}>최고에요</Text>
+            <Text style={[{ color: (writeData.satisfaction === "best") ? theme.color.main : theme.color.grayscale.a09ca4, marginLeft: d2p(5) }, 
+               (writeData.satisfaction === "best") ? FONT.Bold : FONT.Regular]}>최고에요</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setWriteData({ ...writeData, satisfaction: "good" })}
             style={styles.reviewIcon}>
             <Image source={(writeData.satisfaction === "good") ? circle : graycircle} style={{ width: d2p(20), height: h2p(20) }} />
-            <Text style={[{ color: (writeData.satisfaction === "good") ? theme.color.yellow : theme.color.grayscale.a09ca4, marginLeft: d2p(5) }, FONT.Bold]}>괜찮아요</Text>
+            <Text style={[{ color: (writeData.satisfaction === "good") ? theme.color.yellow : theme.color.grayscale.a09ca4, marginLeft: d2p(5) }, 
+               (writeData.satisfaction === "good") ? FONT.Bold : FONT.Regular]}>괜찮아요</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setWriteData({ ...writeData, satisfaction: "bad" })}
             style={styles.reviewIcon}>
             <Image source={(writeData.satisfaction === "bad") ? blackclose : grayclose} style={{ width: d2p(20), height: h2p(20) }} />
-            <Text style={[{ color: (writeData.satisfaction === "bad") ? theme.color.black : theme.color.grayscale.a09ca4, marginLeft: d2p(5) }, FONT.Bold]}>별로에요</Text>
+            <Text style={[{ color: (writeData.satisfaction === "bad") ? theme.color.black : theme.color.grayscale.a09ca4, marginLeft: d2p(5) }, 
+                (writeData.satisfaction === "bad") ? FONT.Bold : FONT.Regular]}>별로에요</Text>
           </TouchableOpacity>
         </View>
         <TextInput

@@ -19,6 +19,7 @@ import { useRecoilValue } from 'recoil';
 import { tokenState } from '~/recoil/atoms';
 import { getSearchUserList } from '~/api/user';
 import { userNormalType } from '~/types/user';
+import { FONT } from '~/styles/fonts';
 
 type SearchProps = {
   navigation: StackNavigationProp<any>
@@ -119,11 +120,11 @@ const Search = ({ navigation }: SearchProps) => {
             <TextInput
               autoFocus
               autoCapitalize="none"
-              style={{
+              style={[{
                 color: theme.color.black,
                 paddingLeft: d2p(10), paddingRight: d2p(40), paddingVertical: d2p(6),
-                includeFontPadding: false, fontSize: 14
-              }}
+                includeFontPadding: false, fontSize: 14,
+              }, FONT.Regular]}
               value={keyword}
               onChangeText={(text) => setKeyword(text)}
               onSubmitEditing={() => handleSearch(keyword)}
@@ -145,7 +146,7 @@ const Search = ({ navigation }: SearchProps) => {
           searchList={searchListQuery.data?.pages.flat()} />
         :
         <View style={styles.container}>
-          <Text style={{ fontSize: 12, color: theme.color.grayscale.a09ca4 }}>최근 검색어</Text>
+          <Text style={[{ fontSize: 12, color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>최근 검색어</Text>
           <ScrollView style={{ marginTop: h2p(15) }}>
             {React.Children.toArray(recentKeywords.map((recentKeyword, filterIndex) =>
               <View style={styles.recentKeyword}>
@@ -155,7 +156,7 @@ const Search = ({ navigation }: SearchProps) => {
                     handleSearch(recentKeyword);
                   }}
                   style={{ width: Dimensions.get("window").width - d2p(70) }}>
-                  <Text style={{ fontSize: 16 }}>{recentKeyword}</Text>
+                  <Text style={[{ fontSize: 16 },FONT.Regular]}>{recentKeyword}</Text>
                 </TouchableOpacity>
                 <CloseIcon onPress={() => filterRecentKeyword(filterIndex)} imageStyle={{ width: 10, height: 10 }} />
               </View>

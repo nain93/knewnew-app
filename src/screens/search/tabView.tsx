@@ -11,6 +11,7 @@ import { leftArrow } from '~/assets/icons';
 import Loading from '~/components/loading';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
+import { FONT } from '~/styles/fonts';
 
 interface SearchTabViewProps {
   searchList?: ReviewListType[],
@@ -42,14 +43,14 @@ const SearchTabView = ({ searchList, userList }: SearchTabViewProps) => {
           case "menu":
             return (
               <View style={styles.container}>
-                <Text style={styles.searchResult}>검색결과 · {searchList.length}건</Text>
+                <Text style={[styles.searchResult, FONT.Regular]}>검색결과 · {searchList.length}건</Text>
                 <FlatList
                   style={{ marginBottom: h2p(80) }}
                   contentContainerStyle={{ paddingBottom: d2p(40) }}
                   keyExtractor={(review) => String(review.id)}
                   data={searchList}
                   ListEmptyComponent={() =>
-                    <Text style={{ textAlign: "center", marginTop: h2p(115), color: theme.color.grayscale.C_79737e }}>
+                    <Text style={[{ textAlign: "center", marginTop: h2p(115), color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
                       검색결과가 없습니다.</Text>}
                   renderItem={(review) => {
                     return (
@@ -77,20 +78,20 @@ const SearchTabView = ({ searchList, userList }: SearchTabViewProps) => {
           case "user":
             return (
               <View style={styles.container}>
-                <Text style={[styles.searchResult, { marginBottom: h2p(30) }]}>검색결과 · {userList.length}건</Text>
+                <Text style={[styles.searchResult, { marginBottom: h2p(30) }, FONT.Regular]}>검색결과 · {userList.length}건</Text>
                 <FlatList
                   style={{ marginBottom: h2p(80) }}
                   contentContainerStyle={{ paddingBottom: d2p(40), paddingHorizontal: d2p(20) }}
                   keyExtractor={(review) => String(review.id)}
                   data={userList}
                   ListEmptyComponent={() =>
-                    <Text style={{ textAlign: "center", marginTop: h2p(115), color: theme.color.grayscale.C_79737e }}>
+                    <Text style={[{ textAlign: "center", marginTop: h2p(115), color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
                       검색결과가 없습니다.</Text>}
                   renderItem={(user) =>
                     <View style={{ marginBottom: h2p(30), flexDirection: "row", alignItems: "center" }}>
                       <Image source={user.item.profileImage ? { uri: user.item.profileImage } : noProfile}
                         style={{ marginRight: d2p(10), borderColor: theme.color.grayscale.e9e7ec, borderWidth: 1, width: d2p(24), height: d2p(24), borderRadius: 24 }} />
-                      <Text style={{ fontSize: 16, width: Dimensions.get("window").width - d2p(84) }}>{user.item.nickname}</Text>
+                      <Text style={[{ fontSize: 16, width: Dimensions.get("window").width - d2p(84) }, FONT.Regular]}>{user.item.nickname}</Text>
                       <Image source={leftArrow} style={{ marginLeft: "auto", width: d2p(11), height: h2p(25), transform: [{ rotate: "180deg" }] }} />
                     </View>
                   }
