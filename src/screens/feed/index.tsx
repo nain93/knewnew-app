@@ -12,7 +12,6 @@ import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
 import SelectLayout from '~/components/selectLayout';
 import { BadgeType, NavigationType } from '~/types';
 import AlertPopup from '~/components/popup/alertPopup';
-import ReKnew from '~/components/review/reKnew';
 import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
 import { getReviewList } from '~/api/review';
 import { useRecoilValue } from 'recoil';
@@ -23,6 +22,7 @@ import { MyPrfoileType } from '~/types/user';
 import { ReviewListType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
 import { initialBadgeData } from '~/utils/data';
+import ReKnew from '~/components/review/reKnew';
 
 function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
   return (
@@ -187,7 +187,6 @@ const Feed = ({ navigation }: NavigationType) => {
                 filterBadge={filterBadge}
               />
             </Pressable>
-            // <ReKnew review={item} />
           }
           ListFooterComponent={() =>
             <View style={{ height: h2p(40) }} />
