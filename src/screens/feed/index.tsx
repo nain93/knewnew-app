@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, Animated, Pressable } from 'react-native';
-import React, { Fragment, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import Header from '~/components/header';
@@ -14,15 +14,15 @@ import { BadgeType, NavigationType } from '~/types';
 import AlertPopup from '~/components/popup/alertPopup';
 import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
 import { getReviewList } from '~/api/review';
-import { useRecoilValue } from 'recoil';
-import { tokenState } from '~/recoil/atoms';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { refreshState, tokenState } from '~/recoil/atoms';
 import Loading from '~/components/loading';
 import { getMyProfile } from '~/api/user';
 import { MyPrfoileType } from '~/types/user';
 import { ReviewListType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
 import { initialBadgeData } from '~/utils/data';
-import ReKnew from '~/components/review/reKnew';
+import { useFocusEffect } from '@react-navigation/native';
 
 function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
   return (
@@ -44,22 +44,15 @@ const Feed = ({ navigation }: NavigationType) => {
   const queryClient = useQueryClient();
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [filterBadge, setFilterBadge] = useState("");
+  const [isRefersh, setIsRefresh] = useRecoilState(refreshState);
 
-  const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
+  const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token, filterBadge], () => getMyProfile(token), {
     enabled: !!token,
     onSuccess: (data) => {
       // * 최초 유저 대표뱃지로 필터링 설정
-      setFilterBadge(data.representBadge);
-      setUserBadge({
-        interest: userBadge.interest.map(v => {
-          if (v.title === data.representBadge) {
-            return { title: v.title, isClick: true };
-          }
-          return { title: v.title, isClick: false };
-        }),
-        household: userBadge.household.map(v => ({ title: v.title, isClick: false })),
-        taste: userBadge.taste.map(v => ({ title: v.title, isClick: false })),
-      });
+      if (!filterBadge) {
+        setFilterBadge(data.representBadge);
+      }
     }
   });
 
@@ -69,9 +62,16 @@ const Feed = ({ navigation }: NavigationType) => {
   }, {
     enabled: !!filterBadge,
     getNextPageParam: (next, all) => all.flat().length,
-    getPreviousPageParam: (prev) => (prev.length - 20) ?? undefined,
+    getPreviousPageParam: (prev) => (prev.length - 20) ?? undefined
   });
-  // console.log(reviewListQuery.data?.pages.flat()[0], 'reviewListQuery.data?.pages.flat()[0]');
+
+  useFocusEffect(
+    useCallback(() => {
+      if (isRefersh) {
+        setIsRefresh(false);
+      }
+    }, []));
+
   const fadeIn = () => {
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -97,7 +97,21 @@ const Feed = ({ navigation }: NavigationType) => {
     }
   }, [isPopupOpen, fadeAnim, scrollOffset]);
 
-  if (reviewListQuery.isLoading && reviewListQuery.isFetching) {
+  useEffect(() => {
+    setUserBadge({
+      interest: userBadge.interest.map(v => {
+        if (v.title === filterBadge) {
+          return { title: v.title, isClick: true };
+        }
+        return { title: v.title, isClick: false };
+      }),
+      household: userBadge.household.map(v => ({ title: v.title, isClick: false })),
+      taste: userBadge.taste.map(v => ({ title: v.title, isClick: false })),
+    });
+  }, [filterBadge]);
+
+
+  if (reviewListQuery.isLoading && reviewListQuery.isFetching || !reviewListQuery.data?.pages.flat()) {
     return <Loading />;
   }
 
@@ -133,7 +147,12 @@ const Feed = ({ navigation }: NavigationType) => {
           refreshing={reviewListQuery.isLoading}
           onRefresh={() => {
             if (getMyProfileQuery.data) {
-              setFilterBadge(getMyProfileQuery.data?.representBadge);
+              if (filterBadge === getMyProfileQuery.data.representBadge) {
+                queryClient.invalidateQueries("reviewList");
+              }
+              else {
+                setFilterBadge(getMyProfileQuery.data.representBadge);
+              }
             }
 
             // * 대표 뱃지로 선택상태 초기화
@@ -176,7 +195,7 @@ const Feed = ({ navigation }: NavigationType) => {
             <Pressable onPress={() =>
               navigation.navigate("FeedDetail", {
                 id: item.id, badge: filterBadge,
-                isLike: item.isLike, isBookmark: item.isBookmark
+                isLike: item.isLike, isBookmark: item.isBookmark,
               })}
               style={styles.review}>
               <FeedReview

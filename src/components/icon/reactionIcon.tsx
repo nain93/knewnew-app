@@ -23,7 +23,7 @@ interface ReviewIconProp {
 
 const ReactionIcon = ({ review, name, count, state, isState, mutation, id }: ReviewIconProp) => {
   const navigation = useNavigation<StackNavigationProp>();
-  const [reactCount, setReactCount] = useState(count);
+  const [reactCount, setReactCount] = useState(count || 0);
 
   return (
     <TouchableOpacity style={{
@@ -33,17 +33,16 @@ const ReactionIcon = ({ review, name, count, state, isState, mutation, id }: Rev
         isState(!state);
         mutation?.mutate({ id, state: !state });
         if (!state) {
-          setReactCount(prev => prev && (prev + 1));
+          setReactCount(prev => prev + 1);
         }
         else {
-          setReactCount(prev => prev && (prev - 1));
+          setReactCount(prev => prev - 1);
         }
       } else if (name === "comment") {
         navigation.navigate("FeedDetail", { id });
       } else {
 
         if (name === "ReKnew") {
-          console.log(review, 'review');
           navigation.navigate(name, { review });
         }
         else {

@@ -12,6 +12,11 @@ export const myIdState = atom<number>({
   default: -1,
 });
 
+export const refreshState = atom<boolean>({
+  key: "refreshState",
+  default: false
+});
+
 interface popupStateProps {
   isOpen: boolean;
   content: string;

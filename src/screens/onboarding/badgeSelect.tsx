@@ -15,7 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserInfoType } from '~/types/user';
 import { FONT } from '~/styles/fonts';
 import { initialBadgeData } from '~/utils/data';
-import OnepickLayout from '~/components/onepickLayout';
+import OnepickLayout from '~/components/layout/OnepickLayout';
 
 interface BadgeSelectProps {
   navigation: NavigationStackProp

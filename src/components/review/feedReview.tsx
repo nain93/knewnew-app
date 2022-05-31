@@ -23,7 +23,7 @@ interface FeedReviewProps {
   review: ReviewListType,
   isRetweet?: boolean,
   type?: "reKnewWrite" | "normal"
-  setSelectedIndex: (idx: number) => void
+  setSelectedIndex?: (idx: number) => void
   selectedIndex?: number
   idx?: number
   clickBoxStyle?: ViewStyle
@@ -47,7 +47,13 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
     ({ id, isBookmark }: { id: number, isBookmark: boolean }) => bookmarkReview(token, id, isBookmark));
 
   const likeReviewFeedMutation = useMutation('likeReviewFeed',
-    ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state));
+    ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("reviewDetail");
+        queryClient.invalidateQueries("reviewList");
+      }
+    });
 
   const deleteMutation = useMutation("deleteReview",
     (id: number) => deleteReview(token, id), {
@@ -62,7 +68,8 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
 
   useFocusEffect(
     useCallback(() => {
-      return () => setSelectedIndex(-1);
+      if (setSelectedIndex)
+        return () => setSelectedIndex(-1);
     }, []));
 
   useEffect(() => {
@@ -80,7 +87,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
     <>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: h2p(20) }}>
         <TouchableOpacity
-          onPress={() => navigation.navigate("UserProfile", { id: review.id })}
+          onPress={() => navigation.navigate("마이페이지", { id: review.author.id })}
           style={{
             position: "absolute",
             left: 0,
@@ -105,12 +112,13 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
         </View>
         {type === "normal" &&
           <TouchableOpacity onPress={() => {
-            if (selectedIndex === idx) {
-              setSelectedIndex(-1);
-            }
-            else {
-              setSelectedIndex(idx);
-            }
+            if (setSelectedIndex)
+              if (selectedIndex === idx) {
+                setSelectedIndex(-1);
+              }
+              else {
+                setSelectedIndex(idx);
+              }
           }}>
             <Image
               source={more}
@@ -260,7 +268,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           {/* 인용글에서는 리트윗 아이콘 삭제 */}
           {!review.parent &&
             <TouchableOpacity
-              onPress={() => navigation.navigate("ReKnew", { review, nickname: getMyProfileQuery.data?.nickname, filterBadge })}
+              onPress={() => navigation.navigate("작성", { loading: false, type: "reKnewWrite", review, nickname: getMyProfileQuery.data?.nickname, filterBadge })}
               style={styles.reviewIcon}>
               <Image source={reKnew} style={styles.reviewImg} />
               <Text style={styles.reviewCount}>{review.childCount}</Text>
@@ -277,7 +285,14 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           review.author.id === myId ?
             <View style={[styles.clickBox, clickBoxStyle]}>
               <Pressable style={styles.clickBtn}
-                onPress={() => navigation.navigate("editReview", { review })}
+                onPress={() => {
+                  if (review.parent) {
+                    navigation.navigate("작성", { loading: true, type: "reknew", nickname: review.author.nickname, review, filterBadge });
+                  }
+                  else {
+                    navigation.navigate("작성", { loading: true, review, filterBadge });
+                  }
+                }}
               >
                 <Text style={[styles.click, { color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
               </Pressable>

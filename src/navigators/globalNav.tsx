@@ -15,9 +15,6 @@ import { useRecoilValue } from 'recoil';
 import { tokenState } from '~/recoil/atoms';
 import theme from '~/styles/theme';
 import FeedDetail from '~/screens/feed/detail';
-import reKnewWrite from '~/screens/write/reKnewWrite';
-import UserProfile from '~/screens/mypage/userProfile';
-import EditReview from '~/screens/write/edit';
 
 const Stack = createStackNavigator();
 
@@ -81,29 +78,8 @@ const GlobalNav = () => {
           }}
           component={FeedDetail} />
         <Stack.Screen
-          name="UserProfile"
-          options={{
-            title: "",
-            headerShown: false,
-          }}
-          component={UserProfile} />
-        <Stack.Screen
           name="editProfile"
           component={EditProfile}
-          options={{
-            headerShown: false
-          }}
-        />
-        <Stack.Screen
-          name="ReKnew"
-          component={reKnewWrite}
-          options={{
-            headerShown: false
-          }}
-        />
-        <Stack.Screen
-          name="editReview"
-          component={EditReview}
           options={{
             headerShown: false
           }}
