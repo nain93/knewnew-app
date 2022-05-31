@@ -1,5 +1,5 @@
 import { View, Text, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView, Keyboard, FlatList, LayoutRectangle } from 'react-native';
-import React, { Fragment, RefObject, useEffect, useRef, useState } from 'react';
+import React, { Fragment, SetStateAction, useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import theme from '~/styles/theme';
@@ -9,12 +9,13 @@ import Badge from '~/components/badge';
 import ReactionIcon from '~/components/icon/reactionIcon';
 import { commentMore, more, tag } from '~/assets/icons';
 import { getBottomSpace } from 'react-native-iphone-x-helper';
-import { useRecoilValue } from 'recoil';
-import { myIdState, tokenState } from '~/recoil/atoms';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { myIdState, refreshState, tokenState } from '~/recoil/atoms';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
-import { deleteReview, getReviewDetail, likeReview } from '~/api/review';
+import { bookmarkReview, getReviewDetail, likeReview } from '~/api/review';
+
 import { ReviewListType } from '~/types/review';
 import Loading from '~/components/loading';
 import { FONT } from '~/styles/fonts';
@@ -27,18 +28,15 @@ interface FeedDetailProps {
     id: number,
     badge: string,
     isLike: boolean,
-    isBookmark: boolean
+    isBookmark: boolean,
   }>;
 }
 
 const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
-  const [like, setLike] = useState<boolean>(route.params?.isLike || false);
-  const [cart, setCart] = useState<boolean>(route.params?.isBookmark || false);
   const [inputHeight, setInputHeight] = useState(getBottomSpace());
   const token = useRecoilValue(tokenState);
   const inputRef = useRef<TextInput>(null);
   const [scrollIdx, setScrollIdx] = React.useState(0);
-
   const [isMoreClick, setIsMoreClick] = useState<boolean>();
   const myId = useRecoilValue(myIdState);
   const queryClient = useQueryClient();
@@ -49,6 +47,10 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [tags, setTags] = useState<Array<string>>([]);
   const [content, setContent] = useState<string>("");
   const [commentSelectedIdx, setCommentSelectedIdx] = useState<number>(-1);
+  const [like, setLike] = useState<boolean>(false);
+  const [cart, setCart] = useState<boolean>(false);
+  const [isRefersh, setIsRefresh] = useRecoilState(refreshState);
+
   const reviewDetailQuery = useQuery<ReviewListType, Error>(["reviewDetail", token, route.params?.id],
     async () => {
       if (route.params) {
@@ -57,26 +59,27 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
       }
     }, {
     enabled: !!route.params?.id,
+    onSuccess: (data) => {
+      setLike(data.isLike);
+      setCart(data.isBookmark);
+    }
   });
-
-  interface CommentListType {
-    id: number;
-    author: {
-      id: number;
-      nickname: string;
-      profileImage: string;
-    };
-    content: string;
-    created: string;
-    likeCount: string;
-  }
-
   const likeReviewMutation = useMutation('likeReview',
     ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state), {
-      onSuccess: () => {
-        queryClient.invalidateQueries("reviewList");
-      }
-    });
+    onSuccess: () => {
+      queryClient.invalidateQueries("reviewList");
+      setIsRefresh(true);
+    }
+  });
+
+  const boomarkMutation = useMutation("bookmark",
+    ({ id, state }: { id: number, state: boolean }) => bookmarkReview(token, id, state), {
+    onSuccess: () => {
+      queryClient.invalidateQueries("reviewList");
+      setIsRefresh(true);
+    }
+  });
+
 
   const commentListQuery = useQuery<CommentListType[], Error>(['getCommentList', token, route.params?.id], async () => {
     if (route.params) {
@@ -153,9 +156,10 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
         return acc;
       }, [])
     );
-  }, [reviewDetailQuery.data]);
+  }, [reviewDetailQuery.data?.tags]);
 
-  if (reviewDetailQuery.isLoading) {
+
+  if (reviewDetailQuery.isLoading || reviewDetailQuery.isFetching) {
     return <Loading />;
   }
 
@@ -164,7 +168,13 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
       <Header
         isBorder={true}
         headerLeft={<LeftArrowIcon onBackClick={() => {
-          navigation.goBack();
+          if (isRefersh) {
+            //@ts-ignore
+            navigation.reset({ index: 0, routes: [{ name: "TabNav" }] });
+          }
+          else {
+            navigation.goBack();
+          }
         }} imageStyle={{ width: 11, height: 25 }} />}
         title="리뷰 상세"
       />
@@ -323,10 +333,13 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             </View>
           }
           <View style={[styles.reactionContainer, { paddingTop: reviewDetailQuery.data?.parent ? 0 : h2p(10) }]}>
-            <ReactionIcon name="cart" state={cart} count={reviewDetailQuery.data?.bookmarkCount} isState={(isState: boolean) => setCart(isState)} />
+            <ReactionIcon name="cart" state={cart} count={reviewDetailQuery.data?.bookmarkCount}
+              mutation={boomarkMutation}
+              id={route.params?.id}
+              isState={(isState: boolean) => setCart(isState)} />
             <View style={{ borderLeftWidth: 1, borderLeftColor: theme.color.grayscale.eae7ec, height: h2p(26) }} />
             <ReactionIcon name="like" count={reviewDetailQuery.data?.likeCount} state={like}
-              isState={(isState: boolean) => { setLike(isState); }} mutation={likeReviewMutation} id={route.params?.id} />
+              isState={(isState: boolean) => setLike(isState)} mutation={likeReviewMutation} id={route.params?.id} />
           </View>
           <Pressable onPress={() => {
             setCommentSelectedIdx(-1);

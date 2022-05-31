@@ -43,7 +43,6 @@ const ReactionIcon = ({ review, name, count, state, isState, mutation, id }: Rev
       } else {
 
         if (name === "ReKnew") {
-          console.log(review, 'review');
           navigation.navigate(name, { review });
         }
         else {

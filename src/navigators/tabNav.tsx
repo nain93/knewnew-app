@@ -56,6 +56,12 @@ const TabNavigator = () => {
       <Tabs.Screen
         name="작성"
         component={Write}
+        listeners={({ navigation }) => ({
+          tabPress: e => {
+            e.preventDefault();
+            navigation.navigate('작성', { loading: false });
+          },
+        })}
         options={{
           tabBarStyle: { display: "none" },
           tabBarIcon: () => (
@@ -81,6 +87,12 @@ const TabNavigator = () => {
       <Tabs.Screen
         name="마이페이지"
         component={Mypage}
+        listeners={({ navigation }) => ({
+          tabPress: e => {
+            e.preventDefault();
+            navigation.navigate('마이페이지', {});
+          },
+        })}
         options={{
           tabBarIcon: ({ focused }) => (
             <Image

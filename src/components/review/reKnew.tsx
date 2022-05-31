@@ -38,7 +38,7 @@ const ReKnew = ({ review, filterBadge }: FeedReviewProps) => {
           <Image source={retweetfrom}
             style={{ width: d2p(15), height: d2p(40) }} />
           <TouchableOpacity
-            onPress={() => navigation.navigate("UserProfile", { id: review.id })}
+            onPress={() => navigation.navigate("마이페이지", { id: review.author.id })}
             style={{
               position: "absolute",
               left: d2p(25),

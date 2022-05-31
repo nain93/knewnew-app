@@ -3,9 +3,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Header from '~/components/header';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
-import { okPopupState, tokenState } from '~/recoil/atoms';
-import { getMyProfile } from '~/api/user';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { myIdState, okPopupState, tokenState } from '~/recoil/atoms';
+import { getMyProfile, getUserProfile } from '~/api/user';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useQuery } from 'react-query';
 import { MyPrfoileType } from '~/types/user';
 import { noProfile } from '~/assets/images';
@@ -19,15 +19,28 @@ import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 
 interface MypageProps {
   navigation: NavigationStackProp;
-  route: NavigationRoute;
+  route: NavigationRoute<{
+    id?: number
+  }>;
 }
 
-const Mypage = ({ navigation }: MypageProps) => {
+const Mypage = ({ navigation, route }: MypageProps) => {
   const [token, setToken] = useRecoilState(tokenState);
-  const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile"], () => getMyProfile(token), {
+  const myId = useRecoilValue(myIdState);
+  const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", route.params?.id], async () => {
+    if (route.params?.id && (route.params.id !== myId)) {
+      const queryData = await getUserProfile(token, route.params?.id);
+      return queryData;
+    }
+    else {
+      const queryData = await getMyProfile(token);
+      return queryData;
+    }
+  }, {
     enabled: !!token,
   });
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -80,13 +93,24 @@ const Mypage = ({ navigation }: MypageProps) => {
             backgroundColor: theme.color.white,
           }} />}
         <Header
-          title="마이페이지"
+          title={(route.params?.id === myId || !route.params?.id) ? "마이페이지" : "회원 프로필"}
           bgColor={theme.color.white}
           viewStyle={{
             marginTop: 0,
           }}
+          headerLeft={
+            (route.params?.id === myId || !route.params?.id) ? undefined :
+              <LeftArrowIcon onBackClick={() => {
+                navigation.goBack();
+              }}
+                imageStyle={{ width: 11, height: 25 }} />}
           // headerRight={<Image source={write} style={{ width: d2p(15), height: h2p(15) }} />}
-          headerRight={<Image source={more} style={{ width: d2p(26), height: h2p(16) }} />}
+          headerRight={
+            (route.params?.id === myId || !route.params?.id) ?
+              <Image source={more} style={{ width: d2p(26), height: h2p(16) }} />
+              :
+              undefined
+          }
           headerRightPress={() => setOpenMore(!openMore)}
         />
       </View>

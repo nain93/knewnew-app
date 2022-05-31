@@ -41,9 +41,9 @@ export const likeReview = async (token: string, id: number, state: boolean) => {
   }
 };
 
-export const bookmarkReview = async (token: string, id: number, isBookmark: boolean) => {
+export const bookmarkReview = async (token: string, id: number, state: boolean) => {
   const res = await axios.post(baseURL + `review/${id}/bookmark/`, {
-    isBookmark
+    isBookmark: state
   }, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -58,6 +58,7 @@ export const writeReview = async ({
   token, images, content,
   satisfaction, market,
   product, parent, cart, tags }: { token: string } & WriteReviewType) => {
+  console.log(parent, 'parent');
   const res = await axios.post(baseURL + "review/", {
     images,
     content,

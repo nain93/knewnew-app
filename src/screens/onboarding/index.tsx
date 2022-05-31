@@ -125,14 +125,14 @@ const Onboarding = ({ navigation }: NavigationType) => {
     const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
     console.log(credentialState, 'credentialState');
     if (credentialState === appleAuth.State.AUTHORIZED) {
-      const token = appleAuthRequestResponse.identityToken;
+      const token = appleAuthRequestResponse.authorizationCode;
       if (token) {
         console.log(token, 'token');
         const data = await userLogin({ token, providerType: "apple" });
         console.log(data, 'data');
-        if (data) {
-          goToBadgeSelect(data);
-        }
+        // if (data) {
+        //   goToBadgeSelect(data);
+        // }
       }
     }
   };
