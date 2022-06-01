@@ -65,5 +65,6 @@ export interface ReviewListType {
     taste: Array<string>
   },
   isLike: boolean,
-  isBookmark: boolean
+  isBookmark: boolean,
+  isEdit: boolean
 }

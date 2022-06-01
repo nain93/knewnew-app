@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, Animated, Pressable } from 'react-native';
-import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import Header from '~/components/header';
@@ -14,15 +14,14 @@ import { BadgeType, NavigationType } from '~/types';
 import AlertPopup from '~/components/popup/alertPopup';
 import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
 import { getReviewList } from '~/api/review';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { refreshState, tokenState } from '~/recoil/atoms';
+import { useRecoilValue } from 'recoil';
+import { tokenState } from '~/recoil/atoms';
 import Loading from '~/components/loading';
 import { getMyProfile } from '~/api/user';
 import { MyPrfoileType } from '~/types/user';
 import { ReviewListType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
 import { initialBadgeData } from '~/utils/data';
-import { useFocusEffect } from '@react-navigation/native';
 
 function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
   return (
@@ -44,7 +43,6 @@ const Feed = ({ navigation }: NavigationType) => {
   const queryClient = useQueryClient();
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [filterBadge, setFilterBadge] = useState("");
-  const [isRefersh, setIsRefresh] = useRecoilState(refreshState);
 
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token, filterBadge], () => getMyProfile(token), {
     enabled: !!token,
@@ -64,13 +62,6 @@ const Feed = ({ navigation }: NavigationType) => {
     getNextPageParam: (next, all) => all.flat().length,
     getPreviousPageParam: (prev) => (prev.length - 20) ?? undefined
   });
-
-  useFocusEffect(
-    useCallback(() => {
-      if (isRefersh) {
-        setIsRefresh(false);
-      }
-    }, []));
 
   const fadeIn = () => {
     Animated.timing(fadeAnim, {
@@ -97,21 +88,9 @@ const Feed = ({ navigation }: NavigationType) => {
     }
   }, [isPopupOpen, fadeAnim, scrollOffset]);
 
-  useEffect(() => {
-    setUserBadge({
-      interest: userBadge.interest.map(v => {
-        if (v.title === filterBadge) {
-          return { title: v.title, isClick: true };
-        }
-        return { title: v.title, isClick: false };
-      }),
-      household: userBadge.household.map(v => ({ title: v.title, isClick: false })),
-      taste: userBadge.taste.map(v => ({ title: v.title, isClick: false })),
-    });
-  }, [filterBadge]);
+  // console.log(reviewListQuery.data?.pages.flat()[0], 'reviewListQuery.data?.pages.flat()');
 
-
-  if (reviewListQuery.isLoading && reviewListQuery.isFetching || !reviewListQuery.data?.pages.flat()) {
+  if (reviewListQuery.isFetching || !filterBadge) {
     return <Loading />;
   }
 
@@ -147,11 +126,11 @@ const Feed = ({ navigation }: NavigationType) => {
           refreshing={reviewListQuery.isLoading}
           onRefresh={() => {
             if (getMyProfileQuery.data) {
-              if (filterBadge === getMyProfileQuery.data.representBadge) {
+              if (filterBadge === getMyProfileQuery.data?.representBadge) {
                 queryClient.invalidateQueries("reviewList");
               }
               else {
-                setFilterBadge(getMyProfileQuery.data.representBadge);
+                setFilterBadge(getMyProfileQuery.data?.representBadge);
               }
             }
 
@@ -220,6 +199,28 @@ const Feed = ({ navigation }: NavigationType) => {
       </View>
       <RBSheet
         ref={tagRefRBSheet}
+        onOpen={() =>
+          setUserBadge({
+            interest: userBadge.interest.map(v => {
+              if (v.title === filterBadge) {
+                return { title: v.title, isClick: true };
+              }
+              return { title: v.title, isClick: false };
+            }),
+            household: userBadge.household.map(v => {
+              if (v.title === filterBadge) {
+                return { title: v.title, isClick: true };
+              }
+              return { title: v.title, isClick: false };
+            }),
+            taste: userBadge.taste.map(v => {
+              if (v.title === filterBadge) {
+                return { title: v.title, isClick: true };
+              }
+              return { title: v.title, isClick: false };
+            })
+          })
+        }
         closeOnDragDown
         dragFromTopOnly
         animationType="fade"

@@ -47,18 +47,13 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
     ({ id, isBookmark }: { id: number, isBookmark: boolean }) => bookmarkReview(token, id, isBookmark));
 
   const likeReviewFeedMutation = useMutation('likeReviewFeed',
-    ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries("reviewDetail");
-        queryClient.invalidateQueries("reviewList");
-      }
-    });
+    ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state));
 
   const deleteMutation = useMutation("deleteReview",
     (id: number) => deleteReview(token, id), {
     onSuccess: () => {
       queryClient.invalidateQueries("reviewList");
+      queryClient.invalidateQueries("myProfile");
     }
   });
 
@@ -111,6 +106,11 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           <Text style={[styles.title, FONT.Medium]}>{review.author.nickname}</Text>
           <Badge type="feed" text={review.author.representBadge} />
           <Text style={[{ fontSize: 12, marginLeft: d2p(5), color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>{review.author.household}</Text>
+          {review.isEdit &&
+            <Text style={[FONT.Regular,
+            { fontSize: 12, color: theme.color.grayscale.d3d0d5, marginLeft: d2p(5) }]}>
+              수정됨</Text>
+          }
         </View>
         {type === "normal" &&
           <TouchableOpacity onPress={() => {
@@ -270,7 +270,8 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           {/* 인용글에서는 리트윗 아이콘 삭제 */}
           {!review.parent &&
             <TouchableOpacity
-              onPress={() => navigation.navigate("작성", { loading: false, type: "reKnewWrite", review, nickname: getMyProfileQuery.data?.nickname, filterBadge })}
+              onPress={() => navigation.navigate("작성",
+                { loading: false, isEdit: false, type: "reKnewWrite", review, nickname: getMyProfileQuery.data?.nickname, filterBadge })}
               style={styles.reviewIcon}>
               <Image source={reKnew} style={styles.reviewImg} />
               <Text style={styles.reviewCount}>{review.childCount}</Text>
@@ -289,10 +290,10 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
               <Pressable style={styles.clickBtn}
                 onPress={() => {
                   if (review.parent) {
-                    navigation.navigate("작성", { loading: true, type: "reknew", nickname: review.author.nickname, review, filterBadge });
+                    navigation.navigate("작성", { loading: true, isEdit: true, type: "reknew", nickname: review.author.nickname, review, filterBadge });
                   }
                   else {
-                    navigation.navigate("작성", { loading: true, review, filterBadge });
+                    navigation.navigate("작성", { loading: true, isEdit: true, review, filterBadge });
                   }
                 }}
               >
