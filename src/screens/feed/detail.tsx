@@ -9,8 +9,8 @@ import Badge from '~/components/badge';
 import ReactionIcon from '~/components/icon/reactionIcon';
 import { commentMore, more, tag } from '~/assets/icons';
 import { getBottomSpace } from 'react-native-iphone-x-helper';
-import { useRecoilValue } from 'recoil';
-import { myIdState, tokenState } from '~/recoil/atoms';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { myIdState, refreshState, tokenState } from '~/recoil/atoms';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
@@ -60,6 +60,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [commentSelectedIdx, setCommentSelectedIdx] = useState<number>(-1);
   const [like, setLike] = useState<boolean>(false);
   const [cart, setCart] = useState<boolean>(false);
+  const setRefresh = useSetRecoilState(refreshState);
 
   const reviewDetailQuery = useQuery<ReviewListType, Error>(["reviewDetail", token, route.params?.id],
     async () => {
@@ -78,6 +79,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state), {
     onSuccess: () => {
       queryClient.invalidateQueries("reviewList");
+      setRefresh(true);
     }
   });
 
@@ -85,6 +87,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     ({ id, state }: { id: number, state: boolean }) => bookmarkReview(token, id, state), {
     onSuccess: () => {
       queryClient.invalidateQueries("reviewList");
+      setRefresh(true);
     }
   });
 

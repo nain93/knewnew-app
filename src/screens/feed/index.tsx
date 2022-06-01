@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, Animated, Pressable } from 'react-native';
-import React, { Fragment, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import Header from '~/components/header';
@@ -14,14 +14,15 @@ import { BadgeType, NavigationType } from '~/types';
 import AlertPopup from '~/components/popup/alertPopup';
 import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
 import { getReviewList } from '~/api/review';
-import { useRecoilValue } from 'recoil';
-import { tokenState } from '~/recoil/atoms';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { refreshState, tokenState } from '~/recoil/atoms';
 import Loading from '~/components/loading';
 import { getMyProfile } from '~/api/user';
 import { MyPrfoileType } from '~/types/user';
 import { ReviewListType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
 import { initialBadgeData } from '~/utils/data';
+import { useFocusEffect } from '@react-navigation/native';
 
 function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
   return (
@@ -43,6 +44,7 @@ const Feed = ({ navigation }: NavigationType) => {
   const queryClient = useQueryClient();
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [filterBadge, setFilterBadge] = useState("");
+  const [refresh, setRefresh] = useRecoilState(refreshState);
 
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token, filterBadge], () => getMyProfile(token), {
     enabled: !!token,
@@ -88,9 +90,15 @@ const Feed = ({ navigation }: NavigationType) => {
     }
   }, [isPopupOpen, fadeAnim, scrollOffset]);
 
-  // console.log(reviewListQuery.data?.pages.flat()[0], 'reviewListQuery.data?.pages.flat()');
+  useFocusEffect(
+    useCallback(() => {
+      if (refresh) {
+        setRefresh(false);
+      }
+    }, [refresh]));
 
-  if (reviewListQuery.isFetching || !filterBadge) {
+  // console.log(reviewListQuery.data?.pages.flat()[0], 'reviewListQuery.data?.pages.flat()');
+  if ((reviewListQuery.isFetching && refresh) || !filterBadge) {
     return <Loading />;
   }
 
