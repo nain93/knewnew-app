@@ -187,6 +187,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
               autoCapitalize="none"
               style={[FONT.Regular, {
                 color: theme.color.black,
+                minWidth: d2p(135),
                 fontSize: 16, padding: 0, includeFontPadding: false, paddingTop: 0
               }]}
               placeholder="닉네임을 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
@@ -220,6 +221,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
               autoCapitalize="none"
               style={[FONT.Regular, {
                 color: theme.color.black,
+                minWidth: d2p(145),
                 fontSize: 16, padding: 0, paddingTop: 0, includeFontPadding: false,
               }]}
               placeholder="자기소개를 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
