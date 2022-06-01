@@ -19,7 +19,7 @@ import { ReviewListType, WriteReviewType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
-import { writeReview } from '~/api/review';
+import { editReview, writeReview } from '~/api/review';
 import { initialBadgeData } from '~/utils/data';
 import FeedReview from '~/components/review/feedReview';
 import { getBottomSpace } from 'react-native-iphone-x-helper';
@@ -35,7 +35,8 @@ interface WriteProp {
     type?: "reknew" | "reKnewWrite",
     filterBadge?: string,
     nickname?: string,
-    loading?: boolean
+    loading?: boolean,
+    isEdit: boolean
   }>;
 }
 
@@ -59,7 +60,6 @@ const Write = ({ navigation, route }: WriteProp) => {
       taste: []
     }
   });
-
   const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
 
   const inputRef = useRef<TextInput>(null);
@@ -74,6 +74,15 @@ const Write = ({ navigation, route }: WriteProp) => {
 
   const addReviewMutation = useMutation(["addReview", token],
     (writeProps: WriteReviewType) => writeReview({ token, ...writeProps }), {
+    onSuccess: () => {
+      queryClient.invalidateQueries("reviewList");
+      navigation.goBack();
+    }
+  });
+
+  const editReviewMutation = useMutation(["editReview", token],
+    ({ writeProps, id }: { writeProps: WriteReviewType, id: number }) =>
+      editReview({ token, id, ...writeProps }), {
     onSuccess: () => {
       queryClient.invalidateQueries("reviewList");
       navigation.goBack();
@@ -115,7 +124,13 @@ const Write = ({ navigation, route }: WriteProp) => {
       return acc;
     }, []);
 
-    addReviewMutation.mutate({ ...writeData, images });
+    if (route.params?.isEdit && route.params.review?.id) {
+      editReviewMutation.mutate({ writeProps: { ...writeData, images }, id: route.params.review?.id });
+    }
+    else {
+      addReviewMutation.mutate({ ...writeData, images });
+    }
+
   };
 
   useEffect(() => {

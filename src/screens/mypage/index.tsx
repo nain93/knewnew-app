@@ -104,7 +104,6 @@ const Mypage = ({ navigation, route }: MypageProps) => {
                 navigation.goBack();
               }}
                 imageStyle={{ width: 11, height: 25 }} />}
-          // headerRight={<Image source={write} style={{ width: d2p(15), height: h2p(15) }} />}
           headerRight={
             (route.params?.id === myId || !route.params?.id) ?
               <Image source={more} style={{ width: d2p(26), height: h2p(16) }} />

@@ -1,5 +1,5 @@
-import { View, Text, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView, Keyboard, FlatList, LayoutRectangle } from 'react-native';
-import React, { Fragment, SetStateAction, useEffect, useRef, useState } from 'react';
+import { View, Text, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView, Keyboard, FlatList } from 'react-native';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import theme from '~/styles/theme';
@@ -9,12 +9,12 @@ import Badge from '~/components/badge';
 import ReactionIcon from '~/components/icon/reactionIcon';
 import { commentMore, more, tag } from '~/assets/icons';
 import { getBottomSpace } from 'react-native-iphone-x-helper';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { myIdState, refreshState, tokenState } from '~/recoil/atoms';
+import { useRecoilValue } from 'recoil';
+import { myIdState, tokenState } from '~/recoil/atoms';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
-import { bookmarkReview, getReviewDetail, likeReview } from '~/api/review';
+import { bookmarkReview, deleteReview, getReviewDetail, likeReview } from '~/api/review';
 
 import { ReviewListType } from '~/types/review';
 import Loading from '~/components/loading';
@@ -30,6 +30,17 @@ interface FeedDetailProps {
     isLike: boolean,
     isBookmark: boolean,
   }>;
+}
+interface CommentListType {
+  id: number;
+  author: {
+    id: number;
+    nickname: string;
+    profileImage: string;
+  };
+  content: string;
+  created: string;
+  likeCount: string;
 }
 
 const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
@@ -49,7 +60,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [commentSelectedIdx, setCommentSelectedIdx] = useState<number>(-1);
   const [like, setLike] = useState<boolean>(false);
   const [cart, setCart] = useState<boolean>(false);
-  const [isRefersh, setIsRefresh] = useRecoilState(refreshState);
 
   const reviewDetailQuery = useQuery<ReviewListType, Error>(["reviewDetail", token, route.params?.id],
     async () => {
@@ -68,7 +78,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state), {
     onSuccess: () => {
       queryClient.invalidateQueries("reviewList");
-      setIsRefresh(true);
     }
   });
 
@@ -76,7 +85,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     ({ id, state }: { id: number, state: boolean }) => bookmarkReview(token, id, state), {
     onSuccess: () => {
       queryClient.invalidateQueries("reviewList");
-      setIsRefresh(true);
     }
   });
 
@@ -110,12 +118,11 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     }
   });
 
-  const deleteMutation = useMutation("deleteReview",
-  (id: number) => deleteReview(token, id), {
-  onSuccess: () => {
-    queryClient.invalidateQueries("reviewList");
-  }
-});
+  const deleteMutation = useMutation("deleteReview", (id: number) => deleteReview(token, id), {
+    onSuccess: () => {
+      queryClient.invalidateQueries("reviewList");
+    }
+  });
 
   const handleWriteComment = () => {
     if (route.params) {
@@ -168,13 +175,14 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
       <Header
         isBorder={true}
         headerLeft={<LeftArrowIcon onBackClick={() => {
-          if (isRefersh) {
-            //@ts-ignore
-            navigation.reset({ index: 0, routes: [{ name: "TabNav" }] });
-          }
-          else {
-            navigation.goBack();
-          }
+          navigation.goBack();
+          // if (isRefersh) {
+          //   //@ts-ignore
+          //   navigation.reset({ index: 0, routes: [{ name: "TabNav" }] });
+          // }
+          // else {
+          //   navigation.goBack();
+          // }
         }} imageStyle={{ width: 11, height: 25 }} />}
         title="리뷰 상세"
       />
@@ -187,40 +195,43 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           showsVerticalScrollIndicator={false}
           style={{ paddingTop: h2p(20), flex: 1 }}
         >
-          <View style={{ paddingHorizontal: d2p(20), flexDirection: 'row', justifyContent: 'space-between' }}>
-            {isMoreClick &&
-              (myId === reviewDetailQuery.data?.author.id ?
-                <View style={styles.clickBox}>
-                  <Pressable onPress={() => {
-                    navigation.navigate("editReview", { review: reviewDetailQuery.data });
+          {isMoreClick &&
+            (myId === reviewDetailQuery.data?.author.id ?
+              <View style={styles.clickBox}>
+                <TouchableOpacity
+                  style={styles.clickBtn}
+                  onPress={() => {
+                    navigation.navigate("작성", { review: reviewDetailQuery.data });
                     setIsMoreClick(false);
                   }}>
-                    <Text style={[styles.click, { color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
-                  </Pressable>
-                  <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-                  <Pressable onPress={() => {
-                    navigation.goBack();
-                    // console.log('삭제 밖');
-                    // navigation.navigate("editReview",{ review: reviewDetailQuery.data });
-                    // if (route.params){
-                    //   deleteMutation.mutate(route.params?.id);
-                    //   console.log('삭제 ', route.params.id);
-                    // }
-                    }}>
-                    <Text style={[styles.click, { color: theme.color.main }, FONT.Regular]}>삭제</Text>
-                  </Pressable>
-                </View>
-                :
-                <View style={styles.clickBox}>
-                  <Pressable>
-                    <Text style={[styles.click, { color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
-                  </Pressable>
-                  <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-                  <Pressable>
-                    <Text style={[styles.click, { color: theme.color.main }, FONT.Regular]}>신고</Text>
-                  </Pressable>
-                </View>
-              )}
+                  <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
+                </TouchableOpacity>
+                <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
+                <TouchableOpacity
+                  style={styles.clickBtn}
+                  onPress={() => {
+                    if (route.params) {
+                      deleteMutation.mutate(route.params.id);
+                      navigation.goBack();
+                    }
+                  }}>
+                  <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
+                </TouchableOpacity>
+              </View>
+              :
+              <View style={styles.clickBox}>
+                <Pressable>
+                  <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
+                </Pressable>
+                <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
+                <Pressable>
+                  <Text style={[{ color: theme.color.main }, FONT.Regular]}>신고</Text>
+                </Pressable>
+              </View>
+            )}
+          <View style={{
+            paddingHorizontal: d2p(20), flexDirection: 'row', justifyContent: 'space-between'
+          }}>
             <View style={{
               borderRadius: 40,
               height: d2p(40),
@@ -402,24 +413,24 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                           setEditCommentId(item.id);
                           setCommentSelectedIdx(-1);
                         }}>
-                          <Text style={[styles.click, { color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
+                          <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
                         </Pressable>
                         <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
                         <Pressable onPress={() => {
                           deleteCommentMutation.mutate(item.id);
                           setCommentSelectedIdx(-1);
                         }}>
-                          <Text style={[styles.click, { color: theme.color.main }, FONT.Regular]}>삭제</Text>
+                          <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
                         </Pressable>
                       </View>
                       :
                       <View style={[styles.clickBox, { right: d2p(15) }]}>
                         <Pressable>
-                          <Text style={[styles.click, { color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
+                          <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
                         </Pressable>
                         <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
                         <Pressable>
-                          <Text style={[styles.click, { color: theme.color.main }, FONT.Regular]}>신고</Text>
+                          <Text style={[{ color: theme.color.main }, FONT.Regular]}>신고</Text>
                         </Pressable>
                       </View>
                     )}
@@ -526,8 +537,9 @@ const styles = StyleSheet.create({
     marginLeft: d2p(40)
   },
   clickBox: {
-    display: 'flex', justifyContent: 'space-evenly', alignItems: 'center',
-    width: d2p(70),
+    height: d2p(70),
+    justifyContent: "space-evenly",
+    alignItems: "center",
     borderRadius: 5,
     position: 'absolute', right: d2p(36), top: h2p(5),
     shadowColor: '#000000',
@@ -539,10 +551,12 @@ const styles = StyleSheet.create({
     },
     elevation: (Platform.OS === 'android') ? 3 : 0,
     backgroundColor: theme.color.white,
-    zIndex: 999,
+    zIndex: 10,
   },
-  click: {
-    color: theme.color.grayscale.C_443e49,
-    paddingHorizontal: d2p(23), paddingTop: h2p(8), paddingBottom: h2p(8)
+
+  clickBtn: {
+    width: d2p(70),
+    alignItems: "center",
+    justifyContent: "center"
   },
 });

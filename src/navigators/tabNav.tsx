@@ -59,7 +59,7 @@ const TabNavigator = () => {
         listeners={({ navigation }) => ({
           tabPress: e => {
             e.preventDefault();
-            navigation.navigate('작성', { loading: false });
+            navigation.navigate('작성', { loading: false, isEdit: false });
           },
         })}
         options={{
