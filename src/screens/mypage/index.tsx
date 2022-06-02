@@ -6,7 +6,7 @@ import theme from '~/styles/theme';
 import { myIdState, okPopupState, tokenState } from '~/recoil/atoms';
 import { getMyProfile, getUserProfile } from '~/api/user';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { useQuery } from 'react-query';
+import { QueryClient, useQuery, useQueryClient } from 'react-query';
 import { MyPrfoileType } from '~/types/user';
 import { noProfile } from '~/assets/images';
 import Loading from '~/components/loading';
@@ -20,6 +20,7 @@ import { NavigationRoute } from 'react-navigation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
+import BasicButton from '~/components/button/basicButton';
 
 interface MypageProps {
   navigation: NavigationStackProp;
@@ -30,6 +31,7 @@ interface MypageProps {
 
 const Mypage = ({ navigation, route }: MypageProps) => {
   const [token, setToken] = useRecoilState(tokenState);
+  const queryClient = useQueryClient();
   const myId = useRecoilValue(myIdState);
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", route.params?.id], async () => {
     if (route.params?.id && (route.params.id !== myId)) {
@@ -61,12 +63,6 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     useCallback(() => {
       return () => setOpenMore(false);
     }, []));
-
-  if (getMyProfileQuery.isLoading || getMyProfileQuery.isFetching) {
-    return (
-      <Loading />
-    );
-  }
 
   return (
     <>
@@ -217,28 +213,69 @@ const Mypage = ({ navigation, route }: MypageProps) => {
         <Tabs.Tab
           name={`작성 글 ${getMyProfileQuery.data?.reviews.length}`}>
           <Tabs.FlatList
+            ListEmptyComponent={() => (
+              <View style={{ paddingTop: h2p(100), flex: 1 }}>
+                <View style={{ marginBottom: "auto" }}>
+                  <Text style={[FONT.Regular,
+                  {
+                    color: theme.color.grayscale.C_79737e,
+                    textAlign: "center",
+                  }]}>
+                    작성한 글이 없습니다.</Text>
+                </View>
+                <BasicButton
+                  viewStyle={{ marginHorizontal: d2p(20), marginTop: h2p(100) }}
+                  onPress={() => navigation.navigate('작성', { loading: false, isEdit: false })}
+                  text="작성하기" textColor={theme.color.main} bgColor={theme.color.white} />
+              </View>
+            )}
+            refreshing={getMyProfileQuery.isLoading}
+            onRefresh={() => queryClient.invalidateQueries("myProfile")}
             contentContainerStyle={{ paddingBottom: h2p(100), paddingTop: Platform.OS === "ios" ? h2p(90) : h2p(370) }}
             showsVerticalScrollIndicator={false}
             data={getMyProfileQuery.data?.reviews}
-            renderItem={(review) => (
-              <Pressable
-                onPress={() => navigation.navigate("FeedDetail",
-                  { id: review.item.id, isLike: review.item.isLike })}
-                style={styles.review}
-              >
-                <FeedReview
-                  clickBoxStyle={{ right: d2p(26), top: h2p(-10) }}
-                  idx={review.index}
-                  selectedIndex={selectedIndex}
-                  setSelectedIndex={(selectIdx: number) => setSelectedIndex(selectIdx)}
-                  review={review.item} />
-              </Pressable>
-            )}
+            renderItem={(review) => {
+              if (getMyProfileQuery.isLoading || getMyProfileQuery.isFetching) {
+                return (
+                  <Loading />
+                );
+              }
+              return (
+                <Pressable
+                  onPress={() => navigation.navigate("FeedDetail",
+                    { id: review.item.id, isLike: review.item.isLike })}
+                  style={styles.review}
+                >
+                  <FeedReview
+                    clickBoxStyle={{ right: d2p(26), top: h2p(-10) }}
+                    idx={review.index}
+                    selectedIndex={selectedIndex}
+                    setSelectedIndex={(selectIdx: number) => setSelectedIndex(selectIdx)}
+                    review={review.item} />
+                </Pressable>
+              );
+            }}
             keyExtractor={(v) => String(v.id)}
           />
         </Tabs.Tab>
         <Tabs.Tab name={`담은 글 ${getMyProfileQuery.data?.bookmarks.length}`}>
           <Tabs.FlatList
+            ListEmptyComponent={() => (
+              <View style={{ paddingTop: h2p(100) }}>
+                <View style={{ marginBottom: "auto" }}>
+                  <Text style={[FONT.Regular,
+                  {
+                    color: theme.color.grayscale.C_79737e,
+                    textAlign: "center",
+                  }]}>
+                    담은 글이 없습니다.</Text>
+                </View>
+                <BasicButton
+                  viewStyle={{ marginHorizontal: d2p(20), marginTop: h2p(100) }}
+                  onPress={() => navigation.navigate('피드')}
+                  text="담으러 가기" textColor={theme.color.main} bgColor={theme.color.white} />
+              </View>
+            )}
             contentContainerStyle={{ paddingBottom: h2p(100), paddingTop: Platform.OS === "ios" ? h2p(90) : h2p(370) }}
             showsVerticalScrollIndicator={false}
             data={getMyProfileQuery.data?.bookmarks}

@@ -93,26 +93,29 @@ const Onboarding = ({ navigation }: NavigationType) => {
   };
 
   const handleGoogleLogin = async () => {
-    // * 추후 개발
-    // navigation.navigate("TagSelect");
     GoogleSignin.configure({
       webClientId: "1025814485939-95vtu3p4iqb7qp23henp85c1nd2d2i3c.apps.googleusercontent.com",
       iosClientId: "1025814485939-hebcl4c1tmq4bqt9q0ifng6mq7amltnf.apps.googleusercontent.com"
     });
-    const token = await GoogleSignin.getTokens();
-    console.log(token.accessToken, 'accessToken');
-    console.log(token.idToken, 'idToken');
-    // const userInfo = await GoogleSignin.signIn();
-    // console.log(userInfo, 'userInfo');
-    // const { idToken } = userInfo;
-    // console.log(idToken, 'idToken');
-    // if (idToken) {
-    //   const data = await userLogin({ token: idToken, providerType: "google" });
-    //   console.log(data, 'data');
-    //   if (data) {
-    //     goToBadgeSelect(data);
-    //   }
-    // }
+    const userInfo = await GoogleSignin.signIn();
+    console.log(userInfo, 'userInfo');
+    const { accessToken } = await GoogleSignin.getTokens();
+    console.log(accessToken, 'accessToken');
+    if (accessToken) {
+      const data = await userLogin({ token: accessToken, providerType: "google" });
+      console.log(data, 'data');
+      if (data.accessToken) {
+        // * 이미 가입된 유저
+        setToken(data.accessToken);
+        AsyncStorage.setItem("token", data.accessToken);
+        AsyncStorage.setItem("refreshToken", data.refreshToken);
+        //@ts-ignore
+        navigation.reset({ routes: [{ name: "TabNav" }] });
+      }
+      else {
+        goToBadgeSelect(data);
+      }
+    }
   };
 
   const handleAppleLogin = async () => {
@@ -123,16 +126,23 @@ const Onboarding = ({ navigation }: NavigationType) => {
     });
     console.log(appleAuthRequestResponse, 'appleAuthRequestResponse');
     const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
-    console.log(credentialState, 'credentialState');
     if (credentialState === appleAuth.State.AUTHORIZED) {
       const token = appleAuthRequestResponse.authorizationCode;
       if (token) {
         console.log(token, 'token');
         const data = await userLogin({ token, providerType: "apple" });
         console.log(data, 'data');
-        // if (data) {
-        //   goToBadgeSelect(data);
-        // }
+        if (data.accessToken) {
+          // * 이미 가입된 유저
+          setToken(data.accessToken);
+          AsyncStorage.setItem("token", data.accessToken);
+          AsyncStorage.setItem("refreshToken", data.refreshToken);
+          //@ts-ignore
+          navigation.reset({ routes: [{ name: "TabNav" }] });
+        }
+        else {
+          goToBadgeSelect(data);
+        }
       }
     }
   };

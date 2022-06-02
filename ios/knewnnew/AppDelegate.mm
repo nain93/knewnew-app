@@ -1,11 +1,13 @@
 #import "AppDelegate.h"
 #import <RNKakaoLogins.h>
+#import <RNGoogleSignin/RNGoogleSignin.h>
 #import <NaverThirdPartyLogin/NaverThirdPartyLoginConnection.h>
 #import "RNSplashScreen.h"
 
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
+#import <React/RCTLinkingManager.h>
 
 #import <React/RCTAppSetupUtils.h>
 
@@ -30,21 +32,6 @@
 
 #include <Firebase/Firebase.h>
 @implementation AppDelegate
-
-- (BOOL)application:(UIApplication *)application openURL:(nonnull NSURL *)url options:(nonnull NSDictionary<NSString *,id> *)options {
-  dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
-      dispatch_async(dispatch_get_main_queue(), ^(void){
-        if ([RNKakaoLogins isKakaoTalkLoginUrl:url]) {
-          [RNKakaoLogins handleOpenUrl: url];
-        }
-      });
-  });
-  if ([url.scheme isEqualToString:@"naverlogin"]) {
-    return [[NaverThirdPartyLoginConnection getSharedInstance] application:application openURL:url options:options];
-  }
-	return NO;
-//   return [RNGoogleSignin application:application openURL:url options:options];
-}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {  
@@ -128,5 +115,29 @@
 }
 
 #endif
+
+- (BOOL)application:(UIApplication *)application openURL:(nonnull NSURL *)url options:(nonnull NSDictionary<NSString *,id> *)options {
+  dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+      dispatch_async(dispatch_get_main_queue(), ^(void){
+        if ([RNKakaoLogins isKakaoTalkLoginUrl:url]) {
+          [RNKakaoLogins handleOpenUrl: url];
+        }
+      });
+  });
+  if ([url.scheme isEqualToString:@"knewnnew"]) {
+    return [RCTLinkingManager application:application openURL:url options:options];  
+  }
+  if ([url.scheme isEqualToString:@"naverlogin"]) {
+    return [[NaverThirdPartyLoginConnection getSharedInstance] application:application openURL:url options:options];
+  }
+  return [RNGoogleSignin application:application openURL:url options:options];
+}
+
+// - (BOOL)application:(UIApplication *)application
+//    openURL:(NSURL *)url
+//    options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
+// {
+//   return [RCTLinkingManager application:application openURL:url options:options];
+// }
 
 @end

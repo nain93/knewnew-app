@@ -22,7 +22,7 @@ const GlobalNav = () => {
   const isLogin = useRecoilValue(tokenState);
 
   return (
-    <NavigationContainer>
+    <>
       <Stack.Navigator
         screenOptions={
           {
@@ -94,7 +94,7 @@ const GlobalNav = () => {
           }}
           component={Welcome} />
       </Stack.Navigator>
-    </NavigationContainer>
+    </>
   );
 };
 

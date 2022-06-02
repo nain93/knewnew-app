@@ -25,7 +25,7 @@ import ImageCropPicker from 'react-native-image-crop-picker';
 import { getBottomSpace } from 'react-native-iphone-x-helper';
 import Loading from '~/components/loading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { preSiginedImages, uploadImage } from '~/api';
 
 interface ProfileEditType {
   nickname: string,
@@ -55,7 +55,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
   const [profileInfo, setProfileInfo] = useState<ProfileEditType>({
     nickname: nickname ? nickname : "",
     occupation: occupation ? occupation : "",
-    profileImage: profileImage ? profileImage : "",
+    profileImage: "",
     tags: tags ? tags : [],
     representBadge: representBadge ? representBadge : ""
   });
@@ -66,16 +66,23 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
   const myId = useRecoilValue(myIdState);
   const setModalOpen = useSetRecoilState(okPopupState);
   const queryClient = useQueryClient();
+  const [profile, setProfile] = useState(profileImage ? profileImage : "");
 
   const editProfileMutation = useMutation(["editprofile", token],
-    (profile: ProfileEditType) => editUserProfile({ token, id: myId, profile }), {
+    (profileprop: ProfileEditType) => editUserProfile({ token, id: myId, profile: profileprop }), {
     onSuccess: () => {
       queryClient.invalidateQueries("myProfile");
-      // todo 수정완료 alert
-      // navigation.goBack()
     }
   });
   const deleteUserMutation = useMutation("deleteUser", () => deleteUser({ token, id: myId }));
+
+  const presignMutation = useMutation("presignImages",
+    (fileName: Array<string>) => preSiginedImages({ token, fileName, route: "user" }),
+    {
+      onSuccess: (data) => {
+        setProfileInfo({ ...profileInfo, profileImage: data[0] });
+      }
+    });
 
   useEffect(() => {
     setUserBadge({
@@ -111,7 +118,10 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
       includeBase64: true,
       compressImageMaxWidth: 720,
       compressImageMaxHeight: 720
-    }).then(v => setProfileInfo({ ...profileInfo, profileImage: `data:${v.mime};base64,${v.data}` }));
+    }).then(v => {
+      setProfile(`data:${v.mime};base64,${v.data}`);
+      presignMutation.mutate([v.path]);
+    });
   };
 
   useEffect(() => {
@@ -133,31 +143,27 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
         isBorder={true}
         headerLeft={<LeftArrowIcon onBackClick={() => navigation.goBack()} imageStyle={{ width: d2p(11), height: h2p(25) }} />}
         title="프로필 수정"
-        headerRightPress={() => {
+        headerRightPress={async () => {
           const copy: { [index: string]: Array<{ isClick: boolean, title: string }> } = { ...userBadge };
           const reduceTags = Object.keys(copy).reduce<Array<string>>((acc, cur) => {
             acc = acc.concat(copy[cur].filter(v => v.isClick).map(v => v.title));
             return acc;
           }, []);
-          if (profileInfo.profileImage?.includes("https")) {
-            editProfileMutation.mutate({
-              nickname: profileInfo.nickname,
-              occupation: profileInfo.occupation,
-              representBadge: userBadge.interest.filter(v => v.masterBadge)[0]?.title || profileInfo.representBadge,
-              tags: reduceTags
-            });
-          } else {
-            editProfileMutation.mutate({
-              ...profileInfo,
-              representBadge: userBadge.interest.filter(v => v.masterBadge)[0]?.title || profileInfo.representBadge,
-              tags: reduceTags
-            });
-          }
+          //@ts-ignore
+          await uploadImage(profile, profileInfo.profileImage);
+          editProfileMutation.mutate({
+            //@ts-ignore
+            profileImage: profileInfo.profileImage.fields.key,
+            nickname: profileInfo.nickname,
+            occupation: profileInfo.occupation,
+            representBadge: userBadge.interest.filter(v => v.masterBadge)[0]?.title || profileInfo.representBadge,
+            tags: reduceTags
+          });
         }}
         headerRight={<Text style={[{ color: theme.color.main }, FONT.Regular]}>완료</Text>} />
       <View style={styles.container}>
         <TouchableOpacity onPress={pickImage} style={styles.profileImage}>
-          <Image source={profileInfo.profileImage ? { uri: profileInfo.profileImage } : noProfile}
+          <Image source={profile ? { uri: profile } : noProfile}
             style={{ width: d2p(60), height: d2p(60), borderRadius: 60 }} />
           <Image source={plusIcon}
             style={{ width: d2p(18), height: h2p(18), position: "absolute", bottom: 0, right: 0 }} />
