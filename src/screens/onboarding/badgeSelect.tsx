@@ -31,6 +31,7 @@ const BadgeSelect = ({ route, navigation }: BadgeSelectProps) => {
   const setIspopupOpen = useSetRecoilState(popupState);
   const setToken = useSetRecoilState(tokenState);
 
+  console.log(signupData, 'signupData');
   const handleSignUp = async () => {
     if (userBadge.interest.every(v => !v.masterBadge)) {
       setIspopupOpen({ isOpen: true, content: "대표 뱃지를 선택해주세요" });

@@ -6,12 +6,13 @@ import { myIdState, okPopupState, popupState, tokenState } from '~/recoil/atoms'
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import SplashScreen from 'react-native-splash-screen';
-import { Animated } from 'react-native';
+import { Animated, Text } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useQuery } from 'react-query';
 import { getMyProfile } from '~/api/user';
 import { MyPrfoileType } from '~/types/user';
 import OkPopup from '~/components/popup/okPopup';
+import { NavigationContainer } from '@react-navigation/native';
 
 const App = () => {
   const [isPopupOpen, setIsPopupOpen] = useRecoilState(popupState);
@@ -70,9 +71,29 @@ const App = () => {
     }
   }, [isPopupOpen, fadeAnim]);
 
+  const linking = {
+    prefixes: ["knewnnew://", "https://knewnnew.com"],
+    config: {
+      screens: {
+        TabNav: {
+          initialRouteName: '피드',
+          screens: {
+            피드: "피드",
+            작성: "작성"
+          }
+        },
+        Welcome: "welcome",
+        NotFound: "*"
+      }
+    },
+  };
+
   return (
     <SafeAreaProvider>
-      <GlobalNav />
+      {/*@ts-ignore*/}
+      <NavigationContainer linking={linking} fallback={<Text>Loading...</Text>}>
+        <GlobalNav />
+      </NavigationContainer>
       <OkPopup title={modalOpen.content}
         handleOkayButton={modalOpen.okButton}
         modalOpen={modalOpen.isOpen}
