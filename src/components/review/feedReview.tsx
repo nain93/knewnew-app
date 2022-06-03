@@ -83,7 +83,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
     <>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: h2p(20) }}>
         <TouchableOpacity
-          onPress={() => navigation.navigate("마이페이지", { id: review.author.id })}
+          onPress={() => navigation.navigate("Mypage", { id: review.author.id })}
           style={{
             position: "absolute",
             left: 0,
@@ -269,7 +269,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           {/* 인용글에서는 리트윗 아이콘 삭제 */}
           {!review.parent &&
             <TouchableOpacity
-              onPress={() => navigation.navigate("작성",
+              onPress={() => navigation.navigate("Write",
                 { loading: false, isEdit: false, type: "reKnewWrite", review, nickname: getMyProfileQuery.data?.nickname, filterBadge })}
               style={styles.reviewIcon}>
               <Image source={reKnew} style={styles.reviewImg} />
@@ -289,10 +289,10 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
               <Pressable style={styles.clickBtn}
                 onPress={() => {
                   if (review.parent) {
-                    navigation.navigate("작성", { loading: true, isEdit: true, type: "reknew", nickname: review.author.nickname, review, filterBadge });
+                    navigation.navigate("Write", { loading: true, isEdit: true, type: "reknew", nickname: review.author.nickname, review, filterBadge });
                   }
                   else {
-                    navigation.navigate("작성", { loading: true, isEdit: true, review, filterBadge });
+                    navigation.navigate("Write", { loading: true, isEdit: true, review, filterBadge });
                   }
                 }}
               >

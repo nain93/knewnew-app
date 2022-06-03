@@ -6,14 +6,15 @@ import { myIdState, okPopupState, popupState, tokenState } from '~/recoil/atoms'
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import SplashScreen from 'react-native-splash-screen';
-import { Animated, Text } from 'react-native';
+import { Animated, Linking, Text } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useQuery } from 'react-query';
 import { getMyProfile } from '~/api/user';
 import { MyPrfoileType } from '~/types/user';
 import OkPopup from '~/components/popup/okPopup';
-import { NavigationContainer } from '@react-navigation/native';
+import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 
+export const navigationRef = createNavigationContainerRef();
 const App = () => {
   const [isPopupOpen, setIsPopupOpen] = useRecoilState(popupState);
   const [modalOpen, setModalOpen] = useRecoilState(okPopupState);
@@ -71,19 +72,29 @@ const App = () => {
     }
   }, [isPopupOpen, fadeAnim]);
 
+
   const linking = {
     prefixes: ["knewnnew://", "https://knewnnew.com"],
     config: {
       screens: {
         TabNav: {
-          initialRouteName: '피드',
+          initialRouteName: 'Feed',
           screens: {
-            피드: "피드",
-            작성: "작성"
+            Feed: "Feed",
+            Write: "Write",
+            Search: "Search",
+            Mypage: "Mypage"
           }
         },
-        Welcome: "welcome",
+        FeedDetail: "FeedDetail/:id",
         NotFound: "*"
+      }
+    },
+    async getInitialURL() {
+      // Check if app was opened from a deep link
+      const url = await Linking.getInitialURL();
+      if (url != null) {
+        return url;
       }
     },
   };
@@ -91,7 +102,8 @@ const App = () => {
   return (
     <SafeAreaProvider>
       {/*@ts-ignore*/}
-      <NavigationContainer linking={linking} fallback={<Text>Loading...</Text>}>
+      <NavigationContainer linking={linking} ref={navigationRef} fallback={<Text>Loading...</Text>}
+      >
         <GlobalNav />
       </NavigationContainer>
       <OkPopup title={modalOpen.content}

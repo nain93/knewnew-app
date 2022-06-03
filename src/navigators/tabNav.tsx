@@ -42,7 +42,7 @@ const TabNavigator = () => {
       }}
     >
       <Tabs.Screen
-        name="피드"
+        name="Feed"
         component={Feed}
         options={{
           tabBarIcon: ({ focused }) => (
@@ -54,12 +54,12 @@ const TabNavigator = () => {
         }}
       />
       <Tabs.Screen
-        name="작성"
+        name="Write"
         component={Write}
         listeners={({ navigation }) => ({
           tabPress: e => {
             e.preventDefault();
-            navigation.navigate('작성', { loading: false, isEdit: false });
+            navigation.navigate('Write', { loading: false, isEdit: false });
           },
         })}
         options={{
@@ -73,7 +73,7 @@ const TabNavigator = () => {
         }}
       />
       <Tabs.Screen
-        name="검색"
+        name="Search"
         component={Search}
         options={{
           tabBarIcon: ({ focused }) => (
@@ -85,12 +85,12 @@ const TabNavigator = () => {
         }}
       />
       <Tabs.Screen
-        name="마이페이지"
+        name="Mypage"
         component={Mypage}
         listeners={({ navigation }) => ({
           tabPress: e => {
             e.preventDefault();
-            navigation.navigate('마이페이지', {});
+            navigation.navigate('Mypage', {});
           },
         })}
         options={{
