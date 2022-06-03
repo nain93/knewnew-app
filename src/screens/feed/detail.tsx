@@ -177,16 +177,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     <Fragment>
       <Header
         isBorder={true}
-        headerLeft={<LeftArrowIcon onBackClick={() => {
-          navigation.goBack();
-          // if (isRefersh) {
-          //   //@ts-ignore
-          //   navigation.reset({ index: 0, routes: [{ name: "TabNav" }] });
-          // }
-          // else {
-          //   navigation.goBack();
-          // }
-        }} imageStyle={{ width: 11, height: 25 }} />}
+        headerLeft={<LeftArrowIcon onBackClick={() => navigation.goBack()}
+          imageStyle={{ width: d2p(11), height: d2p(25) }} />}
         title="리뷰 상세"
       />
       <KeyboardAvoidingView

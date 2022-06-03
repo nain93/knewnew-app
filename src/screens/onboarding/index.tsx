@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Platform, Dimensions } from 'react-native';
 import React from 'react';
 import { d2p, h2p } from '~/utils';
 import {
@@ -21,6 +21,8 @@ import { tokenState } from '~/recoil/atoms';
 import { useSetRecoilState } from 'recoil';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FONT } from '~/styles/fonts';
+import { getBottomSpace } from 'react-native-iphone-x-helper';
+import theme from '~/styles/theme';
 
 const iosKeys = {
   kConsumerKey: Config.NAVER_KEY,
@@ -176,6 +178,25 @@ const Onboarding = ({ navigation }: NavigationType) => {
               <Image source={appleImg} style={styles.snsImg} />
             </TouchableOpacity>}
         </View>
+
+      </View>
+      <View style={{
+        width: Dimensions.get("window").width - d2p(40),
+        position: "absolute",
+        bottom: getBottomSpace() + h2p(10)
+      }}>
+        <Text style={[FONT.Regular, { textAlign: "center" }]}>뉴뉴 서비스 필수 동의 항목</Text>
+        <View style={{ flexDirection: "row", alignSelf: "center" }}>
+          <TouchableOpacity>
+            <Text style={[FONT.Bold, { color: theme.color.grayscale.ff5d5d }]}>개인정보처리방침</Text>
+          </TouchableOpacity>
+          <Text style={FONT.Regular}>과 </Text>
+          <TouchableOpacity>
+            <Text style={[FONT.Bold, { color: theme.color.grayscale.ff5d5d }]}>서비스 이용약관</Text>
+          </TouchableOpacity>
+          <Text style={FONT.Regular}>을 읽고 이해했으며 </Text>
+        </View>
+        <Text style={[FONT.Regular, { textAlign: "center" }]}>그에 동의합니다.</Text>
       </View>
     </View>
   );
