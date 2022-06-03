@@ -1,6 +1,5 @@
 import { Platform } from 'react-native';
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import Onboarding from '~/screens/onboarding';
 import TagSelect from '~/screens/onboarding/tagSelect';

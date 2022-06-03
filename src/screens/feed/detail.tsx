@@ -177,7 +177,15 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     <Fragment>
       <Header
         isBorder={true}
-        headerLeft={<LeftArrowIcon onBackClick={() => navigation.goBack()}
+        headerLeft={<LeftArrowIcon onBackClick={() => {
+          if (route.path) {
+            //@ts-ignore
+            navigation.reset({ index: 0, routes: [{ name: "TabNav" }] });
+          }
+          else {
+            navigation.goBack();
+          }
+        }}
           imageStyle={{ width: d2p(11), height: d2p(25) }} />}
         title="리뷰 상세"
       />
@@ -196,7 +204,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                 <TouchableOpacity
                   style={styles.clickBtn}
                   onPress={() => {
-                    navigation.navigate("작성", { review: reviewDetailQuery.data });
+                    navigation.navigate("Write", { review: reviewDetailQuery.data });
                     setIsMoreClick(false);
                   }}>
                   <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>

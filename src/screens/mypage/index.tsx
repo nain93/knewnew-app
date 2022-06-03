@@ -225,7 +225,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
                 </View>
                 <BasicButton
                   viewStyle={{ marginHorizontal: d2p(20), marginTop: h2p(100) }}
-                  onPress={() => navigation.navigate('작성', { loading: false, isEdit: false })}
+                  onPress={() => navigation.navigate('Write', { loading: false, isEdit: false })}
                   text="작성하기" textColor={theme.color.main} bgColor={theme.color.white} />
               </View>
             )}
@@ -272,7 +272,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
                 </View>
                 <BasicButton
                   viewStyle={{ marginHorizontal: d2p(20), marginTop: h2p(100) }}
-                  onPress={() => navigation.navigate('피드')}
+                  onPress={() => navigation.navigate('Feed')}
                   text="담으러 가기" textColor={theme.color.main} bgColor={theme.color.white} />
               </View>
             )}
