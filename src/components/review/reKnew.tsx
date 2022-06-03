@@ -4,7 +4,7 @@ import theme from '~/styles/theme';
 import { d2p, h2p } from '~/utils';
 import Badge from '../badge';
 import ReviewIcon from '../icon/reviewIcon';
-import { retweetfrom, tag } from '~/assets/icons';
+import { more, retweetfrom, tag } from '~/assets/icons';
 import { FONT } from '~/styles/fonts';
 import { ReviewParentType } from '~/types/review';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
@@ -86,6 +86,76 @@ const ReKnew = ({ review, filterBadge }: FeedReviewProps) => {
         <View style={styles.sign}>
           <Text style={[styles.store, FONT.Regular]}>{review.market}</Text>
         </View>
+        {
+          (() => {
+            switch (review.images.length) {
+              // * 사진 없음
+              case 0: {
+                return null;
+              }
+              // * 사진 1개
+              case 1: {
+                return (
+                  <Image source={{ uri: review.images[0]?.image }}
+                    style={[styles.imageWrap, {
+                      width:
+                        Dimensions.get("window").width - d2p(120),
+                      aspectRatio: 3 / 2
+                    }]} />
+                );
+              }
+              // * 사진 2개
+              case 2: {
+                return (
+                  <View style={[styles.imageWrap, { borderWidth: 0, flexDirection: "row" }]}>
+                    {React.Children.toArray(review.images.map((v, i) => (
+                      <Image source={{ uri: v.image }} style={{
+                        marginRight: i === 0 ? d2p(10) : 0,
+                        borderRadius: 10,
+                        borderWidth: 1,
+                        borderColor: theme.color.grayscale.d3d0d5,
+                        width:
+                          Dimensions.get("window").width - d2p(245),
+                        aspectRatio: 3 / 2,
+                      }} />
+                    )))}
+                  </View>
+                );
+              }
+              // * 사진 3개이상
+              default:
+                return (
+                  <View style={[styles.imageWrap, { borderWidth: 0, flexDirection: "row" }]}>
+                    {React.Children.toArray(review.images.slice(0, 3).map((v, i) => (
+                      <View>
+                        <Image source={{ uri: v.image }} style={{
+                          marginRight: i !== 2 ? d2p(5) : 0,
+                          borderRadius: 10,
+                          borderWidth: 1,
+                          borderColor: theme.color.grayscale.d3d0d5,
+                          width:
+                            Dimensions.get("window").width - d2p(283.5),
+                          aspectRatio: 3 / 2,
+                        }} />
+                        {i === 2 &&
+                          <View style={{
+                            position: "absolute",
+                            width: "100%",
+                            height: "100%",
+                            borderRadius: 10,
+                            backgroundColor: "rgba(0,0,0,0.6)",
+                            justifyContent: "center",
+                            alignItems: "center"
+                          }}>
+                            <Image source={more} style={{ width: d2p(26), height: d2p(16) }} />
+                          </View>}
+                      </View>
+                    )))}
+                  </View>
+                );
+            }
+          })()
+        }
       </View>
     </View>
   );
@@ -119,5 +189,10 @@ const styles = StyleSheet.create({
     color: theme.color.grayscale.a09ca4,
     marginRight: d2p(10)
   },
+  imageWrap: {
+    borderWidth: 1,
+    borderColor: theme.color.grayscale.d3d0d5,
+    borderRadius: 10,
+  }
 });
 

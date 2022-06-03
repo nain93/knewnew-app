@@ -24,6 +24,7 @@ import { initialBadgeData } from '~/utils/data';
 import FeedReview from '~/components/review/feedReview';
 import { getBottomSpace } from 'react-native-iphone-x-helper';
 import Loading from '~/components/loading';
+import { preSiginedImages, uploadImage } from '~/api';
 
 const marketList: Array<"선택 안함" | "마켓컬리" | "쿠팡프레시" | "SSG" | "B마트" | "윙잇" | "쿠캣마켓"> =
   ["선택 안함", "마켓컬리", "쿠팡프레시", "SSG", "B마트", "윙잇", "쿠캣마켓"];
@@ -61,7 +62,6 @@ const Write = ({ navigation, route }: WriteProp) => {
     }
   });
   const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
-
   const inputRef = useRef<TextInput>(null);
   const tagRefRBSheet = useRef<RBSheet>(null);
   const marketRefRBSheet = useRef<RBSheet>(null);
@@ -70,7 +70,7 @@ const Write = ({ navigation, route }: WriteProp) => {
   const queryClient = useQueryClient();
   const token = useRecoilValue(tokenState);
   const setIspopupOpen = useSetRecoilState(popupState);
-  const [selectMarket, setIsSelectMarket] = useState(false);
+  const [isLoading, setIsLoading] = useState(route.params?.loading);
 
   const addReviewMutation = useMutation(["addReview", token],
     (writeProps: WriteReviewType) => writeReview({ token, ...writeProps }), {
@@ -89,6 +89,27 @@ const Write = ({ navigation, route }: WriteProp) => {
     }
   });
 
+  const presignMutation = useMutation("presignImages",
+    (fileName: Array<string>) => preSiginedImages({ token, fileName, route: "review" }),
+    {
+      onSuccess: (data) => {
+        imageList.map(async (v, i) => {
+          await uploadImage(v, data[i]);
+        });
+        //@ts-ignore
+        const images = data.reduce<Array<{ priority: number, image: string }>>((acc, cur, idx) => {
+          acc = acc.concat({ priority: idx, image: cur.fields.key });
+          return acc;
+        }, []);
+        if (route.params?.isEdit && route.params.review?.id) {
+          editReviewMutation.mutate({ writeProps: { ...writeData, images }, id: route.params.review?.id });
+        }
+        else {
+          addReviewMutation.mutate({ ...writeData, images });
+        }
+      }
+    });
+
   const pickImage = () => {
     if (imageList.length >= 5) {
       return;
@@ -100,9 +121,12 @@ const Write = ({ navigation, route }: WriteProp) => {
       includeBase64: true,
       compressImageMaxWidth: 720,
       compressImageMaxHeight: 720
-    }).then(v => setImageList(imageList.concat(`data:${v.mime};base64,${v.data}`)));
+    }).then(v => {
+      setImageList(imageList.concat(`data:${v.mime};base64,${v.data}`));
+    }
+    );
   };
-  const handleAddWrite = () => {
+  const handleAddWrite = async () => {
     if (writeData.satisfaction === "") {
       setIspopupOpen({ isOpen: true, content: "선호도를 표시해주세요", popupStyle: { bottom: keyboardHeight + h2p(20) } });
       return;
@@ -118,36 +142,48 @@ const Write = ({ navigation, route }: WriteProp) => {
         return;
       }
     }
-
-    const images = imageList.reduce<Array<{ priority: number, image: string }>>((acc, cur, idx) => {
-      acc = acc.concat({ priority: idx, image: cur });
-      return acc;
-    }, []);
-
-    if (route.params?.isEdit && route.params.review?.id) {
-      editReviewMutation.mutate({ writeProps: { ...writeData, images }, id: route.params.review?.id });
-    }
-    else {
-      addReviewMutation.mutate({ ...writeData, images });
-    }
-
+    presignMutation.mutate(imageList);
   };
 
   useEffect(() => {
     if (route.params?.review && route.params.type !== "reKnewWrite") {
+      setImageList(route.params.review.images.map(v => v.image));
+      setUserBadge({
+        interest: userBadge.interest.map(v => {
+          if (route.params?.review?.tags.interest.includes(v.title)) {
+            return { isClick: true, title: v.title };
+          }
+          return { isClick: false, title: v.title };
+        }),
+        household: userBadge.household.map(v => {
+          if (route.params?.review?.tags.household.includes(v.title)) {
+            return { isClick: true, title: v.title };
+          }
+          return { isClick: false, title: v.title };
+        }),
+        taste: userBadge.taste.map(v => {
+          if (route.params?.review?.tags.taste &&
+            route.params?.review?.tags.taste.includes(v.title)) {
+            return { isClick: true, title: v.title };
+          }
+          return { isClick: false, title: v.title };
+        }),
+      });
       setWriteData({
         ...writeData,
         images: route.params.review.images,
         content: route.params.review.content,
         satisfaction: route.params.review.satisfaction,
-        market: route.params.review.market,
+        market: route.params.review.market ? route.params.review.market : "선택 안함",
         tags: {
           ...route.params.review.tags,
           taste: route.params.review.tags.taste || []
-        }
+        },
       });
     }
     else {
+      setUserBadge(initialBadgeData);
+      setImageList([]);
       setWriteData({
         images: [],
         content: "",
@@ -182,7 +218,7 @@ const Write = ({ navigation, route }: WriteProp) => {
     });
   }, []);
 
-  if (!writeData.content && route.params?.loading) {
+  if (route.params?.loading && !writeData.satisfaction) {
     return (
       <Loading />
     );
@@ -305,11 +341,7 @@ const Write = ({ navigation, route }: WriteProp) => {
                 onPress={() => marketRefRBSheet.current?.open()}
                 style={styles.select}>
                 <Image source={(writeData.market !== "선택 안함") ? maincart : cart} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
-                {selectMarket ?
-                  <Text style={FONT.Medium}>{writeData.market ? writeData.market : "유통사 선택"}</Text>
-                  :
-                  <Text style={FONT.Medium}>유통사 선택</Text>
-                }
+                <Text style={FONT.Medium}>{writeData.market}</Text>
               </TouchableOpacity>
             </View>
           </>
@@ -406,10 +438,9 @@ const Write = ({ navigation, route }: WriteProp) => {
           <View />
         </View>
         <ScrollView style={{ paddingHorizontal: d2p(20) }}>
-          {React.Children.toArray(marketList.map((market, marketIdx) =>
+          {React.Children.toArray(marketList.map((market) =>
             <TouchableOpacity
               onPress={() => {
-                setIsSelectMarket(true);
                 setWriteData({ ...writeData, market });
                 marketRefRBSheet.current?.close();
               }}

@@ -58,7 +58,6 @@ export const writeReview = async ({
   token, images, content,
   satisfaction, market,
   product, parent, cart, tags }: { token: string } & WriteReviewType) => {
-  console.log(parent, 'parent');
   const res = await axios.post(baseURL + "review/", {
     images,
     content,
@@ -80,6 +79,7 @@ export const editReview = async ({
   token, id, images, content,
   satisfaction, market,
   product, parent, cart, tags }: { token: string, id: number } & WriteReviewType) => {
+  console.log(images, 'images');
   const res = await axios.patch(baseURL + `review/${id}/`, {
     images,
     content,
