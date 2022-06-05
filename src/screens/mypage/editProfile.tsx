@@ -141,7 +141,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
     <>
       <Header
         isBorder={true}
-        headerLeft={<LeftArrowIcon onBackClick={() => navigation.goBack()} imageStyle={{ width: d2p(11), height: h2p(25) }} />}
+        headerLeft={<LeftArrowIcon onBackClick={() => navigation.goBack()} imageStyle={{ width: d2p(11), height: d2p(25) }} />}
         title="프로필 수정"
         headerRightPress={async () => {
           const copy: { [index: string]: Array<{ isClick: boolean, title: string }> } = { ...userBadge };

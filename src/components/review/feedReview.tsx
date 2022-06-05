@@ -14,7 +14,7 @@ import { myIdState, tokenState } from '~/recoil/atoms';
 import { bookmarkReview, deleteReview, likeReview } from '~/api/review';
 import { FONT } from '~/styles/fonts';
 import { noProfile } from '~/assets/images';
-import Loading from '~/components/loading';
+import Share from 'react-native-share';
 import { MyPrfoileType } from '~/types/user';
 import { getMyProfile } from '~/api/user';
 import ReKnew from '~/components/review/reKnew';
@@ -307,12 +307,26 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             :
             <View style={[styles.clickBox, clickBoxStyle]}>
               <Pressable style={styles.clickBtn}
-                onPress={() => console.log("")}>
+                onPress={async () => {
+                  Share.open({
+                    title: "뉴뉴",
+                    url: `knewnnew://FeedDetail/${review.id}`
+                  })
+                    .then((res) => {
+                      console.log(res);
+                    })
+                    .catch((err) => {
+                      err && console.log(err);
+                    });
+                  if (setSelectedIndex) {
+                    setSelectedIndex(-1);
+                  }
+                }}>
                 <Text style={[styles.click, { color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
               </Pressable>
               <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
               <Pressable style={styles.clickBtn}
-                onPress={() => console.log("")}>
+                onPress={() => navigation.navigate("report")}>
                 <Text style={[styles.click, { color: theme.color.main }, FONT.Regular]}>신고</Text>
               </Pressable>
             </View>

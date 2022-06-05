@@ -8,7 +8,6 @@ import {
   appleImg
 } from "~/assets/images/snsImg/index";
 import mainLogo from '~/assets/logo';
-import { onboardingImg } from '~/assets/images';
 
 import Config from "react-native-config";
 import { NavigationType } from '~/types';
@@ -21,7 +20,7 @@ import { tokenState } from '~/recoil/atoms';
 import { useSetRecoilState } from 'recoil';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FONT } from '~/styles/fonts';
-import { getBottomSpace } from 'react-native-iphone-x-helper';
+import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 import theme from '~/styles/theme';
 
 const iosKeys = {
@@ -156,11 +155,6 @@ const Onboarding = ({ navigation }: NavigationType) => {
           제대로 된 맛있는 발견</Text>
         <Image source={mainLogo} style={styles.logo} />
       </View>
-      {/* <Image
-          source={onboardingImg}
-          resizeMode="contain"
-          style={styles.onboardingImg}
-        /> */}
       <View style={{ marginBottom: h2p(145) }}>
         <Text style={[{ textAlign: "center", fontSize: 16, fontWeight: "bold" }, FONT.Bold]}>SNS로 시작하기</Text>
         <View style={{ flexDirection: "row", marginTop: d2p(20), alignSelf: "center" }}>
@@ -183,10 +177,10 @@ const Onboarding = ({ navigation }: NavigationType) => {
       <View style={{
         width: Dimensions.get("window").width - d2p(40),
         position: "absolute",
-        bottom: getBottomSpace() + h2p(10)
+        bottom: isIphoneX() ? getBottomSpace() + h2p(20) : h2p(40)
       }}>
-        <Text style={[FONT.Regular, { textAlign: "center" }]}>뉴뉴 서비스 필수 동의 항목</Text>
-        <View style={{ flexDirection: "row", alignSelf: "center" }}>
+        <Text style={FONT.Regular}>회원가입 시 뉴뉴 서비스 필수 동의 항목</Text>
+        <View style={{ flexDirection: "row" }}>
           <TouchableOpacity>
             <Text style={[FONT.Bold, { color: theme.color.grayscale.ff5d5d }]}>개인정보처리방침</Text>
           </TouchableOpacity>
@@ -194,9 +188,8 @@ const Onboarding = ({ navigation }: NavigationType) => {
           <TouchableOpacity>
             <Text style={[FONT.Bold, { color: theme.color.grayscale.ff5d5d }]}>서비스 이용약관</Text>
           </TouchableOpacity>
-          <Text style={FONT.Regular}>을 읽고 이해했으며 </Text>
+          <Text style={[FONT.Regular, { textAlign: "center" }]}>에 동의하게 됩니다.</Text>
         </View>
-        <Text style={[FONT.Regular, { textAlign: "center" }]}>그에 동의합니다.</Text>
       </View>
     </View>
   );
