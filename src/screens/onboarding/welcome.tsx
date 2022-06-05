@@ -6,6 +6,8 @@ import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { getMyProfile } from '~/api/user';
 import BasicButton from '~/components/button/basicButton';
+import Header from '~/components/header';
+import CloseIcon from '~/components/icon/closeIcon';
 import Loading from '~/components/loading';
 import { tokenState } from '~/recoil/atoms';
 import { FONT } from '~/styles/fonts';
@@ -46,27 +48,35 @@ const Welcome = ({ navigation, route }: NavigationType) => {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.main}>
-        <Text style={[styles.mainText, { color: theme.color.main }, { lineHeight: 28 }, FONT.SemiBold]}>{data?.nickname}</Text>
-        <Text style={[styles.mainText, { lineHeight: 29 }, FONT.SemiBold]}>님 반가워요!</Text>
-      </View>
-      <View style={{
-        marginBottom: h2p(10),
-        justifyContent: "center",
-        alignItems: "center",
-        width: d2p(96),
-        borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
-        paddingHorizontal: d2p(15), paddingVertical: h2p(5), height: h2p(28), borderRadius: 14
-      }}>
-        <Text style={[{ color: theme.color.black, fontWeight: "500" }, FONT.Medium]}>{masterBadge}</Text>
-      </View>
-      <View style={{ flexDirection: "row" }}>
-        {React.Children.toArray(badge?.map(v => <Text style={[styles.tag, FONT.SemiBold]}>#{v} </Text>))}
-      </View>
-      <Text style={[styles.subText, FONT.Regular]}>맛있는 정보 함께 나눠요.</Text>
-      <BasicButton onPress={handleSignIn} text="입장하기" bgColor={theme.color.main} textColor={theme.color.white} />
-    </View >
+    <>
+      <Header isBorder={false}
+        headerLeft={<CloseIcon onPress={() => {
+          //@ts-ignore
+          navigation.reset({ index: 0, routes: [{ name: "TabNav" }] });
+        }} />}
+      />
+      <View style={styles.container}>
+        <View style={styles.main}>
+          <Text style={[styles.mainText, { color: theme.color.main }, { lineHeight: 28 }, FONT.SemiBold]}>{data?.nickname}</Text>
+          <Text style={[styles.mainText, { lineHeight: 29 }, FONT.SemiBold]}>님 반가워요!</Text>
+        </View>
+        <View style={{
+          marginBottom: h2p(10),
+          justifyContent: "center",
+          alignItems: "center",
+          width: d2p(96),
+          borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
+          paddingHorizontal: d2p(15), paddingVertical: h2p(5), height: h2p(28), borderRadius: 14
+        }}>
+          <Text style={[{ color: theme.color.black, fontWeight: "500" }, FONT.Medium]}>{masterBadge}</Text>
+        </View>
+        <View style={{ flexDirection: "row" }}>
+          {React.Children.toArray(badge?.map(v => <Text style={[styles.tag, FONT.SemiBold]}>#{v} </Text>))}
+        </View>
+        <Text style={[styles.subText, FONT.Regular]}>맛있는 정보 함께 나눠요.</Text>
+        <BasicButton onPress={handleSignIn} text="입장하기" bgColor={theme.color.main} textColor={theme.color.white} />
+      </View >
+    </>
   );
 };
 

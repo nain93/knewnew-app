@@ -10,12 +10,13 @@ interface BasicButtonProp {
   textColor: string;
   viewStyle?: ViewStyle;
   onPress: () => void;
+  borderColor?: string
 }
 
-const BasicButton = ({ text, bgColor, textColor, viewStyle, onPress }: BasicButtonProp) => {
+const BasicButton = ({ text, bgColor, textColor, borderColor, viewStyle, onPress }: BasicButtonProp) => {
   return (
     <TouchableOpacity onPress={onPress}>
-      <View style={[styles.container, viewStyle, { backgroundColor: bgColor }, { borderColor: textColor }]}>
+      <View style={[styles.container, viewStyle, { backgroundColor: bgColor }, { borderColor: borderColor ? borderColor : textColor }]}>
         <View style={styles.textContainer}>
           <Text style={[styles.text, { color: textColor }, FONT.Bold]}>{text}</Text>
         </View>

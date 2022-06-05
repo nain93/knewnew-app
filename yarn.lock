@@ -6326,6 +6326,11 @@ react-native-screens@^3.13.1:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
 
+react-native-share@^7.5.0:
+  version "7.5.0"
+  resolved "https://registry.yarnpkg.com/react-native-share/-/react-native-share-7.5.0.tgz#888c4ee14c428109ce345ceae9ffedf39aefc4e1"
+  integrity sha512-0O88MSVpPbc0pNYCTk91qZgh4DzeFR0zFVEXPm1zy9qqdyHd3rbaKS15BJ6s0BmXe2Yz9BmyRbxxP5wqjMvZKg==
+
 react-native-splash-screen@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/react-native-splash-screen/-/react-native-splash-screen-3.3.0.tgz#3af71ed17afe50fee69590a45aec399d071ead02"

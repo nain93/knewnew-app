@@ -14,6 +14,7 @@ import { useRecoilValue } from 'recoil';
 import { tokenState } from '~/recoil/atoms';
 import theme from '~/styles/theme';
 import FeedDetail from '~/screens/feed/detail';
+import Report from '~/screens/report';
 
 const Stack = createStackNavigator();
 
@@ -86,12 +87,16 @@ const GlobalNav = () => {
         <Stack.Screen
           name="Welcome"
           options={{
-            title: "",
-            headerLeft: () => <CloseIcon onPress={() => console.log("close")} />,
-            headerLeftContainerStyle: { paddingLeft: d2p(20) },
-            headerShadowVisible: false,
+            headerShown: false
           }}
           component={Welcome} />
+        <Stack.Screen
+          name="report"
+          component={Report}
+          options={{
+            headerShown: false
+          }}
+        />
       </Stack.Navigator>
     </>
   );
