@@ -107,6 +107,7 @@ const Feed = ({ navigation }: NavigationType) => {
       {Platform.OS === "ios" &&
         <StatusBarPlaceHolder scrollOffset={scrollOffset} />}
       <Header
+        type="feed"
         viewStyle={isIphoneX() ? { marginTop: 0 } : {}}
         customRight={
           <Animated.View style={{ opacity: fadeAnim ? fadeAnim : 1, zIndex: 10 }}>
@@ -114,17 +115,17 @@ const Feed = ({ navigation }: NavigationType) => {
               <TouchableOpacity
                 onPress={() => tagRefRBSheet.current?.open()}
                 style={[styles.filter, { marginRight: 0, marginBottom: 0 }]}>
-                <Image source={tagfilter} style={{ width: 11, height: 10, marginRight: d2p(10) }} />
+                <Image source={tagfilter} style={{ width: d2p(11), height: d2p(10), marginRight: d2p(10) }} />
                 <Text style={FONT.Medium}>태그 변경</Text>
               </TouchableOpacity> : <View />}
           </Animated.View>
         }
         headerLeft={scrollOffset >= h2p(130) ?
           <Animated.View style={{ opacity: fadeAnim ? fadeAnim : 1, zIndex: 10 }}>
-            <Text style={[{ fontSize: 16, fontWeight: "bold" }, FONT.Bold]}>
+            <Text style={[{ fontSize: 16 }, FONT.Bold]}>
               {filterBadge ? `#${filterBadge}` : `#${getMyProfileQuery.data?.representBadge}`}
             </Text>
-          </Animated.View> : <Image source={mainLogo} resizeMode="contain" style={{ width: d2p(96), height: h2p(20) }} />}
+          </Animated.View> : <Image source={mainLogo} resizeMode="contain" style={{ width: d2p(96), height: d2p(20) }} />}
         isBorder={scrollOffset >= h2p(130) ? true : false} bgColor={scrollOffset >= h2p(130) ? theme.color.white : theme.color.grayscale.f7f7fc}
       />
       <View style={{ flex: 1, backgroundColor: theme.color.grayscale.f7f7fc }}>

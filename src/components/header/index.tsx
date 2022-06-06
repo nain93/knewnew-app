@@ -14,31 +14,46 @@ interface HeaderProps {
   headerRightPress?: () => void;
   customRight?: JSX.Element;
   viewStyle?: ViewStyle;
+  type?: "feed"
 }
 
-const Header = ({ headerRightPress, headerLeft, headerRight, customRight, title, isBorder = true, bgColor, viewStyle }: HeaderProps) => {
+function StatusBarPlaceHolder() {
   return (
-    <View style={[styles.container, viewStyle, { borderBottomWidth: isBorder ? 1 : 0 }, { backgroundColor: bgColor }]}>
-      <View
-        style={{ position: "absolute", left: d2p(20) }}>
-        {headerLeft}
-      </View>
-      <Text style={[{ fontSize: 16, color: theme.color.black }, FONT.Regular]}>
-        {title}
-      </Text>
-      {headerRight ?
-        <TouchableOpacity
-          hitSlop={{ top: d2p(20), left: d2p(20), right: d2p(20), bottom: d2p(20) }}
-          onPress={headerRightPress}
-          style={{ position: "absolute", right: d2p(20) }}>
-          {headerRight}
-        </TouchableOpacity>
-        :
-        <View style={{ position: "absolute", right: d2p(20) }}>
-          {customRight}
+    <View style={{
+      width: "100%",
+      height: getStatusBarHeight(),
+      backgroundColor: theme.color.white
+    }} />
+  );
+}
+
+const Header = ({ type, headerRightPress, headerLeft, headerRight, customRight, title, isBorder = true, bgColor, viewStyle }: HeaderProps) => {
+  return (
+    <>
+      {(type !== "feed" && !isIphoneX()) &&
+        <StatusBarPlaceHolder />}
+      <View style={[styles.container, viewStyle, { borderBottomWidth: isBorder ? 1 : 0 }, { backgroundColor: bgColor }]}>
+        <View
+          style={{ position: "absolute", left: d2p(20) }}>
+          {headerLeft}
         </View>
-      }
-    </View>
+        <Text style={[{ fontSize: 16, color: theme.color.black }, FONT.Regular]}>
+          {title}
+        </Text>
+        {headerRight ?
+          <TouchableOpacity
+            hitSlop={{ top: d2p(20), left: d2p(20), right: d2p(20), bottom: d2p(20) }}
+            onPress={headerRightPress}
+            style={{ position: "absolute", right: d2p(20) }}>
+            {headerRight}
+          </TouchableOpacity>
+          :
+          <View style={{ position: "absolute", right: d2p(20) }}>
+            {customRight}
+          </View>
+        }
+      </View>
+    </>
   );
 };
 

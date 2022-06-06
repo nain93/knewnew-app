@@ -120,7 +120,6 @@ const Onboarding = ({ navigation }: NavigationType) => {
   };
 
   const handleAppleLogin = async () => {
-    // * 추후 개발
     const appleAuthRequestResponse = await appleAuth.performRequest({
       requestedOperation: appleAuth.Operation.LOGIN,
       requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
