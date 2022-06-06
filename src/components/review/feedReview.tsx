@@ -1,4 +1,4 @@
-import { View, Text, Pressable, StyleSheet, Dimensions, Image, TouchableOpacity, Platform, ViewStyle } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Dimensions, Image, TouchableOpacity, ViewStyle } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import theme from '~/styles/theme';
 import { d2p, h2p, simpleDate } from '~/utils';
@@ -8,16 +8,16 @@ import { cart, colorCart, colorLike, comment, like, more, reKnew, tag } from '~/
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 import { ReviewListType } from '~/types/review';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
-import { myIdState, tokenState } from '~/recoil/atoms';
-import { bookmarkReview, deleteReview, likeReview } from '~/api/review';
+import { tokenState } from '~/recoil/atoms';
+import { bookmarkReview, likeReview } from '~/api/review';
 import { FONT } from '~/styles/fonts';
 import { noProfile } from '~/assets/images';
-import Share from 'react-native-share';
 import { MyPrfoileType } from '~/types/user';
 import { getMyProfile } from '~/api/user';
 import ReKnew from '~/components/review/reKnew';
+import More from '~/components/more';
 
 interface FeedReviewProps {
   review: ReviewListType,
@@ -40,22 +40,12 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
   const [bookmarkCount, setBookmarkCount] = useState(review.bookmarkCount);
   const [tags, setTags] = useState<Array<string>>([]);
   const token = useRecoilValue(tokenState);
-  const myId = useRecoilValue(myIdState);
-  const queryClient = useQueryClient();
 
   const boomarkMutation = useMutation("bookmark",
     ({ id, isBookmark }: { id: number, isBookmark: boolean }) => bookmarkReview(token, id, isBookmark));
 
   const likeReviewFeedMutation = useMutation('likeReviewFeed',
     ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state));
-
-  const deleteMutation = useMutation("deleteReview",
-    (id: number) => deleteReview(token, id), {
-    onSuccess: () => {
-      queryClient.invalidateQueries("reviewList");
-      queryClient.invalidateQueries("myProfile");
-    }
-  });
 
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
     enabled: !!token
@@ -282,55 +272,20 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
         <ReKnew review={{ ...review.parent, tags: review.tags }} filterBadge={filterBadge ? filterBadge : ""} />
       }
       {
-        (selectedIndex === idx && type === "normal") &&
-        (
-          review.author.id === myId ?
-            <View style={[styles.clickBox, clickBoxStyle]}>
-              <Pressable style={styles.clickBtn}
-                onPress={() => {
-                  if (review.parent) {
-                    navigation.navigate("Write", { loading: true, isEdit: true, type: "reknew", nickname: review.author.nickname, review, filterBadge });
-                  }
-                  else {
-                    navigation.navigate("Write", { loading: true, isEdit: true, review, filterBadge });
-                  }
-                }}
-              >
-                <Text style={[styles.click, { color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
-              </Pressable>
-              <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-              <Pressable style={styles.clickBtn}
-                onPress={() => deleteMutation.mutate(review.id)}>
-                <Text style={[styles.click, { color: theme.color.main }, FONT.Regular]}>삭제</Text>
-              </Pressable>
-            </View>
-            :
-            <View style={[styles.clickBox, clickBoxStyle]}>
-              <Pressable style={styles.clickBtn}
-                onPress={async () => {
-                  Share.open({
-                    title: "뉴뉴",
-                    url: `knewnnew://FeedDetail/${review.id}`
-                  })
-                    .then((res) => {
-                      console.log(res);
-                    })
-                    .catch((err) => {
-                      err && console.log(err);
-                    });
-                  if (setSelectedIndex) {
-                    setSelectedIndex(-1);
-                  }
-                }}>
-                <Text style={[styles.click, { color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
-              </Pressable>
-              <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-              <Pressable style={styles.clickBtn}
-                onPress={() => navigation.navigate("report")}>
-                <Text style={[styles.click, { color: theme.color.main }, FONT.Regular]}>신고</Text>
-              </Pressable>
-            </View>
-        )}
+        type === "normal" &&
+        <More
+          review={review}
+          filterBadge={filterBadge}
+          userId={review.author.id}
+          isMoreClick={selectedIndex === idx}
+          type="review"
+          handleCloseMore={() => {
+            if (setSelectedIndex) {
+              setSelectedIndex(-1);
+            }
+          }}
+        />
+      }
     </>
   );
 };
@@ -361,37 +316,10 @@ const styles = StyleSheet.create({
     color: theme.color.grayscale.a09ca4,
     marginRight: d2p(10)
   },
-
   dottedLine: {
     borderWidth: 1,
     borderColor: theme.color.grayscale.e9e7ec,
     borderStyle: 'dotted',
-  },
-  clickBox: {
-    display: 'flex', justifyContent: 'space-evenly', alignItems: 'center',
-    width: d2p(70),
-    borderRadius: 5,
-    position: 'absolute', right: d2p(36), top: h2p(5),
-    shadowColor: '#000000',
-    shadowOpacity: 0.27,
-    shadowRadius: 4.65,
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    elevation: (Platform.OS === 'android') ? 3 : 0,
-    backgroundColor: theme.color.white,
-    zIndex: 10,
-  },
-  click: {
-    color: theme.color.grayscale.C_443e49,
-    paddingHorizontal: d2p(23), paddingTop: h2p(8), paddingBottom: h2p(8)
-  },
-  clickBtn: {
-    width: d2p(70),
-    height: d2p(35),
-    alignItems: "center",
-    justifyContent: "center"
   },
   reactionContainer: {
     marginLeft: d2p(50),

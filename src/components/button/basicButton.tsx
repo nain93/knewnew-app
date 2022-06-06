@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, ViewStyle } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, ViewStyle, Pressable } from "react-native";
 import { FONT } from "~/styles/fonts";
 import theme from "~/styles/theme";
 import { d2p } from "~/utils";

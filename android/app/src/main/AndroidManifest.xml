@@ -2,6 +2,10 @@
   <queries>
     <intent>
       <action android:name="android.intent.action.VIEW" />
+      <data android:scheme="http"/>
+    </intent>
+    <intent>
+      <action android:name="android.intent.action.VIEW" />
       <data android:scheme="https"/>
     </intent>
   </queries>
@@ -33,7 +37,6 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <!-- <data android:host="kakaolink" android:scheme="kakao7637c35cfedcb6c01b1f17ce7cd42f05" /> -->
         <data android:host="oauth" android:scheme="kakao7637c35cfedcb6c01b1f17ce7cd42f05"/>
       </intent-filter>
     </activity>

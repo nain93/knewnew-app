@@ -22,6 +22,7 @@ import { FONT } from '~/styles/fonts';
 import { noProfile } from '~/assets/images';
 import { addReviewComment, deleteReviewComment, editReviewComment, getReviewComment } from '~/api/comment';
 import ReKnew from '~/components/review/reKnew';
+import More from '~/components/more';
 interface FeedDetailProps {
   navigation: NavigationStackProp
   route: NavigationRoute<{
@@ -198,40 +199,15 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           showsVerticalScrollIndicator={false}
           style={{ paddingTop: h2p(20), flex: 1 }}
         >
-          {isMoreClick &&
-            (myId === reviewDetailQuery.data?.author.id ?
-              <View style={styles.clickBox}>
-                <TouchableOpacity
-                  style={styles.clickBtn}
-                  onPress={() => {
-                    navigation.navigate("Write", { review: reviewDetailQuery.data });
-                    setIsMoreClick(false);
-                  }}>
-                  <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
-                </TouchableOpacity>
-                <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-                <TouchableOpacity
-                  style={styles.clickBtn}
-                  onPress={() => {
-                    if (route.params) {
-                      deleteMutation.mutate(route.params.id);
-                      navigation.goBack();
-                    }
-                  }}>
-                  <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
-                </TouchableOpacity>
-              </View>
-              :
-              <View style={styles.clickBox}>
-                <Pressable>
-                  <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
-                </Pressable>
-                <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-                <Pressable>
-                  <Text style={[{ color: theme.color.main }, FONT.Regular]}>신고</Text>
-                </Pressable>
-              </View>
-            )}
+          {reviewDetailQuery.data &&
+            <More
+              review={reviewDetailQuery.data}
+              userId={reviewDetailQuery.data?.author.id}
+              isMoreClick={isMoreClick}
+              type="review"
+              handleCloseMore={() => setIsMoreClick(false)}
+            />
+          }
           <View style={{
             paddingHorizontal: d2p(20), flexDirection: 'row', justifyContent: 'space-between'
           }}>
@@ -389,54 +365,45 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                           <Text style={[styles.commentDate, FONT.Regular]}>{dateCommentFormat(item.created)}</Text>
                         </View>
                       </View>
-                      <TouchableOpacity onPress={() => {
-                        if (commentSelectedIdx === index) {
-                          setCommentSelectedIdx(-1);
-                        } else {
-                          setCommentSelectedIdx(index);
-                        }
-                      }}>
-                        <Image
-                          source={commentMore}
-                          resizeMode="contain"
-                          style={{ width: d2p(12), height: d2p(16) }}
-                        />
-                      </TouchableOpacity>
+                      {myId === item.author.id &&
+                        <TouchableOpacity onPress={() => {
+                          if (commentSelectedIdx === index) {
+                            setCommentSelectedIdx(-1);
+                          } else {
+                            setCommentSelectedIdx(index);
+                          }
+                        }}>
+                          <Image
+                            source={commentMore}
+                            resizeMode="contain"
+                            style={{ width: d2p(12), height: d2p(16) }}
+                          />
+                        </TouchableOpacity>
+                      }
                     </View>
                   </View>
                   <Text style={[styles.commentContent, FONT.Regular]}>{item.content}</Text>
                   <View style={styles.commentLine} />
                   {commentSelectedIdx === index &&
-                    (myId === item.author.id ?
-                      <View style={[styles.clickBox, { right: d2p(15) }]}>
-                        <Pressable onPress={() => {
-                          setContent(item.content);
-                          setCommentIsEdit(true);
-                          setModifyingIdx(commentSelectedIdx);
-                          setEditCommentId(item.id);
-                          setCommentSelectedIdx(-1);
-                        }}>
-                          <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
-                        </Pressable>
-                        <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-                        <Pressable onPress={() => {
-                          deleteCommentMutation.mutate(item.id);
-                          setCommentSelectedIdx(-1);
-                        }}>
-                          <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
-                        </Pressable>
-                      </View>
-                      :
-                      <View style={[styles.clickBox, { right: d2p(15) }]}>
-                        <Pressable>
-                          <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
-                        </Pressable>
-                        <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-                        <Pressable>
-                          <Text style={[{ color: theme.color.main }, FONT.Regular]}>신고</Text>
-                        </Pressable>
-                      </View>
-                    )}
+                    <View style={[styles.clickBox, { right: d2p(32) }]}>
+                      <Pressable onPress={() => {
+                        setContent(item.content);
+                        setCommentIsEdit(true);
+                        setModifyingIdx(commentSelectedIdx);
+                        setEditCommentId(item.id);
+                        setCommentSelectedIdx(-1);
+                      }}>
+                        <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
+                      </Pressable>
+                      <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
+                      <Pressable onPress={() => {
+                        deleteCommentMutation.mutate(item.id);
+                        setCommentSelectedIdx(-1);
+                      }}>
+                        <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
+                      </Pressable>
+                    </View>
+                  }
                 </View>
               )}
               keyExtractor={(item) => String(item.id)} />
@@ -540,6 +507,7 @@ const styles = StyleSheet.create({
     marginLeft: d2p(40)
   },
   clickBox: {
+    width: d2p(70),
     height: d2p(70),
     justifyContent: "space-evenly",
     alignItems: "center",
@@ -555,11 +523,5 @@ const styles = StyleSheet.create({
     elevation: (Platform.OS === 'android') ? 3 : 0,
     backgroundColor: theme.color.white,
     zIndex: 10,
-  },
-
-  clickBtn: {
-    width: d2p(70),
-    alignItems: "center",
-    justifyContent: "center"
   },
 });
