@@ -1,9 +1,10 @@
-import { Dimensions, StatusBar, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { Dimensions, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import React from 'react';
 import { d2p, h2p } from '~/utils';
 import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
 import theme from '~/styles/theme';
 import { FONT } from '~/styles/fonts';
+import { hitslop } from '~/utils/constant';
 
 interface HeaderProps {
   title?: string;
@@ -30,7 +31,7 @@ function StatusBarPlaceHolder() {
 const Header = ({ type, headerRightPress, headerLeft, headerRight, customRight, title, isBorder = true, bgColor, viewStyle }: HeaderProps) => {
   return (
     <>
-      {(type !== "feed" && !isIphoneX()) &&
+      {(type !== "feed" && !isIphoneX() && Platform.OS === "ios") &&
         <StatusBarPlaceHolder />}
       <View style={[styles.container, viewStyle, { borderBottomWidth: isBorder ? 1 : 0 }, { backgroundColor: bgColor }]}>
         <View
@@ -42,7 +43,7 @@ const Header = ({ type, headerRightPress, headerLeft, headerRight, customRight, 
         </Text>
         {headerRight ?
           <TouchableOpacity
-            hitSlop={{ top: d2p(20), left: d2p(20), right: d2p(20), bottom: d2p(20) }}
+            hitSlop={hitslop}
             onPress={headerRightPress}
             style={{ position: "absolute", right: d2p(20) }}>
             {headerRight}

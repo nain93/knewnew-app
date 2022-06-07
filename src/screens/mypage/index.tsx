@@ -4,16 +4,16 @@ import Header from '~/components/header';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import { myIdState, okPopupState, tokenState } from '~/recoil/atoms';
-import { getMyProfile, getUserProfile } from '~/api/user';
+import { getMyProfile, getUserBookmarkList, getUserProfile, getUserReviewList } from '~/api/user';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { QueryClient, useQuery, useQueryClient } from 'react-query';
+import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
 import { MyPrfoileType } from '~/types/user';
 import { noProfile } from '~/assets/images';
 import Loading from '~/components/loading';
 import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
 import FeedReview from '~/components/review/feedReview';
 import { FONT } from '~/styles/fonts';
-import { more, write } from '~/assets/icons';
+import { more } from '~/assets/icons';
 import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
@@ -21,6 +21,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import BasicButton from '~/components/button/basicButton';
+import { ReviewListType } from '~/types/review';
 
 interface MypageProps {
   navigation: NavigationStackProp;
@@ -33,6 +34,11 @@ const Mypage = ({ navigation, route }: MypageProps) => {
   const [token, setToken] = useRecoilState(tokenState);
   const queryClient = useQueryClient();
   const myId = useRecoilValue(myIdState);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [headerHeight, setHeaderHeight] = useState(h2p(60));
+  const [index, setIndex] = useState(0);
+  const [openMore, setOpenMore] = useState(false);
+  const setModalOpen = useSetRecoilState(okPopupState);
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", route.params?.id], async () => {
     if (route.params?.id && (route.params.id !== myId)) {
       const queryData = await getUserProfile(token, route.params?.id);
@@ -43,13 +49,30 @@ const Mypage = ({ navigation, route }: MypageProps) => {
       return queryData;
     }
   }, {
-    enabled: !!token,
+    enabled: !!route.params?.id,
   });
-  const [selectedIndex, setSelectedIndex] = useState(-1);
-  const [headerHeight, setHeaderHeight] = useState(h2p(60));
-  const [index, setIndex] = useState(0);
-  const [openMore, setOpenMore] = useState(false);
-  const setModalOpen = useSetRecoilState(okPopupState);
+
+  const userReviewListQuery = useInfiniteQuery<ReviewListType[], Error>(["userReviewList", route.params?.id], async ({ pageParam = 0 }) => {
+    if (route.params?.id) {
+      const queryData = await getUserReviewList({ token, id: route.params?.id, offset: pageParam });
+      return queryData;
+    }
+  }, {
+    enabled: !!route.params?.id,
+    getNextPageParam: (next, all) => all.flat().length,
+    getPreviousPageParam: (prev) => (prev.length - 20) ?? undefined,
+  });
+
+  const userBookmarkListQuery = useInfiniteQuery<ReviewListType[], Error>(["userBookmarkList", route.params?.id], async ({ pageParam = 0 }) => {
+    if (route.params?.id) {
+      const queryData = await getUserBookmarkList({ token, id: route.params?.id, offset: pageParam });
+      return queryData;
+    }
+  }, {
+    enabled: !!route.params?.id,
+    getNextPageParam: (next, all) => all.flat().length,
+    getPreviousPageParam: (prev) => (prev.length - 20) ?? undefined,
+  });
 
   useEffect(() => {
     // * 로그아웃시 온보딩화면으로
@@ -63,6 +86,12 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     useCallback(() => {
       return () => setOpenMore(false);
     }, []));
+
+  if (getMyProfileQuery.isLoading || userReviewListQuery.isLoading || userBookmarkListQuery.isLoading) {
+    return (
+      <Loading />
+    );
+  }
 
   return (
     <>
@@ -211,10 +240,10 @@ const Mypage = ({ navigation, route }: MypageProps) => {
         )}
       >
         <Tabs.Tab
-          name={`작성 글 ${getMyProfileQuery.data?.reviews.length}`}>
+          name={`작성 글 ${userReviewListQuery.data?.pages.flat().length}`}>
           <Tabs.FlatList
             ListEmptyComponent={() => (
-              <View style={{ paddingTop: h2p(100), flex: 1 }}>
+              <View style={{ paddingTop: h2p(20), flex: 1 }}>
                 <View style={{ marginBottom: "auto" }}>
                   <Text style={[FONT.Regular,
                   {
@@ -229,11 +258,13 @@ const Mypage = ({ navigation, route }: MypageProps) => {
                   text="작성하기" textColor={theme.color.main} bgColor={theme.color.white} />
               </View>
             )}
-            refreshing={getMyProfileQuery.isLoading}
-            onRefresh={() => queryClient.invalidateQueries("myProfile")}
+            onEndReached={() => userReviewListQuery.fetchNextPage()}
+            onEndReachedThreshold={0.3}
+            refreshing={userReviewListQuery.isLoading}
+            onRefresh={() => queryClient.invalidateQueries("userReviewList")}
             contentContainerStyle={{ paddingBottom: h2p(100), paddingTop: Platform.OS === "ios" ? h2p(90) : h2p(370) }}
             showsVerticalScrollIndicator={false}
-            data={getMyProfileQuery.data?.reviews}
+            data={userReviewListQuery.data?.pages.flat()}
             renderItem={(review) => {
               if (getMyProfileQuery.isLoading || getMyProfileQuery.isFetching) {
                 return (
@@ -258,10 +289,10 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             keyExtractor={(v) => String(v.id)}
           />
         </Tabs.Tab>
-        <Tabs.Tab name={`담은 글 ${getMyProfileQuery.data?.bookmarks.length}`}>
+        <Tabs.Tab name={`담은 글 ${userBookmarkListQuery.data?.pages.flat().length}`}>
           <Tabs.FlatList
             ListEmptyComponent={() => (
-              <View style={{ paddingTop: h2p(100) }}>
+              <View style={{ paddingTop: h2p(20) }}>
                 <View style={{ marginBottom: "auto" }}>
                   <Text style={[FONT.Regular,
                   {
@@ -276,9 +307,13 @@ const Mypage = ({ navigation, route }: MypageProps) => {
                   text="담으러 가기" textColor={theme.color.main} bgColor={theme.color.white} />
               </View>
             )}
+            onEndReached={() => userBookmarkListQuery.fetchNextPage()}
+            onEndReachedThreshold={0.3}
+            refreshing={userBookmarkListQuery.isLoading}
+            onRefresh={() => queryClient.invalidateQueries("userBookmarkList")}
             contentContainerStyle={{ paddingBottom: h2p(100), paddingTop: Platform.OS === "ios" ? h2p(90) : h2p(370) }}
             showsVerticalScrollIndicator={false}
-            data={getMyProfileQuery.data?.bookmarks}
+            data={userBookmarkListQuery.data?.pages.flat()}
             renderItem={(bookmarks) => (
               <Pressable
                 onPress={() => navigation.navigate("FeedDetail",

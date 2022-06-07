@@ -26,18 +26,31 @@ import { getBottomSpace } from 'react-native-iphone-x-helper';
 import Loading from '~/components/loading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { preSiginedImages, uploadImage } from '~/api';
+import { hitslop } from '~/utils/constant';
 
 interface ProfileEditType {
   nickname: string,
   occupation: string,
-  profileImage?: string,
+  profileImage: {
+    fields: {
+      key: string
+    }
+  } | null,
+  tags: Array<string>,
+  representBadge: string
+}
+
+interface ProfileType {
+  nickname: string,
+  occupation: string,
+  profileImage: string | null,
   tags: Array<string>,
   representBadge: string
 }
 interface EditProfileProps {
   navigation: NavigationStackProp;
   route: NavigationRoute<{
-    profile: ProfileEditType
+    profile: ProfileType
   }>;
 }
 
@@ -48,14 +61,18 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
   const { nickname, occupation, profileImage, tags, representBadge } = route.params?.profile || {
     nickname: "",
     occupation: "",
-    profileImage: "",
+    profileImage: null,
     tags: [],
     representBadge: ""
   };
   const [profileInfo, setProfileInfo] = useState<ProfileEditType>({
     nickname: nickname ? nickname : "",
     occupation: occupation ? occupation : "",
-    profileImage: "",
+    profileImage: profileImage ? {
+      fields: {
+        key: "user" + profileImage?.split("user")[1]
+      }
+    } : null,
     tags: tags ? tags : [],
     representBadge: representBadge ? representBadge : ""
   });
@@ -69,7 +86,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
   const [profile, setProfile] = useState(profileImage ? profileImage : "");
 
   const editProfileMutation = useMutation(["editprofile", token],
-    (profileprop: ProfileEditType) => editUserProfile({ token, id: myId, profile: profileprop }), {
+    (profileprop: ProfileType) => editUserProfile({ token, id: myId, profile: profileprop }), {
     onSuccess: () => {
       queryClient.invalidateQueries("myProfile");
     }
@@ -132,7 +149,6 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
     }
   }, [token]);
 
-
   if (editProfileMutation.isLoading) {
     return <Loading />;
   }
@@ -149,11 +165,14 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
             acc = acc.concat(copy[cur].filter(v => v.isClick).map(v => v.title));
             return acc;
           }, []);
-          //@ts-ignore
-          await uploadImage(profile, profileInfo.profileImage);
-          editProfileMutation.mutate({
+
+          if (profileInfo.profileImage) {
             //@ts-ignore
-            profileImage: profileInfo.profileImage.fields.key,
+            await uploadImage(profile, profileInfo.profileImage);
+          }
+
+          editProfileMutation.mutate({
+            profileImage: profileInfo.profileImage ? profileInfo.profileImage.fields.key : null,
             nickname: profileInfo.nickname,
             occupation: profileInfo.occupation,
             representBadge: userBadge.interest.filter(v => v.masterBadge)[0]?.title || profileInfo.representBadge,
@@ -168,7 +187,15 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
           <Image source={plusIcon}
             style={{ width: d2p(18), height: h2p(18), position: "absolute", bottom: 0, right: 0 }} />
         </TouchableOpacity>
-
+        <TouchableOpacity
+          hitSlop={hitslop}
+          onPress={() => {
+            setProfile("");
+            setProfileInfo({ ...profileInfo, profileImage: null });
+          }}
+          style={{ marginBottom: h2p(40), marginTop: h2p(20), alignSelf: "center" }}>
+          <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4 }]}>삭제</Text>
+        </TouchableOpacity>
         <View>
           <View style={{ flexDirection: "row", paddingHorizontal: d2p(20), marginBottom: d2p(10) }}>
             <Text style={[styles.inputTitle, FONT.Bold]}>닉네임</Text>
@@ -336,7 +363,6 @@ const styles = StyleSheet.create({
     width: d2p(60),
     height: d2p(60),
     borderRadius: 60,
-    marginBottom: h2p(40),
     borderWidth: 1,
     alignSelf: "center",
     borderColor: theme.color.grayscale.eae7ec

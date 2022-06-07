@@ -75,11 +75,19 @@ const Report = ({ navigation, route }: ReportProps) => {
             value={report}
             ref={inputRef}
             autoCapitalize="none"
-            onChangeText={(e) => setReport(e)}
+            maxLength={501}
+            onChangeText={(e) => {
+              if (e.length > 500) {
+                console.log(report.length, 'report.length');
+                setReport(e.slice(0, e.length - 1));
+              }
+              else {
+                setReport(e);
+              }
+            }}
             placeholder="신고 사유를 입력해주세요."
             placeholderTextColor={theme.color.grayscale.a09ca4}
             multiline
-            maxLength={501}
             textAlignVertical="top"
             style={[FONT.Regular, {
               maxHeight: h2p(436),
@@ -88,6 +96,10 @@ const Report = ({ navigation, route }: ReportProps) => {
               fontSize: 16, marginTop: h2p(20)
             }]}
           />
+          <Text style={[FONT.Regular, {
+            position: "absolute", right: 30, bottom: 30,
+            color: report.length === 500 ? theme.color.main : theme.color.grayscale.a09ca4
+          }]}>{report.length}/500</Text>
         </Pressable>
         <View style={{ marginTop: "auto", marginBottom: isIphoneX() ? getBottomSpace() : h2p(20) }}>
           <BasicButton bgColor={report ? theme.color.white : theme.color.grayscale.f7f7fc}

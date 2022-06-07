@@ -8,10 +8,13 @@ import Mypage from '~/screens/mypage';
 import theme from '~/styles/theme';
 import { d2p, h2p } from '~/utils';
 import { mainSearchIcon, graylogo, graymypage, graysearch, graywrite, mainmypage, mainlogoIcon } from '~/assets/icons';
+import { useRecoilValue } from 'recoil';
+import { myIdState } from '~/recoil/atoms';
 
 const Tabs = createBottomTabNavigator();
 
 const TabNavigator = () => {
+  const myId = useRecoilValue(myIdState);
   return (
     <Tabs.Navigator
       screenOptions={{
@@ -90,7 +93,7 @@ const TabNavigator = () => {
         listeners={({ navigation }) => ({
           tabPress: e => {
             e.preventDefault();
-            navigation.navigate('Mypage', {});
+            navigation.navigate('Mypage', { id: myId });
           },
         })}
         options={{

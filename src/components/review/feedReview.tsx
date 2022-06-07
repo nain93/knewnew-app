@@ -7,6 +7,8 @@ import ReviewIcon from '../icon/reviewIcon';
 import { cart, colorCart, colorLike, comment, like, more, reKnew, tag } from '~/assets/icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
+//@ts-ignore
+import Highlighter from 'react-native-highlight-words';
 import { ReviewListType } from '~/types/review';
 import { useMutation, useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
@@ -28,10 +30,11 @@ interface FeedReviewProps {
   idx?: number
   clickBoxStyle?: ViewStyle
   filterBadge?: string,
+  keyword?: string
 }
 
 const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
-  clickBoxStyle,
+  clickBoxStyle, keyword,
   type = "normal", filterBadge, review }: FeedReviewProps) => {
   const navigation = useNavigation<StackNavigationProp>();
   const [isLike, setIsLike] = useState<boolean>(review.isLike);
@@ -124,7 +127,17 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           <Text style={[{ fontSize: 10, color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>{simpleDate(review.created, ' 전')}</Text>
         }
       </View>
-      <Text style={[{ color: theme.color.black, marginBottom: h2p(10), marginLeft: d2p(50) }, FONT.Regular]}>{review.content}</Text>
+      {keyword ?
+        <Highlighter
+          highlightStyle={[FONT.Bold, { color: theme.color.main }]}
+          searchWords={[keyword]}
+          textToHighlight={review.content}
+          style={[FONT.Regular, { marginBottom: h2p(10), marginLeft: d2p(50) }]}
+        />
+        :
+        <Text style={[{ color: theme.color.black, marginBottom: h2p(10), marginLeft: d2p(50) }, FONT.Regular]}>
+          {review.content}</Text>
+      }
       {!review.parent &&
         <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: d2p(10), marginLeft: d2p(50) }}>
           <Image source={tag} style={{ width: 10, height: 10, marginRight: d2p(5) }} />
@@ -274,6 +287,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
       {
         type === "normal" &&
         <More
+          clickBoxStyle={clickBoxStyle}
           review={review}
           filterBadge={filterBadge}
           userId={review.author.id}

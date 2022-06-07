@@ -1,4 +1,4 @@
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import React from 'react';
 import { useRecoilValue } from 'recoil';
 import { myIdState, tokenState } from '~/recoil/atoms';
@@ -18,10 +18,11 @@ interface MoreProps {
   type: "review" | "comment",
   review: ReviewListType,
   filterBadge?: string,
-  handleCloseMore: () => void
+  handleCloseMore: () => void,
+  clickBoxStyle?: ViewStyle
 }
 
-const More = ({ handleCloseMore, userId, isMoreClick, type, review, filterBadge }: MoreProps) => {
+const More = ({ handleCloseMore, userId, isMoreClick, type, review, filterBadge, clickBoxStyle }: MoreProps) => {
   const navigation = useNavigation<StackNavigationProp>();
   const myId = useRecoilValue(myIdState);
   const token = useRecoilValue(tokenState);
@@ -66,7 +67,7 @@ const More = ({ handleCloseMore, userId, isMoreClick, type, review, filterBadge 
     Share.open({
       title: "뉴뉴",
       url: `knewnnew://FeedDetail/${review.id}`
-      // url: `https://knewnnew.co.kr/FeedDetail/${review.id}`
+      // url: `https://knewnnew/link/FeedDetail/${review.id}`
     })
       .then((res) => {
         console.log(res);
@@ -85,7 +86,7 @@ const More = ({ handleCloseMore, userId, isMoreClick, type, review, filterBadge 
     <>
       {isMoreClick &&
         (myId === userId ?
-          <View style={styles.clickBox}>
+          <View style={[styles.clickBox, clickBoxStyle]}>
             <Pressable style={styles.press} onPress={handleEditPress}>
               <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
             </Pressable>
@@ -95,7 +96,7 @@ const More = ({ handleCloseMore, userId, isMoreClick, type, review, filterBadge 
             </Pressable>
           </View>
           :
-          <View style={styles.clickBox}>
+          <View style={[styles.clickBox, clickBoxStyle]}>
             <Pressable style={styles.press} onPress={handleSharePress}>
               <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
             </Pressable>

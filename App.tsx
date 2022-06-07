@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import GlobalNav from './src/navigators/globalNav';
 import AlertPopup from '~/components/popup/alertPopup';
 import { myIdState, okPopupState, popupState, tokenState } from '~/recoil/atoms';
-
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import SplashScreen from 'react-native-splash-screen';
@@ -22,7 +21,10 @@ const App = () => {
   const [token, setToken] = useRecoilState(tokenState);
   const setMyId = useSetRecoilState(myIdState);
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
-    enabled: !!token
+    enabled: !!token,
+    onSuccess: (data) => {
+      setMyId(data.id);
+    }
   });
 
   useEffect(() => {
@@ -34,14 +36,10 @@ const App = () => {
       }
     };
     getToken();
-    SplashScreen.hide();
-  }, []);
-
-  useEffect(() => {
-    if (getMyProfileQuery.data) {
-      setMyId(getMyProfileQuery.data.id);
+    if (!getMyProfileQuery.isLoading) {
+      SplashScreen.hide();
     }
-  }, [getMyProfileQuery.data]);
+  }, [getMyProfileQuery.isLoading]);
 
   const fadeIn = () => {
     Animated.timing(fadeAnim, {
@@ -75,7 +73,7 @@ const App = () => {
 
   const linking = {
     // prefixes: ["kakao7637c35cfedcb6c01b1f17ce7cd42f05://"],
-    prefixes: ["knewnnew://", "https://knewnnew.com"],
+    prefixes: ["knewnnew://"],
     config: {
       screens: {
         TabNav: {

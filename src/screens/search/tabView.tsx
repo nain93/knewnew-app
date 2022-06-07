@@ -1,6 +1,8 @@
 import { Dimensions, FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { useState } from 'react';
 import { TabBar, TabView } from 'react-native-tab-view';
+//@ts-ignore
+import Highlighter from 'react-native-highlight-words';
 import theme from '~/styles/theme';
 import { d2p, h2p } from '~/utils';
 import { ReviewListType } from '~/types/review';
@@ -16,9 +18,12 @@ import { FONT } from '~/styles/fonts';
 interface SearchTabViewProps {
   searchList?: ReviewListType[],
   userList?: userNormalType[],
+  keyword: string,
+  reviewNext: () => void,
+  userNext: () => void
 }
 
-const SearchTabView = ({ searchList, userList }: SearchTabViewProps) => {
+const SearchTabView = ({ searchList, userList, keyword, reviewNext, userNext }: SearchTabViewProps) => {
   const navigation = useNavigation<StackNavigationProp>();
   const [index, setIndex] = useState(0);
   const [routes] = useState([
@@ -45,6 +50,8 @@ const SearchTabView = ({ searchList, userList }: SearchTabViewProps) => {
               <View style={styles.container}>
                 <Text style={[styles.searchResult, FONT.Regular]}>검색결과 · {searchList.length}건</Text>
                 <FlatList
+                  onEndReached={reviewNext}
+                  onEndReachedThreshold={0.3}
                   style={{ marginBottom: h2p(80) }}
                   contentContainerStyle={{ paddingBottom: d2p(40) }}
                   keyExtractor={(review) => String(review.id)}
@@ -63,6 +70,7 @@ const SearchTabView = ({ searchList, userList }: SearchTabViewProps) => {
                         }}
                       >
                         <FeedReview
+                          keyword={keyword}
                           clickBoxStyle={{ right: d2p(26), top: h2p(-10) }}
                           idx={review.index}
                           selectedIndex={selectedIndex}
@@ -80,6 +88,8 @@ const SearchTabView = ({ searchList, userList }: SearchTabViewProps) => {
               <View style={styles.container}>
                 <Text style={[styles.searchResult, { marginBottom: h2p(30) }, FONT.Regular]}>검색결과 · {userList.length}건</Text>
                 <FlatList
+                  onEndReached={userNext}
+                  onEndReachedThreshold={0.3}
                   style={{ marginBottom: h2p(80) }}
                   contentContainerStyle={{ paddingBottom: d2p(40), paddingHorizontal: d2p(20) }}
                   keyExtractor={(review) => String(review.id)}
@@ -91,7 +101,14 @@ const SearchTabView = ({ searchList, userList }: SearchTabViewProps) => {
                     <View style={{ marginBottom: h2p(30), flexDirection: "row", alignItems: "center" }}>
                       <Image source={user.item.profileImage ? { uri: user.item.profileImage } : noProfile}
                         style={{ marginRight: d2p(10), borderColor: theme.color.grayscale.e9e7ec, borderWidth: 1, width: d2p(24), height: d2p(24), borderRadius: 24 }} />
-                      <Text style={[{ fontSize: 16, width: Dimensions.get("window").width - d2p(84) }, FONT.Regular]}>{user.item.nickname}</Text>
+                      <View style={{ flexDirection: "row", width: Dimensions.get("window").width - d2p(84) }}>
+                        <Highlighter
+                          highlightStyle={[FONT.Bold, { fontSize: 16, color: theme.color.main }]}
+                          searchWords={[keyword]}
+                          textToHighlight={user.item.nickname}
+                          style={[FONT.Regular, { fontSize: 16 }]}
+                        />
+                      </View>
                       <Image source={leftArrow} style={{ marginLeft: "auto", width: d2p(11), height: h2p(25), transform: [{ rotate: "180deg" }] }} />
                     </View>
                   }
