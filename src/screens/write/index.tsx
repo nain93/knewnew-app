@@ -318,7 +318,7 @@ const Write = ({ navigation, route }: WriteProp) => {
                   multiline
                   placeholder={`${route.params?.nickname}님은 어떻게 생각하세요?`}
                   placeholderTextColor={theme.color.grayscale.a09ca4}
-                  style={[{ paddingTop: 0, fontSize: 16, }, FONT.Regular]} />
+                  style={[{ paddingTop: 0, fontSize: 16, color: theme.color.black }, FONT.Regular]} />
                 <Text style={[FONT.Regular, {
                   position: "absolute", right: d2p(10), bottom: h2p(94),
                   color: writeData.content.length === 300 ? theme.color.main : theme.color.grayscale.a09ca4

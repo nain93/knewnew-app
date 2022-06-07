@@ -97,7 +97,7 @@ const Feed = ({ navigation }: NavigationType) => {
       }
     }, [refresh]));
 
-  // console.log(reviewListQuery.data?.pages.flat()[0], 'reviewListQuery.data?.pages.flat()');
+  // console.log(reviewListQuery.data?.pages.flat()[0].parent?.images, 'reviewListQuery.data?.pages.flat()');
   if ((reviewListQuery.isFetching && refresh) || !filterBadge) {
     return <Loading />;
   }

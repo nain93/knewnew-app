@@ -12,6 +12,7 @@ import { getMyProfile } from '~/api/user';
 import { MyPrfoileType } from '~/types/user';
 import OkPopup from '~/components/popup/okPopup';
 import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
+import Loading from '~/components/loading';
 
 export const navigationRef = createNavigationContainerRef();
 const App = () => {
@@ -101,7 +102,7 @@ const App = () => {
   return (
     <SafeAreaProvider>
       {/*@ts-ignore*/}
-      <NavigationContainer linking={linking} ref={navigationRef} fallback={<Text>Loading...</Text>}
+      <NavigationContainer linking={linking} ref={navigationRef} fallback={<Loading />}
       >
         <GlobalNav />
       </NavigationContainer>
