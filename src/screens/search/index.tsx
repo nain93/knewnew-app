@@ -30,6 +30,7 @@ const Search = ({ navigation }: SearchProps) => {
   const [textForRefresh, setTextForRefresh] = useState(""); // * 검색 할때마다 query 리프레시용
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [keyword, setKeyword] = useState("");
+  const [searchWords, setSearchWords] = useState("");
   const [recentKeywords, setRecentKeyWords] = useState<Array<string>>([]);
 
   const token = useRecoilValue(tokenState);
@@ -56,7 +57,7 @@ const Search = ({ navigation }: SearchProps) => {
     if (searchKeyword === "") {
       return;
     }
-
+    setSearchWords(searchKeyword);
     // * 최근검색어 중복일시 리스트에 넣지않음
     if (!recentKeywords.every(v => v !== searchKeyword)) {
     }
@@ -141,7 +142,9 @@ const Search = ({ navigation }: SearchProps) => {
       />
       {isSearchMode ?
         <SearchTabView
-          keyword={keyword}
+          reviewNext={() => searchListQuery.fetchNextPage()}
+          userNext={() => userListQuery.fetchNextPage()}
+          keyword={searchWords}
           userList={userListQuery.data?.pages.flat()}
           searchList={searchListQuery.data?.pages.flat()} />
         :
@@ -156,7 +159,7 @@ const Search = ({ navigation }: SearchProps) => {
                     handleSearch(recentKeyword);
                   }}
                   style={{ width: Dimensions.get("window").width - d2p(70) }}>
-                  <Text style={[{ fontSize: 16 },FONT.Regular]}>{recentKeyword}</Text>
+                  <Text style={[{ fontSize: 16 }, FONT.Regular]}>{recentKeyword}</Text>
                 </TouchableOpacity>
                 <CloseIcon onPress={() => filterRecentKeyword(filterIndex)} imageStyle={{ width: 10, height: 10 }} />
               </View>

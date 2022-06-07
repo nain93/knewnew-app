@@ -29,7 +29,7 @@ interface EditPrfoileType {
   id: number,
   profile: {
     nickname: string,
-    profileImage?: string,
+    profileImage: string | null,
     occupation: string,
     representBadge: string,
     tags: Array<string>
@@ -130,6 +130,34 @@ export const getSearchUserList = async ({ token, nickname, offset }: { token: st
 
 export const deleteUser = async ({ token, id }: { token: string, id: number }) => {
   const res = await axios.delete(baseURL + `user/${id}/profile/`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+  if (res) {
+    return res.data;
+  }
+};
+
+export const getUserReviewList = async ({ token, id, offset }: { token: string, id: number, offset: number }) => {
+  const res = await axios.get(baseURL + `user/${id}/reviews/`, {
+    params: {
+      offset
+    },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+  if (res) {
+    return res.data;
+  }
+};
+
+export const getUserBookmarkList = async ({ token, id, offset }: { token: string, id: number, offset: number }) => {
+  const res = await axios.get(baseURL + `user/${id}/bookmarks/`, {
+    params: {
+      offset
+    },
     headers: {
       Authorization: `Bearer ${token}`,
     }

@@ -2,6 +2,7 @@ import React from "react";
 import { TouchableOpacity, Image, ImageStyle } from "react-native";
 import { close } from "~/assets/icons";
 import { d2p } from "~/utils";
+import { hitslop } from "~/utils/constant";
 
 interface CloseIcon {
   imageStyle?: ImageStyle
@@ -11,7 +12,7 @@ interface CloseIcon {
 const CloseIcon = ({ imageStyle, onPress }: CloseIcon) => {
   return (
     <TouchableOpacity onPress={onPress}
-      hitSlop={{ top: d2p(20), left: d2p(20), right: d2p(20), bottom: d2p(20) }}>
+      hitSlop={hitslop}>
       <Image
         source={close}
         resizeMode="contain"

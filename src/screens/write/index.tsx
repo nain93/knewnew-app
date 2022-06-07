@@ -74,18 +74,22 @@ const Write = ({ navigation, route }: WriteProp) => {
 
   const addReviewMutation = useMutation(["addReview", token],
     (writeProps: WriteReviewType) => writeReview({ token, ...writeProps }), {
-    onSuccess: () => {
-      queryClient.invalidateQueries("reviewList");
-      navigation.goBack();
+    onSuccess: (data) => {
+      if (data) {
+        queryClient.invalidateQueries("reviewList");
+        navigation.goBack();
+      }
     }
   });
 
   const editReviewMutation = useMutation(["editReview", token],
     ({ writeProps, id }: { writeProps: WriteReviewType, id: number }) =>
       editReview({ token, id, ...writeProps }), {
-    onSuccess: () => {
-      queryClient.invalidateQueries("reviewList");
-      navigation.goBack();
+    onSuccess: (data) => {
+      if (data) {
+        queryClient.invalidateQueries("reviewList");
+        navigation.goBack();
+      }
     }
   });
 
@@ -171,7 +175,7 @@ const Write = ({ navigation, route }: WriteProp) => {
       });
       setWriteData({
         ...writeData,
-        images: route.params.review.images,
+        images: route.params.review.images.map(v => ({ ...v, image: "review" + v.image?.split("review")[1] })),
         content: route.params.review.content,
         satisfaction: route.params.review.satisfaction,
         market: route.params.review.market ? route.params.review.market : "선택 안함",
@@ -218,7 +222,8 @@ const Write = ({ navigation, route }: WriteProp) => {
     });
   }, []);
 
-  if (route.params?.loading && !writeData.satisfaction) {
+  // console.log(writeData.images, 'writeData.images');
+  if ((route.params?.loading && !writeData.satisfaction) || addReviewMutation.isLoading || editReviewMutation.isLoading) {
     return (
       <Loading />
     );
@@ -299,28 +304,52 @@ const Write = ({ navigation, route }: WriteProp) => {
               >
                 <TextInput
                   value={writeData.content}
-                  onChangeText={(e) => setWriteData({ ...writeData, content: e })}
+                  maxLength={301}
+                  onChangeText={(e) => {
+                    if (e.length > 300) {
+                      setWriteData({ ...writeData, content: e.slice(0, e.length - 1) });
+                    }
+                    else {
+                      setWriteData({ ...writeData, content: e });
+                    }
+                  }}
                   autoCapitalize="none"
                   ref={inputRef}
                   multiline
                   placeholder={`${route.params?.nickname}님은 어떻게 생각하세요?`}
                   placeholderTextColor={theme.color.grayscale.a09ca4}
                   style={[{ paddingTop: 0, fontSize: 16, }, FONT.Regular]} />
+                <Text style={[FONT.Regular, {
+                  position: "absolute", right: d2p(10), bottom: h2p(94),
+                  color: writeData.content.length === 300 ? theme.color.main : theme.color.grayscale.a09ca4
+                }]}>{writeData.content.length}/300</Text>
               </Pressable>
             </View>
             :
             <>
               <Pressable onPress={() => inputRef.current?.focus()}
-                style={{ height: h2p(476) }}>
+                style={{ height: h2p(446) }}>
                 <TextInput
                   ref={inputRef}
                   value={writeData.content}
                   autoCapitalize="none"
                   multiline
+                  maxLength={301}
                   textAlignVertical="top"
-                  onChangeText={(e) => setWriteData({ ...writeData, content: e })}
+                  onChangeText={(e) => {
+                    if (e.length > 300) {
+                      setWriteData({ ...writeData, content: e.slice(0, e.length - 1) });
+                    }
+                    else {
+                      setWriteData({ ...writeData, content: e });
+                    }
+                  }}
                   style={[styles.textInput, FONT.Regular]}
                   placeholder="내용을 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
+                <Text style={[FONT.Regular, {
+                  position: "absolute", right: 30, bottom: 30,
+                  color: writeData.content.length === 300 ? theme.color.main : theme.color.grayscale.a09ca4
+                }]}>{writeData.content.length}/300</Text>
               </Pressable>
               <View style={styles.selectWrap}>
                 <TouchableOpacity
@@ -351,7 +380,10 @@ const Write = ({ navigation, route }: WriteProp) => {
               </View>
             </>
           }
-          <View style={{ flexDirection: "row", alignItems: "center", marginBottom: getBottomSpace() + h2p(30) }}>
+          <View style={{
+            position: "absolute", flexDirection: "row", alignItems: "center",
+            bottom: (route.params?.type === "reknew" || route.params?.type === "reKnewWrite") ? h2p(10) : getBottomSpace() + h2p(30)
+          }}>
             <Pressable onPress={pickImage} style={[styles.images, { marginLeft: d2p(20), marginRight: d2p(15) }]}>
               <View style={{ alignItems: "center" }}>
                 <Image source={photo} style={{ width: d2p(20), height: h2p(20), marginTop: h2p(12) }} />
@@ -467,7 +499,7 @@ export default Write;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
   },
   textInput: {
     paddingHorizontal: d2p(20),
@@ -490,7 +522,7 @@ const styles = StyleSheet.create({
   selectWrap: {
     flexDirection: "row",
     justifyContent: "center",
-    marginBottom: h2p(20)
+    marginBottom: h2p(144)
   },
   select: {
     flexDirection: "row",
