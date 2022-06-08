@@ -31,6 +31,29 @@ const ReKnew = ({ review, filterBadge }: FeedReviewProps) => {
     );
   }, []);
 
+  if (!review.isActive) {
+    return (
+      <View style={[styles.review, { paddingBottom: 0 }]}>
+        <View style={{ flexDirection: "row" }}>
+          <Image source={retweetfrom}
+            style={{ width: d2p(15), height: d2p(40) }} />
+          <View style={{
+            marginLeft: d2p(10),
+            width: Dimensions.get("window").width - d2p(65),
+            paddingVertical: h2p(5),
+            justifyContent: "center",
+            backgroundColor: theme.color.grayscale.f7f7fc,
+            borderRadius: 5
+          }}>
+            <Text style={[FONT.Regular, { marginLeft: d2p(25), color: theme.color.grayscale.C_79737e }]}>
+              원문 글이 삭제되었습니다.
+            </Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.review}>
       <View style={{ flexDirection: "row", height: h2p(20) }}>
@@ -165,10 +188,8 @@ export default ReKnew;
 
 const styles = StyleSheet.create({
   review: {
-    width: Dimensions.get('window').width - d2p(40),
-    borderRadius: 10,
     paddingTop: d2p(20),
-    paddingBottom: d2p(15),
+    paddingBottom: d2p(15)
   },
   title: {
     fontSize: 16, fontWeight: 'bold',

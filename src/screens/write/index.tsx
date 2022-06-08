@@ -192,7 +192,7 @@ const Write = ({ navigation, route }: WriteProp) => {
         images: [],
         content: "",
         satisfaction: "",
-        market: "선택 안함",
+        market: "유통사 선택",
         parent: parentId,
         tags: {
           interest: [],
@@ -374,7 +374,7 @@ const Write = ({ navigation, route }: WriteProp) => {
                 <TouchableOpacity
                   onPress={() => marketRefRBSheet.current?.open()}
                   style={styles.select}>
-                  <Image source={(writeData.market !== "선택 안함") ? maincart : cart} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
+                  <Image source={(writeData.market !== "선택 안함" && writeData.market !== "유통사 선택") ? maincart : cart} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
                   <Text style={FONT.Medium}>{writeData.market}</Text>
                 </TouchableOpacity>
               </View>

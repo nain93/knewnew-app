@@ -23,6 +23,8 @@ import { ReviewListType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
 import { initialBadgeData } from '~/utils/data';
 import { useFocusEffect } from '@react-navigation/native';
+import { NavigationStackProp } from 'react-navigation-stack';
+import { NavigationRoute } from 'react-navigation';
 
 function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
   return (
@@ -34,7 +36,14 @@ function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
   );
 }
 
-const Feed = ({ navigation }: NavigationType) => {
+export interface FeedProps {
+  navigation: NavigationStackProp;
+  route: NavigationRoute<{
+    refresh: boolean
+  }>;
+}
+
+const Feed = ({ navigation, route }: FeedProps) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [isPopupOpen, setIspopupOpen] = useState(false);
   const [scrollOffset, setScrollOffset] = useState(0);
@@ -45,6 +54,7 @@ const Feed = ({ navigation }: NavigationType) => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [filterBadge, setFilterBadge] = useState("");
   const [refresh, setRefresh] = useRecoilState(refreshState);
+  const flatListRef = useRef<FlatList>(null);
 
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token, filterBadge], () => getMyProfile(token), {
     enabled: !!token,
@@ -97,7 +107,13 @@ const Feed = ({ navigation }: NavigationType) => {
       }
     }, [refresh]));
 
-  // console.log(reviewListQuery.data?.pages.flat()[0].parent?.images, 'reviewListQuery.data?.pages.flat()');
+  useEffect(() => {
+    if (route.params?.refresh) {
+      flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
+    }
+  }, [route.params]);
+
+  // console.log(reviewListQuery.data?.pages.flat()[0], 'reviewListQuery.data?.pages.flat()');
   if ((reviewListQuery.isFetching && refresh) || !filterBadge) {
     return <Loading />;
   }
@@ -130,40 +146,18 @@ const Feed = ({ navigation }: NavigationType) => {
       />
       <View style={{ flex: 1, backgroundColor: theme.color.grayscale.f7f7fc }}>
         <FlatList
+          ref={flatListRef}
           onEndReached={() => reviewListQuery.fetchNextPage()}
           onEndReachedThreshold={0.3}
           refreshing={reviewListQuery.isLoading}
-          onRefresh={() => {
-            if (getMyProfileQuery.data) {
-              if (filterBadge === getMyProfileQuery.data?.representBadge) {
-                queryClient.invalidateQueries("reviewList");
-              }
-              else {
-                setFilterBadge(getMyProfileQuery.data?.representBadge);
-              }
-            }
-
-            // * 대표 뱃지로 선택상태 초기화
-            setUserBadge({
-              interest: userBadge.interest.map(v => {
-                if (v.title === getMyProfileQuery.data?.representBadge) {
-                  return { title: v.title, isClick: true };
-                }
-                return { title: v.title, isClick: false };
-              }),
-              household: userBadge.household.map(v => ({ title: v.title, isClick: false })),
-              taste: userBadge.taste.map(v => ({ title: v.title, isClick: false })),
-            });
-
-            queryClient.invalidateQueries("reviewList");
-          }}
+          onRefresh={() => queryClient.invalidateQueries("reviewList")}
           data={reviewListQuery.data?.pages.flat()}
           ListHeaderComponent={() =>
             <Fragment>
               <View style={styles.main}>
                 <Text style={[styles.mainText, FONT.Bold]}>뉴뉴는 지금</Text>
                 <View style={{ flexDirection: 'row' }}>
-                  <Text style={[styles.mainText, { color: theme.color.main, marginTop: h2p(2) }, FONT.Bold]}>
+                  <Text style={[styles.mainText, { color: theme.color.main, marginTop: Platform.OS === "ios" ? h2p(2) : 0 }, FONT.Bold]}>
                     {filterBadge ? `#${filterBadge}` : `#${getMyProfileQuery.data?.representBadge}`} </Text>
                   <Text style={[styles.mainText, FONT.Bold]}>관련 메뉴 추천 중 👀</Text>
                 </View>
@@ -284,9 +278,9 @@ const Feed = ({ navigation }: NavigationType) => {
               }, "");
               setFilterBadge(badge);
 
-              // * 필터후 스크롤 offset초기화
-              setScrollOffset(0);
               tagRefRBSheet.current?.close();
+              // * 필터후 스크롤 offset초기화
+              flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
             }}
             style={{
               justifyContent: "center",

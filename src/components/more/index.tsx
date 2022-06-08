@@ -19,10 +19,12 @@ interface MoreProps {
   review: ReviewListType,
   filterBadge?: string,
   handleCloseMore: () => void,
-  clickBoxStyle?: ViewStyle
+  clickBoxStyle?: ViewStyle,
+  isGobacK?: () => void,
+  setLoading: (isLoading: boolean) => void
 }
 
-const More = ({ handleCloseMore, userId, isMoreClick, type, review, filterBadge, clickBoxStyle }: MoreProps) => {
+const More = ({ setLoading, isGobacK, handleCloseMore, userId, isMoreClick, type, review, filterBadge, clickBoxStyle }: MoreProps) => {
   const navigation = useNavigation<StackNavigationProp>();
   const myId = useRecoilValue(myIdState);
   const token = useRecoilValue(tokenState);
@@ -30,9 +32,13 @@ const More = ({ handleCloseMore, userId, isMoreClick, type, review, filterBadge,
 
   const deleteMutation = useMutation("deleteReview",
     (id: number) => deleteReview(token, id), {
-    onSuccess: () => {
-      queryClient.invalidateQueries("reviewList");
-      queryClient.invalidateQueries("myProfile");
+    onSuccess: async () => {
+      await queryClient.invalidateQueries("reviewList");
+      await queryClient.invalidateQueries("myProfile");
+      setLoading(false);
+      if (isGobacK) {
+        isGobacK();
+      }
     }
   });
 
@@ -55,6 +61,7 @@ const More = ({ handleCloseMore, userId, isMoreClick, type, review, filterBadge,
   };
 
   const handleDeletePress = () => {
+    setLoading(true);
     if (type === "review") {
       deleteMutation.mutate(review.id);
     }

@@ -47,6 +47,12 @@ const TabNavigator = () => {
       <Tabs.Screen
         name="Feed"
         component={Feed}
+        listeners={({ navigation }) => ({
+          tabPress: e => {
+            e.preventDefault();
+            navigation.navigate('Feed', { refresh: true });
+          },
+        })}
         options={{
           tabBarIcon: ({ focused }) => (
             <Image
