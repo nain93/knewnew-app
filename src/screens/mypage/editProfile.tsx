@@ -170,7 +170,6 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
             //@ts-ignore
             await uploadImage(profile, profileInfo.profileImage);
           }
-
           editProfileMutation.mutate({
             profileImage: profileInfo.profileImage ? profileInfo.profileImage.fields.key : null,
             nickname: profileInfo.nickname,

@@ -20,6 +20,7 @@ import { MyPrfoileType } from '~/types/user';
 import { getMyProfile } from '~/api/user';
 import ReKnew from '~/components/review/reKnew';
 import More from '~/components/more';
+import Loading from '~/components/loading';
 
 interface FeedReviewProps {
   review: ReviewListType,
@@ -43,6 +44,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
   const [bookmarkCount, setBookmarkCount] = useState(review.bookmarkCount);
   const [tags, setTags] = useState<Array<string>>([]);
   const token = useRecoilValue(tokenState);
+  const [loading, setLoading] = useState(false);
 
   const boomarkMutation = useMutation("bookmark",
     ({ id, isBookmark }: { id: number, isBookmark: boolean }) => bookmarkReview(token, id, isBookmark));
@@ -71,6 +73,11 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
     );
   }, [review]);
 
+  if (loading) {
+    return (
+      <Loading />
+    );
+  }
 
   return (
     <>
@@ -287,6 +294,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
       {
         type === "normal" &&
         <More
+          setLoading={(isLoading: boolean) => setLoading(isLoading)}
           clickBoxStyle={clickBoxStyle}
           review={review}
           filterBadge={filterBadge}

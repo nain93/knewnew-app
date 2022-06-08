@@ -63,6 +63,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [like, setLike] = useState<boolean>(false);
   const [cart, setCart] = useState<boolean>(false);
   const [numberLine, setNumberLine] = useState(1);
+  const [loading, setLoading] = useState(false);
   const setRefresh = useSetRecoilState(refreshState);
 
   const reviewDetailQuery = useQuery<ReviewListType, Error>(["reviewDetail", token, route.params?.id],
@@ -166,7 +167,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   }, [reviewDetailQuery.data?.tags]);
 
 
-  if (reviewDetailQuery.isLoading || reviewDetailQuery.isFetching) {
+  if (reviewDetailQuery.isLoading || reviewDetailQuery.isFetching || loading) {
     return <Loading />;
   }
 
@@ -197,10 +198,12 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
         >
           {reviewDetailQuery.data &&
             <More
+              setLoading={(isLoading: boolean) => setLoading(isLoading)}
               review={reviewDetailQuery.data}
               userId={reviewDetailQuery.data?.author.id}
               isMoreClick={isMoreClick}
               type="review"
+              isGobacK={() => navigation.goBack()}
               handleCloseMore={() => setIsMoreClick(false)}
             />
           }

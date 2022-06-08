@@ -93,11 +93,12 @@ const Report = ({ navigation, route }: ReportProps) => {
               maxHeight: h2p(436),
               padding: 0,
               paddingTop: 0,
-              fontSize: 16, marginTop: h2p(20)
+              fontSize: 16, marginTop: h2p(20),
+              color: theme.color.black
             }]}
           />
           <Text style={[FONT.Regular, {
-            position: "absolute", right: 30, bottom: 30,
+            position: "absolute", right: 0, bottom: d2p(30),
             color: report.length === 500 ? theme.color.main : theme.color.grayscale.a09ca4
           }]}>{report.length}/500</Text>
         </Pressable>

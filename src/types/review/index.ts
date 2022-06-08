@@ -13,7 +13,7 @@ export interface WriteReviewType {
   parent?: number,
   parentReview?: ReviewParentType,
   cart?: number,
-  market: "선택 안함" | "마켓컬리" | "쿠팡프레시" | "SSG" | "B마트" | "윙잇" | "쿠캣마켓",
+  market: "선택 안함" | "마켓컬리" | "쿠팡프레시" | "SSG" | "B마트" | "윙잇" | "쿠캣마켓" | "유통사 선택",
   tags: {
     interest: Array<string>,
     household: Array<string>,
@@ -29,6 +29,7 @@ export interface ReviewParentType {
   },
   content: string,
   created: string,
+  isActive: boolean
   id: number,
   images: Array<WriteImagesType>,
   market: "선택 안함" | "마켓컬리" | "쿠팡프레시" | "SSG" | "B마트" | "윙잇" | "쿠캣마켓",
@@ -56,7 +57,7 @@ export interface ReviewListType {
   images: Array<WriteImagesType>,
   likeCount: number,
   market: "선택 안함" | "마켓컬리" | "쿠팡프레시" | "SSG" | "B마트" | "윙잇" | "쿠캣마켓",
-  parent?: ReviewListType,
+  parent?: ReviewParentType,
   product: string | null,
   satisfaction: "best" | "good" | "bad",
   tags: {
