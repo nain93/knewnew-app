@@ -22,7 +22,7 @@ import { NavigationRoute } from 'react-navigation';
 import { editReview, writeReview } from '~/api/review';
 import { initialBadgeData } from '~/utils/data';
 import FeedReview from '~/components/review/feedReview';
-import { getBottomSpace } from 'react-native-iphone-x-helper';
+import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 import Loading from '~/components/loading';
 import { preSiginedImages, uploadImage } from '~/api';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -254,159 +254,165 @@ const Write = ({ navigation, route }: WriteProp) => {
         headerRight={<Text style={[{ color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>완료</Text>} />
       <KeyboardAwareScrollView
         showsVerticalScrollIndicator={false}
-        style={{ flex: 1 }}
+        contentContainerStyle={styles.container}
       >
-        <View style={styles.container}>
-          <View style={styles.reviewIconWrap}>
-            <TouchableOpacity
-              onPress={() => setWriteData({ ...writeData, satisfaction: "best" })}
-              style={styles.reviewIcon}>
-              <Image source={(writeData.satisfaction === "best") ? heart : grayheart} style={{ width: d2p(20), height: h2p(20) }} />
-              <Text style={[{ color: (writeData.satisfaction === "best") ? theme.color.main : theme.color.grayscale.a09ca4, marginLeft: d2p(5) },
-              (writeData.satisfaction === "best") ? FONT.Bold : FONT.Regular]}>최고에요</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setWriteData({ ...writeData, satisfaction: "good" })}
-              style={styles.reviewIcon}>
-              <Image source={(writeData.satisfaction === "good") ? circle : graycircle} style={{ width: d2p(20), height: h2p(20) }} />
-              <Text style={[{ color: (writeData.satisfaction === "good") ? theme.color.yellow : theme.color.grayscale.a09ca4, marginLeft: d2p(5) },
-              (writeData.satisfaction === "good") ? FONT.Bold : FONT.Regular]}>괜찮아요</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setWriteData({ ...writeData, satisfaction: "bad" })}
-              style={styles.reviewIcon}>
-              <Image source={(writeData.satisfaction === "bad") ? blackclose : grayclose} style={{ width: d2p(20), height: h2p(20) }} />
-              <Text style={[{ color: (writeData.satisfaction === "bad") ? theme.color.black : theme.color.grayscale.a09ca4, marginLeft: d2p(5) },
-              (writeData.satisfaction === "bad") ? FONT.Bold : FONT.Regular]}>별로에요</Text>
-            </TouchableOpacity>
-          </View>
-          {(route.params?.type === "reknew" || route.params?.type === "reKnewWrite") ?
-            <View
-              style={{ marginTop: h2p(30), paddingHorizontal: d2p(20), marginBottom: "auto" }}>
-              <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>이 글을 인용하고 있어요.</Text>
-              <View style={{
-                borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
-                paddingHorizontal: d2p(15),
-                paddingTop: h2p(15),
-                paddingBottom: h2p(10),
-                marginVertical: h2p(15),
-                borderRadius: 5,
-              }}>
-                {route.params.review &&
-                  <FeedReview
-                    filterBadge={route.params.filterBadge}
-                    type="reKnewWrite"
-                    review={route.params?.review.parent ? route.params?.review.parent : route.params?.review} />
-                }
-              </View>
-              <Pressable onPress={() => inputRef.current?.focus()}
-                style={{ height: h2p(290) }}
-              >
-                <TextInput
-                  value={writeData.content}
-                  maxLength={301}
-                  onChangeText={(e) => {
-                    if (e.length > 300) {
-                      setWriteData({ ...writeData, content: e.slice(0, e.length - 1) });
-                    }
-                    else {
-                      setWriteData({ ...writeData, content: e });
-                    }
-                  }}
-                  autoCapitalize="none"
-                  ref={inputRef}
-                  multiline
-                  placeholder={`${route.params?.nickname}님은 어떻게 생각하세요?`}
-                  placeholderTextColor={theme.color.grayscale.a09ca4}
-                  style={[{ paddingTop: 0, fontSize: 16, color: theme.color.black }, FONT.Regular]} />
-                <Text style={[FONT.Regular, {
-                  position: "absolute", right: d2p(10), bottom: h2p(94),
-                  color: writeData.content.length === 300 ? theme.color.main : theme.color.grayscale.a09ca4
-                }]}>{writeData.content.length}/300</Text>
-              </Pressable>
+        <View style={styles.reviewIconWrap}>
+          <TouchableOpacity
+            onPress={() => setWriteData({ ...writeData, satisfaction: "best" })}
+            style={styles.reviewIcon}>
+            <Image source={(writeData.satisfaction === "best") ? heart : grayheart} style={{ width: d2p(20), height: h2p(20) }} />
+            <Text style={[{ color: (writeData.satisfaction === "best") ? theme.color.main : theme.color.grayscale.a09ca4, marginLeft: d2p(5) },
+            (writeData.satisfaction === "best") ? FONT.Bold : FONT.Regular]}>최고에요</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setWriteData({ ...writeData, satisfaction: "good" })}
+            style={styles.reviewIcon}>
+            <Image source={(writeData.satisfaction === "good") ? circle : graycircle} style={{ width: d2p(20), height: h2p(20) }} />
+            <Text style={[{ color: (writeData.satisfaction === "good") ? theme.color.yellow : theme.color.grayscale.a09ca4, marginLeft: d2p(5) },
+            (writeData.satisfaction === "good") ? FONT.Bold : FONT.Regular]}>괜찮아요</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setWriteData({ ...writeData, satisfaction: "bad" })}
+            style={styles.reviewIcon}>
+            <Image source={(writeData.satisfaction === "bad") ? blackclose : grayclose} style={{ width: d2p(20), height: h2p(20) }} />
+            <Text style={[{ color: (writeData.satisfaction === "bad") ? theme.color.black : theme.color.grayscale.a09ca4, marginLeft: d2p(5) },
+            (writeData.satisfaction === "bad") ? FONT.Bold : FONT.Regular]}>별로에요</Text>
+          </TouchableOpacity>
+        </View>
+        {(route.params?.type === "reknew" || route.params?.type === "reKnewWrite") ?
+          <View
+            style={{ marginTop: h2p(30), paddingHorizontal: d2p(20), marginBottom: "auto" }}>
+            <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>이 글을 인용하고 있어요.</Text>
+            <View style={{
+              borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
+              paddingHorizontal: d2p(15),
+              paddingTop: h2p(15),
+              paddingBottom: h2p(10),
+              marginVertical: h2p(15),
+              borderRadius: 5,
+            }}>
+              {route.params.review &&
+                (
+                  (route.params.review.parent?.isActive || !route.params.review.parent) ?
+                    <FeedReview
+                      filterBadge={route.params.filterBadge}
+                      type="reKnewWrite"
+                      review={route.params?.review.parent ? route.params?.review.parent : route.params?.review} />
+                    :
+                    <Text style={[FONT.Regular, { color: theme.color.grayscale.C_79737e }]}>
+                      원문 글이 삭제되었습니다.
+                    </Text>
+                )
+              }
             </View>
-            :
-            <>
-              <Pressable onPress={() => inputRef.current?.focus()}
-                style={{ height: h2p(446) }}>
-                <TextInput
-                  ref={inputRef}
-                  value={writeData.content}
-                  autoCapitalize="none"
-                  multiline
-                  maxLength={301}
-                  textAlignVertical="top"
-                  onChangeText={(e) => {
-                    if (e.length > 300) {
-                      setWriteData({ ...writeData, content: e.slice(0, e.length - 1) });
-                    }
-                    else {
-                      setWriteData({ ...writeData, content: e });
-                    }
-                  }}
-                  style={[styles.textInput, FONT.Regular]}
-                  placeholder="내용을 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
-                <Text style={[FONT.Regular, {
-                  position: "absolute", right: 30, bottom: 30,
-                  color: writeData.content.length === 300 ? theme.color.main : theme.color.grayscale.a09ca4
-                }]}>{writeData.content.length}/300</Text>
-              </Pressable>
-              <View style={styles.selectWrap}>
-                <TouchableOpacity
-                  onPress={() => tagRefRBSheet.current?.open()}
-                  style={[styles.select, { marginRight: d2p(10) }]}>
-                  <View style={{ position: "relative" }}>
-                    <Image source={((
-                      writeData.tags.interest.length +
-                      writeData.tags.household.length +
-                      writeData.tags.taste.length) === 0) ? tag : maintag} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
-                    {(writeData.tags.interest.length +
-                      writeData.tags.household.length +
-                      writeData.tags.taste.length) !== 0 &&
-                      <Text style={{ fontSize: 8, color: theme.color.white, top: h2p(3), left: "22%", position: "absolute" }}>
-                        {(writeData.tags.interest.length +
-                          writeData.tags.household.length +
-                          writeData.tags.taste.length)}</Text>}
-                  </View>
-                  <Text style={FONT.Medium}>태그 선택</Text>
-                  <Text style={[{ fontSize: 12, color: theme.color.main }, FONT.Medium]}> *</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => marketRefRBSheet.current?.open()}
-                  style={styles.select}>
-                  <Image source={(writeData.market !== "선택 안함" && writeData.market !== "유통사 선택") ? maincart : cart} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
-                  <Text style={FONT.Medium}>{writeData.market}</Text>
-                </TouchableOpacity>
-              </View>
-            </>
-          }
-          <View style={{
-            position: "absolute", flexDirection: "row", alignItems: "center",
-            bottom: (route.params?.type === "reknew" || route.params?.type === "reKnewWrite") ? h2p(10) : getBottomSpace() + h2p(30)
-          }}>
-            <Pressable onPress={pickImage} style={[styles.images, { marginLeft: d2p(20), marginRight: d2p(15) }]}>
-              <View style={{ alignItems: "center" }}>
-                <Image source={photo} style={{ width: d2p(20), height: h2p(20), marginTop: h2p(12) }} />
-                <Text style={[{ fontSize: 12, color: theme.color.grayscale.d3d0d5, marginVertical: h2p(8) }, FONT.Regular]}>{imageList.length}/5</Text>
-              </View>
+            <Pressable onPress={() => inputRef.current?.focus()}
+              style={{ height: h2p(290) }}
+            >
+              <TextInput
+                value={writeData.content}
+                maxLength={301}
+                onChangeText={(e) => {
+                  if (e.length > 300) {
+                    setWriteData({ ...writeData, content: e.slice(0, e.length - 1) });
+                  }
+                  else {
+                    setWriteData({ ...writeData, content: e });
+                  }
+                }}
+                autoCapitalize="none"
+                ref={inputRef}
+                multiline
+                placeholder={`${route.params?.nickname}님은 어떻게 생각하세요?`}
+                placeholderTextColor={theme.color.grayscale.a09ca4}
+                style={[{ paddingTop: 0, fontSize: 16, color: theme.color.black }, FONT.Regular]} />
+              <Text style={[FONT.Regular, {
+                position: "absolute", right: d2p(10),
+                bottom: (route.params.type === "reKnewWrite" || route.params.type === "reknew") ? h2p(96) : 0,
+                color: writeData.content.length === 300 ? theme.color.main : theme.color.grayscale.a09ca4
+              }]}>{writeData.content.length}/300</Text>
             </Pressable>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {React.Children.toArray(imageList.map((image, idx) => {
-                return (
-                  <View style={[styles.images, { marginRight: (idx === imageList.length - 1) ? d2p(20) : d2p(5) }]}>
-                    <View style={{ alignItems: "center" }}>
-                      <Image source={{ uri: image }} style={{ width: d2p(96), height: h2p(64), borderRadius: 4 }} />
-                      <Pressable onPress={() => setImageList(imageList.filter((_, filterIdx) => idx !== filterIdx))}
-                        style={{ position: "absolute", right: 0, top: 0 }}>
-                        <Image source={photoClose} style={{ width: d2p(16), height: h2p(16) }} />
-                      </Pressable>
-                    </View>
-                  </View>
-                );
-              }))}
-            </ScrollView>
           </View>
-        </View >
+          :
+          <>
+            <Pressable onPress={() => inputRef.current?.focus()}
+              style={{ height: h2p(446) }}>
+              <TextInput
+                ref={inputRef}
+                value={writeData.content}
+                autoCapitalize="none"
+                multiline
+                maxLength={301}
+                textAlignVertical="top"
+                onChangeText={(e) => {
+                  if (e.length > 300) {
+                    setWriteData({ ...writeData, content: e.slice(0, e.length - 1) });
+                  }
+                  else {
+                    setWriteData({ ...writeData, content: e });
+                  }
+                }}
+                style={[styles.textInput, FONT.Regular]}
+                placeholder="내용을 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
+              <Text style={[FONT.Regular, {
+                position: "absolute", right: 30, bottom: 30,
+                color: writeData.content.length === 300 ? theme.color.main : theme.color.grayscale.a09ca4
+              }]}>{writeData.content.length}/300</Text>
+            </Pressable>
+            <View style={styles.selectWrap}>
+              <TouchableOpacity
+                onPress={() => tagRefRBSheet.current?.open()}
+                style={[styles.select, { marginRight: d2p(10) }]}>
+                <View style={{ position: "relative" }}>
+                  <Image source={((
+                    writeData.tags.interest.length +
+                    writeData.tags.household.length +
+                    writeData.tags.taste.length) === 0) ? tag : maintag} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
+                  {(writeData.tags.interest.length +
+                    writeData.tags.household.length +
+                    writeData.tags.taste.length) !== 0 &&
+                    <Text style={{ fontSize: 8, color: theme.color.white, top: h2p(3), left: "22%", position: "absolute" }}>
+                      {(writeData.tags.interest.length +
+                        writeData.tags.household.length +
+                        writeData.tags.taste.length)}</Text>}
+                </View>
+                <Text style={FONT.Medium}>태그 선택</Text>
+                <Text style={[{ fontSize: 12, color: theme.color.main }, FONT.Medium]}> *</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => marketRefRBSheet.current?.open()}
+                style={styles.select}>
+                <Image source={(writeData.market !== "선택 안함" && writeData.market !== "유통사 선택") ? maincart : cart} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
+                <Text style={FONT.Medium}>{writeData.market}</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        }
+        <View style={{
+          position: "absolute", flexDirection: "row", alignItems: "center",
+          bottom: isIphoneX() ? getBottomSpace() : h2p(30)
+        }}>
+          <Pressable onPress={pickImage} style={[styles.images, { marginLeft: d2p(20), marginRight: d2p(15) }]}>
+            <View style={{ alignItems: "center" }}>
+              <Image source={photo} style={{ width: d2p(20), height: h2p(20), marginTop: h2p(12) }} />
+              <Text style={[{ fontSize: 12, color: theme.color.grayscale.d3d0d5, marginVertical: h2p(8) }, FONT.Regular]}>{imageList.length}/5</Text>
+            </View>
+          </Pressable>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {React.Children.toArray(imageList.map((image, idx) => {
+              return (
+                <View style={[styles.images, { marginRight: (idx === imageList.length - 1) ? d2p(20) : d2p(5) }]}>
+                  <View style={{ alignItems: "center" }}>
+                    <Image source={{ uri: image }} style={{ width: d2p(96), height: h2p(64), borderRadius: 4 }} />
+                    <Pressable onPress={() => setImageList(imageList.filter((_, filterIdx) => idx !== filterIdx))}
+                      style={{ position: "absolute", right: 0, top: 0 }}>
+                      <Image source={photoClose} style={{ width: d2p(16), height: h2p(16) }} />
+                    </Pressable>
+                  </View>
+                </View>
+              );
+            }))}
+          </ScrollView>
+        </View>
       </KeyboardAwareScrollView>
 
       {/* 태그 선택 바텀시트 */}
@@ -522,7 +528,8 @@ const styles = StyleSheet.create({
   selectWrap: {
     flexDirection: "row",
     justifyContent: "center",
-    marginBottom: h2p(144)
+    marginTop: "auto",
+    marginBottom: h2p(114)
   },
   select: {
     flexDirection: "row",

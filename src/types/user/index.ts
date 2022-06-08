@@ -44,10 +44,8 @@ export interface MyPrfoileType {
   household: "자취생" | "애기가족" | "가족한끼" | "신혼부부",
   tags: Array<string>,
   created: string,
-  reviews: Array<ReviewListType>,
   reviewCount: number,
   bookmarkCount: number,
-  bookmarks: Array<ReviewListType>
 }
 
 export interface UserInfoType {
