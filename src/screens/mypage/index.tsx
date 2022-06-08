@@ -39,6 +39,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
   const [index, setIndex] = useState(0);
   const [openMore, setOpenMore] = useState(false);
   const setModalOpen = useSetRecoilState(okPopupState);
+
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", route.params?.id], async () => {
     if (route.params?.id && (route.params.id !== myId)) {
       const queryData = await getUserProfile(token, route.params?.id);
@@ -87,7 +88,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
       return () => setOpenMore(false);
     }, []));
 
-  if (getMyProfileQuery.isLoading || userReviewListQuery.isLoading || userBookmarkListQuery.isLoading) {
+  if (getMyProfileQuery.isLoading) {
     return (
       <Loading />
     );
@@ -240,7 +241,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
         )}
       >
         <Tabs.Tab
-          name={`작성 글 ${userReviewListQuery.data?.pages.flat().length}`}>
+          name={`작성 글 ${getMyProfileQuery.data?.reviewCount}`}>
           <Tabs.FlatList
             ListEmptyComponent={() => (
               <View style={{ paddingTop: h2p(20), flex: 1 }}>
@@ -262,13 +263,21 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             onEndReachedThreshold={0.3}
             refreshing={userReviewListQuery.isLoading}
             onRefresh={() => queryClient.invalidateQueries("userReviewList")}
-            contentContainerStyle={{ paddingBottom: h2p(100), paddingTop: Platform.OS === "ios" ? h2p(90) : h2p(370) }}
+            contentContainerStyle={{
+              paddingBottom: h2p(100),
+              paddingTop: Platform.OS === "ios" ? h2p(90) : h2p(370)
+            }}
             showsVerticalScrollIndicator={false}
             data={userReviewListQuery.data?.pages.flat()}
             renderItem={(review) => {
-              if (getMyProfileQuery.isLoading || getMyProfileQuery.isFetching) {
+              if (userReviewListQuery.isLoading) {
                 return (
-                  <Loading />
+                  <View style={{
+                    position: "absolute",
+                    top: Platform.OS === "ios" ? h2p(-90) : h2p(-370), alignSelf: "center"
+                  }}>
+                    <Loading />
+                  </View>
                 );
               }
               return (
@@ -289,7 +298,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             keyExtractor={(v) => String(v.id)}
           />
         </Tabs.Tab>
-        <Tabs.Tab name={`담은 글 ${userBookmarkListQuery.data?.pages.flat().length}`}>
+        <Tabs.Tab name={`담은 글 ${getMyProfileQuery.data?.bookmarkCount}`}>
           <Tabs.FlatList
             ListEmptyComponent={() => (
               <View style={{ paddingTop: h2p(20) }}>
@@ -314,20 +323,30 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             contentContainerStyle={{ paddingBottom: h2p(100), paddingTop: Platform.OS === "ios" ? h2p(90) : h2p(370) }}
             showsVerticalScrollIndicator={false}
             data={userBookmarkListQuery.data?.pages.flat()}
-            renderItem={(bookmarks) => (
-              <Pressable
-                onPress={() => navigation.navigate("FeedDetail",
-                  { id: bookmarks.item.id, isLike: bookmarks.item.isLike })}
-                style={styles.review}
-              >
-                <FeedReview
-                  clickBoxStyle={{ right: d2p(26), top: h2p(-10) }}
-                  idx={bookmarks.index}
-                  selectedIndex={selectedIndex}
-                  setSelectedIndex={(selectIdx: number) => setSelectedIndex(selectIdx)}
-                  review={bookmarks.item} />
-              </Pressable>
-            )}
+            renderItem={(bookmarks) => {
+              if (userBookmarkListQuery.isLoading) {
+                return <View style={{
+                  position: "absolute",
+                  top: Platform.OS === "ios" ? h2p(-90) : h2p(-370), alignSelf: "center"
+                }}>
+                  <Loading />
+                </View>;
+              }
+              return (
+                <Pressable
+                  onPress={() => navigation.navigate("FeedDetail",
+                    { id: bookmarks.item.id, isLike: bookmarks.item.isLike })}
+                  style={styles.review}
+                >
+                  <FeedReview
+                    clickBoxStyle={{ right: d2p(26), top: h2p(-10) }}
+                    idx={bookmarks.index}
+                    selectedIndex={selectedIndex}
+                    setSelectedIndex={(selectIdx: number) => setSelectedIndex(selectIdx)}
+                    review={bookmarks.item} />
+                </Pressable>
+              );
+            }}
             keyExtractor={(v) => String(v.id)}
           />
         </Tabs.Tab>

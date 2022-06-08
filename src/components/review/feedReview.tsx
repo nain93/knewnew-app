@@ -9,7 +9,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 //@ts-ignore
 import Highlighter from 'react-native-highlight-words';
-import { ReviewListType } from '~/types/review';
+import { ReviewListType, ReviewParentType } from '~/types/review';
 import { useMutation, useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { tokenState } from '~/recoil/atoms';
@@ -124,7 +124,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             <Image
               source={more}
               resizeMode="contain"
-              style={{ width: 26, height: 16 }}
+              style={{ width: d2p(26), height: d2p(16) }}
             />
           </TouchableOpacity>}
       </View>

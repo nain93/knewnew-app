@@ -106,9 +106,11 @@ const ReKnew = ({ review, filterBadge }: FeedReviewProps) => {
             }
           </Text>
         </View>
-        <View style={styles.sign}>
-          <Text style={[styles.store, FONT.Regular]}>{review.market}</Text>
-        </View>
+        {review.market &&
+          <View style={styles.sign}>
+            <Text style={[styles.store, FONT.Regular]}>{review.market}</Text>
+          </View>
+        }
         {
           (() => {
             switch (review.images.length) {
@@ -189,7 +191,6 @@ export default ReKnew;
 const styles = StyleSheet.create({
   review: {
     paddingTop: d2p(20),
-    paddingBottom: d2p(15)
   },
   title: {
     fontSize: 16, fontWeight: 'bold',
@@ -203,7 +204,7 @@ const styles = StyleSheet.create({
   sign: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginTop: h2p(10)
+    marginTop: h2p(10),
   },
   store: {
     fontSize: 12,
