@@ -1,4 +1,4 @@
-import { Dimensions, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, Pressable, StyleSheet, Text, TouchableOpacity, View, Animated } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import Header from '~/components/header';
@@ -27,6 +27,8 @@ import Loading from '~/components/loading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { preSiginedImages, uploadImage } from '~/api';
 import { hitslop } from '~/utils/constant';
+import AlertPopup from '~/components/popup/alertPopup';
+import FadeInOut from '~/hooks/fadeInOut';
 
 interface ProfileEditType {
   nickname: string,
@@ -84,11 +86,14 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
   const setModalOpen = useSetRecoilState(okPopupState);
   const queryClient = useQueryClient();
   const [profile, setProfile] = useState(profileImage ? profileImage : "");
+  const [isPopupOpen, setIsPopupOpen] = useState({ isOpen: false, content: "" });
+  const { fadeAnim } = FadeInOut({ isPopupOpen, setIsPopupOpen });
 
   const editProfileMutation = useMutation(["editprofile", token],
     (profileprop: ProfileType) => editUserProfile({ token, id: myId, profile: profileprop }), {
-    onSuccess: () => {
-      queryClient.invalidateQueries("myProfile");
+    onSuccess: async () => {
+      await queryClient.invalidateQueries("myProfile");
+      navigation.goBack();
     }
   });
   const deleteUserMutation = useMutation("deleteUser", () => deleteUser({ token, id: myId }));
@@ -293,8 +298,6 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
       <RBSheet
         animationType="fade"
         ref={tagRefRBSheet}
-        closeOnDragDown
-        dragFromTopOnly
         onClose={() => setIsBadgeNext(false)}
         height={Dimensions.get("window").height - h2p(200)}
         openDuration={250}
@@ -304,7 +307,6 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
             borderTopRightRadius: 30,
             paddingHorizontal: d2p(20),
             paddingVertical: h2p(20)
-            // paddingTop: isIphoneX() ? getStatusBarHeight() + d2p(15) : d2p(15),
           }, draggableIcon: {
             display: "none"
           }
@@ -320,6 +322,14 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
             {isBadgeNext ? "대표뱃지 선택" : "태그 선택"}
           </Text>
           <TouchableOpacity onPress={() => {
+            if (userBadge.interest.every(v => !v.isClick)) {
+              setIsPopupOpen({ isOpen: true, content: "관심사를 선택해주세요" });
+              return;
+            }
+            if (userBadge.household.every(v => !v.isClick)) {
+              setIsPopupOpen({ isOpen: true, content: "가족구성을 선택해주세요" });
+              return;
+            }
             if (!isBadgeNext) {
               setIsBadgeNext(true);
             }
@@ -345,6 +355,11 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
             </View>
             <SelectLayout isInitial={isBadgeNext ? false : true} userBadge={userBadge} setUserBadge={(badge: BadgeType) => setUserBadge(badge)} />
           </>
+        }
+        {isPopupOpen.isOpen &&
+          <Animated.View style={{ opacity: fadeAnim ? fadeAnim : 1, zIndex: fadeAnim ? fadeAnim : -1 }}>
+            <AlertPopup text={isPopupOpen.content} popupStyle={{ bottom: h2p(20) }} />
+          </Animated.View>
         }
       </RBSheet>
     </>

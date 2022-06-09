@@ -12,10 +12,10 @@ import ImageCropPicker from 'react-native-image-crop-picker';
 import RBSheet from "react-native-raw-bottom-sheet";
 import SelectLayout from '~/components/selectLayout';
 import CloseIcon from '~/components/icon/closeIcon';
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { popupState, tokenState } from '~/recoil/atoms';
-import { ReviewListType, WriteReviewType } from '~/types/review';
+import { ReviewListType, WriteImagesType, WriteReviewType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
@@ -26,6 +26,8 @@ import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 import Loading from '~/components/loading';
 import { preSiginedImages, uploadImage } from '~/api';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { getMyProfile } from '~/api/user';
+import { MyPrfoileType } from '~/types/user';
 
 const marketList: Array<"선택 안함" | "마켓컬리" | "쿠팡프레시" | "SSG" | "B마트" | "윙잇" | "쿠캣마켓"> =
   ["선택 안함", "마켓컬리", "쿠팡프레시", "SSG", "B마트", "윙잇", "쿠캣마켓"];
@@ -41,6 +43,8 @@ interface WriteProp {
     isEdit: boolean
   }>;
 }
+
+const today = new Date();
 
 const Write = ({ navigation, route }: WriteProp) => {
   let parentId: number | undefined;
@@ -71,15 +75,44 @@ const Write = ({ navigation, route }: WriteProp) => {
   const queryClient = useQueryClient();
   const token = useRecoilValue(tokenState);
   const setIspopupOpen = useSetRecoilState(popupState);
+  const [presignImg, setPresignImg] = useState<WriteImagesType[]>([]);
+  const [blockSubmit, setBlockSubmit] = useState(false);
+
+  const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
+    enabled: !!token
+  });
 
   const addReviewMutation = useMutation(["addReview", token],
     (writeProps: WriteReviewType) => writeReview({ token, ...writeProps }), {
     onSuccess: (data) => {
       if (data) {
-        queryClient.invalidateQueries("reviewList");
+        queryClient.setQueriesData("reviewList", (reviewQuery: any) => {
+          if (reviewQuery && getMyProfileQuery.data) {
+            return {
+              ...reviewQuery, pages: [[{
+                author: {
+                  id: getMyProfileQuery.data.id,
+                  profileImage: getMyProfileQuery.data.profileImage,
+                  representBadge: getMyProfileQuery.data.representBadge,
+                  nickname: getMyProfileQuery.data.nickname,
+                  household: getMyProfileQuery.data.household
+                },
+                ...writeData,
+                bookmarkCount: 0,
+                likeCount: 0,
+                childCount: 0,
+                commentCount: 0,
+                created: today.toISOString(),
+                id: data.id,
+                images: presignImg.map(img => ({ ...img, image: "https://knewnnew-s3.s3.amazonaws.com/" + img.image }))
+              }, ...reviewQuery.pages.flat()]]
+            };
+          }
+        });
         navigation.goBack();
       }
-    }
+    },
+    onSettled: () => setBlockSubmit(false)
   });
 
   const editReviewMutation = useMutation(["editReview", token],
@@ -87,10 +120,32 @@ const Write = ({ navigation, route }: WriteProp) => {
       editReview({ token, id, ...writeProps }), {
     onSuccess: (data) => {
       if (data) {
-        queryClient.invalidateQueries("reviewList");
+        queryClient.setQueriesData("reviewList", (reviewQuery: any) => {
+          if (reviewQuery && getMyProfileQuery.data) {
+            return {
+              //@ts-ignore
+              ...reviewQuery, pages: [reviewQuery.pages.flat().map(v => {
+                if (v.id === route.params?.review?.id) {
+                  return {
+                    author: route.params?.review?.author,
+                    created: route.params?.review?.created,
+                    bookmarkCount: route.params?.review?.bookmarkCount,
+                    likeCount: route.params?.review?.likeCount,
+                    childCount: route.params?.review?.childCount,
+                    commentCount: route.params?.review?.commentCount,
+                    ...writeData, id: v.id,
+                    images: presignImg.map(img => ({ ...img, image: "https://knewnnew-s3.s3.amazonaws.com/" + img.image }))
+                  };
+                }
+                return v;
+              })]
+            };
+          }
+        });
         navigation.goBack();
       }
-    }
+    },
+    onSettled: () => setBlockSubmit(false)
   });
 
   const presignMutation = useMutation("presignImages",
@@ -105,6 +160,7 @@ const Write = ({ navigation, route }: WriteProp) => {
           acc = acc.concat({ priority: idx, image: cur.fields.key });
           return acc;
         }, []);
+        setPresignImg(images);
         if (route.params?.isEdit && route.params.review?.id) {
           editReviewMutation.mutate({ writeProps: { ...writeData, images }, id: route.params.review?.id });
         }
@@ -146,6 +202,7 @@ const Write = ({ navigation, route }: WriteProp) => {
         return;
       }
     }
+    setBlockSubmit(true);
     presignMutation.mutate(imageList);
   };
 
@@ -222,7 +279,6 @@ const Write = ({ navigation, route }: WriteProp) => {
     });
   }, []);
 
-  // console.log(writeData.images, 'writeData.images');
   if ((route.params?.loading && !writeData.satisfaction) || addReviewMutation.isLoading || editReviewMutation.isLoading) {
     return (
       <Loading />
@@ -250,7 +306,14 @@ const Write = ({ navigation, route }: WriteProp) => {
         }}
           imageStyle={{ width: d2p(11), height: h2p(25) }} />}
         title="작성하기"
-        headerRightPress={handleAddWrite}
+        headerRightPress={() => {
+          if (blockSubmit) {
+            return;
+          }
+          else {
+            handleAddWrite();
+          }
+        }}
         headerRight={<Text style={[{ color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>완료</Text>} />
       <KeyboardAwareScrollView
         showsVerticalScrollIndicator={false}

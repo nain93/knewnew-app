@@ -21,10 +21,9 @@ interface MoreProps {
   handleCloseMore: () => void,
   clickBoxStyle?: ViewStyle,
   isGobacK?: () => void,
-  setLoading: (isLoading: boolean) => void
 }
 
-const More = ({ setLoading, isGobacK, handleCloseMore, userId, isMoreClick, type, review, filterBadge, clickBoxStyle }: MoreProps) => {
+const More = ({ isGobacK, handleCloseMore, userId, isMoreClick, type, review, filterBadge, clickBoxStyle }: MoreProps) => {
   const navigation = useNavigation<StackNavigationProp>();
   const myId = useRecoilValue(myIdState);
   const token = useRecoilValue(tokenState);
@@ -33,9 +32,6 @@ const More = ({ setLoading, isGobacK, handleCloseMore, userId, isMoreClick, type
   const deleteMutation = useMutation("deleteReview",
     (id: number) => deleteReview(token, id), {
     onSuccess: async () => {
-      await queryClient.invalidateQueries("reviewList");
-      await queryClient.invalidateQueries("myProfile");
-      setLoading(false);
       if (isGobacK) {
         isGobacK();
       }
@@ -61,8 +57,25 @@ const More = ({ setLoading, isGobacK, handleCloseMore, userId, isMoreClick, type
   };
 
   const handleDeletePress = () => {
-    setLoading(true);
     if (type === "review") {
+      queryClient.setQueriesData("reviewList", (data) => {
+        if (data) {
+          //@ts-ignore
+          return { ...data, pages: [data.pages.flat().filter(v => v.id !== review.id)] };
+        }
+      });
+      queryClient.setQueriesData("userReviewList", (data) => {
+        if (data) {
+          //@ts-ignore
+          return { ...data, pages: [data.pages.flat().filter(v => v.id !== review.id)] };
+        }
+      });
+      queryClient.setQueriesData("userBookmarkList", (data) => {
+        if (data) {
+          //@ts-ignore
+          return { ...data, pages: [data.pages.flat().filter(v => v.id !== review.id)] };
+        }
+      });
       deleteMutation.mutate(review.id);
     }
     if (type === "comment") {

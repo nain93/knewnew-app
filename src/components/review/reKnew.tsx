@@ -215,6 +215,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.color.grayscale.d3d0d5,
     borderRadius: 10,
+    marginTop: h2p(10)
   }
 });
 
