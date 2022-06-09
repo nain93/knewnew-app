@@ -31,7 +31,7 @@ interface FeedReviewProps {
   idx?: number
   clickBoxStyle?: ViewStyle
   filterBadge?: string,
-  keyword?: string
+  keyword?: string,
 }
 
 const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
@@ -44,7 +44,6 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
   const [bookmarkCount, setBookmarkCount] = useState(review.bookmarkCount);
   const [tags, setTags] = useState<Array<string>>([]);
   const token = useRecoilValue(tokenState);
-  const [loading, setLoading] = useState(false);
 
   const boomarkMutation = useMutation("bookmark",
     ({ id, isBookmark }: { id: number, isBookmark: boolean }) => bookmarkReview(token, id, isBookmark));
@@ -72,12 +71,6 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
       }, [])
     );
   }, [review]);
-
-  if (loading) {
-    return (
-      <Loading />
-    );
-  }
 
   return (
     <>
@@ -147,7 +140,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
       }
       {!review.parent &&
         <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: d2p(10), marginLeft: d2p(50) }}>
-          <Image source={tag} style={{ width: 10, height: 10, marginRight: d2p(5) }} />
+          <Image source={tag} style={{ width: d2p(10), height: d2p(10), marginRight: d2p(5) }} />
           <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
             {React.Children.toArray(tags.map((v) => {
               if (v === filterBadge) {
@@ -160,7 +153,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             }
           </Text>
         </View>}
-      {(!review.parent && type === "normal") &&
+      {(review.market) &&
         <View style={styles.sign}>
           <Text style={[styles.store, FONT.Regular]}>{review.market}</Text>
         </View>}
@@ -294,7 +287,6 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
       {
         type === "normal" &&
         <More
-          setLoading={(isLoading: boolean) => setLoading(isLoading)}
           clickBoxStyle={clickBoxStyle}
           review={review}
           filterBadge={filterBadge}
@@ -366,7 +358,8 @@ const styles = StyleSheet.create({
   imageWrap: {
     borderWidth: 1,
     marginLeft: d2p(50),
-    marginVertical: h2p(5),
+    marginBottom: h2p(5),
+    marginTop: h2p(10),
     borderColor: theme.color.grayscale.d3d0d5,
     borderRadius: 10,
   }

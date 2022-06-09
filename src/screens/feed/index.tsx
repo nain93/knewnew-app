@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, Animated, Pressable } from 'react-native';
 import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
-import { d2p, h2p } from '~/utils';
+import { d2p, h2p, simpleDate } from '~/utils';
 import theme from '~/styles/theme';
 import Header from '~/components/header';
 import mainLogo from '~/assets/logo';
@@ -25,6 +25,7 @@ import { initialBadgeData } from '~/utils/data';
 import { useFocusEffect } from '@react-navigation/native';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
+import FadeInOut from '~/hooks/fadeInOut';
 
 function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
   return (
@@ -45,7 +46,8 @@ export interface FeedProps {
 
 const Feed = ({ navigation, route }: FeedProps) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const [isPopupOpen, setIspopupOpen] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState({ isOpen: false, content: "" });
+  const fadeHook = FadeInOut({ isPopupOpen, setIsPopupOpen });
   const [scrollOffset, setScrollOffset] = useState(0);
   const tagRefRBSheet = useRef<RBSheet>(null);
   const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
@@ -261,10 +263,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
                 userBadge.interest.every(v => !v.isClick) &&
                 userBadge.taste.every(v => !v.isClick)
               ) {
-                setIspopupOpen(true);
-                setTimeout(() => {
-                  setIspopupOpen(false);
-                }, 1500);
+                setIsPopupOpen({ isOpen: true, content: "태그를 선택해주세요" });
                 return;
               }
 
@@ -292,8 +291,10 @@ const Feed = ({ navigation, route }: FeedProps) => {
           </TouchableOpacity>
         </View>
         <SelectLayout type="filter" userBadge={userBadge} setUserBadge={setUserBadge} />
-        {isPopupOpen &&
-          <AlertPopup text={"태그를 선택해주세요"} popupStyle={{ bottom: h2p(20) }} />
+        {isPopupOpen.isOpen &&
+          <Animated.View style={{ opacity: fadeHook.fadeAnim ? fadeHook.fadeAnim : 1, zIndex: fadeHook.fadeAnim ? fadeHook.fadeAnim : -1 }}>
+            <AlertPopup text={isPopupOpen.content} popupStyle={{ bottom: h2p(20) }} />
+          </Animated.View>
         }
       </RBSheet>
     </>
