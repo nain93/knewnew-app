@@ -1,7 +1,7 @@
 import { Platform, Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import React from 'react';
-import { useRecoilValue } from 'recoil';
-import { myIdState, tokenState } from '~/recoil/atoms';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { myIdState, okPopupState, tokenState } from '~/recoil/atoms';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import { FONT } from '~/styles/fonts';
@@ -21,13 +21,15 @@ interface MoreProps {
   handleCloseMore: () => void,
   clickBoxStyle?: ViewStyle,
   isGobacK?: () => void,
+  setSelectedIndex?: (idx: number) => void
 }
 
-const More = ({ isGobacK, handleCloseMore, userId, isMoreClick, type, review, filterBadge, clickBoxStyle }: MoreProps) => {
+const More = ({ setSelectedIndex, isGobacK, handleCloseMore, userId, isMoreClick, type, review, filterBadge, clickBoxStyle }: MoreProps) => {
   const navigation = useNavigation<StackNavigationProp>();
   const myId = useRecoilValue(myIdState);
   const token = useRecoilValue(tokenState);
   const queryClient = useQueryClient();
+  const setModalOpen = useSetRecoilState(okPopupState);
 
   const deleteMutation = useMutation("deleteReview",
     (id: number) => deleteReview(token, id), {
@@ -60,8 +62,15 @@ const More = ({ isGobacK, handleCloseMore, userId, isMoreClick, type, review, fi
     if (type === "review") {
       queryClient.setQueriesData("reviewList", (data) => {
         if (data) {
-          //@ts-ignore
-          return { ...data, pages: [data.pages.flat().filter(v => v.id !== review.id)] };
+          return {
+            //@ts-ignore
+            ...data, pages: [data.pages.flat().filter(v => v.id !== review.id).map(v => {
+              if (v.parent?.id === review.id) {
+                return { ...v, parent: { ...v.parent, isActive: false } };
+              }
+              return v;
+            })]
+          };
         }
       });
       queryClient.setQueriesData("userReviewList", (data) => {
@@ -111,7 +120,16 @@ const More = ({ isGobacK, handleCloseMore, userId, isMoreClick, type, review, fi
               <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
             </Pressable>
             <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-            <Pressable style={styles.press} onPress={handleDeletePress}>
+            <Pressable style={styles.press} onPress={() => {
+              if (setSelectedIndex) {
+                setSelectedIndex(-1);
+              }
+              setModalOpen({
+                isOpen: true,
+                content: "글을 삭제할까요?",
+                okButton: handleDeletePress
+              });
+            }}>
               <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
             </Pressable>
           </View>

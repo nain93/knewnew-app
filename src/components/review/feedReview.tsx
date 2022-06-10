@@ -153,7 +153,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             }
           </Text>
         </View>}
-      {(review.market) &&
+      {review.market &&
         <View style={styles.sign}>
           <Text style={[styles.store, FONT.Regular]}>{review.market}</Text>
         </View>}
@@ -287,6 +287,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
       {
         type === "normal" &&
         <More
+          setSelectedIndex={(seIdx: number) => setSelectedIndex && setSelectedIndex(seIdx)}
           clickBoxStyle={clickBoxStyle}
           review={review}
           filterBadge={filterBadge}

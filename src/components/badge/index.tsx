@@ -57,7 +57,7 @@ const Badge = ({ layoutType = "normal", text, type, badge, isClick, idx, userBad
               }
             }
           }} style={[styles.tag, !isClick ? styles.basic : styles.checked, viewStyle]}>
-          {isClick && <Image source={colorCheck} resizeMode="contain" style={{ width: 10, height: 8, marginRight: 5 }} />}
+          {isClick && <Image source={colorCheck} resizeMode="contain" style={{ width: d2p(10), height: d2p(8), marginRight: d2p(5) }} />}
           <Text style={[styles.text, !isClick ? styles.blackText : styles.colorText, FONT.Medium]}>{text}</Text>
         </TouchableOpacity>
       );
@@ -88,13 +88,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 16,
     marginTop: d2p(10), marginRight: d2p(5),
-    paddingVertical: d2p(5), paddingHorizontal: d2p(15),
+    paddingVertical: d2p(5)
   },
   basic: {
     borderColor: theme.color.grayscale.eae7ec,
+    paddingHorizontal: d2p(15),
   },
   checked: {
     borderColor: theme.color.main,
+    paddingRight: d2p(15),
+    paddingLeft: d2p(10)
   },
   text: {
     fontWeight: '500'

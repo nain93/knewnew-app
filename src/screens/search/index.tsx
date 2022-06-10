@@ -120,6 +120,7 @@ const Search = ({ navigation }: SearchProps) => {
           }}>
             <TextInput
               autoFocus
+              onFocus={() => setIsSearchMode(false)}
               autoCapitalize="none"
               style={[{
                 color: theme.color.black,

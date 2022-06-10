@@ -1,4 +1,4 @@
-import { Dimensions, FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, FlatList, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useState } from 'react';
 import { TabBar, TabView } from 'react-native-tab-view';
 //@ts-ignore
@@ -98,7 +98,9 @@ const SearchTabView = ({ searchList, userList, keyword, reviewNext, userNext }: 
                     <Text style={[{ textAlign: "center", marginTop: h2p(115), color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
                       검색결과가 없습니다.</Text>}
                   renderItem={(user) =>
-                    <View style={{ marginBottom: h2p(30), flexDirection: "row", alignItems: "center" }}>
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate('Mypage', { id: user.item.id })}
+                      style={{ marginBottom: h2p(30), flexDirection: "row", alignItems: "center" }}>
                       <Image source={user.item.profileImage ? { uri: user.item.profileImage } : noProfile}
                         style={{ marginRight: d2p(10), borderColor: theme.color.grayscale.e9e7ec, borderWidth: 1, width: d2p(24), height: d2p(24), borderRadius: 24 }} />
                       <View style={{ flexDirection: "row", width: Dimensions.get("window").width - d2p(84) }}>
@@ -110,7 +112,7 @@ const SearchTabView = ({ searchList, userList, keyword, reviewNext, userNext }: 
                         />
                       </View>
                       <Image source={leftArrow} style={{ marginLeft: "auto", width: d2p(11), height: h2p(25), transform: [{ rotate: "180deg" }] }} />
-                    </View>
+                    </TouchableOpacity>
                   }
                   showsVerticalScrollIndicator={false}
                 />

@@ -57,7 +57,8 @@ const Welcome = ({ navigation, route }: NavigationType) => {
       />
       <View style={styles.container}>
         <View style={styles.main}>
-          <Text style={[styles.mainText, { color: theme.color.main }, { lineHeight: 28 }, FONT.SemiBold]}>{data?.nickname}</Text>
+          <Text style={[styles.mainText, { color: theme.color.main }, { lineHeight: 28 }, FONT.SemiBold]}>
+            {data?.nickname}</Text>
           <Text style={[styles.mainText, { lineHeight: 29 }, FONT.SemiBold]}>님 반가워요!</Text>
         </View>
         <View style={{
@@ -89,6 +90,7 @@ const styles = StyleSheet.create({
   main: {
     flexDirection: 'row',
     marginTop: d2p(173), marginBottom: d2p(40),
+    flexWrap: "wrap"
   },
   mainText: {
     fontSize: 26,

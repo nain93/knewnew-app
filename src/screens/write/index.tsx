@@ -98,6 +98,9 @@ const Write = ({ navigation, route }: WriteProp) => {
                   household: getMyProfileQuery.data.household
                 },
                 ...writeData,
+                tags: route.params?.type === "reKnewWrite" ? route.params.review?.tags : writeData.tags,
+                parent: route.params?.type === "reKnewWrite" ? { ...route.params?.review, isActive: true } : null,
+                market: (writeData.market === "유통사 선택" || writeData.market === "선택 안함") ? undefined : writeData.market,
                 bookmarkCount: 0,
                 likeCount: 0,
                 childCount: 0,
@@ -125,6 +128,10 @@ const Write = ({ navigation, route }: WriteProp) => {
             return {
               //@ts-ignore
               ...reviewQuery, pages: [reviewQuery.pages.flat().map(v => {
+                if (!route.params?.type && route.params?.review &&
+                  (v.parent?.id === route.params?.review.id)) {
+                  return { ...v, parent: { ...v.parent, content: writeData.content, satisfaction: writeData.satisfaction } };
+                }
                 if (v.id === route.params?.review?.id) {
                   return {
                     author: route.params?.review?.author,
@@ -134,6 +141,14 @@ const Write = ({ navigation, route }: WriteProp) => {
                     childCount: route.params?.review?.childCount,
                     commentCount: route.params?.review?.commentCount,
                     ...writeData, id: v.id,
+                    parent:
+                      route.params?.review?.parent ?
+                        (route.params?.review?.parent?.isActive ? { ...route.params?.review?.parent, isActive: true }
+                          :
+                          { ...route.params?.review?.parent, isActive: false })
+                        :
+                        null,
+                    market: (writeData.market === "유통사 선택" || writeData.market === "선택 안함") ? undefined : writeData.market,
                     images: presignImg.map(img => ({ ...img, image: "https://knewnnew-s3.s3.amazonaws.com/" + img.image }))
                   };
                 }
@@ -162,7 +177,11 @@ const Write = ({ navigation, route }: WriteProp) => {
         }, []);
         setPresignImg(images);
         if (route.params?.isEdit && route.params.review?.id) {
-          editReviewMutation.mutate({ writeProps: { ...writeData, images }, id: route.params.review?.id });
+          editReviewMutation.mutate({
+            writeProps:
+              { ...writeData, parent: route.params.review.parent?.isActive ? writeData.parent : undefined, images },
+            id: route.params.review?.id
+          });
         }
         else {
           addReviewMutation.mutate({ ...writeData, images });
