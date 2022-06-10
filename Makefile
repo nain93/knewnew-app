@@ -9,11 +9,14 @@ clean:
 	(cd android && ./gradlew clean)
 	(cd ios && xcodebuild clean -workspace ${PROJECT_NAME}.xcworkspace -scheme ${PROJECT_NAME})
 
-build-android:
-	(cd android && ./gradlew build -x lint)
+run-android:
+	npx react-native run-android
 
-build-ios: setup
-	(cd ios && xcodebuild build -workspace ${PROJECT_NAME}.xcworkspace -scheme ${PROJECT_NAME})
+run-ios:
+	npx react-native run-ios
+
+build-ios:
+  npx react-native run-ios --configuration Release
 
 run-tests:
 	npx jest --testPathIgnorePatterns node_modules/ --runInBand
