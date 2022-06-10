@@ -1,4 +1,4 @@
-import { Dimensions, Image, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, Linking, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import Header from '~/components/header';
 import { d2p, h2p } from '~/utils';
@@ -158,6 +158,11 @@ const Mypage = ({ navigation, route }: MypageProps) => {
           </TouchableOpacity>
           <View style={{ borderWidth: 1, width: d2p(70), alignSelf: "center", borderColor: theme.color.grayscale.e9e7ec }} />
           <TouchableOpacity
+            onPress={() => Linking.openURL("https://pf.kakao.com/_YQFcb")}
+            style={{ width: d2p(90), height: h2p(35), justifyContent: "center", alignItems: "center" }}>
+            <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>문의하기</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
             onPress={() => {
               setModalOpen({
                 isOpen: true,
@@ -283,7 +288,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
               return (
                 <Pressable
                   onPress={() => navigation.navigate("FeedDetail",
-                    { id: review.item.id, isLike: review.item.isLike })}
+                    { id: review.item.id, isLike: review.item.isLike, authorId: review.item.author.id })}
                   style={styles.review}
                 >
                   <FeedReview

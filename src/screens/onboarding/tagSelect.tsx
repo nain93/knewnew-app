@@ -32,6 +32,15 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
       setIspopupOpen({ isOpen: true, content: "관심사(or가족구성)을 선택해주세요" });
       return;
     }
+    const copy: { [index: string]: Array<{ isClick: boolean, title: string }> } = { ...userBadge };
+    const badge = Object.keys(userBadge).reduce<Array<{ isClick: boolean, title: string }>>((acc, cur) => {
+      acc = acc.concat(copy[cur].filter(v => v.isClick));
+      return acc;
+    }, []);
+    if (badge.length > 10) {
+      setIspopupOpen({ isOpen: true, content: "태그는 10개까지만 선택할 수 있어요" });
+      return;
+    }
     navigation.navigate("BadgeSelect", { userBadge, userInfo });
   };
 

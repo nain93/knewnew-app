@@ -115,7 +115,6 @@ const Feed = ({ navigation, route }: FeedProps) => {
     }
   }, [route.params]);
 
-  // console.log(reviewListQuery.data?.pages.flat()[0], 'reviewListQuery.data?.pages.flat()');
   if ((reviewListQuery.isFetching && refresh) || !filterBadge) {
     return <Loading />;
   }
@@ -178,6 +177,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
           renderItem={({ item, index }) =>
             <Pressable onPress={() =>
               navigation.navigate("FeedDetail", {
+                authorId: item.author.id,
                 id: item.id, badge: filterBadge,
                 isLike: item.isLike, isBookmark: item.isBookmark,
               })}
@@ -229,7 +229,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
         closeOnDragDown
         dragFromTopOnly
         animationType="fade"
-        height={Dimensions.get("window").height * ((Platform.OS === "ios" ? 461 : 481) / 760)}
+        height={Dimensions.get("window").height * (481 / 760)}
         openDuration={250}
         customStyles={{
           wrapper: {

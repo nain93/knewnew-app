@@ -10,7 +10,7 @@ import ReactionIcon from '~/components/icon/reactionIcon';
 import { commentMore, more, tag } from '~/assets/icons';
 import { getBottomSpace } from 'react-native-iphone-x-helper';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { myIdState, refreshState, tokenState } from '~/recoil/atoms';
+import { myIdState, okPopupState, refreshState, tokenState } from '~/recoil/atoms';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
@@ -31,6 +31,7 @@ interface FeedDetailProps {
     badge: string,
     isLike: boolean,
     isBookmark: boolean,
+    authorId: number
   }>;
 }
 interface CommentListType {
@@ -63,8 +64,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [like, setLike] = useState<boolean>(false);
   const [cart, setCart] = useState<boolean>(false);
   const [numberLine, setNumberLine] = useState(1);
-  const [loading, setLoading] = useState(false);
   const setRefresh = useSetRecoilState(refreshState);
+  const setModalOpen = useSetRecoilState(okPopupState);
 
   const reviewDetailQuery = useQuery<ReviewListType, Error>(["reviewDetail", token, route.params?.id],
     async () => {
@@ -109,12 +110,14 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries('getCommentList');
       queryClient.invalidateQueries("reviewList");
+      Keyboard.dismiss();
     }
   });
 
   const editCommentMutation = useMutation('editComment', ({ rId, cId, comment }: { rId: number, cId: number, comment: string }) => editReviewComment(token, rId, cId, comment), {
     onSuccess: () => {
       queryClient.invalidateQueries('getCommentList');
+      Keyboard.dismiss();
     }
   });
 
@@ -131,7 +134,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
         addCommentMutation.mutate({ rid: route.params?.id, comment: content });
       } else {
         editCommentMutation.mutate({ rId: route.params?.id, cId: editCommentId, comment: content });
-        Keyboard.dismiss();
         setCommentIsEdit(false);
       }
     }
@@ -167,7 +169,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   }, [reviewDetailQuery.data?.tags]);
 
 
-  if (reviewDetailQuery.isLoading || reviewDetailQuery.isFetching || loading) {
+  if (reviewDetailQuery.isLoading || reviewDetailQuery.isFetching) {
     return <Loading />;
   }
 
@@ -185,7 +187,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           }
         }}
           imageStyle={{ width: d2p(11), height: d2p(25) }} />}
-        title="리뷰 상세"
+        title="게시글 상세"
       />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -198,7 +200,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
         >
           {reviewDetailQuery.data &&
             <More
-              setLoading={(isLoading: boolean) => setLoading(isLoading)}
               review={reviewDetailQuery.data}
               userId={reviewDetailQuery.data?.author.id}
               isMoreClick={isMoreClick}
@@ -210,23 +211,27 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           <View style={{
             paddingHorizontal: d2p(20), flexDirection: 'row', justifyContent: 'space-between'
           }}>
-            <View style={{
-              borderRadius: 40,
-              height: d2p(40),
-              width: d2p(40),
-              borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec
-            }}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Mypage", { id: route.params?.authorId })}
+              style={{
+                borderRadius: 40,
+                height: d2p(40),
+                width: d2p(40),
+                borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec
+              }}>
               <Image source={reviewDetailQuery.data?.author.profileImage ?
                 { uri: reviewDetailQuery.data?.author.profileImage } : noProfile}
                 style={{ width: d2p(40), height: d2p(40), borderRadius: 40 }}
               />
-            </View>
+            </TouchableOpacity>
             <View style={{
               width: Dimensions.get('window').width - d2p(105),
               paddingLeft: d2p(10)
             }}>
               <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap" }}>
-                <Text style={[styles.writer, FONT.Medium]}>{reviewDetailQuery.data?.author.nickname}</Text>
+                <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: route.params?.authorId })}>
+                  <Text style={[styles.writer, FONT.Medium]}>{reviewDetailQuery.data?.author.nickname}</Text>
+                </TouchableOpacity>
                 {reviewDetailQuery.data?.author.representBadge &&
                   <Badge type="feed" text={reviewDetailQuery.data?.author.representBadge} />}
                 <Text style={{ fontSize: 12, marginLeft: d2p(5), color: theme.color.grayscale.a09ca4 }}>{reviewDetailQuery.data?.author.household}</Text>
@@ -354,7 +359,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                       flexDirection: "row",
                       alignItems: "center",
                     }}>
-                      <TouchableOpacity onPress={() => navigation.navigate("UserProfile", { id: item.author.id })}
+                      <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: item.author.id })}
                         style={styles.commentProfileLine}
                       >
                         <Image source={item.author.profileImage ? { uri: item.author.profileImage } : noProfile}
@@ -366,7 +371,9 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                       }}>
                         <View style={{ marginLeft: d2p(10) }}>
                           <View style={{ flexDirection: "row" }}>
-                            <Text style={FONT.Medium}>{item.author.nickname}</Text>
+                            <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: item.author.id })}>
+                              <Text style={FONT.Medium}>{item.author.nickname}</Text>
+                            </TouchableOpacity>
                             <Text style={[styles.commentDate, FONT.Regular]}>{dateCommentFormat(item.created)}</Text>
                           </View>
                         </View>
@@ -391,20 +398,30 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                     <View style={styles.commentLine} />
                     {commentSelectedIdx === index &&
                       <View style={[styles.clickBox, { right: d2p(32) }]}>
-                        <Pressable onPress={() => {
-                          setContent(item.content);
-                          setCommentIsEdit(true);
-                          setModifyingIdx(commentSelectedIdx);
-                          setEditCommentId(item.id);
-                          setCommentSelectedIdx(-1);
-                        }}>
+                        <Pressable
+                          style={{
+                            justifyContent: "center", alignItems: "center", width: d2p(70), height: d2p(35)
+                          }}
+                          onPress={() => {
+                            setContent(item.content);
+                            setCommentIsEdit(true);
+                            setModifyingIdx(commentSelectedIdx);
+                            setEditCommentId(item.id);
+                            setCommentSelectedIdx(-1);
+                          }}>
                           <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
                         </Pressable>
                         <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-                        <Pressable onPress={() => {
-                          deleteCommentMutation.mutate(item.id);
-                          setCommentSelectedIdx(-1);
-                        }}>
+                        <Pressable
+                          style={{ justifyContent: "center", alignItems: "center", width: d2p(70), height: d2p(35) }}
+                          onPress={() => {
+                            setModalOpen({
+                              isOpen: true,
+                              content: "댓글을 삭제할까요?",
+                              okButton: () => deleteCommentMutation.mutate(item.id)
+                            });
+                            setCommentSelectedIdx(-1);
+                          }}>
                           <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
                         </Pressable>
                       </View>
@@ -483,6 +500,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center', justifyContent: 'space-evenly',
     paddingBottom: h2p(10.5),
+    marginTop: h2p(5),
     borderBottomWidth: 1,
     borderBottomColor: theme.color.grayscale.eae7ec
   },

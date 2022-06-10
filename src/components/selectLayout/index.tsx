@@ -25,7 +25,9 @@ const SelectLayout = ({ isInitial, userBadge, setUserBadge, type = "normal" }: S
 
   return (
     <>
-      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ flex: 1 }}
+        contentContainerStyle={{ flex: 1 }}
+        showsVerticalScrollIndicator={false}>
         <View style={{ flexDirection: 'row' }}>
           <Text style={[{ ...styles.menu, marginTop: 0 }, FONT.Regular]}>관심사 </Text>
           {type === "normal" &&
@@ -79,7 +81,7 @@ const SelectLayout = ({ isInitial, userBadge, setUserBadge, type = "normal" }: S
               }} />
           )))}
         </View>
-        <Text style={[styles.menu, FONT.Regular]}>입맛</Text>
+        <Text style={[styles.menu, { marginTop: h2p(30) }, FONT.Regular]}>입맛</Text>
         <View style={{ flexDirection: 'row' }}>
           {React.Children.toArray(userBadge.taste.map((item, idx) => (
             <Badge type="picker" layoutType={type === "filter" ? "filter" : "normal"} badge="taste" text={item.title} idx={idx} isClick={userBadge.taste[idx].isClick}
