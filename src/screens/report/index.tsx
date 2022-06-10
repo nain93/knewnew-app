@@ -35,7 +35,7 @@ const Report = ({ navigation, route }: ReportProps) => {
       onSuccess: () => {
         setReport("");
         setIspopupOpen({ isOpen: true, content: "신고 되었습니다" });
-        // navigation.goBack();
+        navigation.goBack();
       }
     }
   );

@@ -14,7 +14,7 @@ import SelectLayout from '~/components/selectLayout';
 import CloseIcon from '~/components/icon/closeIcon';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { popupState, tokenState } from '~/recoil/atoms';
+import { okPopupState, popupState, tokenState } from '~/recoil/atoms';
 import { ReviewListType, WriteImagesType, WriteReviewType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
 import { NavigationStackProp } from 'react-navigation-stack';
@@ -77,6 +77,7 @@ const Write = ({ navigation, route }: WriteProp) => {
   const setIspopupOpen = useSetRecoilState(popupState);
   const [presignImg, setPresignImg] = useState<WriteImagesType[]>([]);
   const [blockSubmit, setBlockSubmit] = useState(false);
+  const setModalOpen = useSetRecoilState(okPopupState);
 
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
     enabled: !!token
@@ -309,19 +310,41 @@ const Write = ({ navigation, route }: WriteProp) => {
       <Header
         isBorder={true}
         headerLeft={<LeftArrowIcon onBackClick={() => {
-          navigation.goBack();
-          setWriteData({
-            images: [],
-            content: "",
-            satisfaction: "",
-            market: "선택 안함",
-            parent: parentId,
-            tags: {
-              interest: [],
-              household: [],
-              taste: []
-            }
-          });
+          const copy: { [index: string]: Array<{ isClick: boolean, title: string }> } = { ...userBadge };
+          const reduceTags = Object.keys(copy).reduce<Array<string>>((acc, cur) => {
+            acc = acc.concat(copy[cur].filter(v => v.isClick).map(v => v.title));
+            return acc;
+          }, []);
+          if (writeData.content
+            || writeData.satisfaction
+            || writeData.images && writeData.images.length > 0
+            || writeData.market && (writeData.market !== "유통사 선택")
+            || writeData.tags.interest.length > 0
+            || writeData.tags.household.length > 0
+            || writeData.tags.taste.length > 0) {
+            setModalOpen({
+              isOpen: true,
+              content: "앗! 지금까지 작성하신 내용이 사라져요",
+              okButton: () => {
+                navigation.goBack();
+                setWriteData({
+                  images: [],
+                  content: "",
+                  satisfaction: "",
+                  market: "선택 안함",
+                  parent: parentId,
+                  tags: {
+                    interest: [],
+                    household: [],
+                    taste: []
+                  }
+                });
+              }
+            });
+          }
+          else {
+            navigation.goBack();
+          }
         }}
           imageStyle={{ width: d2p(11), height: h2p(25) }} />}
         title="작성하기"
