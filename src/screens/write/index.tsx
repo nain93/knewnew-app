@@ -276,6 +276,7 @@ const Write = ({ navigation, route }: WriteProp) => {
     }
     else {
       setUserBadge(initialBadgeData);
+      setUploadBody([]);
       setImageList([]);
       setWriteData({
         images: [],
@@ -322,11 +323,6 @@ const Write = ({ navigation, route }: WriteProp) => {
       <Header
         isBorder={true}
         headerLeft={<LeftArrowIcon onBackClick={() => {
-          const copy: { [index: string]: Array<{ isClick: boolean, title: string }> } = { ...userBadge };
-          const reduceTags = Object.keys(copy).reduce<Array<string>>((acc, cur) => {
-            acc = acc.concat(copy[cur].filter(v => v.isClick).map(v => v.title));
-            return acc;
-          }, []);
           if (writeData.content
             || writeData.satisfaction
             || writeData.images && writeData.images.length > 0

@@ -293,7 +293,9 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                       borderWidth: 1,
                       borderColor: theme.color.grayscale.e9e7ec,
                       width: Dimensions.get('window').width - d2p(30),
-                      height: Dimensions.get("window").height * (180 / 760), borderRadius: 18
+                      aspectRatio: 1.7,
+                      height: h2p(180),
+                      borderRadius: 18
                     }}
                     source={{ uri: image.item.image }} />
                 </>
@@ -316,8 +318,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           </View>
           {reviewDetailQuery.data?.parent &&
             <View style={{
-              marginHorizontal: d2p(20),
-              // borderTopWidth: 1, borderColor: theme.color.grayscale.eae7ec
+              marginHorizontal: d2p(20)
             }}>
               <ReKnew review={{
                 ...reviewDetailQuery.data.parent,
