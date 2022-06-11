@@ -78,6 +78,11 @@ const Write = ({ navigation, route }: WriteProp) => {
   const [presignImg, setPresignImg] = useState<WriteImagesType[]>([]);
   const [blockSubmit, setBlockSubmit] = useState(false);
   const setModalOpen = useSetRecoilState(okPopupState);
+  const [uploadBody, setUploadBody] = useState<{
+    uri: string,
+    name: string | undefined,
+    type: string
+  }[]>([]);
 
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
     enabled: !!token
@@ -106,7 +111,7 @@ const Write = ({ navigation, route }: WriteProp) => {
                 likeCount: 0,
                 childCount: 0,
                 commentCount: 0,
-                created: today.toISOString(),
+                created: new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString(),
                 id: data.id,
                 images: presignImg.map(img => ({ ...img, image: "https://knewnnew-s3.s3.amazonaws.com/" + img.image }))
               }, ...reviewQuery.pages.flat()]]
@@ -168,7 +173,7 @@ const Write = ({ navigation, route }: WriteProp) => {
     (fileName: Array<string>) => preSiginedImages({ token, fileName, route: "review" }),
     {
       onSuccess: (data) => {
-        imageList.map(async (v, i) => {
+        uploadBody.map(async (v, i) => {
           await uploadImage(v, data[i]);
         });
         //@ts-ignore
@@ -202,6 +207,13 @@ const Write = ({ navigation, route }: WriteProp) => {
       compressImageMaxWidth: 720,
       compressImageMaxHeight: 720
     }).then(v => {
+      setUploadBody(uploadBody.concat(
+        {
+          uri: v.path,
+          type: v.mime,
+          name: Platform.OS === 'ios' ? v.filename : `my_profile_${Date.now()}.${v.mime === 'image/jpeg' ? 'jpg' : 'png'}`,
+        }
+      ));
       setImageList(imageList.concat(`data:${v.mime};base64,${v.data}`));
     }
     );
@@ -402,6 +414,7 @@ const Write = ({ navigation, route }: WriteProp) => {
                     <FeedReview
                       filterBadge={route.params.filterBadge}
                       type="reKnewWrite"
+                      //@ts-ignore
                       review={route.params?.review.parent ? route.params?.review.parent : route.params?.review} />
                     :
                     <Text style={[FONT.Regular, { color: theme.color.grayscale.C_79737e }]}>
