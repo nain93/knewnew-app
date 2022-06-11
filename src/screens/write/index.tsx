@@ -517,7 +517,10 @@ const Write = ({ navigation, route }: WriteProp) => {
                 <View style={[styles.images, { marginRight: (idx === imageList.length - 1) ? d2p(20) : d2p(5) }]}>
                   <View style={{ alignItems: "center" }}>
                     <Image source={{ uri: image }} style={{ width: d2p(96), height: h2p(64), borderRadius: 4 }} />
-                    <Pressable onPress={() => setImageList(imageList.filter((_, filterIdx) => idx !== filterIdx))}
+                    <Pressable onPress={() => {
+                      setImageList(imageList.filter((_, filterIdx) => idx !== filterIdx));
+                      setUploadBody(uploadBody.filter((_, filterIdx) => idx !== filterIdx));
+                    }}
                       style={{ position: "absolute", right: 0, top: 0 }}>
                       <Image source={photoClose} style={{ width: d2p(16), height: h2p(16) }} />
                     </Pressable>
