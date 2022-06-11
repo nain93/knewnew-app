@@ -34,23 +34,20 @@ export const preSiginedImages = async ({ token, fileName, route }: preSiginedTyp
   }
 };
 
-export async function uploadImage(file: string, preSigned: { url: string, fields: { [key: string]: string } }) {
+export async function uploadImage(file: { uri: string, type: string, name: string | undefined },
+  preSigned: { url: string, fields: { [key: string]: string } }) {
   const data = new FormData();
   Object.keys(preSigned.fields).map(k => {
     data.append(k, preSigned.fields[k]);
   });
 
-  const parsedPath = file.split("/");
-  const filename = parsedPath[parsedPath.length - 1];
-  const parsedFilename = filename.split(".");
+  data.append("file", file);
 
-  data.append("file", {
-    uri: file,
-    type: `image/${parsedFilename[parsedFilename.length - 1]}`,
-    name: filename,
-  });
-
-  return (await axios.post(preSigned.url, data)).data;
+  return (await axios.post(preSigned.url, data, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })).data;
 }
 
 
