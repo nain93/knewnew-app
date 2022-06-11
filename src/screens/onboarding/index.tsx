@@ -174,11 +174,11 @@ const Onboarding = ({ navigation }: NavigationType) => {
       }}>
         <Text style={FONT.Regular}>회원가입 시 뉴뉴 서비스 필수 동의 항목</Text>
         <View style={{ flexDirection: "row" }}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("privacy")}>
             <Text style={[FONT.Bold, { color: theme.color.grayscale.ff5d5d }]}>개인정보처리방침</Text>
           </TouchableOpacity>
           <Text style={FONT.Regular}>과 </Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("term")}>
             <Text style={[FONT.Bold, { color: theme.color.grayscale.ff5d5d }]}>서비스 이용약관</Text>
           </TouchableOpacity>
           <Text style={[FONT.Regular, { textAlign: "center" }]}>에 동의하게 됩니다.</Text>

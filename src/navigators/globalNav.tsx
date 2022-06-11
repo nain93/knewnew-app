@@ -15,6 +15,8 @@ import { tokenState } from '~/recoil/atoms';
 import theme from '~/styles/theme';
 import FeedDetail from '~/screens/feed/detail';
 import Report from '~/screens/report';
+import Term from '~/screens/setting';
+import Privacy from '~/screens/setting/privacy';
 
 const Stack = createStackNavigator();
 
@@ -93,6 +95,20 @@ const GlobalNav = () => {
         <Stack.Screen
           name="report"
           component={Report}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="term"
+          component={Term}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="privacy"
+          component={Privacy}
           options={{
             headerShown: false
           }}
