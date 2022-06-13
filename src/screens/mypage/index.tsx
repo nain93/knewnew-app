@@ -369,7 +369,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             onEndReachedThreshold={0.8}
             refreshing={userReviewListQuery.isLoading}
             onRefresh={() => queryClient.invalidateQueries("userReviewList")}
-            style={{ marginTop: Platform.OS === "ios" ? h2p(90) : h2p(370) }}
+            style={{ marginTop: Platform.OS === "ios" ? h2p(100) : h2p(90) }}
             contentContainerStyle={{ paddingBottom: h2p(100) }}
             showsVerticalScrollIndicator={false}
             data={userReviewListQuery.data?.pages.flat()}
@@ -385,7 +385,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             onEndReachedThreshold={0.8}
             refreshing={userBookmarkListQuery.isLoading}
             onRefresh={() => queryClient.invalidateQueries("userBookmarkList")}
-            style={{ marginTop: Platform.OS === "ios" ? h2p(90) : h2p(370) }}
+            style={{ marginTop: Platform.OS === "ios" ? h2p(100) : h2p(90) }}
             contentContainerStyle={{ paddingBottom: h2p(100) }}
             showsVerticalScrollIndicator={false}
             data={userBookmarkListQuery.data?.pages.flat()}

@@ -186,7 +186,7 @@ const Privacy = ({ navigation }: PrivacyProps) => {
         </TouchableOpacity>
         <Text style={[FONT.Bold, { marginTop: h2p(35) }]}>동의를 거부할 권리 및 거부 경우의 불이익</Text>
         <Text style={[FONT.Regular, { marginTop: h2p(20), marginBottom: h2p(30) }]}>
-          귀하께서는 밀링이 위와 같이 수집하는 개인정보에 대해 동의하지 않거나 개인정보를 기재하지 않음으로써 거부할 수 있습니다. 다만, 이때 회원에게 제공되는 서비스가 제한될 수 있습니다.
+          귀하께서는 뉴뉴가 위와 같이 수집하는 개인정보에 대해 동의하지 않거나 개인정보를 기재하지 않음으로써 거부할 수 있습니다. 다만, 이때 회원에게 제공되는 서비스가 제한될 수 있습니다.
         </Text>
         <Text style={FONT.Bold}>부칙</Text>
         <Text style={FONT.Regular}>이 약관은 2022년 6월 1일부터 적용됩니다.</Text>
