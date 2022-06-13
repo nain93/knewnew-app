@@ -7,13 +7,15 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import SplashScreen from 'react-native-splash-screen';
 import { Animated, Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useQuery } from 'react-query';
+import { useInfiniteQuery, useQuery } from 'react-query';
 import { getMyProfile } from '~/api/user';
 import { MyPrfoileType } from '~/types/user';
 import OkPopup from '~/components/popup/okPopup';
 import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import Loading from '~/components/loading';
 import FadeInOut from '~/hooks/fadeInOut';
+import { ReviewListType } from '~/types/review';
+import { getReviewList } from '~/api/review';
 
 export const navigationRef = createNavigationContainerRef();
 const App = () => {
@@ -29,6 +31,18 @@ const App = () => {
     }
   });
 
+  useInfiniteQuery<ReviewListType[], Error>(["reviewList", token, getMyProfileQuery.data?.representBadge], async ({ pageParam = 0 }) => {
+    const queryData = await getReviewList({ token, tag: getMyProfileQuery.data?.representBadge, offset: pageParam });
+    return queryData;
+  }, {
+    enabled: !!getMyProfileQuery.data?.representBadge,
+    getNextPageParam: (next, all) => all.flat().length,
+    getPreviousPageParam: (prev) => (prev.length - 20) ?? undefined,
+    onSuccess: () => {
+      SplashScreen.hide();
+    }
+  });
+
   useEffect(() => {
     const getToken = async () => {
       // TODO refresh api
@@ -36,12 +50,12 @@ const App = () => {
       if (storageToken) {
         setToken(storageToken);
       }
+      else {
+        SplashScreen.hide();
+      }
     };
     getToken();
-    if (!getMyProfileQuery.isLoading) {
-      SplashScreen.hide();
-    }
-  }, [getMyProfileQuery.isLoading]);
+  }, []);
 
   const linking = {
     // prefixes: ["kakao7637c35cfedcb6c01b1f17ce7cd42f05://"],

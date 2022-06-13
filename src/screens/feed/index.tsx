@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, Animated, Pressable } from 'react-native';
 import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
-import { d2p, h2p, simpleDate } from '~/utils';
+import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import Header from '~/components/header';
 import mainLogo from '~/assets/logo';
@@ -10,7 +10,7 @@ import { tagfilter } from '~/assets/icons';
 import RBSheet from "react-native-raw-bottom-sheet";
 import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
 import SelectLayout from '~/components/selectLayout';
-import { BadgeType, NavigationType } from '~/types';
+import { BadgeType } from '~/types';
 import AlertPopup from '~/components/popup/alertPopup';
 import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
 import { getReviewList } from '~/api/review';
@@ -76,6 +76,46 @@ const Feed = ({ navigation, route }: FeedProps) => {
     getNextPageParam: (next, all) => all.flat().length,
     getPreviousPageParam: (prev) => (prev.length - 20) ?? undefined
   });
+
+  const reviewKey = useCallback((review) => String(review.id), []);
+  const reviewHeader = useCallback(() =>
+    <>
+      <View style={styles.main}>
+        <Text style={[styles.mainText, FONT.Bold]}>뉴뉴는 지금</Text>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={[styles.mainText, { color: theme.color.main, marginTop: Platform.OS === "ios" ? h2p(2) : 0 }, FONT.Bold]}>
+            {filterBadge ? `#${filterBadge}` : `#${getMyProfileQuery.data?.representBadge}`} </Text>
+          <Text style={[styles.mainText, FONT.Bold]}>관련 메뉴 추천 중 👀</Text>
+        </View>
+      </View>
+      <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+        <TouchableOpacity
+          onPress={() => tagRefRBSheet.current?.open()}
+          style={styles.filter}>
+          <Image source={tagfilter} style={{ width: 11, height: 10, marginRight: d2p(10) }} />
+          <Text style={FONT.Medium}>태그 변경</Text>
+        </TouchableOpacity>
+      </View>
+    </>
+    , [filterBadge, getMyProfileQuery.data?.representBadge]);
+  const reviewFooter = useCallback(() => <View style={{ height: h2p(117) }} />, []);
+
+  const reviewRenderItem = useCallback(({ item, index }) =>
+    <Pressable onPress={() =>
+      navigation.navigate("FeedDetail", {
+        authorId: item.author.id,
+        id: item.id, badge: filterBadge,
+        isLike: item.isLike, isBookmark: item.isBookmark,
+      })}
+      style={styles.review}>
+      <FeedReview
+        idx={index}
+        selectedIndex={selectedIndex}
+        setSelectedIndex={(selectIdx: number) => setSelectedIndex(selectIdx)}
+        review={item}
+        filterBadge={filterBadge}
+      />
+    </Pressable>, [filterBadge, selectedIndex]);
 
   const fadeIn = () => {
     Animated.timing(fadeAnim, {
@@ -153,49 +193,12 @@ const Feed = ({ navigation, route }: FeedProps) => {
           refreshing={reviewListQuery.isLoading}
           onRefresh={() => queryClient.invalidateQueries("reviewList")}
           data={reviewListQuery.data?.pages.flat()}
-          ListHeaderComponent={() =>
-            <Fragment>
-              <View style={styles.main}>
-                <Text style={[styles.mainText, FONT.Bold]}>뉴뉴는 지금</Text>
-                <View style={{ flexDirection: 'row' }}>
-                  <Text style={[styles.mainText, { color: theme.color.main, marginTop: Platform.OS === "ios" ? h2p(2) : 0 }, FONT.Bold]}>
-                    {filterBadge ? `#${filterBadge}` : `#${getMyProfileQuery.data?.representBadge}`} </Text>
-                  <Text style={[styles.mainText, FONT.Bold]}>관련 메뉴 추천 중 👀</Text>
-                </View>
-              </View>
-              <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                <TouchableOpacity
-                  onPress={() => tagRefRBSheet.current?.open()}
-                  style={styles.filter}>
-                  <Image source={tagfilter} style={{ width: 11, height: 10, marginRight: d2p(10) }} />
-                  <Text style={FONT.Medium}>태그 변경</Text>
-                </TouchableOpacity>
-              </View>
-            </Fragment>
-          }
+          ListHeaderComponent={reviewHeader}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item, index }) =>
-            <Pressable onPress={() =>
-              navigation.navigate("FeedDetail", {
-                authorId: item.author.id,
-                id: item.id, badge: filterBadge,
-                isLike: item.isLike, isBookmark: item.isBookmark,
-              })}
-              style={styles.review}>
-              <FeedReview
-                idx={index}
-                selectedIndex={selectedIndex}
-                setSelectedIndex={(selectIdx: number) => setSelectedIndex(selectIdx)}
-                review={item}
-                filterBadge={filterBadge}
-              />
-            </Pressable>
-          }
-          ListFooterComponent={() =>
-            <View style={{ height: h2p(117) }} />
-          }
+          renderItem={reviewRenderItem}
+          ListFooterComponent={reviewFooter}
           style={{ marginTop: 0, marginBottom: h2p(80), backgroundColor: theme.color.grayscale.f7f7fc }}
-          keyExtractor={(review) => String(review.id)}
+          keyExtractor={reviewKey}
           onScroll={(event) => {
             const currentScrollOffset = event.nativeEvent.contentOffset.y;
             setScrollOffset(currentScrollOffset);

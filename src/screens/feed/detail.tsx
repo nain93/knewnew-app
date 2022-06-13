@@ -1,5 +1,5 @@
 import { View, Text, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView, Keyboard, FlatList } from 'react-native';
-import React, { Fragment, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import theme from '~/styles/theme';
@@ -14,7 +14,8 @@ import { myIdState, okPopupState, refreshState, tokenState } from '~/recoil/atom
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
-import { bookmarkReview, deleteReview, getReviewDetail, likeReview } from '~/api/review';
+import { bookmarkReview, getReviewDetail, likeReview } from '~/api/review';
+import FastImage from 'react-native-fast-image';
 
 import { ReviewListType } from '~/types/review';
 import Loading from '~/components/loading';
@@ -139,6 +140,21 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     }
     setContent("");
   };
+
+  const imageKey = useCallback((v) => String(v.id), []);
+  const imageRenderItem = useCallback((image) =>
+    <FastImage
+      style={{
+        marginHorizontal: d2p(15),
+        borderWidth: 1,
+        borderColor: theme.color.grayscale.e9e7ec,
+        width: Dimensions.get('window').width - d2p(30),
+        aspectRatio: 1.7,
+        height: h2p(180),
+        borderRadius: 18
+      }}
+      source={{ uri: image.item.image }} />
+    , []);
 
   // * 키보드 높이 컨트롤
   useEffect(() => {
@@ -284,22 +300,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                   reviewDetailQuery.data?.images.length ?? 0,
                   Math.max(0, Math.round(e.nativeEvent.contentOffset.x / (Dimensions.get("window").width - d2p(30))))))}
               showsHorizontalScrollIndicator={false}
-              keyExtractor={(v) => String(v.id)}
-              renderItem={(image) =>
-                <>
-                  <Image
-                    style={{
-                      marginHorizontal: d2p(15),
-                      borderWidth: 1,
-                      borderColor: theme.color.grayscale.e9e7ec,
-                      width: Dimensions.get('window').width - d2p(30),
-                      aspectRatio: 1.7,
-                      height: h2p(180),
-                      borderRadius: 18
-                    }}
-                    source={{ uri: image.item.image }} />
-                </>
-              }
+              keyExtractor={imageKey}
+              renderItem={imageRenderItem}
             />
             {(reviewDetailQuery.data?.images.length || 0) > 1 &&
               <View style={{
@@ -339,7 +341,98 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           <Pressable onPress={() => {
             setCommentSelectedIdx(-1);
           }}>
-            <FlatList
+            {React.Children.toArray(commentListQuery.data?.map((item, index) => {
+              if (commentListQuery.isLoading) {
+                return (
+                  <Loading />
+                );
+              }
+              return (
+                <>
+                  <Text style={[styles.commentMeta, FONT.Bold]}>작성된 댓글 {commentListQuery.data?.length}개</Text>
+                  <View
+                    style={{
+                      paddingHorizontal: d2p(20),
+                      paddingTop: h2p(10),
+                      backgroundColor: (index === modifyingIdx) && commentIsEdit ? "#F7F7FC" : theme.color.white
+                    }}>
+                    <View style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}>
+                      <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: item.author.id })}
+                        style={styles.commentProfileLine}
+                      >
+                        <FastImage source={item.author.profileImage ? { uri: item.author.profileImage } : noProfile}
+                          style={styles.commentImg} />
+                      </TouchableOpacity>
+                      <View style={{
+                        flexDirection: "row", justifyContent: "space-between",
+                        width: Dimensions.get("window").width - d2p(70),
+                      }}>
+                        <View style={{ marginLeft: d2p(10) }}>
+                          <View style={{ flexDirection: "row" }}>
+                            <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: item.author.id })}>
+                              <Text style={FONT.Medium}>{item.author.nickname}</Text>
+                            </TouchableOpacity>
+                            <Text style={[styles.commentDate, FONT.Regular]}>{dateCommentFormat(item.created)}</Text>
+                          </View>
+                        </View>
+                        {myId === item.author.id &&
+                          <TouchableOpacity onPress={() => {
+                            if (commentSelectedIdx === index) {
+                              setCommentSelectedIdx(-1);
+                            } else {
+                              setCommentSelectedIdx(index);
+                            }
+                          }}>
+                            <Image
+                              source={commentMore}
+                              resizeMode="contain"
+                              style={{ width: d2p(12), height: d2p(16) }}
+                            />
+                          </TouchableOpacity>
+                        }
+                      </View>
+                    </View>
+                    <Text style={[styles.commentContent, FONT.Regular]}>{item.content}</Text>
+                    <View style={styles.commentLine} />
+                    {commentSelectedIdx === index &&
+                      <View style={[styles.clickBox, { right: d2p(32) }]}>
+                        <Pressable
+                          style={{
+                            justifyContent: "center", alignItems: "center", width: d2p(70), height: d2p(35)
+                          }}
+                          onPress={() => {
+                            setContent(item.content);
+                            setCommentIsEdit(true);
+                            setModifyingIdx(commentSelectedIdx);
+                            setEditCommentId(item.id);
+                            setCommentSelectedIdx(-1);
+                          }}>
+                          <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
+                        </Pressable>
+                        <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
+                        <Pressable
+                          style={{ justifyContent: "center", alignItems: "center", width: d2p(70), height: d2p(35) }}
+                          onPress={() => {
+                            setModalOpen({
+                              isOpen: true,
+                              content: "댓글을 삭제할까요?",
+                              okButton: () => deleteCommentMutation.mutate(item.id)
+                            });
+                            setCommentSelectedIdx(-1);
+                          }}>
+                          <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
+                        </Pressable>
+                      </View>
+                    }
+                  </View>
+                </>
+              );
+            }))}
+
+            {/* <FlatList
               data={commentListQuery.data}
               ListHeaderComponent={() =>
                 <Text style={[styles.commentMeta, FONT.Bold]}>작성된 댓글 {commentListQuery.data?.length}개</Text>}
@@ -430,7 +523,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                   </View>
                 );
               }}
-              keyExtractor={(item) => String(item.id)} />
+              keyExtractor={(item) => String(item.id)} /> */}
           </Pressable>
         </ScrollView>
         <Pressable

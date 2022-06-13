@@ -10,7 +10,7 @@ import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
 import { MyPrfoileType } from '~/types/user';
 import { noProfile } from '~/assets/images';
 import Loading from '~/components/loading';
-import { Tabs, MaterialTabBar, CollapsibleRef } from 'react-native-collapsible-tab-view';
+import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
 import FeedReview from '~/components/review/feedReview';
 import { FONT } from '~/styles/fonts';
 import { more } from '~/assets/icons';

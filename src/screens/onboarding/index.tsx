@@ -95,10 +95,10 @@ const Onboarding = ({ navigation }: NavigationType) => {
 
   const handleGoogleLogin = async () => {
     GoogleSignin.configure({
-      // webClientId: "1025814485939-95vtu3p4iqb7qp23henp85c1nd2d2i3c.apps.googleusercontent.com",
+      webClientId: "1025814485939-95vtu3p4iqb7qp23henp85c1nd2d2i3c.apps.googleusercontent.com",
       // iosClientId: "1025814485939-hebcl4c1tmq4bqt9q0ifng6mq7amltnf.apps.googleusercontent.com"
     });
-    const userInfo = await GoogleSignin.signIn();
+    await GoogleSignin.signIn();
     const { accessToken } = await GoogleSignin.getTokens();
     if (accessToken) {
       const data = await userLogin({ token: accessToken, providerType: "google" });
