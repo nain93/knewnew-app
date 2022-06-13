@@ -9,8 +9,8 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 //@ts-ignore
 import Highlighter from 'react-native-highlight-words';
-import { ReviewListType, ReviewParentType } from '~/types/review';
-import { useMutation, useQuery } from 'react-query';
+import { ReviewListType } from '~/types/review';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { tokenState } from '~/recoil/atoms';
 import { bookmarkReview, likeReview } from '~/api/review';
@@ -44,12 +44,22 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
   const [bookmarkCount, setBookmarkCount] = useState(review.bookmarkCount);
   const [tags, setTags] = useState<Array<string>>([]);
   const token = useRecoilValue(tokenState);
+  const queryClient = useQueryClient();
 
   const boomarkMutation = useMutation("bookmark",
-    ({ id, isBookmark }: { id: number, isBookmark: boolean }) => bookmarkReview(token, id, isBookmark));
+    ({ id, isBookmark }: { id: number, isBookmark: boolean }) => bookmarkReview(token, id, isBookmark), {
+    onSuccess: () => {
+      queryClient.invalidateQueries("myProfile");
+      queryClient.invalidateQueries("userBookmarkList");
+    }
+  });
 
   const likeReviewFeedMutation = useMutation('likeReviewFeed',
-    ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state));
+    ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state), {
+    onSuccess: () => {
+      queryClient.invalidateQueries("myProfile");
+    }
+  });
 
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
     enabled: !!token

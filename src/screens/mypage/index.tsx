@@ -1,5 +1,5 @@
-import { Dimensions, Image, Linking, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
+import { Dimensions, FlatList, Image, Linking, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
@@ -10,7 +10,7 @@ import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
 import { MyPrfoileType } from '~/types/user';
 import { noProfile } from '~/assets/images';
 import Loading from '~/components/loading';
-import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
+import { Tabs, MaterialTabBar, CollapsibleRef } from 'react-native-collapsible-tab-view';
 import FeedReview from '~/components/review/feedReview';
 import { FONT } from '~/styles/fonts';
 import { more } from '~/assets/icons';
@@ -26,7 +26,8 @@ import { ReviewListType } from '~/types/review';
 interface MypageProps {
   navigation: NavigationStackProp;
   route: NavigationRoute<{
-    id?: number
+    id?: number,
+    refresh?: boolean
   }>;
 }
 
@@ -39,6 +40,8 @@ const Mypage = ({ navigation, route }: MypageProps) => {
   const [index, setIndex] = useState(0);
   const [openMore, setOpenMore] = useState(false);
   const setModalOpen = useSetRecoilState(okPopupState);
+  const reviewRef = useRef<FlatList>(null);
+  const bookmarkRef = useRef<FlatList>(null);
 
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", route.params?.id], async () => {
     if (route.params?.id && (route.params.id !== myId)) {
@@ -75,21 +78,8 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     getPreviousPageParam: (prev) => (prev.length - 20) ?? undefined,
   });
 
-  useEffect(() => {
-    // * 로그아웃시 온보딩화면으로
-    if (!token) {
-      //@ts-ignore
-      navigation.reset({ index: 0, routes: [{ name: "OnBoarding" }] });
-    }
-  }, [token]);
-
-  useFocusEffect(
-    useCallback(() => {
-      return () => setOpenMore(false);
-    }, []));
-
   const tabHeader = useCallback(() => (
-    <View pointerEvents="none">
+    <View pointerEvents="none" >
       <View style={styles.profileImage} >
         <Image style={{
           width: d2p(60), height: d2p(60), borderRadius: 60,
@@ -130,7 +120,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
         </View>
       </View>
     </View>
-  ), [getMyProfileQuery.isLoading, route.params?.id]);
+  ), [getMyProfileQuery.isLoading, route.params?.id, getMyProfileQuery.data]);
 
   const reviewKey = useCallback((v) => String(v.id), []);
   const reviewEmpty = useCallback(() => {
@@ -232,6 +222,29 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     );
   }, [userBookmarkListQuery.isLoading, selectedIndex]);
 
+  useEffect(() => {
+    // * 로그아웃시 온보딩화면으로
+    if (!token) {
+      //@ts-ignore
+      navigation.reset({ index: 0, routes: [{ name: "OnBoarding" }] });
+    }
+  }, [token]);
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => setOpenMore(false);
+    }, []));
+
+  useEffect(() => {
+    if (route.params?.refresh) {
+      if (index === 1) {
+        bookmarkRef.current?.scrollToOffset({ animated: true, offset: 0 });
+      }
+      else {
+        reviewRef.current?.scrollToOffset({ animated: true, offset: 0 });
+      }
+    }
+  }, [route.params]);
 
   if (getMyProfileQuery.isLoading) {
     return (
@@ -350,15 +363,14 @@ const Mypage = ({ navigation, route }: MypageProps) => {
         <Tabs.Tab
           name={`작성 글 ${getMyProfileQuery.data?.reviewCount}`}>
           <Tabs.FlatList
+            ref={reviewRef}
             ListEmptyComponent={reviewEmpty}
             onEndReached={() => userReviewListQuery.fetchNextPage()}
             onEndReachedThreshold={0.8}
             refreshing={userReviewListQuery.isLoading}
             onRefresh={() => queryClient.invalidateQueries("userReviewList")}
-            contentContainerStyle={{
-              paddingBottom: h2p(100),
-              paddingTop: Platform.OS === "ios" ? h2p(90) : h2p(370)
-            }}
+            style={{ marginTop: Platform.OS === "ios" ? h2p(90) : h2p(370) }}
+            contentContainerStyle={{ paddingBottom: h2p(100) }}
             showsVerticalScrollIndicator={false}
             data={userReviewListQuery.data?.pages.flat()}
             renderItem={reviewRenderItem}
@@ -367,12 +379,14 @@ const Mypage = ({ navigation, route }: MypageProps) => {
         </Tabs.Tab>
         <Tabs.Tab name={`담은 글 ${getMyProfileQuery.data?.bookmarkCount}`}>
           <Tabs.FlatList
+            ref={bookmarkRef}
             ListEmptyComponent={bookmarkEmpty}
             onEndReached={() => userBookmarkListQuery.fetchNextPage()}
             onEndReachedThreshold={0.8}
             refreshing={userBookmarkListQuery.isLoading}
             onRefresh={() => queryClient.invalidateQueries("userBookmarkList")}
-            contentContainerStyle={{ paddingBottom: h2p(100), paddingTop: Platform.OS === "ios" ? h2p(90) : h2p(370) }}
+            style={{ marginTop: Platform.OS === "ios" ? h2p(90) : h2p(370) }}
+            contentContainerStyle={{ paddingBottom: h2p(100) }}
             showsVerticalScrollIndicator={false}
             data={userBookmarkListQuery.data?.pages.flat()}
             renderItem={bookmarkRenderItem}

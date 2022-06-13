@@ -1,4 +1,4 @@
-import { Dimensions, Image, Pressable, StyleSheet, Text, TouchableOpacity, View, Animated } from 'react-native';
+import { Dimensions, Image, Pressable, StyleSheet, Text, TouchableOpacity, View, Animated, Platform } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import Header from '~/components/header';
@@ -88,6 +88,11 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
   const [profile, setProfile] = useState(profileImage ? profileImage : "");
   const [isPopupOpen, setIsPopupOpen] = useState({ isOpen: false, content: "" });
   const { fadeAnim } = FadeInOut({ isPopupOpen, setIsPopupOpen });
+  const [uploadBody, setUploadBody] = useState<{
+    uri: string,
+    name: string | undefined,
+    type: string
+  }>();
 
   const editProfileMutation = useMutation(["editprofile", token],
     (profileprop: ProfileType) => editUserProfile({ token, id: myId, profile: profileprop }), {
@@ -96,13 +101,34 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
       navigation.goBack();
     }
   });
-  const deleteUserMutation = useMutation("deleteUser", () => deleteUser({ token, id: myId }));
+  const deleteUserMutation = useMutation("deleteUser", () => deleteUser({ token, id: myId }), {
+    onSuccess: () => {
+      setToken("");
+      AsyncStorage.removeItem("token");
+    }
+  });
 
   const presignMutation = useMutation("presignImages",
-    (fileName: Array<string>) => preSiginedImages({ token, fileName, route: "user" }),
+    async (fileName: Array<string>) => preSiginedImages({ token, fileName, route: "user" }),
     {
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
+        const copy: { [index: string]: Array<{ isClick: boolean, title: string }> } = { ...userBadge };
+        const reduceTags = Object.keys(copy).reduce<Array<string>>((acc, cur) => {
+          acc = acc.concat(copy[cur].filter(v => v.isClick).map(v => v.title));
+          return acc;
+        }, []);
+        if (uploadBody) {
+          await uploadImage(uploadBody, data[0]);
+        }
         setProfileInfo({ ...profileInfo, profileImage: data[0] });
+
+        editProfileMutation.mutate({
+          profileImage: profile.includes("https") ? profile.split("com/")[1] : data[0].fields.key,
+          nickname: profileInfo.nickname,
+          occupation: profileInfo.occupation,
+          representBadge: userBadge.interest.filter(v => v.masterBadge)[0]?.title || profileInfo.representBadge,
+          tags: reduceTags
+        });
       }
     });
 
@@ -141,8 +167,14 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
       compressImageMaxWidth: 720,
       compressImageMaxHeight: 720
     }).then(v => {
+      setUploadBody(
+        {
+          uri: v.path,
+          type: v.mime,
+          name: Platform.OS === 'ios' ? v.filename : `${Date.now()}.${v.mime === 'image/jpeg' ? 'jpg' : 'png'}`,
+        }
+      );
       setProfile(`data:${v.mime};base64,${v.data}`);
-      presignMutation.mutate([v.path]);
     });
   };
 
@@ -164,24 +196,24 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
         isBorder={true}
         headerLeft={<LeftArrowIcon onBackClick={() => navigation.goBack()} imageStyle={{ width: d2p(11), height: d2p(25) }} />}
         title="프로필 수정"
-        headerRightPress={async () => {
+        headerRightPress={() => {
           const copy: { [index: string]: Array<{ isClick: boolean, title: string }> } = { ...userBadge };
           const reduceTags = Object.keys(copy).reduce<Array<string>>((acc, cur) => {
             acc = acc.concat(copy[cur].filter(v => v.isClick).map(v => v.title));
             return acc;
           }, []);
-
-          if (profileInfo.profileImage) {
-            //@ts-ignore
-            await uploadImage(profile, profileInfo.profileImage);
+          if (!profileInfo.profileImage && !profile) {
+            editProfileMutation.mutate({
+              profileImage: null,
+              nickname: profileInfo.nickname,
+              occupation: profileInfo.occupation,
+              representBadge: userBadge.interest.filter(v => v.masterBadge)[0]?.title || profileInfo.representBadge,
+              tags: reduceTags
+            });
           }
-          editProfileMutation.mutate({
-            profileImage: profileInfo.profileImage ? profileInfo.profileImage.fields.key : null,
-            nickname: profileInfo.nickname,
-            occupation: profileInfo.occupation,
-            representBadge: userBadge.interest.filter(v => v.masterBadge)[0]?.title || profileInfo.representBadge,
-            tags: reduceTags
-          });
+          else {
+            presignMutation.mutate([profile]);
+          }
         }}
         headerRight={<Text style={[{ color: theme.color.main }, FONT.Regular]}>완료</Text>} />
       <View style={styles.container}>

@@ -213,7 +213,7 @@ const Write = ({ navigation, route }: WriteProp) => {
         {
           uri: v.path,
           type: v.mime,
-          name: Platform.OS === 'ios' ? v.filename : `my_profile_${Date.now()}.${v.mime === 'image/jpeg' ? 'jpg' : 'png'}`,
+          name: Platform.OS === 'ios' ? v.filename : `${Date.now()}.${v.mime === 'image/jpeg' ? 'jpg' : 'png'}`,
         }
       ));
       setImageList(imageList.concat(`data:${v.mime};base64,${v.data}`));
@@ -242,6 +242,7 @@ const Write = ({ navigation, route }: WriteProp) => {
 
   useEffect(() => {
     if (route.params?.review && route.params.type !== "reKnewWrite") {
+
       setImageList(route.params.review.images.map(v => v.image));
       setUserBadge({
         interest: userBadge.interest.map(v => {
