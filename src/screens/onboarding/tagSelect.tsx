@@ -61,16 +61,14 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
         </View>
         <Text style={FONT.Regular}>최소 2개 최대 10개까지 고를 수 있어요.</Text>
       </View>
-      <View style={{ flex: 1 }}>
-        <SelectLayout userBadge={userBadge} setUserBadge={(badgeProp: BadgeType) => setUserBadge(badgeProp)}
-          isInitial={true} />
-        <BasicButton onPress={handleNext} text="다음으로" bgColor={theme.color.white}
-          textColor={theme.color.main}
-          viewStyle={{
-            marginTop: h2p(19),
-            marginBottom: h2p(40)
-          }} />
-      </View>
+      <SelectLayout userBadge={userBadge} setUserBadge={(badgeProp: BadgeType) => setUserBadge(badgeProp)}
+        isInitial={true} />
+      <BasicButton onPress={handleNext} text="다음으로" bgColor={theme.color.white}
+        textColor={theme.color.main}
+        viewStyle={{
+          marginTop: h2p(19),
+          marginBottom: h2p(40)
+        }} />
     </View>
   );
 };

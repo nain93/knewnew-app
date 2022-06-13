@@ -1,7 +1,7 @@
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { useEffect } from 'react';
+import React from 'react';
 import Badge from '~/components/badge';
-import { h2p } from '~/utils';
+import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import { initialize } from '~/assets/icons';
 import { BadgeType } from '~/types';
@@ -103,9 +103,9 @@ const SelectLayout = ({ isInitial, userBadge, setUserBadge, type = "normal" }: S
         {isInitial &&
           <TouchableOpacity
             onPress={resetIsClick}
-            style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: h2p(40) }}>
-            <Image source={initialize} resizeMode="contain" style={{ height: 12, width: 12, marginRight: 5 }} />
-            <Text style={[{ color: theme.color.grayscale.a09ca4, fontWeight: 'bold' }, FONT.Bold]}>초기화</Text>
+            style={{ position: "absolute", flexDirection: 'row', right: 0, bottom: 0 }}>
+            <Image source={initialize} resizeMode="contain" style={{ height: d2p(12), width: d2p(12), marginRight: d2p(5) }} />
+            <Text style={[{ color: theme.color.grayscale.a09ca4 }, FONT.Bold]}>초기화</Text>
           </TouchableOpacity>
         }
       </ScrollView>

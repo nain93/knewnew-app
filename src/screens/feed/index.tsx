@@ -145,7 +145,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
           </Animated.View> : <Image source={mainLogo} resizeMode="contain" style={{ width: d2p(96), height: d2p(20) }} />}
         isBorder={scrollOffset >= h2p(130) ? true : false} bgColor={scrollOffset >= h2p(130) ? theme.color.white : theme.color.grayscale.f7f7fc}
       />
-      <View style={{ flex: 1, backgroundColor: theme.color.grayscale.f7f7fc }}>
+      <View>
         <FlatList
           ref={flatListRef}
           onEndReached={() => reviewListQuery.fetchNextPage()}
@@ -192,9 +192,9 @@ const Feed = ({ navigation, route }: FeedProps) => {
             </Pressable>
           }
           ListFooterComponent={() =>
-            <View style={{ height: h2p(40) }} />
+            <View style={{ height: h2p(117) }} />
           }
-          style={{ marginTop: 0, marginBottom: h2p(80) }}
+          style={{ marginTop: 0, marginBottom: h2p(80), backgroundColor: theme.color.grayscale.f7f7fc }}
           keyExtractor={(review) => String(review.id)}
           onScroll={(event) => {
             const currentScrollOffset = event.nativeEvent.contentOffset.y;
