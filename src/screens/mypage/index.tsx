@@ -88,6 +88,151 @@ const Mypage = ({ navigation, route }: MypageProps) => {
       return () => setOpenMore(false);
     }, []));
 
+  const tabHeader = useCallback(() => (
+    <View pointerEvents="none">
+      <View style={styles.profileImage} >
+        <Image style={{
+          width: d2p(60), height: d2p(60), borderRadius: 60,
+          borderWidth: 1,
+          borderColor: theme.color.grayscale.eae7ec
+        }}
+          source={getMyProfileQuery.data?.profileImage ? { uri: getMyProfileQuery.data?.profileImage } : noProfile} />
+      </View>
+      <View style={styles.profileInfo}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text style={[FONT.Bold, { fontSize: 24, marginRight: d2p(10) }]}>{getMyProfileQuery.data?.nickname}</Text>
+          <View style={{
+            height: h2p(20), minWidth: d2p(55),
+            marginRight: d2p(5),
+            justifyContent: "center", alignItems: "center",
+            paddingHorizontal: d2p(10), paddingVertical: h2p(3),
+            borderRadius: 10, backgroundColor: theme.color.grayscale.f7f7fc, borderWidth: 1, borderColor: theme.color.grayscale.d2d0d5
+          }}>
+            <Text style={[FONT.Medium, { fontSize: 10, fontWeight: '500' }]}>{getMyProfileQuery.data?.representBadge}</Text>
+          </View>
+          <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>{getMyProfileQuery.data?.household}</Text>
+        </View>
+        <View style={styles.occupation}>
+          <Text style={[FONT.Medium, {
+            fontWeight: "500",
+            color: getMyProfileQuery.data?.occupation ? theme.color.black : theme.color.grayscale.a09ca4
+          }]}>
+            {getMyProfileQuery.data?.occupation ? getMyProfileQuery.data?.occupation : "자기소개를 입력해주세요."}</Text>
+        </View>
+        <View style={{
+          flexDirection: "row", flexWrap: "wrap",
+          justifyContent: "center",
+          width: Dimensions.get("window").width - d2p(40)
+        }}>
+          {React.Children.toArray(getMyProfileQuery.data?.tags.map(v =>
+            <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>#{v} </Text>
+          ))}
+        </View>
+      </View>
+    </View>
+  ), [getMyProfileQuery.isLoading, route.params?.id]);
+
+  const reviewKey = useCallback((v) => String(v.id), []);
+  const reviewEmpty = useCallback(() => {
+    if (!userReviewListQuery.isLoading) {
+      return (
+        <View style={{ paddingTop: h2p(100) }}>
+          <View style={{ marginBottom: h2p(80) }}>
+            <Text style={[FONT.Regular,
+            {
+              color: theme.color.grayscale.C_79737e,
+              textAlign: "center",
+            }]}>
+              작성한 글이 없습니다.</Text>
+          </View>
+          <BasicButton
+            viewStyle={{ marginHorizontal: d2p(20) }}
+            onPress={() => navigation.navigate('Write', { loading: false, isEdit: false })}
+            text="작성하기" textColor={theme.color.main} bgColor={theme.color.white} />
+        </View>
+      );
+    }
+    return null;
+  }, [userReviewListQuery.isLoading]);
+
+  const reviewRenderItem = useCallback(
+    (review) => {
+      if (userReviewListQuery.isLoading) {
+        return (
+          <View style={{
+            position: "absolute",
+            top: Platform.OS === "ios" ? h2p(-90) : h2p(-370), alignSelf: "center"
+          }}>
+            <Loading />
+          </View>
+        );
+      }
+      return (
+        <Pressable
+          onPress={() => navigation.navigate("FeedDetail",
+            { id: review.item.id, isLike: review.item.isLike, authorId: review.item.author.id })}
+          style={styles.review}
+        >
+          <FeedReview
+            clickBoxStyle={{ right: d2p(26), top: h2p(-10) }}
+            idx={review.index}
+            selectedIndex={selectedIndex}
+            setSelectedIndex={(selectIdx: number) => setSelectedIndex(selectIdx)}
+            review={review.item} />
+        </Pressable>
+      );
+    }
+    , [userReviewListQuery.isLoading, selectedIndex]);
+
+  const bookmarkKey = useCallback((v) => String(v.id), []);
+  const bookmarkEmpty = useCallback(() => {
+    if (!userBookmarkListQuery.isLoading) {
+      return (
+        <View style={{ paddingTop: h2p(100) }}>
+          <View style={{ marginBottom: h2p(80) }}>
+            <Text style={[FONT.Regular,
+            {
+              color: theme.color.grayscale.C_79737e,
+              textAlign: "center",
+            }]}>
+              담은 글이 없습니다.</Text>
+          </View>
+          <BasicButton
+            viewStyle={{ marginHorizontal: d2p(20) }}
+            onPress={() => navigation.navigate('Feed')}
+            text="담으러 가기" textColor={theme.color.main} bgColor={theme.color.white} />
+        </View>
+      );
+    }
+    return null;
+  }, [userBookmarkListQuery.isLoading]);
+
+  const bookmarkRenderItem = useCallback((bookmarks) => {
+    if (userBookmarkListQuery.isLoading) {
+      return <View style={{
+        position: "absolute",
+        top: Platform.OS === "ios" ? h2p(-90) : h2p(-370), alignSelf: "center"
+      }}>
+        <Loading />
+      </View>;
+    }
+    return (
+      <Pressable
+        onPress={() => navigation.navigate("FeedDetail",
+          { id: bookmarks.item.id, isLike: bookmarks.item.isLike })}
+        style={styles.review}
+      >
+        <FeedReview
+          clickBoxStyle={{ right: d2p(26), top: h2p(-10) }}
+          idx={bookmarks.index}
+          selectedIndex={selectedIndex}
+          setSelectedIndex={(selectIdx: number) => setSelectedIndex(selectIdx)}
+          review={bookmarks.item} />
+      </Pressable>
+    );
+  }, [userBookmarkListQuery.isLoading, selectedIndex]);
+
+
   if (getMyProfileQuery.isLoading) {
     return (
       <Loading />
@@ -180,7 +325,6 @@ const Mypage = ({ navigation, route }: MypageProps) => {
         </View>
       }
       <Tabs.Container
-        lazy
         onIndexChange={setIndex}
         containerStyle={styles.container}
         headerContainerStyle={{ marginTop: headerHeight }}
@@ -201,71 +345,14 @@ const Mypage = ({ navigation, route }: MypageProps) => {
               </Text>
             </Pressable>
           )} {...props} />}
-        renderHeader={() => (
-          <View pointerEvents="none">
-            <View style={styles.profileImage} >
-              <Image style={{
-                width: d2p(60), height: d2p(60), borderRadius: 60,
-                borderWidth: 1,
-                borderColor: theme.color.grayscale.eae7ec
-              }}
-                source={getMyProfileQuery.data?.profileImage ? { uri: getMyProfileQuery.data?.profileImage } : noProfile} />
-            </View>
-            <View style={styles.profileInfo}>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Text style={[FONT.Bold, { fontSize: 24, marginRight: d2p(10) }]}>{getMyProfileQuery.data?.nickname}</Text>
-                <View style={{
-                  height: h2p(20), minWidth: d2p(55),
-                  marginRight: d2p(5),
-                  justifyContent: "center", alignItems: "center",
-                  paddingHorizontal: d2p(10), paddingVertical: h2p(3),
-                  borderRadius: 10, backgroundColor: theme.color.grayscale.f7f7fc, borderWidth: 1, borderColor: theme.color.grayscale.d2d0d5
-                }}>
-                  <Text style={[FONT.Medium, { fontSize: 10, fontWeight: '500' }]}>{getMyProfileQuery.data?.representBadge}</Text>
-                </View>
-                <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>{getMyProfileQuery.data?.household}</Text>
-              </View>
-              <View style={styles.occupation}>
-                <Text style={[FONT.Medium, {
-                  fontWeight: "500",
-                  color: getMyProfileQuery.data?.occupation ? theme.color.black : theme.color.grayscale.a09ca4
-                }]}>
-                  {getMyProfileQuery.data?.occupation ? getMyProfileQuery.data?.occupation : "자기소개를 입력해주세요."}</Text>
-              </View>
-              <View style={{
-                flexDirection: "row", flexWrap: "wrap",
-                justifyContent: "center",
-                width: Dimensions.get("window").width - d2p(40)
-              }}>
-                {React.Children.toArray(getMyProfileQuery.data?.tags.map(v =>
-                  <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>#{v} </Text>
-                ))}
-              </View>
-            </View>
-          </View>
-        )}
+        renderHeader={tabHeader}
       >
         <Tabs.Tab
           name={`작성 글 ${getMyProfileQuery.data?.reviewCount}`}>
           <Tabs.FlatList
-            ListEmptyComponent={() => (
-              <View style={{ paddingTop: h2p(20), flex: 1 }}>
-                <View style={{ marginBottom: "auto" }}>
-                  <Text style={[FONT.Regular,
-                  {
-                    color: theme.color.grayscale.C_79737e,
-                    textAlign: "center",
-                  }]}>
-                    작성한 글이 없습니다.</Text>
-                </View>
-                <BasicButton
-                  viewStyle={{ marginHorizontal: d2p(20), marginTop: h2p(100) }}
-                  onPress={() => navigation.navigate('Write', { loading: false, isEdit: false })}
-                  text="작성하기" textColor={theme.color.main} bgColor={theme.color.white} />
-              </View>
-            )}
+            ListEmptyComponent={reviewEmpty}
             onEndReached={() => userReviewListQuery.fetchNextPage()}
-            onEndReachedThreshold={0.3}
+            onEndReachedThreshold={0.8}
             refreshing={userReviewListQuery.isLoading}
             onRefresh={() => queryClient.invalidateQueries("userReviewList")}
             contentContainerStyle={{
@@ -274,85 +361,22 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             }}
             showsVerticalScrollIndicator={false}
             data={userReviewListQuery.data?.pages.flat()}
-            renderItem={(review) => {
-              if (userReviewListQuery.isLoading) {
-                return (
-                  <View style={{
-                    position: "absolute",
-                    top: Platform.OS === "ios" ? h2p(-90) : h2p(-370), alignSelf: "center"
-                  }}>
-                    <Loading />
-                  </View>
-                );
-              }
-              return (
-                <Pressable
-                  onPress={() => navigation.navigate("FeedDetail",
-                    { id: review.item.id, isLike: review.item.isLike, authorId: review.item.author.id })}
-                  style={styles.review}
-                >
-                  <FeedReview
-                    clickBoxStyle={{ right: d2p(26), top: h2p(-10) }}
-                    idx={review.index}
-                    selectedIndex={selectedIndex}
-                    setSelectedIndex={(selectIdx: number) => setSelectedIndex(selectIdx)}
-                    review={review.item} />
-                </Pressable>
-              );
-            }}
-            keyExtractor={(v) => String(v.id)}
+            renderItem={reviewRenderItem}
+            keyExtractor={reviewKey}
           />
         </Tabs.Tab>
         <Tabs.Tab name={`담은 글 ${getMyProfileQuery.data?.bookmarkCount}`}>
           <Tabs.FlatList
-            ListEmptyComponent={() => (
-              <View style={{ paddingTop: h2p(20) }}>
-                <View style={{ marginBottom: "auto" }}>
-                  <Text style={[FONT.Regular,
-                  {
-                    color: theme.color.grayscale.C_79737e,
-                    textAlign: "center",
-                  }]}>
-                    담은 글이 없습니다.</Text>
-                </View>
-                <BasicButton
-                  viewStyle={{ marginHorizontal: d2p(20), marginTop: h2p(100) }}
-                  onPress={() => navigation.navigate('Feed')}
-                  text="담으러 가기" textColor={theme.color.main} bgColor={theme.color.white} />
-              </View>
-            )}
+            ListEmptyComponent={bookmarkEmpty}
             onEndReached={() => userBookmarkListQuery.fetchNextPage()}
-            onEndReachedThreshold={0.3}
+            onEndReachedThreshold={0.8}
             refreshing={userBookmarkListQuery.isLoading}
             onRefresh={() => queryClient.invalidateQueries("userBookmarkList")}
             contentContainerStyle={{ paddingBottom: h2p(100), paddingTop: Platform.OS === "ios" ? h2p(90) : h2p(370) }}
             showsVerticalScrollIndicator={false}
             data={userBookmarkListQuery.data?.pages.flat()}
-            renderItem={(bookmarks) => {
-              if (userBookmarkListQuery.isLoading) {
-                return <View style={{
-                  position: "absolute",
-                  top: Platform.OS === "ios" ? h2p(-90) : h2p(-370), alignSelf: "center"
-                }}>
-                  <Loading />
-                </View>;
-              }
-              return (
-                <Pressable
-                  onPress={() => navigation.navigate("FeedDetail",
-                    { id: bookmarks.item.id, isLike: bookmarks.item.isLike })}
-                  style={styles.review}
-                >
-                  <FeedReview
-                    clickBoxStyle={{ right: d2p(26), top: h2p(-10) }}
-                    idx={bookmarks.index}
-                    selectedIndex={selectedIndex}
-                    setSelectedIndex={(selectIdx: number) => setSelectedIndex(selectIdx)}
-                    review={bookmarks.item} />
-                </Pressable>
-              );
-            }}
-            keyExtractor={(v) => String(v.id)}
+            renderItem={bookmarkRenderItem}
+            keyExtractor={bookmarkKey}
           />
         </Tabs.Tab>
       </Tabs.Container>

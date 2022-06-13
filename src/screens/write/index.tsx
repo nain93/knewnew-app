@@ -119,6 +119,7 @@ const Write = ({ navigation, route }: WriteProp) => {
           }
         });
         navigation.goBack();
+        navigation.navigate("FeedDetail", { id: data.id });
       }
     },
     onSettled: () => setBlockSubmit(false)
@@ -164,6 +165,7 @@ const Write = ({ navigation, route }: WriteProp) => {
           }
         });
         navigation.goBack();
+        navigation.navigate("FeedDetail", { id: data.id });
       }
     },
     onSettled: () => setBlockSubmit(false)

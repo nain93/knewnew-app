@@ -95,7 +95,10 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           marginLeft: d2p(50),
           width: Dimensions.get('window').width - d2p(120)
         }}>
-          <Text style={[styles.title, FONT.Medium]}>{review.author.nickname}</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Mypage", { id: review.author.id })}>
+            <Text style={[styles.title, FONT.Medium]}>{review.author.nickname}</Text>
+          </TouchableOpacity>
           <Badge type="feed" text={review.author.representBadge} />
           <Text style={[{ fontSize: 12, marginLeft: d2p(5), color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>{review.author.household}</Text>
           {review.isEdit &&

@@ -149,7 +149,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
         <FlatList
           ref={flatListRef}
           onEndReached={() => reviewListQuery.fetchNextPage()}
-          onEndReachedThreshold={0.3}
+          onEndReachedThreshold={0.8}
           refreshing={reviewListQuery.isLoading}
           onRefresh={() => queryClient.invalidateQueries("reviewList")}
           data={reviewListQuery.data?.pages.flat()}

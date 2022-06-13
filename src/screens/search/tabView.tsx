@@ -51,7 +51,7 @@ const SearchTabView = ({ searchList, userList, keyword, reviewNext, userNext }: 
                 <Text style={[styles.searchResult, FONT.Regular]}>검색결과 · {searchList.length}건</Text>
                 <FlatList
                   onEndReached={reviewNext}
-                  onEndReachedThreshold={0.3}
+                  onEndReachedThreshold={0.8}
                   style={{ marginBottom: h2p(80) }}
                   contentContainerStyle={{ paddingBottom: d2p(40) }}
                   keyExtractor={(review) => String(review.id)}
@@ -89,7 +89,7 @@ const SearchTabView = ({ searchList, userList, keyword, reviewNext, userNext }: 
                 <Text style={[styles.searchResult, { marginBottom: h2p(30) }, FONT.Regular]}>검색결과 · {userList.length}건</Text>
                 <FlatList
                   onEndReached={userNext}
-                  onEndReachedThreshold={0.3}
+                  onEndReachedThreshold={0.8}
                   style={{ marginBottom: h2p(80) }}
                   contentContainerStyle={{ paddingBottom: d2p(40), paddingHorizontal: d2p(20) }}
                   keyExtractor={(review) => String(review.id)}
