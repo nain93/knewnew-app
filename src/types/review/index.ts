@@ -13,7 +13,7 @@ export interface WriteReviewType {
   parent?: number,
   parentReview?: ReviewParentType,
   cart?: number,
-  market: "선택 안함" | "마켓컬리" | "쿠팡프레시" | "SSG" | "B마트" | "윙잇" | "쿠캣마켓" | "유통사 선택",
+  market: "선택 안함" | "마켓컬리" | "쿠팡프레시" | "SSG" | "B마트" | "윙잇" | "쿠캣마켓" | "판매처 선택",
   tags: {
     interest: Array<string>,
     household: Array<string>,

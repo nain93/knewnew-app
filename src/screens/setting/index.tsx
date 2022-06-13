@@ -27,7 +27,7 @@ const Term = ({ navigation }: TermProps) => {
         <Text style={[FONT.Bold, { fontSize: 16 }]}>제 1장 총칙</Text>
         <Text style={[FONT.Bold, { fontSize: 14, marginVertical: h2p(20) }]}>제 1조 (목적)</Text>
         <Text style={FONT.Regular}>
-          뉴뉴 서비스 이용약관(이하 “약관”이라 합니다)은 주식회사 밀링(이하 “회사”라 합니다)이 제공하는 서비스와 관련하여 회사와 이용 고객(또는 회원) 간에 서비스의 이용 조건 및 절차, 회사와 회원 간의 권리, 의무 및 책임 사항 기타 필요한 사항을 규정함을 목적으로 합니다.
+          뉴뉴 서비스 이용약관(이하 “약관”이라 합니다)은 주식회사 뉴뉴(이하 “회사”라 합니다)이 제공하는 서비스와 관련하여 회사와 이용 고객(또는 회원) 간에 서비스의 이용 조건 및 절차, 회사와 회원 간의 권리, 의무 및 책임 사항 기타 필요한 사항을 규정함을 목적으로 합니다.
         </Text>
         <Text style={[FONT.Bold, { fontSize: 14, marginVertical: h2p(20) }]}>제 2조 (용어의 정의)</Text>
         <Text style={FONT.Regular}>

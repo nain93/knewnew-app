@@ -99,7 +99,7 @@ const TabNavigator = () => {
         listeners={({ navigation }) => ({
           tabPress: e => {
             e.preventDefault();
-            navigation.navigate('Mypage', { id: myId, refresh: true });
+            navigation.navigate('Mypage', { id: myId });
           },
         })}
         options={{
