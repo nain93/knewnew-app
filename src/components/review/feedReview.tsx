@@ -20,7 +20,6 @@ import { MyPrfoileType } from '~/types/user';
 import { getMyProfile } from '~/api/user';
 import ReKnew from '~/components/review/reKnew';
 import More from '~/components/more';
-import Loading from '~/components/loading';
 
 interface FeedReviewProps {
   review: ReviewListType,
@@ -38,26 +37,118 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
   clickBoxStyle, keyword,
   type = "normal", filterBadge, review }: FeedReviewProps) => {
   const navigation = useNavigation<StackNavigationProp>();
-  const [isLike, setIsLike] = useState<boolean>(review.isLike);
-  const [reactCount, setReactCount] = useState(review.likeCount);
-  const [isBookmarkState, setIsBookmarkState] = useState<boolean>(review.isBookmark);
-  const [bookmarkCount, setBookmarkCount] = useState(review.bookmarkCount);
   const [tags, setTags] = useState<Array<string>>([]);
   const token = useRecoilValue(tokenState);
   const queryClient = useQueryClient();
+  const [isLike, setIsLike] = useState<boolean>(review.isLike);
+  const [likeCount, setLikeCount] = useState(review.likeCount);
+  const [isBookmarkState, setIsBookmarkState] = useState<boolean>(review.isBookmark);
+  const [bookmarkCount, setBookmarkCount] = useState(review.bookmarkCount);
+  const [apiBlock, setApiBlock] = useState(false);
 
-  const boomarkMutation = useMutation("bookmark",
+  const bookmarkMutation = useMutation("bookmark",
     ({ id, isBookmark }: { id: number, isBookmark: boolean }) => bookmarkReview(token, id, isBookmark), {
-    onSuccess: () => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries("myProfile");
-      queryClient.invalidateQueries("userBookmarkList");
+      queryClient.invalidateQueries("reviewList");
+
+      if (data.isBookmark) {
+        queryClient.setQueriesData(["userBookmarkList"], (bookmark) => {
+          return {
+            //@ts-ignore
+            ...bookmark, pages: [{ ...review, isBookmark: true, bookmarkCount: review.bookmarkCount + 1 }, ...bookmark.pages.flat()]
+          };
+        });
+        queryClient.setQueriesData(["userReviewList"], (reviewList) => {
+          return {
+            //@ts-ignore
+            ...reviewList, pages: [reviewList.pages.flat().map(v => {
+              if (v.id === review.id) {
+                return { ...v, isBookmark: true, bookmarkCount: v.bookmarkCount + 1 };
+              }
+              return v;
+            })]
+          };
+        });
+      }
+      else {
+        queryClient.setQueriesData(["userBookmarkList"], (bookmark) => {
+          //@ts-ignore
+          return { ...bookmark, pages: [bookmark.pages.flat().filter(v => v.id !== review.id)] };
+        });
+        queryClient.setQueriesData(["userReviewList"], (reviewList) => {
+          return {
+            //@ts-ignore
+            ...reviewList, pages: [reviewList.pages.flat().map(v => {
+              if (v.id === review.id) {
+                return { ...v, isBookmark: false, bookmarkCount: v.bookmarkCount - 1 };
+              }
+              return v;
+            })]
+          };
+        });
+      }
+      setApiBlock(false);
     }
   });
 
   const likeReviewFeedMutation = useMutation('likeReviewFeed',
     ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state), {
-    onSuccess: () => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries("myProfile");
+      queryClient.invalidateQueries("reviewList");
+
+      if (data.isLike) {
+        queryClient.setQueriesData(["userReviewList"], (reviewList) => {
+          return {
+            //@ts-ignore
+            ...reviewList, pages: [reviewList.pages.flat().map(v => {
+              if (v.id === review.id) {
+                return { ...v, isLike: true, likeCount: v.likeCount + 1 };
+              }
+              return v;
+            })]
+          };
+        });
+        //@ts-ignore
+        queryClient.setQueriesData(["userBookmarkList"], (reviewList) => {
+          return {
+            //@ts-ignore
+            ...reviewList, pages: [reviewList.pages.flat().map(v => {
+              if (v.id === review.id) {
+                return { ...v, isLike: true, likeCount: v.likeCount + 1 };
+              }
+              return v;
+            })]
+          };
+        });
+      }
+      else {
+        //@ts-ignore
+        queryClient.setQueriesData(["userReviewList"], (reviewList) => {
+          return {
+            //@ts-ignore
+            ...reviewList, pages: [reviewList.pages.flat().map(v => {
+              if (v.id === review.id) {
+                return { ...v, isLike: false, likeCount: v.likeCount - 1 };
+              }
+              return v;
+            })]
+          };
+        });
+        queryClient.setQueriesData(["userBookmarkList"], (reviewList) => {
+          return {
+            //@ts-ignore
+            ...reviewList, pages: [reviewList.pages.flat().map(v => {
+              if (v.id === review.id) {
+                return { ...v, isLike: false, likeCount: v.likeCount - 1 };
+              }
+              return v;
+            })]
+          };
+        });
+      }
+      setApiBlock(false);
     }
   });
 
@@ -81,6 +172,22 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
       }, [])
     );
   }, [review]);
+
+  useEffect(() => {
+    setLikeCount(review.likeCount);
+  }, [review.likeCount]);
+
+  useEffect(() => {
+    setIsLike(review.isLike);
+  }, [review.isLike]);
+
+  useEffect(() => {
+    setBookmarkCount(review.bookmarkCount);
+  }, [review.bookmarkCount]);
+
+  useEffect(() => {
+    setIsBookmarkState(review.isBookmark);
+  }, [review.isBookmark]);
 
   return (
     <>
@@ -249,13 +356,17 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
         <View style={styles.reactionContainer}>
           <TouchableOpacity
             onPress={() => {
-              setIsBookmarkState(!isBookmarkState);
-              boomarkMutation.mutate({ id: review.id, isBookmark: !isBookmarkState });
-              if (!isBookmarkState) {
-                setBookmarkCount(prev => prev + 1);
+              setApiBlock(true);
+              if (isBookmarkState) {
+                setIsBookmarkState(false);
+                setBookmarkCount(prev => prev - 1);
               }
               else {
-                setBookmarkCount(prev => prev - 1);
+                setIsBookmarkState(true);
+                setBookmarkCount(prev => prev + 1);
+              }
+              if (!apiBlock) {
+                bookmarkMutation.mutate({ id: review.id, isBookmark: !isBookmarkState });
               }
             }}
             style={styles.reviewIcon}>
@@ -269,18 +380,22 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           </Pressable>
           <TouchableOpacity
             onPress={() => {
-              setIsLike(!isLike);
-              likeReviewFeedMutation.mutate({ id: review.id, state: !isLike });
-              if (!isLike) {
-                setReactCount(prev => prev + 1);
+              setApiBlock(true);
+              if (isLike) {
+                setIsLike(false);
+                setLikeCount(prev => prev - 1);
               }
               else {
-                setReactCount(prev => prev - 1);
+                setIsLike(true);
+                setLikeCount(prev => prev + 1);
+              }
+              if (!apiBlock) {
+                likeReviewFeedMutation.mutate({ id: review.id, state: !isLike });
               }
             }}
             style={styles.reviewIcon}>
             <Image source={isLike ? colorLike : like} style={styles.reviewImg} />
-            <Text style={styles.reviewCount}>{reactCount}</Text>
+            <Text style={styles.reviewCount}>{likeCount}</Text>
           </TouchableOpacity>
           {/* 인용글에서는 리트윗 아이콘 삭제 */}
           {!review.parent &&

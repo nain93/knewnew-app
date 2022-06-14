@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import Badge from '~/components/badge';
@@ -15,7 +15,9 @@ interface OnepickLayoutProps {
 const OnepickLayout = ({ userBadge, setUserBadge }: OnepickLayoutProps) => {
 
   return (
-    <>
+    <ScrollView
+      bounces={false}
+      showsVerticalScrollIndicator={false}>
       <View style={{ marginBottom: h2p(40) }}>
         <Text style={[styles.subTitle, FONT.Regular]}>선택하신 관심사 중에서</Text>
         <View style={{ flexDirection: 'row' }}>
@@ -87,7 +89,7 @@ const OnepickLayout = ({ userBadge, setUserBadge }: OnepickLayoutProps) => {
           )))}
         </View>
       </View>
-    </>
+    </ScrollView>
   );
 };
 

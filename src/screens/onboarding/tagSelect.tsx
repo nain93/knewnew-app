@@ -50,18 +50,21 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
 
   return (
     <View style={styles.container}>
-      <View style={{ marginBottom: h2p(40) }}>
-        <Text style={[styles.title, FONT.SemiBold]}>나를 소개하는 태그를</Text>
-        <View style={{ flexDirection: 'row' }}>
-          <Text style={[styles.title, { color: theme.color.main }, FONT.SemiBold]}>2가지 이상 </Text>
-          <Text style={[styles.title, FONT.SemiBold]}>선택해주세요.</Text></View>
-        <View style={{ flexDirection: 'row', marginTop: d2p(20) }}>
-          <Text style={[{ fontWeight: 'bold' }, FONT.Bold]}>나를 소개하는 태그</Text>
-          <Text style={FONT.Regular}>를 골라주세요.</Text>
-        </View>
-        <Text style={FONT.Regular}>최소 2개 최대 10개까지 고를 수 있어요.</Text>
-      </View>
-      <SelectLayout userBadge={userBadge} setUserBadge={(badgeProp: BadgeType) => setUserBadge(badgeProp)}
+      <SelectLayout
+        headerComponent={
+          <View style={{ marginBottom: h2p(40), marginTop: h2p(42.5), }}>
+            <Text style={[styles.title, FONT.SemiBold]}>나를 소개하는 태그를</Text>
+            <View style={{ flexDirection: 'row' }}>
+              <Text style={[styles.title, { color: theme.color.main }, FONT.SemiBold]}>2가지 이상 </Text>
+              <Text style={[styles.title, FONT.SemiBold]}>선택해주세요.</Text></View>
+            <View style={{ flexDirection: 'row', marginTop: d2p(20) }}>
+              <Text style={FONT.Bold}>나를 소개하는 태그</Text>
+              <Text style={FONT.Regular}>를 골라주세요.</Text>
+            </View>
+            <Text style={FONT.Regular}>최소 2개 최대 10개까지 고를 수 있어요.</Text>
+          </View>
+        }
+        userBadge={userBadge} setUserBadge={(badgeProp: BadgeType) => setUserBadge(badgeProp)}
         isInitial={true} />
       <BasicButton onPress={handleNext} text="다음으로" bgColor={theme.color.white}
         textColor={theme.color.main}
@@ -76,13 +79,12 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: h2p(42.5),
     paddingHorizontal: d2p(20)
   },
   title: {
     color: theme.color.black,
     fontSize: 26,
-    fontWeight: '600',
+    includeFontPadding: false,
   },
   select: {
     borderWidth: 1, borderColor: theme.color.grayscale.eae7ec,

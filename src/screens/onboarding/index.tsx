@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, Platform, Dimensions } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import {
   kakaoImg,
@@ -38,6 +38,7 @@ const aosKeys = {
 
 const Onboarding = ({ navigation }: NavigationType) => {
   const setToken = useSetRecoilState(tokenState);
+  const [apiBlock, setApiBlock] = useState(false);
 
   const goToBadgeSelect = (userData: {
     email: string,
@@ -50,8 +51,13 @@ const Onboarding = ({ navigation }: NavigationType) => {
   };
 
   const handleKakaoLogin = async () => {
+    if (apiBlock) {
+      return;
+    }
+    setApiBlock(true);
     const { accessToken } = await login();
     const data = await userLogin({ token: accessToken, providerType: "kakao" });
+    setApiBlock(false);
     if (data.accessToken) {
       // * 이미 가입된 유저
       setToken(data.accessToken);
@@ -67,11 +73,16 @@ const Onboarding = ({ navigation }: NavigationType) => {
   };
 
   const handleNaverLogin = async () => {
+    if (apiBlock) {
+      return;
+    }
+    setApiBlock(true);
     return new Promise((resolve, reject) => {
       NaverLogin.login(Platform.OS === "ios" ? iosKeys : aosKeys, async (err, token) => {
         if (token) {
           const { accessToken } = token;
           const data = await userLogin({ token: accessToken, providerType: "naver" });
+          setApiBlock(false);
           if (data.accessToken) {
             // * 이미 가입된 유저
             setToken(data.accessToken);
@@ -85,6 +96,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
           }
         }
         if (err) {
+          setApiBlock(false);
           reject(err);
           return;
         }
@@ -94,12 +106,17 @@ const Onboarding = ({ navigation }: NavigationType) => {
   };
 
   const handleGoogleLogin = async () => {
+    if (apiBlock) {
+      return;
+    }
+    setApiBlock(true);
     GoogleSignin.configure({
       webClientId: "1025814485939-95vtu3p4iqb7qp23henp85c1nd2d2i3c.apps.googleusercontent.com",
       // iosClientId: "1025814485939-hebcl4c1tmq4bqt9q0ifng6mq7amltnf.apps.googleusercontent.com"
     });
     await GoogleSignin.signIn();
     const { accessToken } = await GoogleSignin.getTokens();
+    setApiBlock(false);
     if (accessToken) {
       const data = await userLogin({ token: accessToken, providerType: "google" });
       if (data.accessToken) {
@@ -117,6 +134,10 @@ const Onboarding = ({ navigation }: NavigationType) => {
   };
 
   const handleAppleLogin = async () => {
+    if (apiBlock) {
+      return;
+    }
+    setApiBlock(true);
     const appleAuthRequestResponse = await appleAuth.performRequest({
       requestedOperation: appleAuth.Operation.LOGIN,
       requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
@@ -126,6 +147,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
       const token = appleAuthRequestResponse.authorizationCode;
       if (token) {
         const data = await userLogin({ token, providerType: "apple" });
+        setApiBlock(false);
         if (data.accessToken) {
           // * 이미 가입된 유저
           setToken(data.accessToken);
@@ -138,6 +160,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
           goToBadgeSelect(data);
         }
       }
+      setApiBlock(false);
     }
   };
 

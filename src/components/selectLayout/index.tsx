@@ -6,15 +6,17 @@ import theme from '~/styles/theme';
 import { initialize } from '~/assets/icons';
 import { BadgeType } from '~/types';
 import { FONT } from '~/styles/fonts';
+import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 
 interface SelectLayoutProps {
   userBadge: BadgeType;
   setUserBadge: (badgeProp: BadgeType) => void;
   isInitial?: boolean;
-  type?: "filter" | "write" | "normal"
+  type?: "filter" | "write" | "normal",
+  headerComponent?: JSX.Element
 }
 
-const SelectLayout = ({ isInitial, userBadge, setUserBadge, type = "normal" }: SelectLayoutProps) => {
+const SelectLayout = ({ headerComponent, isInitial, userBadge, setUserBadge, type = "normal" }: SelectLayoutProps) => {
   const resetIsClick = () => {
     setUserBadge({
       interest: userBadge.interest.map(v => ({ title: v.title, isClick: false })),
@@ -25,9 +27,11 @@ const SelectLayout = ({ isInitial, userBadge, setUserBadge, type = "normal" }: S
 
   return (
     <>
-      <ScrollView style={{ flex: 1 }}
-        contentContainerStyle={{ flex: 1 }}
+      <ScrollView
+        bounces={false}
+        style={{ flex: 1, position: "relative" }}
         showsVerticalScrollIndicator={false}>
+        {headerComponent}
         <View style={{ flexDirection: 'row' }}>
           <Text style={[{ ...styles.menu, marginTop: 0 }, FONT.Regular]}>관심사 </Text>
           {type === "normal" &&
@@ -100,15 +104,18 @@ const SelectLayout = ({ isInitial, userBadge, setUserBadge, type = "normal" }: S
             />
           )))}
         </View>
-        {isInitial &&
-          <TouchableOpacity
-            onPress={resetIsClick}
-            style={{ position: "absolute", flexDirection: 'row', right: 0, bottom: 0 }}>
-            <Image source={initialize} resizeMode="contain" style={{ height: d2p(12), width: d2p(12), marginRight: d2p(5) }} />
-            <Text style={[{ color: theme.color.grayscale.a09ca4 }, FONT.Bold]}>초기화</Text>
-          </TouchableOpacity>
-        }
       </ScrollView>
+      {isInitial &&
+        <TouchableOpacity
+          onPress={resetIsClick}
+          style={{
+            position: "absolute", flexDirection: 'row', right: d2p(30),
+            bottom: headerComponent ? h2p(100) : (isIphoneX() ? getBottomSpace() : h2p(20))
+          }}>
+          <Image source={initialize} resizeMode="contain" style={{ height: d2p(12), width: d2p(12), marginRight: d2p(5) }} />
+          <Text style={[{ color: theme.color.grayscale.a09ca4 }, FONT.Bold]}>초기화</Text>
+        </TouchableOpacity>
+      }
     </>
   );
 };
