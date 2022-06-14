@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, Dimensions, Image, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import theme from '~/styles/theme';
-import { d2p, h2p } from '~/utils';
+import { d2p, h2p, simpleDate } from '~/utils';
 import Badge from '../badge';
 import ReviewIcon from '../icon/reviewIcon';
 import { more, retweetfrom, tag } from '~/assets/icons';
@@ -14,9 +14,10 @@ import { noProfile } from '~/assets/images';
 interface FeedReviewProps {
   review: ReviewParentType,
   filterBadge?: string
+  type?: "detail"
 }
 
-const ReKnew = ({ review, filterBadge }: FeedReviewProps) => {
+const ReKnew = ({ review, filterBadge, type }: FeedReviewProps) => {
   const navigation = useNavigation<StackNavigationProp>();
   const [tags, setTags] = useState<Array<string>>([]);
 
@@ -86,11 +87,15 @@ const ReKnew = ({ review, filterBadge }: FeedReviewProps) => {
             <Badge type="feed" text={review.author.representBadge} />
             <Text style={[styles.household, FONT.Regular]}>{review.author.household}</Text>
           </View>
+          {type === "detail" &&
+            <Text style={[FONT.Regular, { position: "absolute", top: h2p(25), left: d2p(10), fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
+              {simpleDate(review.created, "전")}</Text>
+          }
         </View>
       </View>
 
-      <View style={{ marginLeft: d2p(75) }}>
-        <ReviewIcon viewStyle={{ marginBottom: h2p(10), marginTop: h2p(15) }} review={review.satisfaction} />
+      <View style={{ marginLeft: type === "detail" ? d2p(25) : d2p(75) }}>
+        <ReviewIcon viewStyle={{ marginBottom: h2p(10), marginTop: type === "detail" ? h2p(35) : h2p(15) }} review={review.satisfaction} />
         <Text style={[{ color: theme.color.black }, FONT.Regular]}>{review.content}</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: h2p(10), flexWrap: "wrap" }}>
           <Image source={tag} style={{ width: d2p(10), height: d2p(10), marginRight: d2p(5) }} />
@@ -140,7 +145,10 @@ const ReKnew = ({ review, filterBadge }: FeedReviewProps) => {
                         borderWidth: 1,
                         borderColor: theme.color.grayscale.d3d0d5,
                         width:
-                          Dimensions.get("window").width - d2p(245),
+                          type === "detail" ?
+                            Dimensions.get("window").width - d2p(220)
+                            :
+                            Dimensions.get("window").width - d2p(245),
                         aspectRatio: 3 / 2,
                       }} />
                     )))}

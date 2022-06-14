@@ -1,7 +1,7 @@
 import { Platform, Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import React from 'react';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { myIdState, okPopupState, tokenState } from '~/recoil/atoms';
+import { myIdState, okPopupState, popupState, tokenState } from '~/recoil/atoms';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import { FONT } from '~/styles/fonts';
@@ -11,6 +11,7 @@ import { ReviewListType } from '~/types/review';
 import { useMutation, useQueryClient } from 'react-query';
 import { deleteReview } from '~/api/review';
 import Share from 'react-native-share';
+import { blockUser } from '~/api/user';
 
 interface MoreProps {
   userId: number,
@@ -30,13 +31,23 @@ const More = ({ setSelectedIndex, isGobacK, handleCloseMore, userId, isMoreClick
   const token = useRecoilValue(tokenState);
   const queryClient = useQueryClient();
   const setModalOpen = useSetRecoilState(okPopupState);
+  const setIspopupOpen = useSetRecoilState(popupState);
 
   const deleteMutation = useMutation("deleteReview",
     (id: number) => deleteReview(token, id), {
-    onSuccess: async () => {
+    onSuccess: () => {
       if (isGobacK) {
         isGobacK();
       }
+    }
+  });
+
+  const blockMutation = useMutation("blockUser",
+    ({ id, isBlock }: { id: number, isBlock: boolean }) => blockUser({ token, id, isBlock }), {
+    onSuccess: () => {
+      queryClient.invalidateQueries("reviewList");
+      queryClient.invalidateQueries("userBookmarkList");
+      setIspopupOpen({ isOpen: true, content: "차단되었습니다." });
     }
   });
 
@@ -111,6 +122,14 @@ const More = ({ setSelectedIndex, isGobacK, handleCloseMore, userId, isMoreClick
     navigation.navigate("report", { review });
   };
 
+  const handleBlockUser = () => {
+    if (setSelectedIndex) {
+      setSelectedIndex(-1);
+    }
+    console.log(review.author.id, 'review.author.id');
+    blockMutation.mutate({ id: review.author.id, isBlock: true });
+  };
+
   return (
     <>
       {isMoreClick &&
@@ -141,6 +160,10 @@ const More = ({ setSelectedIndex, isGobacK, handleCloseMore, userId, isMoreClick
             <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
             <Pressable style={styles.press} onPress={handleReportPress}>
               <Text style={[{ color: theme.color.main }, FONT.Regular]}>신고</Text>
+            </Pressable>
+            <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
+            <Pressable style={styles.press} onPress={handleBlockUser}>
+              <Text style={[{ color: theme.color.main }, FONT.Regular]}>차단</Text>
             </Pressable>
           </View>
         )}

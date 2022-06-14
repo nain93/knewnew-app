@@ -165,3 +165,22 @@ export const getUserBookmarkList = async ({ token, id, offset }: { token: string
     return res.data;
   }
 };
+
+interface BlockUserType {
+  token: string,
+  id: number,
+  isBlock: boolean
+}
+
+export const blockUser = async ({ token, id, isBlock }: BlockUserType) => {
+  const res = await axios.post(baseURL + `user/${id}/block/`, {
+    isBlock
+  }, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+  if (res) {
+    return res.data;
+  }
+};

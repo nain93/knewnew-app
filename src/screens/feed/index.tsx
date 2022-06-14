@@ -74,7 +74,6 @@ const Feed = ({ navigation, route }: FeedProps) => {
   }, {
     enabled: !!filterBadge,
     getNextPageParam: (next, all) => all.flat().length,
-    getPreviousPageParam: (prev) => (prev.length - 20) ?? undefined
   });
 
   const reviewKey = useCallback((review) => String(review.id), []);
@@ -191,7 +190,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
           onEndReached={() => reviewListQuery.fetchNextPage()}
           onEndReachedThreshold={0.8}
           refreshing={reviewListQuery.isLoading}
-          onRefresh={() => queryClient.invalidateQueries("reviewList")}
+          onRefresh={reviewListQuery.refetch}
           data={reviewListQuery.data?.pages.flat()}
           ListHeaderComponent={reviewHeader}
           showsVerticalScrollIndicator={false}

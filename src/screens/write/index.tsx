@@ -544,7 +544,8 @@ const Write = ({ navigation, route }: WriteProp) => {
         onOpen={() => {
 
         }}
-        height={Dimensions.get("window").height - h2p(264)}
+        height={(!isIphoneX() && Platform.OS !== "android") ?
+          Dimensions.get("window").height - h2p(204) : Dimensions.get("window").height - h2p(264)}
         openDuration={250}
         customStyles={{
           container: {
@@ -601,7 +602,9 @@ const Write = ({ navigation, route }: WriteProp) => {
           <Text style={[{ fontSize: 16, fontWeight: "bold" }, FONT.Bold]}>판매처 선택</Text>
           <View />
         </View>
-        <ScrollView style={{ paddingHorizontal: d2p(20) }}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          style={{ paddingHorizontal: d2p(20) }}>
           {React.Children.toArray(marketList.map((market) =>
             <TouchableOpacity
               onPress={() => {

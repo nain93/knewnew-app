@@ -33,7 +33,6 @@ interface MypageProps {
 
 const Mypage = ({ navigation, route }: MypageProps) => {
   const [token, setToken] = useRecoilState(tokenState);
-  const queryClient = useQueryClient();
   const myId = useRecoilValue(myIdState);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [headerHeight, setHeaderHeight] = useState(h2p(60));
@@ -63,8 +62,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     }
   }, {
     enabled: !!route.params?.id,
-    getNextPageParam: (next, all) => all.flat().length,
-    getPreviousPageParam: (prev) => (prev.length - 20) ?? undefined,
+    getNextPageParam: (next, all) => all.flat().length
   });
 
   const userBookmarkListQuery = useInfiniteQuery<ReviewListType[], Error>(["userBookmarkList", route.params?.id], async ({ pageParam = 0 }) => {
@@ -74,8 +72,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     }
   }, {
     enabled: !!route.params?.id,
-    getNextPageParam: (next, all) => all.flat().length,
-    getPreviousPageParam: (prev) => (prev.length - 20) ?? undefined,
+    getNextPageParam: (next, all) => all.flat().length
   });
 
   const tabHeader = useCallback(() => (
@@ -104,7 +101,6 @@ const Mypage = ({ navigation, route }: MypageProps) => {
         </View>
         <View style={styles.occupation}>
           <Text style={[FONT.Medium, {
-            fontWeight: "500",
             color: getMyProfileQuery.data?.occupation ? theme.color.black : theme.color.grayscale.a09ca4
           }]}>
             {getMyProfileQuery.data?.occupation ? getMyProfileQuery.data?.occupation : "자기소개를 입력해주세요."}</Text>
@@ -120,7 +116,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
         </View>
       </View>
     </View>
-  ), [getMyProfileQuery.isLoading, route.params?.id, getMyProfileQuery.data]);
+  ), [getMyProfileQuery.data]);
 
   const reviewKey = useCallback((v) => String(v.id), []);
   const reviewEmpty = useCallback(() => {
@@ -172,9 +168,9 @@ const Mypage = ({ navigation, route }: MypageProps) => {
         </Pressable>
       );
     }
-    , [userReviewListQuery.isLoading, selectedIndex]);
+    , [selectedIndex, userReviewListQuery.isLoading]);
 
-  const bookmarkKey = useCallback((v) => String(v.id), []);
+  const bookmarkKey = useCallback((v) => (v.id).toString(), []);
   const bookmarkEmpty = useCallback(() => {
     if (!userBookmarkListQuery.isLoading) {
       return (
@@ -234,17 +230,6 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     useCallback(() => {
       return () => setOpenMore(false);
     }, []));
-
-  useEffect(() => {
-    if (route.params?.refresh) {
-      if (index === 1) {
-        bookmarkRef.current?.scrollToOffset({ animated: true, offset: 0 });
-      }
-      else {
-        reviewRef.current?.scrollToOffset({ animated: true, offset: 0 });
-      }
-    }
-  }, [route.params]);
 
   if (getMyProfileQuery.isLoading) {
     return (
@@ -368,10 +353,13 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             onEndReached={() => userReviewListQuery.fetchNextPage()}
             onEndReachedThreshold={0.8}
             refreshing={userReviewListQuery.isLoading}
-            onRefresh={() => queryClient.invalidateQueries("userReviewList")}
-            style={{ marginTop: Platform.OS === "ios" ? h2p(100) : h2p(90) }}
-            contentContainerStyle={{ paddingBottom: h2p(100) }}
+            onRefresh={() => {
+              userReviewListQuery.refetch();
+              getMyProfileQuery.refetch();
+            }}
+            style={{ marginTop: Platform.OS === "ios" ? h2p(90) : h2p(60) }}
             showsVerticalScrollIndicator={false}
+            ListFooterComponent={() => <View style={{ height: h2p(100) }} />}
             data={userReviewListQuery.data?.pages.flat()}
             renderItem={reviewRenderItem}
             keyExtractor={reviewKey}
@@ -384,10 +372,13 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             onEndReached={() => userBookmarkListQuery.fetchNextPage()}
             onEndReachedThreshold={0.8}
             refreshing={userBookmarkListQuery.isLoading}
-            onRefresh={() => queryClient.invalidateQueries("userBookmarkList")}
-            style={{ marginTop: Platform.OS === "ios" ? h2p(100) : h2p(90) }}
-            contentContainerStyle={{ paddingBottom: h2p(100) }}
+            onRefresh={() => {
+              userBookmarkListQuery.refetch();
+              getMyProfileQuery.refetch();
+            }}
+            style={{ marginTop: Platform.OS === "ios" ? h2p(90) : h2p(60) }}
             showsVerticalScrollIndicator={false}
+            ListFooterComponent={() => <View style={{ height: h2p(100) }} />}
             data={userBookmarkListQuery.data?.pages.flat()}
             renderItem={bookmarkRenderItem}
             keyExtractor={bookmarkKey}

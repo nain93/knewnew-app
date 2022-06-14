@@ -22,13 +22,14 @@ import { deleteUser, editUserProfile } from '~/api/user';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { myIdState, okPopupState, tokenState } from '~/recoil/atoms';
 import ImageCropPicker from 'react-native-image-crop-picker';
-import { getBottomSpace } from 'react-native-iphone-x-helper';
+import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 import Loading from '~/components/loading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { preSiginedImages, uploadImage } from '~/api';
 import { hitslop } from '~/utils/constant';
 import AlertPopup from '~/components/popup/alertPopup';
 import FadeInOut from '~/hooks/fadeInOut';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 interface ProfileEditType {
   nickname: string,
@@ -216,7 +217,12 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
           }
         }}
         headerRight={<Text style={[{ color: theme.color.main }, FONT.Regular]}>완료</Text>} />
-      <View style={styles.container}>
+      <KeyboardAwareScrollView
+        enableAutomaticScroll
+        enableOnAndroid
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flex: 1 }}
+        style={styles.container}>
         <TouchableOpacity onPress={pickImage} style={styles.profileImage}>
           <Image source={profile ? { uri: profile } : noProfile}
             style={{ width: d2p(60), height: d2p(60), borderRadius: 60 }} />
@@ -326,12 +332,13 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
             회원탈퇴
           </Text>
         </TouchableOpacity>
-      </View>
+      </KeyboardAwareScrollView>
       <RBSheet
         animationType="fade"
         ref={tagRefRBSheet}
         onClose={() => setIsBadgeNext(false)}
-        height={Dimensions.get("window").height - h2p(200)}
+        height={(!isIphoneX() && Platform.OS !== "android") ?
+          Dimensions.get("window").height - h2p(120) : Dimensions.get("window").height - h2p(200)}
         openDuration={250}
         customStyles={{
           container: {
