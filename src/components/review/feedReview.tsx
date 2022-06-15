@@ -12,7 +12,7 @@ import Highlighter from 'react-native-highlight-words';
 import { ReviewListType } from '~/types/review';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useRecoilValue } from 'recoil';
-import { tokenState } from '~/recoil/atoms';
+import { myIdState, tokenState } from '~/recoil/atoms';
 import { bookmarkReview, likeReview } from '~/api/review';
 import { FONT } from '~/styles/fonts';
 import { noProfile } from '~/assets/images';
@@ -20,6 +20,7 @@ import { MyPrfoileType } from '~/types/user';
 import { getMyProfile } from '~/api/user';
 import ReKnew from '~/components/review/reKnew';
 import More from '~/components/more';
+import FastImage from 'react-native-fast-image';
 
 interface FeedReviewProps {
   review: ReviewListType,
@@ -39,13 +40,13 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
   const navigation = useNavigation<StackNavigationProp>();
   const [tags, setTags] = useState<Array<string>>([]);
   const token = useRecoilValue(tokenState);
+  const myId = useRecoilValue(myIdState);
   const queryClient = useQueryClient();
   const [isLike, setIsLike] = useState<boolean>(review.isLike);
   const [likeCount, setLikeCount] = useState(review.likeCount);
   const [isBookmarkState, setIsBookmarkState] = useState<boolean>(review.isBookmark);
   const [bookmarkCount, setBookmarkCount] = useState(review.bookmarkCount);
   const [apiBlock, setApiBlock] = useState(false);
-
   const bookmarkMutation = useMutation("bookmark",
     ({ id, isBookmark }: { id: number, isBookmark: boolean }) => bookmarkReview(token, id, isBookmark), {
     onSuccess: async (data) => {
@@ -53,12 +54,14 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
       queryClient.invalidateQueries("reviewList");
 
       if (data.isBookmark) {
-        queryClient.setQueriesData(["userBookmarkList"], (bookmark) => {
-          return {
-            //@ts-ignore
-            ...bookmark, pages: [{ ...review, isBookmark: true, bookmarkCount: review.bookmarkCount + 1 }, ...bookmark.pages.flat()]
-          };
-        });
+        if (review.author.id === myId) {
+          queryClient.setQueriesData(["userBookmarkList"], (bookmark) => {
+            return {
+              //@ts-ignore
+              ...bookmark, pages: [{ ...review, isBookmark: true, bookmarkCount: review.bookmarkCount + 1 }, ...bookmark.pages.flat()]
+            };
+          });
+        }
         queryClient.setQueriesData(["userReviewList"], (reviewList) => {
           return {
             //@ts-ignore
@@ -72,10 +75,12 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
         });
       }
       else {
-        queryClient.setQueriesData(["userBookmarkList"], (bookmark) => {
-          //@ts-ignore
-          return { ...bookmark, pages: [bookmark.pages.flat().filter(v => v.id !== review.id)] };
-        });
+        if (review.author.id === myId) {
+          queryClient.setQueriesData(["userBookmarkList"], (bookmark) => {
+            //@ts-ignore
+            return { ...bookmark, pages: [bookmark.pages.flat().filter(v => v.id !== review.id)] };
+          });
+        }
         queryClient.setQueriesData(["userReviewList"], (reviewList) => {
           return {
             //@ts-ignore
@@ -287,7 +292,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             // * 사진 1개
             case 1: {
               return (
-                <Image source={{ uri: review.images[0]?.image }}
+                <FastImage source={{ uri: review.images[0]?.image }}
                   style={[styles.imageWrap, {
                     width: type === "reKnewWrite" ?
                       Dimensions.get("window").width - d2p(120)
@@ -301,7 +306,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
               return (
                 <View style={[styles.imageWrap, { borderWidth: 0, flexDirection: "row" }]}>
                   {React.Children.toArray(review.images.map((v, i) => (
-                    <Image source={{ uri: v.image }} style={{
+                    <FastImage source={{ uri: v.image }} style={{
                       marginRight: i === 0 ? d2p(10) : 0,
                       borderRadius: 10,
                       borderWidth: 1,
@@ -322,7 +327,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
                 <View style={[styles.imageWrap, { borderWidth: 0, flexDirection: "row" }]}>
                   {React.Children.toArray(review.images.slice(0, 3).map((v, i) => (
                     <View>
-                      <Image source={{ uri: v.image }} style={{
+                      <FastImage source={{ uri: v.image }} style={{
                         marginRight: i !== 2 ? d2p(5) : 0,
                         borderRadius: 10,
                         borderWidth: 1,

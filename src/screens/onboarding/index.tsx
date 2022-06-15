@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, Platform, Dimensions } from 'react-native';
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import {
   kakaoImg,
@@ -22,6 +22,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FONT } from '~/styles/fonts';
 import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 import theme from '~/styles/theme';
+import { useFocusEffect } from '@react-navigation/native';
 
 const iosKeys = {
   kConsumerKey: Config.NAVER_KEY,
@@ -57,7 +58,6 @@ const Onboarding = ({ navigation }: NavigationType) => {
     setApiBlock(true);
     const { accessToken } = await login();
     const data = await userLogin({ token: accessToken, providerType: "kakao" });
-    setApiBlock(false);
     if (data.accessToken) {
       // * 이미 가입된 유저
       setToken(data.accessToken);
@@ -82,7 +82,6 @@ const Onboarding = ({ navigation }: NavigationType) => {
         if (token) {
           const { accessToken } = token;
           const data = await userLogin({ token: accessToken, providerType: "naver" });
-          setApiBlock(false);
           if (data.accessToken) {
             // * 이미 가입된 유저
             setToken(data.accessToken);
@@ -96,7 +95,6 @@ const Onboarding = ({ navigation }: NavigationType) => {
           }
         }
         if (err) {
-          setApiBlock(false);
           reject(err);
           return;
         }
@@ -116,7 +114,6 @@ const Onboarding = ({ navigation }: NavigationType) => {
     });
     await GoogleSignin.signIn();
     const { accessToken } = await GoogleSignin.getTokens();
-    setApiBlock(false);
     if (accessToken) {
       const data = await userLogin({ token: accessToken, providerType: "google" });
       if (data.accessToken) {
@@ -147,7 +144,6 @@ const Onboarding = ({ navigation }: NavigationType) => {
       const token = appleAuthRequestResponse.authorizationCode;
       if (token) {
         const data = await userLogin({ token, providerType: "apple" });
-        setApiBlock(false);
         if (data.accessToken) {
           // * 이미 가입된 유저
           setToken(data.accessToken);
@@ -160,9 +156,16 @@ const Onboarding = ({ navigation }: NavigationType) => {
           goToBadgeSelect(data);
         }
       }
-      setApiBlock(false);
     }
   };
+
+  useEffect(() => {
+    if (apiBlock) {
+      setTimeout(() => {
+        setApiBlock(false);
+      }, 2000);
+    }
+  }, [apiBlock]);
 
   return (
     <View style={styles.container}>

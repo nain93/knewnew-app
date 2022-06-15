@@ -446,7 +446,7 @@ const Term = ({ navigation }: TermProps) => {
           }
         </Text>
         <Text style={FONT.Bold}>부칙 (시행일)</Text>
-        <Text>{
+        <Text style={FONT.Regular}>{
           `
 본 약관은 2022년 6월 1일부터 시행합니다. 개정된 이용약관의 적용일자 이전 가입자 또한 개정된 이용약관의 적용을 받습니다.
         `

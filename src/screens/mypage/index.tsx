@@ -131,10 +131,12 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             }]}>
               작성한 글이 없습니다.</Text>
           </View>
-          <BasicButton
-            viewStyle={{ marginHorizontal: d2p(20) }}
-            onPress={() => navigation.navigate('Write', { loading: false, isEdit: false })}
-            text="작성하기" textColor={theme.color.main} bgColor={theme.color.white} />
+          {route.params?.id === myId &&
+            <BasicButton
+              viewStyle={{ marginHorizontal: d2p(20) }}
+              onPress={() => navigation.navigate('Write', { loading: false, isEdit: false })}
+              text="작성하기" textColor={theme.color.main} bgColor={theme.color.white} />
+          }
         </View>
       );
     }
@@ -183,10 +185,12 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             }]}>
               담은 글이 없습니다.</Text>
           </View>
-          <BasicButton
-            viewStyle={{ marginHorizontal: d2p(20) }}
-            onPress={() => navigation.navigate('Feed')}
-            text="담으러 가기" textColor={theme.color.main} bgColor={theme.color.white} />
+          {route.params?.id === myId &&
+            <BasicButton
+              viewStyle={{ marginHorizontal: d2p(20) }}
+              onPress={() => navigation.navigate('Feed')}
+              text="담으러 가기" textColor={theme.color.main} bgColor={theme.color.white} />
+          }
         </View>
       );
     }
@@ -262,7 +266,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             backgroundColor: theme.color.white,
           }} />}
         <Header
-          title={(route.params?.id === myId || !route.params?.id) ? "마이페이지" : "회원 프로필"}
+          title={route.params?.id === myId ? "마이페이지" : "회원 프로필"}
           bgColor={theme.color.white}
           viewStyle={{
             marginTop: 0,
