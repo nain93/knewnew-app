@@ -17,6 +17,7 @@ import FeedDetail from '~/screens/feed/detail';
 import Report from '~/screens/report';
 import Term from '~/screens/setting';
 import Privacy from '~/screens/setting/privacy';
+import EmailLogin from '~/screens/onboarding/emailLogin';
 
 const Stack = createStackNavigator();
 
@@ -109,6 +110,13 @@ const GlobalNav = () => {
         <Stack.Screen
           name="privacy"
           component={Privacy}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="emailLogin"
+          component={EmailLogin}
           options={{
             headerShown: false
           }}

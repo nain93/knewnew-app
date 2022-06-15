@@ -272,7 +272,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
               <LeftArrowIcon onBackClick={() => {
                 navigation.goBack();
               }}
-                imageStyle={{ width: 11, height: 25 }} />}
+                imageStyle={{ width: d2p(11), height: d2p(25) }} />}
           headerRight={
             (route.params?.id === myId || !route.params?.id) ?
               <Image source={more} style={{ width: d2p(26), height: h2p(16) }} />

@@ -51,13 +51,19 @@ export const editUserProfile = async ({ token, id, profile }: EditPrfoileType) =
 
 interface UserLoginType {
   token: string,
-  providerType: "kakao" | "naver" | "google" | "apple"
+  providerType: "kakao" | "naver" | "google" | "apple" | "email",
+  userInput?: {
+    email: string,
+    password: string
+  }
 }
 
-export const userLogin = async ({ token, providerType }: UserLoginType) => {
+export const userLogin = async ({ token, providerType, userInput }: UserLoginType) => {
   try {
     const res = await axios.post(baseURL + "auth/login/", {
       providerType,
+      email: userInput?.email,
+      password: userInput?.password
     }, {
       headers: {
         "Content-Type": "application/json",
@@ -70,11 +76,10 @@ export const userLogin = async ({ token, providerType }: UserLoginType) => {
   }
   catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      console.log(error.response.data);
+      return error.response.data;
     }
   }
 };
-
 
 export const userSignup = async ({
   providerType,

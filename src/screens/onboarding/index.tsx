@@ -172,7 +172,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
         <Image source={mainLogo} style={styles.logo} />
       </View>
       <View style={{ marginBottom: h2p(145) }}>
-        <Text style={[{ textAlign: "center", fontSize: 16, fontWeight: "bold" }, FONT.Bold]}>SNS로 시작하기</Text>
+        <Text style={[{ textAlign: "center", fontSize: 16 }, FONT.Bold]}>SNS로 시작하기</Text>
         <View style={{ flexDirection: "row", marginTop: d2p(20), alignSelf: "center" }}>
           <TouchableOpacity onPress={handleKakaoLogin}>
             <Image source={kakaoImg} style={styles.snsImg} />
@@ -188,7 +188,16 @@ const Onboarding = ({ navigation }: NavigationType) => {
               <Image source={appleImg} style={styles.snsImg} />
             </TouchableOpacity>}
         </View>
-
+        <TouchableOpacity
+          onPress={() => navigation.navigate("emailLogin")}
+          style={{
+            marginTop: h2p(20),
+            borderRadius: 5,
+            borderWidth: 1, borderColor: theme.color.grayscale.a09ca4,
+            paddingVertical: h2p(10)
+          }}>
+          <Text style={[FONT.Bold, { fontSize: 16, textAlign: "center" }]}>이메일 로그인</Text>
+        </TouchableOpacity>
       </View>
       <View style={{
         width: Dimensions.get("window").width - d2p(40),

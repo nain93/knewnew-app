@@ -19,7 +19,7 @@ const LeftArrowIcon = ({ onBackClick, imageStyle, viewStyle }: LeftArrowIconProp
       <Image
         source={leftArrow}
         resizeMode="contain"
-        style={[{ height: 24.5, width: 24 }, imageStyle]}
+        style={[{ height: d2p(25), width: d2p(11) }, imageStyle]}
       />
     </TouchableOpacity>
   );
