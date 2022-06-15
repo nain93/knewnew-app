@@ -56,14 +56,16 @@ const EmailLogin = ({ navigation }: EmailLoginProps) => {
       />
       <KeyboardAwareScrollView
         showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps
+        keyboardShouldPersistTaps="always"
         contentContainerStyle={{ justifyContent: "center", flex: 1 }}
         style={styles.container}>
         <TextInput
+          placeholderTextColor={theme.color.grayscale.a09ca4}
           value={userInput.email}
           onChangeText={(e) => setUserInput({ ...userInput, email: e })}
           autoCapitalize="none" style={styles.textInput} placeholder="이메일" keyboardType="email-address" />
         <TextInput
+          placeholderTextColor={theme.color.grayscale.a09ca4}
           value={userInput.password}
           onChangeText={(e) => setUserInput({ ...userInput, password: e })}
           autoCapitalize="none"

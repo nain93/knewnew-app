@@ -48,6 +48,9 @@ const More = ({ setSelectedIndex, isGobacK, handleCloseMore, userId, isMoreClick
       queryClient.invalidateQueries("reviewList");
       queryClient.invalidateQueries("userBookmarkList");
       setIspopupOpen({ isOpen: true, content: "차단되었습니다." });
+      if (isGobacK) {
+        isGobacK();
+      }
     }
   });
 
@@ -126,7 +129,6 @@ const More = ({ setSelectedIndex, isGobacK, handleCloseMore, userId, isMoreClick
     if (setSelectedIndex) {
       setSelectedIndex(-1);
     }
-    console.log(review.author.id, 'review.author.id');
     blockMutation.mutate({ id: review.author.id, isBlock: true });
   };
 
