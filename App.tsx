@@ -38,7 +38,7 @@ const App = () => {
     enabled: !!getMyProfileQuery.data?.representBadge,
     getNextPageParam: (next, all) => all.flat().length,
     getPreviousPageParam: (prev) => (prev.length - 20) ?? undefined,
-    onSuccess: () => {
+    onSettled: () => {
       SplashScreen.hide();
     }
   });

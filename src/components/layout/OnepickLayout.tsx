@@ -21,7 +21,7 @@ const OnepickLayout = ({ userBadge, setUserBadge }: OnepickLayoutProps) => {
       <View style={{ marginBottom: h2p(40) }}>
         <Text style={[styles.subTitle, FONT.Regular]}>선택하신 관심사 중에서</Text>
         <View style={{ flexDirection: 'row' }}>
-          <Text style={[{ fontWeight: 'bold' }, FONT.Bold]}>나를 대표하는 뱃지 1개</Text>
+          <Text style={FONT.Bold}>나를 대표하는 뱃지 1개</Text>
           <Text style={FONT.Regular}>를 선택해주세요.</Text>
         </View>
         <Text style={[styles.badgeGuide, FONT.Regular]}>대표 뱃지는 저장 후 7일동안 다시 변경할 수 없습니다.</Text>

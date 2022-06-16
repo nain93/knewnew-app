@@ -448,7 +448,7 @@ const styles = StyleSheet.create({
     marginLeft: d2p(50),
   },
   title: {
-    fontSize: 16, fontWeight: 'bold',
+    fontSize: 16,
     marginRight: d2p(10)
   },
   sign: {

@@ -137,10 +137,10 @@ const SearchTabView = ({ searchList, userList, keyword, reviewNext, userNext }: 
             elevation: 0
           }}
           renderLabel={({ route, focused }) =>
-            <Text style={{
-              fontSize: 16, fontWeight: focused ? "bold" : "normal",
+            <Text style={[focused ? FONT.Bold : FONT.Regular, {
+              fontSize: 16,
               color: focused ? theme.color.black : theme.color.grayscale.C_79737e
-            }}>{route.title}</Text>
+            }]}>{route.title}</Text>
           }
         />}
     />
