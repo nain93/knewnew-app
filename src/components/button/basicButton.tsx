@@ -40,8 +40,6 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   text: {
-    color: theme.color.white,
-    fontSize: 14,
-    fontWeight: 'bold',
+    color: theme.color.white
   }
 });

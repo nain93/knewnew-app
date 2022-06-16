@@ -357,7 +357,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
         }}>
           <CloseIcon onPress={() => tagRefRBSheet.current?.close()}
             imageStyle={{ width: d2p(15), height: h2p(15) }} />
-          <Text style={[{ fontSize: 16, fontWeight: "bold" }, FONT.Bold]}>
+          <Text style={[{ fontSize: 16 }, FONT.Bold]}>
             {isBadgeNext ? "대표뱃지 선택" : "태그 선택"}
           </Text>
           <TouchableOpacity onPress={() => {
@@ -387,7 +387,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
           <>
             <View style={{ marginBottom: h2p(40), marginTop: h2p(20) }}>
               <View style={{ flexDirection: 'row' }}>
-                <Text style={[{ fontWeight: 'bold' }, FONT.Bold]}>나를 소개하는 태그</Text>
+                <Text style={FONT.Bold}>나를 소개하는 태그</Text>
                 <Text style={FONT.Regular}>를 골라주세요.</Text>
               </View>
               <Text style={FONT.Regular}>최소 2개 최대 10개까지 고를 수 있어요.</Text>

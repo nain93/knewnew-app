@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     paddingTop: d2p(20),
   },
   title: {
-    fontSize: 16, fontWeight: 'bold',
+    fontSize: 16,
     marginHorizontal: d2p(10)
   },
   household: {

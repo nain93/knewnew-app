@@ -561,7 +561,7 @@ const Write = ({ navigation, route }: WriteProp) => {
         <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: d2p(10), marginBottom: h2p(34) }}>
           <CloseIcon onPress={() => tagRefRBSheet.current?.close()}
             imageStyle={{ width: d2p(15), height: h2p(15) }} />
-          <Text style={[{ fontSize: 16, fontWeight: "bold" }, FONT.Bold]}>태그 선택</Text>
+          <Text style={[{ fontSize: 16 }, FONT.Bold]}>태그 선택</Text>
           <TouchableOpacity onPress={() => {
             setWriteData({
               ...writeData, tags: {
@@ -599,7 +599,7 @@ const Write = ({ navigation, route }: WriteProp) => {
         <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: d2p(30), paddingVertical: h2p(20) }}>
           <CloseIcon onPress={() => marketRefRBSheet.current?.close()}
             imageStyle={{ width: d2p(15), height: h2p(15) }} />
-          <Text style={[{ fontSize: 16, fontWeight: "bold" }, FONT.Bold]}>판매처 선택</Text>
+          <Text style={[{ fontSize: 16 }, FONT.Bold]}>판매처 선택</Text>
           <View />
         </View>
         <ScrollView

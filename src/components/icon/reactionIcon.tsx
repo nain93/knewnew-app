@@ -77,10 +77,9 @@ export default ReactionIcon;
 
 const styles = StyleSheet.create({
   default: {
-    color: theme.color.grayscale.C_79737e,
+    color: theme.color.grayscale.C_79737e
   },
   clicked: {
-    color: theme.color.grayscale.C_79737e,
-    fontWeight: 'bold'
+    color: theme.color.grayscale.C_79737e
   },
 });

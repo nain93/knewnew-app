@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, Animated, Pressable } from 'react-native';
-import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import Header from '~/components/header';
@@ -12,7 +12,7 @@ import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
 import SelectLayout from '~/components/selectLayout';
 import { BadgeType } from '~/types';
 import AlertPopup from '~/components/popup/alertPopup';
-import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
+import { useInfiniteQuery, useQuery } from 'react-query';
 import { getReviewList } from '~/api/review';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { refreshState, tokenState } from '~/recoil/atoms';
@@ -52,7 +52,6 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const tagRefRBSheet = useRef<RBSheet>(null);
   const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
   const token = useRecoilValue(tokenState);
-  const queryClient = useQueryClient();
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [filterBadge, setFilterBadge] = useState("");
   const [refresh, setRefresh] = useRecoilState(refreshState);

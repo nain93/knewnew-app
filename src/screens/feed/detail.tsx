@@ -503,7 +503,7 @@ export default FeedDetail;
 
 const styles = StyleSheet.create({
   writer: {
-    fontSize: 16, fontWeight: 'bold',
+    fontSize: 16,
     marginRight: d2p(10)
   },
   sign: {
@@ -537,7 +537,7 @@ const styles = StyleSheet.create({
     marginTop: h2p(20),
     paddingBottom: h2p(10),
     marginLeft: d2p(20),
-    fontSize: 12, fontWeight: 'bold',
+    fontSize: 12,
     color: theme.color.grayscale.C_79737e,
   },
   commentImg: {
