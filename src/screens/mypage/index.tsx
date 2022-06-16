@@ -1,11 +1,10 @@
-import { Dimensions, FlatList, Image, Linking, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import Header from '~/components/header';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
-import { myIdState, okPopupState, tokenState } from '~/recoil/atoms';
+import { myIdState, tokenState } from '~/recoil/atoms';
 import { getMyProfile, getUserBookmarkList, getUserProfile, getUserReviewList } from '~/api/user';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
 import { MyPrfoileType } from '~/types/user';
 import { noProfile } from '~/assets/images';
@@ -13,13 +12,8 @@ import Loading from '~/components/loading';
 import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
 import FeedReview from '~/components/review/feedReview';
 import { FONT } from '~/styles/fonts';
-import { more } from '~/assets/icons';
-import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
-import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import BasicButton from '~/components/button/basicButton';
 import { ReviewListType } from '~/types/review';
 
@@ -27,18 +21,16 @@ interface MypageProps {
   navigation: NavigationStackProp;
   route: NavigationRoute<{
     id?: number,
-    refresh?: boolean
+    refresh?: boolean,
+    openMore?: boolean
   }>;
 }
 
 const Mypage = ({ navigation, route }: MypageProps) => {
-  const [token, setToken] = useRecoilState(tokenState);
+  const token = useRecoilValue(tokenState);
   const myId = useRecoilValue(myIdState);
   const [selectedIndex, setSelectedIndex] = useState(-1);
-  const [headerHeight, setHeaderHeight] = useState(h2p(60));
   const [index, setIndex] = useState(0);
-  const [openMore, setOpenMore] = useState(false);
-  const setModalOpen = useSetRecoilState(okPopupState);
   const reviewRef = useRef<FlatList>(null);
   const bookmarkRef = useRef<FlatList>(null);
 
@@ -52,9 +44,8 @@ const Mypage = ({ navigation, route }: MypageProps) => {
       return queryData;
     }
   }, {
-    enabled: !!route.params?.id,
+    enabled: !!route.params?.id
   });
-
   const userReviewListQuery = useInfiniteQuery<ReviewListType[], Error>(["userReviewList", route.params?.id], async ({ pageParam = 0 }) => {
     if (route.params?.id) {
       const queryData = await getUserReviewList({ token, id: route.params?.id, offset: pageParam });
@@ -230,10 +221,6 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     }
   }, [token]);
 
-  useFocusEffect(
-    useCallback(() => {
-      return () => setOpenMore(false);
-    }, []));
 
   if (getMyProfileQuery.isLoading) {
     return (
@@ -243,93 +230,9 @@ const Mypage = ({ navigation, route }: MypageProps) => {
 
   return (
     <>
-      <View
-        onLayout={e => {
-          if (e.nativeEvent.layout) {
-            const height = e.nativeEvent.layout.height;
-            if (height) {
-              setHeaderHeight(height);
-            }
-          }
-        }}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          zIndex: 10,
-          width: Dimensions.get("window").width
-        }}>
-        {isIphoneX() &&
-          <View style={{
-            width: "100%",
-            height: getStatusBarHeight(),
-            backgroundColor: theme.color.white,
-          }} />}
-        <Header
-          title={route.params?.id === myId ? "마이페이지" : "회원 프로필"}
-          bgColor={theme.color.white}
-          viewStyle={{
-            marginTop: 0,
-          }}
-          headerLeft={
-            (route.params?.id === myId || !route.params?.id) ? undefined :
-              <LeftArrowIcon onBackClick={() => {
-                navigation.goBack();
-              }}
-                imageStyle={{ width: d2p(11), height: d2p(25) }} />}
-          headerRight={
-            (route.params?.id === myId || !route.params?.id) ?
-              <Image source={more} style={{ width: d2p(26), height: h2p(16) }} />
-              :
-              undefined
-          }
-          headerRightPress={() => setOpenMore(!openMore)}
-        />
-      </View>
-      {openMore &&
-        <View style={styles.clickBox}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("editProfile",
-              {
-                profile:
-                {
-                  nickname: getMyProfileQuery.data?.nickname,
-                  occupation: getMyProfileQuery.data?.occupation,
-                  profileImage: getMyProfileQuery.data?.profileImage,
-                  tags: getMyProfileQuery.data?.tags,
-                  representBadge: getMyProfileQuery.data?.representBadge
-                }
-              })}
-            style={{ width: d2p(90), height: h2p(35), justifyContent: "center", alignItems: "center" }}>
-            <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>프로필 수정</Text>
-          </TouchableOpacity>
-          <View style={{ borderWidth: 1, width: d2p(70), alignSelf: "center", borderColor: theme.color.grayscale.e9e7ec }} />
-          <TouchableOpacity
-            onPress={() => Linking.openURL("https://pf.kakao.com/_YQFcb")}
-            style={{ width: d2p(90), height: h2p(35), justifyContent: "center", alignItems: "center" }}>
-            <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>문의하기</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setModalOpen({
-                isOpen: true,
-                content: "로그아웃 하시겠습니까?",
-                okButton: () => {
-                  AsyncStorage.removeItem("token");
-                  setToken("");
-                }
-              });
-              setOpenMore(false);
-            }}
-            style={{ width: d2p(90), height: h2p(35), justifyContent: "center", alignItems: "center" }}>
-            <Text style={[FONT.Regular, { color: theme.color.main }]}>로그아웃</Text>
-          </TouchableOpacity>
-        </View>
-      }
       <Tabs.Container
         onIndexChange={setIndex}
         containerStyle={styles.container}
-        headerContainerStyle={{ marginTop: headerHeight }}
         renderTabBar={(props) => <MaterialTabBar
           contentContainerStyle={{ paddingBottom: h2p(4.5), paddingTop: h2p(20) }}
           indicatorStyle={{
@@ -361,7 +264,6 @@ const Mypage = ({ navigation, route }: MypageProps) => {
               userReviewListQuery.refetch();
               getMyProfileQuery.refetch();
             }}
-            style={{ marginTop: Platform.OS === "ios" ? h2p(90) : h2p(60) }}
             showsVerticalScrollIndicator={false}
             ListFooterComponent={() => <View style={{ height: h2p(100) }} />}
             data={userReviewListQuery.data?.pages.flat()}
@@ -380,7 +282,6 @@ const Mypage = ({ navigation, route }: MypageProps) => {
               userBookmarkListQuery.refetch();
               getMyProfileQuery.refetch();
             }}
-            style={{ marginTop: Platform.OS === "ios" ? h2p(90) : h2p(60) }}
             showsVerticalScrollIndicator={false}
             ListFooterComponent={() => <View style={{ height: h2p(100) }} />}
             data={userBookmarkListQuery.data?.pages.flat()}
@@ -401,7 +302,6 @@ const styles = StyleSheet.create({
     paddingTop: h2p(5),
     backgroundColor: theme.color.grayscale.f7f7fc
   },
-
   profileImage: {
     width: d2p(60),
     height: d2p(60),
@@ -434,19 +334,5 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginHorizontal: d2p(10), marginTop: h2p(15),
     paddingHorizontal: d2p(10), paddingVertical: d2p(15)
-  },
-  clickBox: {
-    borderRadius: 5,
-    position: 'absolute', right: d2p(46), top: getBottomSpace() + h2p(20),
-    shadowColor: '#000000',
-    shadowOpacity: 0.27,
-    shadowRadius: 4.65,
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    elevation: (Platform.OS === 'android') ? 3 : 0,
-    backgroundColor: theme.color.white,
-    zIndex: 11
   },
 });

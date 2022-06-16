@@ -1,4 +1,4 @@
-import { Dimensions, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { Platform, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import React from 'react';
 import { d2p, h2p } from '~/utils';
 import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
@@ -33,7 +33,8 @@ const Header = ({ type, headerRightPress, headerLeft, headerRight, customRight, 
     <>
       {(type !== "feed" && !isIphoneX() && Platform.OS === "ios") &&
         <StatusBarPlaceHolder />}
-      <View style={[styles.container, viewStyle, { borderBottomWidth: isBorder ? 1 : 0 }, { backgroundColor: bgColor }]}>
+      <View style={[styles.container, viewStyle, { borderBottomWidth: isBorder ? 1 : 0 },
+      { backgroundColor: bgColor ? bgColor : theme.color.white }]}>
         <View
           style={{ position: "absolute", left: d2p(20) }}>
           {headerLeft}

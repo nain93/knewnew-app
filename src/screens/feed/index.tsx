@@ -12,7 +12,7 @@ import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
 import SelectLayout from '~/components/selectLayout';
 import { BadgeType } from '~/types';
 import AlertPopup from '~/components/popup/alertPopup';
-import { useInfiniteQuery, useQuery } from 'react-query';
+import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
 import { getReviewList } from '~/api/review';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { refreshState, tokenState } from '~/recoil/atoms';
@@ -56,15 +56,10 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const [filterBadge, setFilterBadge] = useState("");
   const [refresh, setRefresh] = useRecoilState(refreshState);
   const flatListRef = useRef<FlatList>(null);
+  const queryClient = useQueryClient();
 
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token, filterBadge], () => getMyProfile(token), {
     enabled: !!token,
-    onSuccess: (data) => {
-      // * 최초 유저 대표뱃지로 필터링 설정
-      if (!filterBadge) {
-        setFilterBadge(data.representBadge);
-      }
-    }
   });
 
   const reviewListQuery = useInfiniteQuery<ReviewListType[], Error>(["reviewList", token, filterBadge], async ({ pageParam = 0 }) => {
@@ -152,6 +147,14 @@ const Feed = ({ navigation, route }: FeedProps) => {
       flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
     }
   }, [route.params]);
+
+  useEffect(() => {
+    // * 최초 유저 대표뱃지로 필터링 설정
+    const state: MyPrfoileType | undefined = queryClient.getQueryData("myProfile");
+    if (state) {
+      setFilterBadge(state.representBadge);
+    }
+  }, []);
 
   if ((reviewListQuery.isFetching && refresh) || !filterBadge) {
     return <Loading />;

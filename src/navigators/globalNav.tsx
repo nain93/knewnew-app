@@ -6,12 +6,9 @@ import TagSelect from '~/screens/onboarding/tagSelect';
 import BadgeSelect from '~/screens/onboarding/badgeSelect';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import Welcome from '~/screens/onboarding/welcome';
-import CloseIcon from '~/components/icon/closeIcon';
 import TabNavigator from '~/navigators/tabNav';
 import { d2p } from '~/utils';
 import EditProfile from '~/screens/mypage/editProfile';
-import { useRecoilValue } from 'recoil';
-import { tokenState } from '~/recoil/atoms';
 import theme from '~/styles/theme';
 import FeedDetail from '~/screens/feed/detail';
 import Report from '~/screens/report';
@@ -21,9 +18,7 @@ import EmailLogin from '~/screens/onboarding/emailLogin';
 
 const Stack = createStackNavigator();
 
-const GlobalNav = () => {
-  const isLogin = useRecoilValue(tokenState);
-
+const GlobalNav = ({ token }: { token: string }) => {
   return (
     <>
       <Stack.Navigator
@@ -36,7 +31,7 @@ const GlobalNav = () => {
                 CardStyleInterpolators.forHorizontalIOS
           }
         }>
-        {!isLogin &&
+        {!token &&
           <>
             <Stack.Screen
               name="OnBoarding"
