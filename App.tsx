@@ -7,7 +7,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import SplashScreen from 'react-native-splash-screen';
 import { Animated, Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useInfiniteQuery, useQuery } from 'react-query';
+import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
 import { getMyProfile } from '~/api/user';
 import { MyPrfoileType } from '~/types/user';
 import OkPopup from '~/components/popup/okPopup';
@@ -24,10 +24,17 @@ const App = () => {
   const { fadeAnim } = FadeInOut({ isPopupOpen, setIsPopupOpen });
   const [token, setToken] = useRecoilState(tokenState);
   const setMyId = useSetRecoilState(myIdState);
+  const queryClient = useQueryClient();
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
     enabled: !!token,
     onSuccess: (data) => {
+      queryClient.setQueryData("myProfile", data);
       setMyId(data.id);
+    },
+    onError: () => {
+      setToken("");
+      AsyncStorage.removeItem("token");
+      SplashScreen.hide();
     }
   });
 
@@ -87,9 +94,8 @@ const App = () => {
   return (
     <SafeAreaProvider>
       {/*@ts-ignore*/}
-      <NavigationContainer linking={linking} ref={navigationRef} fallback={<Loading />}
-      >
-        <GlobalNav />
+      <NavigationContainer linking={linking} ref={navigationRef} fallback={<Loading />}>
+        <GlobalNav token={token} />
       </NavigationContainer>
       <OkPopup title={modalOpen.content}
         handleOkayButton={modalOpen.okButton}
