@@ -64,8 +64,13 @@ const Feed = ({ navigation, route }: FeedProps) => {
     enabled: !!token,
     onSuccess: (data) => {
       // * 최초 유저 대표뱃지로 필터링 설정
-      setFilterBadge(data.representBadge);
-      setMyId(data.id);
+      if (data) {
+        setFilterBadge(data.representBadge);
+        setMyId(data.id);
+      }
+      else {
+        SplashScreen.hide();
+      }
     },
     onError: () => {
       setToken("");

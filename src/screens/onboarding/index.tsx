@@ -218,6 +218,9 @@ const Onboarding = ({ navigation }: NavigationType) => {
           </TouchableOpacity>
           <Text style={[FONT.Regular, { textAlign: "center" }]}>에 동의하게 됩니다.</Text>
         </View>
+        <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4, marginTop: h2p(5) }]}>
+          {Platform.OS === "ios" ? "v1.0.3-demo" : "v1.0.6-demo"}
+        </Text>
       </View>
     </View>
   );
