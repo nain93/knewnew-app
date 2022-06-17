@@ -31,6 +31,8 @@ const TabNavigator = () => {
   const myId = useRecoilValue(myIdState);
   const [openMore, setOpenMore] = useState(false);
 
+
+
   return (
     <Tabs.Navigator
       screenOptions={{
@@ -131,7 +133,8 @@ const TabNavigator = () => {
                 title={params?.id === myId ? "마이페이지" : "회원 프로필"}
                 bgColor={theme.color.white}
                 viewStyle={{
-                  marginTop: 0,
+                  paddingTop: 0,
+                  alignItems: "baseline"
                 }}
                 headerLeft={
                   //@ts-ignore

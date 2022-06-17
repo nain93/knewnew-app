@@ -130,6 +130,13 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
           representBadge: userBadge.interest.filter(v => v.masterBadge)[0]?.title || profileInfo.representBadge,
           tags: reduceTags
         });
+        queryClient.setQueryData("myProfile", {
+          profileImage: profile.includes("https") ? profile.split("com/")[1] : data[0].fields.key,
+          nickname: profileInfo.nickname,
+          occupation: profileInfo.occupation,
+          representBadge: userBadge.interest.filter(v => v.masterBadge)[0]?.title || profileInfo.representBadge,
+          tags: reduceTags
+        });
       }
     });
 
