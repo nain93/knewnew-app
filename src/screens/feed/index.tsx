@@ -12,10 +12,10 @@ import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
 import SelectLayout from '~/components/selectLayout';
 import { BadgeType } from '~/types';
 import AlertPopup from '~/components/popup/alertPopup';
-import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
+import { useInfiniteQuery, useQuery } from 'react-query';
 import { getReviewList } from '~/api/review';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { refreshState, tokenState } from '~/recoil/atoms';
+import { useRecoilState, useSetRecoilState } from 'recoil';
+import { myIdState, refreshState, tokenState } from '~/recoil/atoms';
 import Loading from '~/components/loading';
 import { getMyProfile } from '~/api/user';
 import { MyPrfoileType } from '~/types/user';
@@ -26,6 +26,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import FadeInOut from '~/hooks/fadeInOut';
+import SplashScreen from 'react-native-splash-screen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
   return (
@@ -51,15 +53,25 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const [scrollOffset, setScrollOffset] = useState(0);
   const tagRefRBSheet = useRef<RBSheet>(null);
   const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
-  const token = useRecoilValue(tokenState);
+  const [token, setToken] = useRecoilState(tokenState);
+  const setMyId = useSetRecoilState(myIdState);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [filterBadge, setFilterBadge] = useState("");
   const [refresh, setRefresh] = useRecoilState(refreshState);
   const flatListRef = useRef<FlatList>(null);
-  const queryClient = useQueryClient();
 
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token, filterBadge], () => getMyProfile(token), {
     enabled: !!token,
+    onSuccess: (data) => {
+      // * 최초 유저 대표뱃지로 필터링 설정
+      setFilterBadge(data.representBadge);
+      setMyId(data.id);
+    },
+    onError: () => {
+      setToken("");
+      AsyncStorage.removeItem("token");
+      SplashScreen.hide();
+    }
   });
 
   const reviewListQuery = useInfiniteQuery<ReviewListType[], Error>(["reviewList", token, filterBadge], async ({ pageParam = 0 }) => {
@@ -68,6 +80,9 @@ const Feed = ({ navigation, route }: FeedProps) => {
   }, {
     enabled: !!filterBadge,
     getNextPageParam: (next, all) => all.flat().length,
+    onSettled: () => {
+      SplashScreen.hide();
+    }
   });
 
   const reviewKey = useCallback((review) => String(review.id), []);
@@ -147,14 +162,6 @@ const Feed = ({ navigation, route }: FeedProps) => {
       flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
     }
   }, [route.params]);
-
-  useEffect(() => {
-    // * 최초 유저 대표뱃지로 필터링 설정
-    const state: MyPrfoileType | undefined = queryClient.getQueryData("myProfile");
-    if (state) {
-      setFilterBadge(state.representBadge);
-    }
-  }, []);
 
   if ((reviewListQuery.isFetching && refresh) || !filterBadge) {
     return <Loading />;
