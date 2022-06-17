@@ -122,7 +122,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             }]}>
               작성한 글이 없습니다.</Text>
           </View>
-          {route.params?.id === myId &&
+          {(route.params?.id === myId) &&
             <BasicButton
               viewStyle={{ marginHorizontal: d2p(20) }}
               onPress={() => navigation.navigate('Write', { loading: false, isEdit: false })}
@@ -132,7 +132,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
       );
     }
     return null;
-  }, [userReviewListQuery.isLoading]);
+  }, [userReviewListQuery.isLoading, route.params?.id]);
 
   const reviewRenderItem = useCallback(
     (review) => {
@@ -176,7 +176,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             }]}>
               담은 글이 없습니다.</Text>
           </View>
-          {route.params?.id === myId &&
+          {(route.params?.id === myId) &&
             <BasicButton
               viewStyle={{ marginHorizontal: d2p(20) }}
               onPress={() => navigation.navigate('Feed')}
@@ -186,7 +186,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
       );
     }
     return null;
-  }, [userBookmarkListQuery.isLoading]);
+  }, [userBookmarkListQuery.isLoading, route.params?.id]);
 
   const bookmarkRenderItem = useCallback((bookmarks) => {
     if (userBookmarkListQuery.isLoading) {

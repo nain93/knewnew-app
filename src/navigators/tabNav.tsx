@@ -17,16 +17,6 @@ import MypageHeader from '~/screens/mypage/mypageHeader';
 
 const Tabs = createBottomTabNavigator();
 
-function StatusBarPlaceHolder() {
-  return (
-    <View style={{
-      width: "100%",
-      height: getStatusBarHeight(),
-      backgroundColor: theme.color.white
-    }} />
-  );
-}
-
 const TabNavigator = () => {
   const myId = useRecoilValue(myIdState);
   const [openMore, setOpenMore] = useState(false);
@@ -127,15 +117,10 @@ const TabNavigator = () => {
         options={{
           header: ({ route: { params }, navigation }) => (
             <>
-              <StatusBarPlaceHolder />
               <Header
                 //@ts-ignore
                 title={params?.id === myId ? "마이페이지" : "회원 프로필"}
                 bgColor={theme.color.white}
-                viewStyle={{
-                  paddingTop: 0,
-                  alignItems: "baseline"
-                }}
                 headerLeft={
                   //@ts-ignore
                   (params?.id === myId || !params?.id) ? undefined :
