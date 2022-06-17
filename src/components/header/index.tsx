@@ -64,8 +64,8 @@ export default Header;
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
     borderBottomColor: theme.color.grayscale.e9e7ec,
     marginTop: isIphoneX() ? getStatusBarHeight() : 0,
     paddingVertical: h2p(20),
