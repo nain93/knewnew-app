@@ -1,4 +1,4 @@
-import { Dimensions, FlatList, Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
@@ -33,6 +33,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
   const [index, setIndex] = useState(0);
   const reviewRef = useRef<FlatList>(null);
   const bookmarkRef = useRef<FlatList>(null);
+  const queryClient = useQueryClient();
 
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", route.params?.id], async () => {
     if (route.params?.id && (route.params.id !== myId)) {
@@ -41,6 +42,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     }
     else {
       const queryData = await getMyProfile(token);
+      queryClient.setQueryData("myProfile", queryData);
       return queryData;
     }
   }, {
@@ -140,8 +142,10 @@ const Mypage = ({ navigation, route }: MypageProps) => {
         return (
           <View style={{
             position: "absolute",
-            top: Platform.OS === "ios" ? h2p(-90) : h2p(-370), alignSelf: "center"
+            alignSelf: "center",
+            top: h2p(-90)
           }}>
+            <Text>zdfjadhgkadjghadkjgadkjghadkjghadkj</Text>
             <Loading />
           </View>
         );
@@ -192,7 +196,8 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     if (userBookmarkListQuery.isLoading) {
       return <View style={{
         position: "absolute",
-        top: Platform.OS === "ios" ? h2p(-90) : h2p(-370), alignSelf: "center"
+        alignSelf: "center",
+        top: h2p(-90)
       }}>
         <Loading />
       </View>;
@@ -221,6 +226,8 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     }
   }, [token]);
 
+  // console.log(getMyProfileQuery.isLoading, 'getMyProfileQuery.isLoading');
+  // console.log(userReviewListQuery.isLoading, 'userReviewListQuery.isLoading');
 
   if (getMyProfileQuery.isLoading) {
     return (

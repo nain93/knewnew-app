@@ -12,7 +12,7 @@ import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
 import SelectLayout from '~/components/selectLayout';
 import { BadgeType } from '~/types';
 import AlertPopup from '~/components/popup/alertPopup';
-import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
+import { useInfiniteQuery, useQuery } from 'react-query';
 import { getReviewList } from '~/api/review';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { myIdState, refreshState, tokenState } from '~/recoil/atoms';
@@ -59,7 +59,6 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const [filterBadge, setFilterBadge] = useState("");
   const [refresh, setRefresh] = useRecoilState(refreshState);
   const flatListRef = useRef<FlatList>(null);
-  const queryClient = useQueryClient();
 
   const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token, filterBadge], () => getMyProfile(token), {
     enabled: !!token,
@@ -70,7 +69,6 @@ const Feed = ({ navigation, route }: FeedProps) => {
           setFilterBadge(data.representBadge);
         }
         setMyId(data.id);
-        queryClient.setQueryData("myProfile", data);
       }
       else {
         SplashScreen.hide();

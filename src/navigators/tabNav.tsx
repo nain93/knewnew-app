@@ -1,4 +1,4 @@
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React, { useState } from 'react';
 import Feed from '~/screens/feed';
@@ -11,7 +11,6 @@ import { mainSearchIcon, graylogo, graymypage, graysearch, graywrite, mainmypage
 import { useRecoilValue } from 'recoil';
 import { myIdState } from '~/recoil/atoms';
 import Header from '~/components/header';
-import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import MypageHeader from '~/screens/mypage/mypageHeader';
 
@@ -20,8 +19,6 @@ const Tabs = createBottomTabNavigator();
 const TabNavigator = () => {
   const myId = useRecoilValue(myIdState);
   const [openMore, setOpenMore] = useState(false);
-
-
 
   return (
     <Tabs.Navigator
