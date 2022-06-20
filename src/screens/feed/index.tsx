@@ -120,7 +120,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
       navigation.navigate("FeedDetail", {
         authorId: item.author.id,
         id: item.id, badge: filterBadge,
-        isLike: item.isLike, isBookmark: item.isBookmark,
+        isLike: item.isLike, isBookmark: item.isBookmark
       })}
       style={styles.review}>
       <FeedReview

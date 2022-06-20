@@ -10,7 +10,7 @@ import ReactionIcon from '~/components/icon/reactionIcon';
 import { commentMore, more, tag } from '~/assets/icons';
 import { getBottomSpace } from 'react-native-iphone-x-helper';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { myIdState, okPopupState, refreshState, tokenState } from '~/recoil/atoms';
+import { myIdState, okPopupState, popupState, refreshState, tokenState } from '~/recoil/atoms';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
@@ -25,6 +25,7 @@ import { addReviewComment, deleteReviewComment, editReviewComment, getReviewComm
 import ReKnew from '~/components/review/reKnew';
 import More from '~/components/more';
 import { hitslop } from '~/utils/constant';
+import axios from 'axios';
 interface FeedDetailProps {
   navigation: NavigationStackProp
   route: NavigationRoute<{
@@ -67,6 +68,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [numberLine, setNumberLine] = useState(1);
   const setRefresh = useSetRecoilState(refreshState);
   const setModalOpen = useSetRecoilState(okPopupState);
+  const setIspopupOpen = useSetRecoilState(popupState);
 
   const reviewDetailQuery = useQuery<ReviewListType, Error>(["reviewDetail", token, route.params?.id],
     async () => {
@@ -79,8 +81,18 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     onSuccess: (data) => {
       setLike(data.isLike);
       setCart(data.isBookmark);
+    },
+    onError: (error) => {
+      if (axios.isAxiosError(error) && error.response) {
+        //@ts-ignore
+        if (error.response.data.detail === "Not found.") {
+          setIspopupOpen({ isOpen: true, content: "이미 삭제된 리뷰입니다." });
+          navigation.goBack();
+        }
+      }
     }
   });
+
   const likeReviewMutation = useMutation('likeReview',
     ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state), {
     onSuccess: () => {
@@ -183,7 +195,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
       }, [])
     );
   }, [reviewDetailQuery.data?.tags]);
-
 
   if (reviewDetailQuery.isLoading || reviewDetailQuery.isFetching) {
     return <Loading />;
@@ -334,7 +345,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                 />
               </View>
               <TouchableOpacity
-                onPress={() => navigation.navigate("FeedDetail", { id: reviewDetailQuery.data.parent?.id })}
+                onPress={() => navigation.navigate("FeedDetail",
+                  { id: reviewDetailQuery.data.parent?.id })}
                 style={{
                   marginTop: h2p(15),
                   marginBottom: h2p(10),
