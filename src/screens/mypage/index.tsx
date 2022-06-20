@@ -16,6 +16,7 @@ import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import BasicButton from '~/components/button/basicButton';
 import { ReviewListType } from '~/types/review';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface MypageProps {
   navigation: NavigationStackProp;
@@ -42,11 +43,13 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     }
     else {
       const queryData = await getMyProfile(token);
-      queryClient.setQueryData("myProfile", queryData);
       return queryData;
     }
   }, {
-    enabled: !!route.params?.id
+    enabled: !!route.params?.id,
+    onSuccess: (data) => {
+      queryClient.setQueryData("myProfile", data);
+    },
   });
   const userReviewListQuery = useInfiniteQuery<ReviewListType[], Error>(["userReviewList", route.params?.id], async ({ pageParam = 0 }) => {
     if (route.params?.id) {
@@ -205,7 +208,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     return (
       <Pressable
         onPress={() => navigation.navigate("FeedDetail",
-          { id: bookmarks.item.id, isLike: bookmarks.item.isLike })}
+          { id: bookmarks.item.id, isLike: bookmarks.item.isLike, authorId: bookmarks.item.author.id })}
         style={styles.review}
       >
         <FeedReview
@@ -226,8 +229,11 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     }
   }, [token]);
 
-  // console.log(getMyProfileQuery.isLoading, 'getMyProfileQuery.isLoading');
-  // console.log(userReviewListQuery.isLoading, 'userReviewListQuery.isLoading');
+  useFocusEffect(
+    useCallback(() => {
+      // * 프로필 수정화면으로 넘겨줄 데이터 쿼리에 저장
+      queryClient.setQueryData("myProfile", getMyProfileQuery.data);
+    }, []));
 
   if (getMyProfileQuery.isLoading) {
     return (

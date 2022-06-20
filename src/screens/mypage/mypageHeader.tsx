@@ -39,7 +39,6 @@ const MypageHeader = ({ setOpenMore }: MypageHeaderProps) => {
     }
   );
 
-
   useFocusEffect(
     useCallback(() => {
       const state: ProfileType | undefined = queryClient.getQueryData("myProfile");
