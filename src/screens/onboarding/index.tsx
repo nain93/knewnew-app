@@ -23,6 +23,7 @@ import { FONT } from '~/styles/fonts';
 import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 import theme from '~/styles/theme';
 import { useFocusEffect } from '@react-navigation/native';
+import { versioningAOS, versioningIOS } from '~/utils/constant';
 
 const iosKeys = {
   kConsumerKey: Config.NAVER_KEY,
@@ -219,7 +220,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
           <Text style={[FONT.Regular, { textAlign: "center" }]}>에 동의하게 됩니다.</Text>
         </View>
         <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4, marginTop: h2p(5) }]}>
-          {Platform.OS === "ios" ? "v1.0.3-demo" : "v1.0.6-demo"}
+          {Platform.OS === "ios" ? versioningIOS : versioningAOS}
         </Text>
       </View>
     </View>
