@@ -357,6 +357,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             <ReactionIcon name="like" count={reviewDetailQuery.data?.likeCount} state={like}
               isState={(isState: boolean) => setLike(isState)} mutation={likeReviewMutation} id={route.params?.id} />
           </View>
+          <Text style={[styles.commentMeta, FONT.Bold]}>작성된 댓글 {commentListQuery.data?.length}개</Text>
           <Pressable onPress={() => {
             setCommentSelectedIdx(-1);
           }}>
@@ -368,7 +369,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
               }
               return (
                 <>
-                  <Text style={[styles.commentMeta, FONT.Bold]}>작성된 댓글 {commentListQuery.data?.length}개</Text>
                   <View
                     style={{
                       paddingHorizontal: d2p(20),

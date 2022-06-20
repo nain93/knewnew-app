@@ -1,4 +1,4 @@
-import { Image, StyleSheet } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React, { useState } from 'react';
 import Feed from '~/screens/feed';
@@ -13,8 +13,21 @@ import { myIdState } from '~/recoil/atoms';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import MypageHeader from '~/screens/mypage/mypageHeader';
+import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 
 const Tabs = createBottomTabNavigator();
+
+function StatusBarPlaceHolder() {
+  return (
+    <View style={{
+      width: "100%",
+      position: "absolute",
+      top: 0,
+      height: getStatusBarHeight(),
+      backgroundColor: theme.color.white
+    }} />
+  );
+}
 
 const TabNavigator = () => {
   const myId = useRecoilValue(myIdState);
@@ -114,10 +127,13 @@ const TabNavigator = () => {
         options={{
           header: ({ route: { params }, navigation }) => (
             <>
+              <StatusBarPlaceHolder />
               <Header
                 //@ts-ignore
                 title={params?.id === myId ? "마이페이지" : "회원 프로필"}
                 bgColor={theme.color.white}
+                viewStyle={{
+                }}
                 headerLeft={
                   //@ts-ignore
                   (params?.id === myId || !params?.id) ? undefined :
