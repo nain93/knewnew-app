@@ -61,23 +61,12 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
   const nameInputRef = useRef<TextInput>(null);
   const selfInputRef = useRef<TextInput>(null);
   const tagRefRBSheet = useRef<RBSheet>(null);
-  const { nickname, occupation, profileImage, tags, representBadge } = route.params?.profile || {
+  const [profileInfo, setProfileInfo] = useState<ProfileEditType>({
     nickname: "",
     occupation: "",
     profileImage: null,
     tags: [],
     representBadge: ""
-  };
-  const [profileInfo, setProfileInfo] = useState<ProfileEditType>({
-    nickname: nickname ? nickname : "",
-    occupation: occupation ? occupation : "",
-    profileImage: profileImage ? {
-      fields: {
-        key: "user" + profileImage?.split("user")[1]
-      }
-    } : null,
-    tags: tags ? tags : [],
-    representBadge: representBadge ? representBadge : ""
   });
 
   const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
@@ -86,7 +75,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
   const myId = useRecoilValue(myIdState);
   const setModalOpen = useSetRecoilState(okPopupState);
   const queryClient = useQueryClient();
-  const [profile, setProfile] = useState(profileImage ? profileImage : "");
+  const [profile, setProfile] = useState(route.params?.profile.profileImage || "");
   const [isPopupOpen, setIsPopupOpen] = useState({ isOpen: false, content: "" });
   const { fadeAnim } = FadeInOut({ isPopupOpen, setIsPopupOpen });
   const [uploadBody, setUploadBody] = useState<{
@@ -118,6 +107,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
           acc = acc.concat(copy[cur].filter(v => v.isClick).map(v => v.title));
           return acc;
         }, []);
+
         if (uploadBody) {
           await uploadImage(uploadBody, data[0]);
         }
@@ -139,33 +129,6 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
         });
       }
     });
-
-  useEffect(() => {
-    setUserBadge({
-      interest: userBadge.interest.map(v => {
-        if (v.title === profileInfo.representBadge) {
-          return { ...v, isClick: true, masterBadge: true };
-        }
-        if (profileInfo.tags.includes(v.title)) {
-          return { ...v, isClick: true };
-        }
-        return v;
-      }),
-      household: userBadge.household.map(v => {
-        if (profileInfo.tags.includes(v.title)) {
-          return { ...v, isClick: true };
-        }
-        return v;
-      }),
-      taste: userBadge.taste.map(v => {
-        if (profileInfo.tags.includes(v.title)) {
-          return { ...v, isClick: true };
-        }
-        return v;
-      })
-    });
-  }, []);
-
 
   const pickImage = () => {
     ImageCropPicker.openPicker({
@@ -193,6 +156,44 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
       navigation.reset({ index: 0, routes: [{ name: "OnBoarding" }] });
     }
   }, [token]);
+
+  useEffect(() => {
+    if (route.params) {
+      setProfileInfo({
+        ...route.params?.profile,
+        occupation: route.params.profile.occupation || "",
+        profileImage: route.params.profile.profileImage ? {
+          fields: {
+            key: "user" + route.params.profile.profileImage?.split("user")[1]
+          }
+        } : null
+      });
+
+      setUserBadge({
+        interest: userBadge.interest.map(v => {
+          if (v.title === route.params?.profile.representBadge) {
+            return { ...v, isClick: true, masterBadge: true };
+          }
+          if (route.params?.profile.tags.includes(v.title)) {
+            return { ...v, isClick: true };
+          }
+          return v;
+        }),
+        household: userBadge.household.map(v => {
+          if (route.params?.profile.tags.includes(v.title)) {
+            return { ...v, isClick: true };
+          }
+          return v;
+        }),
+        taste: userBadge.taste.map(v => {
+          if (route.params?.profile.tags.includes(v.title)) {
+            return { ...v, isClick: true };
+          }
+          return v;
+        })
+      });
+    }
+  }, [route.params]);
 
   if (editProfileMutation.isLoading) {
     return <Loading />;
@@ -232,7 +233,10 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
         style={styles.container}>
         <TouchableOpacity onPress={pickImage} style={styles.profileImage}>
           <Image source={profile ? { uri: profile } : noProfile}
-            style={{ width: d2p(60), height: d2p(60), borderRadius: 60 }} />
+            style={{
+              width: d2p(60), height: d2p(60),
+              borderRadius: 60, borderWidth: 1, borderColor: theme.color.grayscale.eae7ec
+            }} />
           <Image source={plusIcon}
             style={{ width: d2p(18), height: h2p(18), position: "absolute", bottom: 0, right: 0 }} />
         </TouchableOpacity>
@@ -423,9 +427,7 @@ const styles = StyleSheet.create({
     width: d2p(60),
     height: d2p(60),
     borderRadius: 60,
-    borderWidth: 1,
-    alignSelf: "center",
-    borderColor: theme.color.grayscale.eae7ec
+    alignSelf: "center"
   },
 
   inputTitle: {

@@ -233,7 +233,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     useCallback(() => {
       // * 프로필 수정화면으로 넘겨줄 데이터 쿼리에 저장
       queryClient.setQueryData("myProfile", getMyProfileQuery.data);
-    }, []));
+    }, [getMyProfileQuery.data, queryClient]));
 
   if (getMyProfileQuery.isLoading) {
     return (

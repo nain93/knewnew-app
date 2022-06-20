@@ -29,6 +29,7 @@ import FadeInOut from '~/hooks/fadeInOut';
 import SplashScreen from 'react-native-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+
 function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
   return (
     <View style={{

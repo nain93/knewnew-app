@@ -14,6 +14,7 @@ import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import MypageHeader from '~/screens/mypage/mypageHeader';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
+import { getFocusedRouteNameFromRoute, useRoute } from '@react-navigation/native';
 
 const Tabs = createBottomTabNavigator();
 
@@ -32,6 +33,8 @@ function StatusBarPlaceHolder() {
 const TabNavigator = () => {
   const myId = useRecoilValue(myIdState);
   const [openMore, setOpenMore] = useState(false);
+  const screen = useRoute();
+  const routeName = getFocusedRouteNameFromRoute(screen);
 
   return (
     <Tabs.Navigator
@@ -68,7 +71,7 @@ const TabNavigator = () => {
         listeners={({ navigation }) => ({
           tabPress: e => {
             e.preventDefault();
-            navigation.navigate('Feed', { refresh: true });
+            navigation.navigate('Feed', { refresh: routeName === "Feed" ? true : false });
           },
         })}
         options={{

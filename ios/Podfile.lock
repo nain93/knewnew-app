@@ -446,10 +446,6 @@ PODS:
     - react-native-config/App (= 1.4.5)
   - react-native-config/App (1.4.5):
     - React-Core
-  - react-native-google-analytics-bridge (7.1.0):
-    - react-native-google-analytics-bridge/Core (= 7.1.0)
-  - react-native-google-analytics-bridge/Core (7.1.0):
-    - React
   - react-native-pager-view (5.4.15):
     - React-Core
   - react-native-safe-area-context (4.2.5):
@@ -648,7 +644,6 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - react-native-config (from `../node_modules/react-native-config`)
-  - react-native-google-analytics-bridge (from `../node_modules/react-native-google-analytics-bridge`)
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
@@ -767,8 +762,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/logger"
   react-native-config:
     :path: "../node_modules/react-native-config"
-  react-native-google-analytics-bridge:
-    :path: "../node_modules/react-native-google-analytics-bridge"
   react-native-pager-view:
     :path: "../node_modules/react-native-pager-view"
   react-native-safe-area-context:
@@ -887,7 +880,6 @@ SPEC CHECKSUMS:
   React-jsinspector: 218a2503198ff28a085f8e16622a8d8f507c8019
   React-logger: f79dd3cc0f9b44f5611c6c7862badd891a862cf8
   react-native-config: 6502b1879f97ed5ac570a029961fc35ea606cd14
-  react-native-google-analytics-bridge: fac6becc9475cae635bff51382be089ea97bddda
   react-native-pager-view: b1914469643f40042e65d78cbf3d3dfebd6fb0d9
   react-native-safe-area-context: ebf8c413eb8b5f7c392a036a315eb7b46b96845f
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457

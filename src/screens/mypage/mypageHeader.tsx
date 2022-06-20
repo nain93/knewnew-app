@@ -6,10 +6,12 @@ import { d2p, h2p } from '~/utils';
 import { FONT } from '~/styles/fonts';
 import theme from '~/styles/theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useSetRecoilState } from 'recoil';
-import { okPopupState, tokenState } from '~/recoil/atoms';
-import { useQueryClient } from 'react-query';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { myIdState, okPopupState, tokenState } from '~/recoil/atoms';
+import { useQuery, useQueryClient } from 'react-query';
 import { isIphoneX } from 'react-native-iphone-x-helper';
+import { MyPrfoileType } from '~/types/user';
+import { getMyProfile } from '~/api/user';
 
 interface MypageHeaderProps {
   setOpenMore: (isOpen: boolean) => void
@@ -28,6 +30,8 @@ const MypageHeader = ({ setOpenMore }: MypageHeaderProps) => {
   const setToken = useSetRecoilState(tokenState);
   const setModalOpen = useSetRecoilState(okPopupState);
   const queryClient = useQueryClient();
+  const myId = useRecoilValue(myIdState);
+  const token = useRecoilValue(tokenState);
   const [profile, setProfile] = useState<ProfileType>(
     queryClient.getQueryData("myProfile") ||
     {
@@ -39,30 +43,47 @@ const MypageHeader = ({ setOpenMore }: MypageHeaderProps) => {
     }
   );
 
+  const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", myId], async () => {
+    const queryData = await getMyProfile(token);
+    return queryData;
+  }, {
+    enabled: !queryClient.getQueryData("myProfile"),
+    onSuccess: (data) => {
+      if (!profile.nickname) {
+        setProfile(data);
+      }
+    },
+  });
+
   useFocusEffect(
     useCallback(() => {
       const state: ProfileType | undefined = queryClient.getQueryData("myProfile");
       if (state) {
         setProfile(state);
       }
-    }, []));
-
+    }, [queryClient]));
 
   return (
     <View style={styles.clickBox}>
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate("editProfile",
-            {
-              profile:
+          if (!profile.nickname) {
+            getMyProfileQuery.refetch();
+            return;
+          }
+          else {
+            navigation.navigate("editProfile",
               {
-                nickname: profile.nickname,
-                occupation: profile.occupation,
-                profileImage: profile.profileImage,
-                tags: profile.tags,
-                representBadge: profile.representBadge
-              }
-            });
+                profile:
+                {
+                  nickname: profile.nickname,
+                  occupation: profile.occupation,
+                  profileImage: profile.profileImage,
+                  tags: profile.tags,
+                  representBadge: profile.representBadge
+                }
+              });
+          }
           setOpenMore(false);
         }
         }
