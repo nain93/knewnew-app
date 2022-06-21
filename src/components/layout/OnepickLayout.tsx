@@ -9,10 +9,11 @@ import { FONT } from '~/styles/fonts';
 
 interface OnepickLayoutProps {
   userBadge: BadgeType,
-  setUserBadge: (badge: BadgeType) => void;
+  setUserBadge: (badge: BadgeType) => void,
+  remainingPeriod?: number
 }
 
-const OnepickLayout = ({ userBadge, setUserBadge }: OnepickLayoutProps) => {
+const OnepickLayout = ({ userBadge, setUserBadge, remainingPeriod }: OnepickLayoutProps) => {
 
   return (
     <ScrollView
@@ -25,6 +26,10 @@ const OnepickLayout = ({ userBadge, setUserBadge }: OnepickLayoutProps) => {
           <Text style={FONT.Regular}>를 선택해주세요.</Text>
         </View>
         <Text style={[styles.badgeGuide, FONT.Regular]}>대표 뱃지는 저장 후 7일동안 다시 변경할 수 없습니다.</Text>
+        {(remainingPeriod && remainingPeriod > 0) &&
+          <Text style={[{ fontSize: 12, marginTop: 0, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
+            ({remainingPeriod}일 후에 수정 가능합니다)</Text>
+        }
       </View>
       <View style={{ flex: 1 }}>
         <View style={{ flexDirection: 'row' }}><Text style={[{ ...styles.menu, marginTop: 0 }, FONT.Regular]}>관심사 </Text>

@@ -34,10 +34,10 @@ export interface userNormalType {
   nickname: string,
   profileImage?: string
 }
-export interface MyPrfoileType {
+export interface MyProfileType {
   id: number,
   nickname: string,
-  occupation: string,
+  occupation?: string,
   profileImage: string,
   headline: string,
   representBadge: "빵식가" | "애주가" | "디저트러버" | "캠핑족" | "속편한식사" | "다이어터" | "비건" | "간편식" | "한끼식사",
@@ -46,6 +46,7 @@ export interface MyPrfoileType {
   created: string,
   reviewCount: number,
   bookmarkCount: number,
+  remainingPeriod: number
 }
 
 export interface UserInfoType {

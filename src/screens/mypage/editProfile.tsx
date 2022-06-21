@@ -33,19 +33,20 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 interface ProfileEditType {
   nickname: string,
-  occupation: string,
+  headline: string,
   profileImage: {
     fields: {
       key: string
     }
   } | null,
   tags: Array<string>,
-  representBadge: string
+  representBadge: string,
+  remainingPeriod?: number
 }
 
 interface ProfileType {
   nickname: string,
-  occupation: string,
+  headline: string,
   profileImage: string | null,
   tags: Array<string>,
   representBadge: string
@@ -63,10 +64,11 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
   const tagRefRBSheet = useRef<RBSheet>(null);
   const [profileInfo, setProfileInfo] = useState<ProfileEditType>({
     nickname: "",
-    occupation: "",
+    headline: "",
     profileImage: null,
     tags: [],
-    representBadge: ""
+    representBadge: "",
+    remainingPeriod: 0
   });
 
   const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
@@ -97,7 +99,6 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
       AsyncStorage.removeItem("token");
     }
   });
-
   const presignMutation = useMutation("presignImages",
     async (fileName: Array<string>) => preSiginedImages({ token, fileName, route: "user" }),
     {
@@ -116,14 +117,14 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
         editProfileMutation.mutate({
           profileImage: profile.includes("https") ? profile.split("com/")[1] : data[0].fields.key,
           nickname: profileInfo.nickname,
-          occupation: profileInfo.occupation,
+          headline: profileInfo.headline,
           representBadge: userBadge.interest.filter(v => v.masterBadge)[0]?.title || profileInfo.representBadge,
           tags: reduceTags
         });
         queryClient.setQueryData("myProfile", {
           profileImage: profile.includes("https") ? profile.split("com/")[1] : data[0].fields.key,
           nickname: profileInfo.nickname,
-          occupation: profileInfo.occupation,
+          headline: profileInfo.headline,
           representBadge: userBadge.interest.filter(v => v.masterBadge)[0]?.title || profileInfo.representBadge,
           tags: reduceTags
         });
@@ -161,7 +162,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
     if (route.params) {
       setProfileInfo({
         ...route.params?.profile,
-        occupation: route.params.profile.occupation || "",
+        headline: route.params.profile.headline || "",
         profileImage: route.params.profile.profileImage ? {
           fields: {
             key: "user" + route.params.profile.profileImage?.split("user")[1]
@@ -215,7 +216,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
             editProfileMutation.mutate({
               profileImage: null,
               nickname: profileInfo.nickname,
-              occupation: profileInfo.occupation,
+              headline: profileInfo.headline,
               representBadge: userBadge.interest.filter(v => v.masterBadge)[0]?.title || profileInfo.representBadge,
               tags: reduceTags
             });
@@ -287,20 +288,20 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
           <View style={{ flexDirection: "row", paddingHorizontal: d2p(20), marginBottom: d2p(10) }}>
             <Text style={[styles.inputTitle, FONT.Bold]}>자기소개</Text>
             <Text style={[styles.inputText, FONT.Regular,
-            { color: profileInfo.occupation.length >= 140 ? theme.color.main : theme.color.grayscale.d3d0d5 }]}>
-              {`(${profileInfo.occupation.length}/140자)`}</Text>
+            { color: profileInfo.headline.length >= 140 ? theme.color.main : theme.color.grayscale.d3d0d5 }]}>
+              {`(${profileInfo.headline.length}/140자)`}</Text>
           </View>
           <Pressable onPress={() => selfInputRef.current?.focus()} style={styles.textInput}>
             <TextInput
               multiline
               maxLength={141}
-              value={profileInfo.occupation}
+              value={profileInfo.headline}
               onChangeText={e => {
                 if (e.length > 140) {
-                  setProfileInfo({ ...profileInfo, occupation: e.slice(0, e.length - 1) });
+                  setProfileInfo({ ...profileInfo, headline: e.slice(0, e.length - 1) });
                 }
                 else {
-                  setProfileInfo({ ...profileInfo, occupation: e });
+                  setProfileInfo({ ...profileInfo, headline: e });
                 }
               }}
               ref={selfInputRef}
@@ -311,7 +312,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
                 fontSize: 16, padding: 0, paddingTop: 0, includeFontPadding: false,
               }]}
               placeholder="자기소개를 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
-            {!profileInfo.occupation &&
+            {!profileInfo.headline &&
               <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}> (선택)</Text>
             }
           </Pressable>
@@ -332,10 +333,10 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
             });
           }}
           style={{
-            marginTop: "auto",
-            marginLeft: "auto",
-            marginRight: d2p(20),
-            marginBottom: getBottomSpace() + h2p(25),
+            position: 'absolute',
+            right: d2p(20),
+            bottom: getBottomSpace() + h2p(25),
+
           }}
         >
           <Text style={[FONT.Bold,
@@ -380,6 +381,24 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
               setIsPopupOpen({ isOpen: true, content: "가족구성을 선택해주세요" });
               return;
             }
+            if (
+              (userBadge.interest.filter(v => v.masterBadge)[0].title !== route.params?.profile.representBadge) &&
+              profileInfo.remainingPeriod && profileInfo.remainingPeriod > 0 && isBadgeNext) {
+              setUserBadge({
+                ...userBadge,
+                interest: userBadge.interest.map(v => {
+                  if (route.params?.profile.representBadge === v.title) {
+                    return { ...v, masterBadge: true };
+                  }
+                  return { ...v, masterBadge: false };
+                })
+              });
+              setIsPopupOpen({
+                isOpen: true,
+                content: `대표뱃지는 ${profileInfo.remainingPeriod}일 후에 수정 가능합니다`
+              });
+              return;
+            }
             if (!isBadgeNext) {
               setIsBadgeNext(true);
             }
@@ -393,7 +412,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
           </TouchableOpacity>
         </View>
         {isBadgeNext ?
-          <OnepickLayout userBadge={userBadge} setUserBadge={(badge: BadgeType) => setUserBadge(badge)} />
+          <OnepickLayout remainingPeriod={profileInfo.remainingPeriod} userBadge={userBadge} setUserBadge={(badge: BadgeType) => setUserBadge(badge)} />
           :
           <>
             <View style={{ marginBottom: h2p(40), marginTop: h2p(20) }}>

@@ -244,11 +244,13 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                 borderRadius: 40,
                 height: d2p(40),
                 width: d2p(40),
-                borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec
               }}>
               <Image source={reviewDetailQuery.data?.author.profileImage ?
                 { uri: reviewDetailQuery.data?.author.profileImage } : noProfile}
-                style={{ width: d2p(40), height: d2p(40), borderRadius: 40 }}
+                style={{
+                  width: d2p(40), height: d2p(40), borderRadius: 40,
+                  borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec
+                }}
               />
             </TouchableOpacity>
             <View style={{
@@ -555,9 +557,10 @@ const styles = StyleSheet.create({
   commentImg: {
     width: d2p(30), height: d2p(30),
     borderRadius: 30,
+    borderColor: theme.color.grayscale.e9e7ec, borderWidth: 1,
+
   },
   commentProfileLine: {
-    borderRadius: 30, borderColor: theme.color.grayscale.e9e7ec, borderWidth: 1,
     width: d2p(30), height: d2p(30),
   },
   commentContainer: {

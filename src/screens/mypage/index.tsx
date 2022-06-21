@@ -6,7 +6,7 @@ import { myIdState, tokenState } from '~/recoil/atoms';
 import { getMyProfile, getUserBookmarkList, getUserProfile, getUserReviewList } from '~/api/user';
 import { useRecoilValue } from 'recoil';
 import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
-import { MyPrfoileType } from '~/types/user';
+import { MyProfileType } from '~/types/user';
 import { noProfile } from '~/assets/images';
 import Loading from '~/components/loading';
 import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
@@ -36,7 +36,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
   const bookmarkRef = useRef<FlatList>(null);
   const queryClient = useQueryClient();
 
-  const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", route.params?.id], async () => {
+  const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", route.params?.id], async () => {
     if (route.params?.id && (route.params.id !== myId)) {
       const queryData = await getUserProfile(token, route.params?.id);
       return queryData;
@@ -91,15 +91,15 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             paddingHorizontal: d2p(10), paddingVertical: h2p(3),
             borderRadius: 10, backgroundColor: theme.color.grayscale.f7f7fc, borderWidth: 1, borderColor: theme.color.grayscale.d2d0d5
           }}>
-            <Text style={[FONT.Medium, { fontSize: 10, fontWeight: '500' }]}>{getMyProfileQuery.data?.representBadge}</Text>
+            <Text style={[FONT.Medium, { fontSize: 10 }]}>{getMyProfileQuery.data?.representBadge}</Text>
           </View>
           <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>{getMyProfileQuery.data?.household}</Text>
         </View>
-        <View style={styles.occupation}>
+        <View style={styles.headline}>
           <Text style={[FONT.Medium, {
-            color: getMyProfileQuery.data?.occupation ? theme.color.black : theme.color.grayscale.a09ca4
+            color: getMyProfileQuery.data?.headline ? theme.color.black : theme.color.grayscale.a09ca4
           }]}>
-            {getMyProfileQuery.data?.occupation ? getMyProfileQuery.data?.occupation : "자기소개를 입력해주세요."}</Text>
+            {getMyProfileQuery.data?.headline ? getMyProfileQuery.data?.headline : "자기소개를 입력해주세요."}</Text>
         </View>
         <View style={{
           flexDirection: "row", flexWrap: "wrap",
@@ -270,7 +270,12 @@ const Mypage = ({ navigation, route }: MypageProps) => {
           <Tabs.FlatList
             ref={reviewRef}
             ListEmptyComponent={reviewEmpty}
-            onEndReached={() => userReviewListQuery.fetchNextPage()}
+            onEndReached={() => {
+              if (userReviewListQuery.data &&
+                userReviewListQuery.data.pages.flat().length > 19) {
+                userReviewListQuery.fetchNextPage();
+              }
+            }}
             onEndReachedThreshold={0.8}
             refreshing={userReviewListQuery.isLoading}
             onRefresh={() => {
@@ -288,7 +293,12 @@ const Mypage = ({ navigation, route }: MypageProps) => {
           <Tabs.FlatList
             ref={bookmarkRef}
             ListEmptyComponent={bookmarkEmpty}
-            onEndReached={() => userBookmarkListQuery.fetchNextPage()}
+            onEndReached={() => {
+              if (userBookmarkListQuery.data &&
+                userBookmarkListQuery.data?.pages.flat().length > 19) {
+                userBookmarkListQuery.fetchNextPage();
+              }
+            }}
             onEndReachedThreshold={0.8}
             refreshing={userBookmarkListQuery.isLoading}
             onRefresh={() => {
@@ -327,7 +337,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: h2p(30)
   },
-  occupation: {
+  headline: {
     width: Dimensions.get("window").width - d2p(40),
     borderWidth: 1,
     minHeight: h2p(40),
