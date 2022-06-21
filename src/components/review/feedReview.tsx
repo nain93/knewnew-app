@@ -12,11 +12,11 @@ import Highlighter from 'react-native-highlight-words';
 import { ReviewListType } from '~/types/review';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useRecoilValue } from 'recoil';
-import { myIdState, tokenState } from '~/recoil/atoms';
+import { tokenState } from '~/recoil/atoms';
 import { bookmarkReview, likeReview } from '~/api/review';
 import { FONT } from '~/styles/fonts';
 import { noProfile } from '~/assets/images';
-import { MyPrfoileType } from '~/types/user';
+import { MyProfileType } from '~/types/user';
 import { getMyProfile } from '~/api/user';
 import ReKnew from '~/components/review/reKnew';
 import More from '~/components/more';
@@ -40,124 +40,36 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
   const navigation = useNavigation<StackNavigationProp>();
   const [tags, setTags] = useState<Array<string>>([]);
   const token = useRecoilValue(tokenState);
-  const myId = useRecoilValue(myIdState);
   const queryClient = useQueryClient();
   const [isLike, setIsLike] = useState<boolean>(review.isLike);
   const [likeCount, setLikeCount] = useState(review.likeCount);
   const [isBookmarkState, setIsBookmarkState] = useState<boolean>(review.isBookmark);
   const [bookmarkCount, setBookmarkCount] = useState(review.bookmarkCount);
   const [apiBlock, setApiBlock] = useState(false);
+
   const bookmarkMutation = useMutation("bookmark",
     ({ id, isBookmark }: { id: number, isBookmark: boolean }) => bookmarkReview(token, id, isBookmark), {
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       queryClient.invalidateQueries("myProfile");
       queryClient.invalidateQueries("reviewList");
-
-      if (data.isBookmark) {
-        if (review.author.id === myId) {
-          queryClient.setQueriesData(["userBookmarkList"], (bookmark) => {
-            return {
-              //@ts-ignore
-              ...bookmark, pages: [{ ...review, isBookmark: true, bookmarkCount: review.bookmarkCount + 1 }, ...bookmark.pages.flat()]
-            };
-          });
-        }
-        queryClient.setQueriesData(["userReviewList"], (reviewList) => {
-          return {
-            //@ts-ignore
-            ...reviewList, pages: [reviewList.pages.flat().map(v => {
-              if (v.id === review.id) {
-                return { ...v, isBookmark: true, bookmarkCount: v.bookmarkCount + 1 };
-              }
-              return v;
-            })]
-          };
-        });
-      }
-      else {
-        if (review.author.id === myId) {
-          queryClient.setQueriesData(["userBookmarkList"], (bookmark) => {
-            //@ts-ignore
-            return { ...bookmark, pages: [bookmark.pages.flat().filter(v => v.id !== review.id)] };
-          });
-        }
-        queryClient.setQueriesData(["userReviewList"], (reviewList) => {
-          return {
-            //@ts-ignore
-            ...reviewList, pages: [reviewList.pages.flat().map(v => {
-              if (v.id === review.id) {
-                return { ...v, isBookmark: false, bookmarkCount: v.bookmarkCount - 1 };
-              }
-              return v;
-            })]
-          };
-        });
-      }
+      queryClient.invalidateQueries("userBookmarkList");
+      queryClient.invalidateQueries("userReviewList");
       setApiBlock(false);
     }
   });
 
   const likeReviewFeedMutation = useMutation('likeReviewFeed',
     ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state), {
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       queryClient.invalidateQueries("myProfile");
       queryClient.invalidateQueries("reviewList");
-
-      if (data.isLike) {
-        queryClient.setQueriesData(["userReviewList"], (reviewList) => {
-          return {
-            //@ts-ignore
-            ...reviewList, pages: [reviewList.pages.flat().map(v => {
-              if (v.id === review.id) {
-                return { ...v, isLike: true, likeCount: v.likeCount + 1 };
-              }
-              return v;
-            })]
-          };
-        });
-        //@ts-ignore
-        queryClient.setQueriesData(["userBookmarkList"], (reviewList) => {
-          return {
-            //@ts-ignore
-            ...reviewList, pages: [reviewList.pages.flat().map(v => {
-              if (v.id === review.id) {
-                return { ...v, isLike: true, likeCount: v.likeCount + 1 };
-              }
-              return v;
-            })]
-          };
-        });
-      }
-      else {
-        //@ts-ignore
-        queryClient.setQueriesData(["userReviewList"], (reviewList) => {
-          return {
-            //@ts-ignore
-            ...reviewList, pages: [reviewList.pages.flat().map(v => {
-              if (v.id === review.id) {
-                return { ...v, isLike: false, likeCount: v.likeCount - 1 };
-              }
-              return v;
-            })]
-          };
-        });
-        queryClient.setQueriesData(["userBookmarkList"], (reviewList) => {
-          return {
-            //@ts-ignore
-            ...reviewList, pages: [reviewList.pages.flat().map(v => {
-              if (v.id === review.id) {
-                return { ...v, isLike: false, likeCount: v.likeCount - 1 };
-              }
-              return v;
-            })]
-          };
-        });
-      }
+      queryClient.invalidateQueries("userBookmarkList");
+      queryClient.invalidateQueries("userReviewList");
       setApiBlock(false);
     }
   });
 
-  const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
+  const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", token], () => getMyProfile(token), {
     enabled: !!token
   });
 

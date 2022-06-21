@@ -58,8 +58,7 @@ const TabNavigator = () => {
           shadowRadius: 10,
           elevation: 24,
         },
-        tabBarLabel: "",
-        // headerShown: false
+        tabBarLabel: ""
       }}
       sceneContainerStyle={{
         backgroundColor: theme.color.white,

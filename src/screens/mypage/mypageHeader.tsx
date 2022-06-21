@@ -10,7 +10,7 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { myIdState, okPopupState, tokenState } from '~/recoil/atoms';
 import { useQuery, useQueryClient } from 'react-query';
 import { isIphoneX } from 'react-native-iphone-x-helper';
-import { MyPrfoileType } from '~/types/user';
+import { MyProfileType } from '~/types/user';
 import { getMyProfile } from '~/api/user';
 
 interface MypageHeaderProps {
@@ -20,9 +20,10 @@ interface MypageHeaderProps {
 interface ProfileType {
   nickname: string,
   profileImage: string | null,
-  occupation: string,
+  headline: string,
   representBadge: string,
-  tags: Array<string>
+  tags: Array<string>,
+  remainingPeriod: number
 }
 
 const MypageHeader = ({ setOpenMore }: MypageHeaderProps) => {
@@ -36,14 +37,15 @@ const MypageHeader = ({ setOpenMore }: MypageHeaderProps) => {
     queryClient.getQueryData("myProfile") ||
     {
       nickname: "",
-      occupation: "",
+      headline: "",
       profileImage: "",
       tags: [],
-      representBadge: ""
+      representBadge: "",
+      remainingPeriod: 0
     }
   );
 
-  const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", myId], async () => {
+  const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", myId], async () => {
     const queryData = await getMyProfile(token);
     return queryData;
   }, {
@@ -77,10 +79,11 @@ const MypageHeader = ({ setOpenMore }: MypageHeaderProps) => {
                 profile:
                 {
                   nickname: profile.nickname,
-                  occupation: profile.occupation,
+                  headline: profile.headline,
                   profileImage: profile.profileImage,
                   tags: profile.tags,
-                  representBadge: profile.representBadge
+                  representBadge: profile.representBadge,
+                  remainingPeriod: profile.remainingPeriod
                 }
               });
           }

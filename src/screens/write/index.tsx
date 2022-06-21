@@ -14,7 +14,7 @@ import SelectLayout from '~/components/selectLayout';
 import CloseIcon from '~/components/icon/closeIcon';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { okPopupState, popupState, tokenState } from '~/recoil/atoms';
+import { myIdState, okPopupState, popupState, tokenState } from '~/recoil/atoms';
 import { ReviewListType, WriteImagesType, WriteReviewType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
 import { NavigationStackProp } from 'react-navigation-stack';
@@ -27,7 +27,7 @@ import Loading from '~/components/loading';
 import { preSiginedImages, uploadImage } from '~/api';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { getMyProfile } from '~/api/user';
-import { MyPrfoileType } from '~/types/user';
+import { MyProfileType } from '~/types/user';
 
 const marketList: Array<"선택 안함" | "마켓컬리" | "쿠팡프레시" | "SSG" | "B마트" | "윙잇" | "쿠캣마켓"> =
   ["선택 안함", "마켓컬리", "쿠팡프레시", "SSG", "B마트", "윙잇", "쿠캣마켓"];
@@ -78,13 +78,14 @@ const Write = ({ navigation, route }: WriteProp) => {
   const [presignImg, setPresignImg] = useState<WriteImagesType[]>([]);
   const [blockSubmit, setBlockSubmit] = useState(false);
   const setModalOpen = useSetRecoilState(okPopupState);
+  const myId = useRecoilValue(myIdState);
   const [uploadBody, setUploadBody] = useState<{
     uri: string,
     name: string | undefined,
     type: string
   }[]>([]);
 
-  const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
+  const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", token], () => getMyProfile(token), {
     enabled: !!token
   });
 
@@ -92,6 +93,12 @@ const Write = ({ navigation, route }: WriteProp) => {
     (writeProps: WriteReviewType) => writeReview({ token, ...writeProps }), {
     onSuccess: (data) => {
       if (data) {
+        queryClient.invalidateQueries("userReviewList");
+        queryClient.setQueriesData("myProfile", (profileQuery: any) => {
+          return {
+            ...profileQuery, reviewCount: profileQuery.reviewCount + 1
+          };
+        });
         queryClient.setQueriesData("reviewList", (reviewQuery: any) => {
           if (reviewQuery && getMyProfileQuery.data) {
             return {
@@ -119,7 +126,7 @@ const Write = ({ navigation, route }: WriteProp) => {
           }
         });
         navigation.goBack();
-        navigation.navigate("FeedDetail", { id: data.id });
+        navigation.navigate("FeedDetail", { id: data.id, authorId: myId });
       }
     },
     onSettled: () => setBlockSubmit(false)
@@ -165,7 +172,7 @@ const Write = ({ navigation, route }: WriteProp) => {
           }
         });
         navigation.goBack();
-        navigation.navigate("FeedDetail", { id: data.id });
+        navigation.navigate("FeedDetail", { id: data.id, authorId: myId });
       }
     },
     onSettled: () => setBlockSubmit(false)
@@ -297,7 +304,7 @@ const Write = ({ navigation, route }: WriteProp) => {
   }, [route.params]);
 
   useEffect(() => {
-    Keyboard.addListener("keyboardDidShow", (e) => {
+    Keyboard.addListener("keyboardWillShow", (e) => {
       if (Platform.OS === "ios") {
         setKeyBoardHeight(e.endCoordinates.height);
       }
@@ -305,9 +312,9 @@ const Write = ({ navigation, route }: WriteProp) => {
         setKeyBoardHeight(0);
       }
     });
-    Keyboard.addListener("keyboardDidHide", (e) => {
+    Keyboard.addListener("keyboardWillHide", () => {
       if (Platform.OS === "ios") {
-        setKeyBoardHeight(e.endCoordinates.height);
+        setKeyBoardHeight(h2p(20));
       }
       else {
         setKeyBoardHeight(h2p(20));
@@ -405,7 +412,7 @@ const Write = ({ navigation, route }: WriteProp) => {
               paddingTop: h2p(15),
               paddingBottom: h2p(10),
               marginVertical: h2p(15),
-              borderRadius: 5,
+              borderRadius: 5
             }}>
               {route.params.review &&
                 (
@@ -441,12 +448,9 @@ const Write = ({ navigation, route }: WriteProp) => {
                 multiline
                 placeholder={`${route.params?.nickname}님은 어떻게 생각하세요?`}
                 placeholderTextColor={theme.color.grayscale.a09ca4}
-                style={[{ paddingTop: 0, fontSize: 16, color: theme.color.black }, FONT.Regular]} />
-              <Text style={[FONT.Regular, {
-                position: "absolute", right: d2p(10),
-                bottom: (route.params.type === "reKnewWrite" || route.params.type === "reknew") ? h2p(96) : 0,
-                color: writeData.content.length === 300 ? theme.color.main : theme.color.grayscale.a09ca4
-              }]}>{writeData.content.length}/300</Text>
+                style={[{
+                  paddingTop: 0, fontSize: 16, color: theme.color.black,
+                }, FONT.Regular]} />
             </Pressable>
           </View>
           :
@@ -470,10 +474,6 @@ const Write = ({ navigation, route }: WriteProp) => {
                 }}
                 style={[styles.textInput, FONT.Regular]}
                 placeholder="내용을 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
-              <Text style={[FONT.Regular, {
-                position: "absolute", right: 30, bottom: 30,
-                color: writeData.content.length === 300 ? theme.color.main : theme.color.grayscale.a09ca4
-              }]}>{writeData.content.length}/300</Text>
             </Pressable>
             <View style={styles.selectWrap}>
               <TouchableOpacity
@@ -504,36 +504,51 @@ const Write = ({ navigation, route }: WriteProp) => {
             </View>
           </>
         }
-        <View style={{
-          position: "absolute", flexDirection: "row", alignItems: "center",
-          bottom: isIphoneX() ? getBottomSpace() : h2p(30)
-        }}>
-          <Pressable onPress={pickImage} style={[styles.images, { marginLeft: d2p(20), marginRight: d2p(15) }]}>
-            <View style={{ alignItems: "center" }}>
-              <Image source={photo} style={{ width: d2p(20), height: h2p(20), marginTop: h2p(12) }} />
-              <Text style={[{ fontSize: 12, color: theme.color.grayscale.d3d0d5, marginVertical: h2p(8) }, FONT.Regular]}>{imageList.length}/5</Text>
-            </View>
-          </Pressable>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {React.Children.toArray(imageList.map((image, idx) => {
-              return (
-                <View style={[styles.images, { marginRight: (idx === imageList.length - 1) ? d2p(20) : d2p(5) }]}>
-                  <View style={{ alignItems: "center" }}>
-                    <Image source={{ uri: image }} style={{ width: d2p(96), height: h2p(64), borderRadius: 4 }} />
-                    <Pressable onPress={() => {
-                      setImageList(imageList.filter((_, filterIdx) => idx !== filterIdx));
-                      setUploadBody(uploadBody.filter((_, filterIdx) => idx !== filterIdx));
-                    }}
-                      style={{ position: "absolute", right: 0, top: 0 }}>
-                      <Image source={photoClose} style={{ width: d2p(16), height: h2p(16) }} />
-                    </Pressable>
-                  </View>
-                </View>
-              );
-            }))}
-          </ScrollView>
-        </View>
       </KeyboardAwareScrollView>
+      <View style={{
+        position: "absolute", flexDirection: "row", alignItems: "center",
+        bottom: 0,
+        paddingBottom: isIphoneX() ? getBottomSpace() : h2p(30),
+        paddingTop: h2p(20),
+        backgroundColor: theme.color.white
+      }}>
+        <Pressable onPress={pickImage} style={[styles.images, { marginLeft: d2p(20), marginRight: d2p(15) }]}>
+          <View style={{ alignItems: "center" }}>
+            <Image source={photo} style={{ width: d2p(20), height: h2p(20), marginTop: h2p(12) }} />
+            <Text style={[{ fontSize: 12, color: theme.color.grayscale.d3d0d5, marginVertical: h2p(8) }, FONT.Regular]}>{imageList.length}/5</Text>
+          </View>
+        </Pressable>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {React.Children.toArray(imageList.map((image, idx) => {
+            return (
+              <View style={[styles.images, { marginRight: (idx === imageList.length - 1) ? d2p(20) : d2p(5) }]}>
+                <View style={{ alignItems: "center" }}>
+                  <Image source={{ uri: image }} style={{ width: d2p(96), height: h2p(64), borderRadius: 4 }} />
+                  <Pressable onPress={() => {
+                    setImageList(imageList.filter((_, filterIdx) => idx !== filterIdx));
+                    setUploadBody(uploadBody.filter((_, filterIdx) => idx !== filterIdx));
+                  }}
+                    style={{ position: "absolute", right: 0, top: 0 }}>
+                    <Image source={photoClose} style={{ width: d2p(16), height: h2p(16) }} />
+                  </Pressable>
+                </View>
+              </View>
+            );
+          }))}
+        </ScrollView>
+        <View style={{
+          position: "absolute", right: d2p(10),
+          bottom: keyboardHeight > 100 ? keyboardHeight + h2p(20) :
+            (route.params?.type === "reKnewWrite" || route.params?.type === "reknew" ? h2p(94) : h2p(184)),
+          backgroundColor: "rgba(0,0,0,0.1)",
+          padding: d2p(5),
+          borderRadius: 5
+        }}>
+          <Text style={[FONT.Regular, {
+            color: writeData.content.length === 300 ? theme.color.main : theme.color.grayscale.a09ca4
+          }]}>{writeData.content.length}/300</Text>
+        </View>
+      </View>
 
       {/* 태그 선택 바텀시트 */}
       <RBSheet
@@ -596,7 +611,10 @@ const Write = ({ navigation, route }: WriteProp) => {
           }
         }}
       >
-        <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: d2p(30), paddingVertical: h2p(20) }}>
+        <View style={{
+          flexDirection: "row", justifyContent: "space-between",
+          paddingHorizontal: d2p(30), paddingVertical: h2p(20)
+        }}>
           <CloseIcon onPress={() => marketRefRBSheet.current?.close()}
             imageStyle={{ width: d2p(15), height: h2p(15) }} />
           <Text style={[{ fontSize: 16 }, FONT.Bold]}>판매처 선택</Text>
@@ -628,7 +646,7 @@ export default Write;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    minHeight: Dimensions.get("window").height - h2p(94)
   },
   textInput: {
     paddingHorizontal: d2p(20),

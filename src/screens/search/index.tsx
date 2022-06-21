@@ -143,8 +143,18 @@ const Search = ({ navigation }: SearchProps) => {
       />
       {isSearchMode ?
         <SearchTabView
-          reviewNext={() => searchListQuery.fetchNextPage()}
-          userNext={() => userListQuery.fetchNextPage()}
+          reviewNext={() => {
+            if (searchListQuery.data &&
+              searchListQuery.data.pages.flat().length > 19) {
+              searchListQuery.fetchNextPage();
+            }
+          }}
+          userNext={() => {
+            if (userListQuery.data &&
+              userListQuery.data.pages.flat().length > 19) {
+              userListQuery.fetchNextPage();
+            }
+          }}
           keyword={searchWords}
           userList={userListQuery.data?.pages.flat()}
           searchList={searchListQuery.data?.pages.flat()} />

@@ -13,7 +13,7 @@ import { tokenState } from '~/recoil/atoms';
 import { FONT } from '~/styles/fonts';
 import theme from '~/styles/theme';
 import { InterestType } from '~/types';
-import { MyPrfoileType } from '~/types/user';
+import { MyProfileType } from '~/types/user';
 import { d2p, h2p } from '~/utils';
 
 export interface NavigationType {
@@ -26,7 +26,7 @@ const Welcome = ({ navigation, route }: NavigationType) => {
   const [badge, setBadge] = useState<Array<string>>();
   const token = useRecoilValue(tokenState);
 
-  const { data, isLoading } = useQuery<MyPrfoileType, Error>(["myProfile", token], () => getMyProfile(token), {
+  const { data, isLoading } = useQuery<MyProfileType, Error>(["myProfile", token], () => getMyProfile(token), {
     enabled: !!token
   });
 

@@ -18,7 +18,7 @@ import { useRecoilState, useSetRecoilState } from 'recoil';
 import { myIdState, refreshState, tokenState } from '~/recoil/atoms';
 import Loading from '~/components/loading';
 import { getMyProfile } from '~/api/user';
-import { MyPrfoileType } from '~/types/user';
+import { MyProfileType } from '~/types/user';
 import { ReviewListType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
 import { initialBadgeData } from '~/utils/data';
@@ -61,7 +61,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const [refresh, setRefresh] = useRecoilState(refreshState);
   const flatListRef = useRef<FlatList>(null);
 
-  const getMyProfileQuery = useQuery<MyPrfoileType, Error>(["myProfile", token, filterBadge], () => getMyProfile(token), {
+  const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", token, filterBadge], () => getMyProfile(token), {
     enabled: !!token,
     onSuccess: (data) => {
       if (data) {
@@ -204,7 +204,12 @@ const Feed = ({ navigation, route }: FeedProps) => {
       <View>
         <FlatList
           ref={flatListRef}
-          onEndReached={() => reviewListQuery.fetchNextPage()}
+          onEndReached={() => {
+            if (reviewListQuery.data &&
+              reviewListQuery.data.pages.flat().length > 19) {
+              reviewListQuery.fetchNextPage();
+            }
+          }}
           onEndReachedThreshold={0.8}
           refreshing={reviewListQuery.isLoading}
           onRefresh={reviewListQuery.refetch}

@@ -30,7 +30,7 @@ interface EditPrfoileType {
   profile: {
     nickname: string,
     profileImage: string | null,
-    occupation: string,
+    headline: string,
     representBadge: string,
     tags: Array<string>
   }
