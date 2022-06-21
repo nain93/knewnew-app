@@ -76,7 +76,7 @@ const More = ({ setSelectedIndex, isGobacK, handleCloseMore, userId, isMoreClick
     if (type === "review") {
       queryClient.setQueriesData("myProfile", (profileQuery: any) => {
         return {
-          ...profileQuery, reviewCount: profileQuery.reviewCount - 1
+          ...profileQuery, reviewCount: profileQuery?.reviewCount > 0 && profileQuery?.reviewCount - 1
         };
       });
       queryClient.setQueriesData("reviewList", (data) => {

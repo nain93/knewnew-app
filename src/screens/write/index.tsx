@@ -96,7 +96,7 @@ const Write = ({ navigation, route }: WriteProp) => {
         queryClient.invalidateQueries("userReviewList");
         queryClient.setQueriesData("myProfile", (profileQuery: any) => {
           return {
-            ...profileQuery, reviewCount: profileQuery.reviewCount + 1
+            ...profileQuery, reviewCount: profileQuery?.reviewCount + 1
           };
         });
         queryClient.setQueriesData("reviewList", (reviewQuery: any) => {
@@ -678,7 +678,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     marginTop: "auto",
-    marginBottom: (!isIphoneX() && Platform.OS === "ios") ? h2p(114) : h2p(94)
+    marginBottom: Platform.OS === "ios" ? h2p(114) : h2p(94)
   },
   select: {
     flexDirection: "row",

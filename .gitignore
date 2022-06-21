@@ -112,6 +112,7 @@ gradle-app.setting
 
 # Avoid ignore Gradle wrappper properties
 !gradle-wrapper.properties
+gradle.properties
 
 # Cache of project
 .gradletasknamecache
@@ -224,6 +225,9 @@ web_modules/
 
 # dotenv environment variable files
 .env
+.env.develop
+.env.product
+.env.stage
 .env.development.local
 .env.test.local
 .env.production.local
