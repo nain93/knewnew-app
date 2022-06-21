@@ -148,7 +148,6 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             alignSelf: "center",
             top: h2p(-90)
           }}>
-            <Text>zdfjadhgkadjghadkjgadkjghadkjghadkj</Text>
             <Loading />
           </View>
         );
