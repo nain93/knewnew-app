@@ -304,23 +304,28 @@ const Write = ({ navigation, route }: WriteProp) => {
   }, [route.params]);
 
   useEffect(() => {
-    Keyboard.addListener("keyboardWillShow", (e) => {
-      if (Platform.OS === "ios") {
+    if (Platform.OS === "ios") {
+      Keyboard.addListener("keyboardWillShow", (e) => {
         setKeyBoardHeight(e.endCoordinates.height);
-      }
-      else {
-        setKeyBoardHeight(0);
-      }
-    });
-    Keyboard.addListener("keyboardWillHide", () => {
-      if (Platform.OS === "ios") {
+      });
+      Keyboard.addListener("keyboardWillHide", () => {
         setKeyBoardHeight(h2p(20));
-      }
-      else {
+      });
+    }
+    else {
+      Keyboard.addListener("keyboardDidShow", (e) => {
+        if ((route.params?.type === "reKnewWrite" || route.params?.type === "reknew")) {
+          setKeyBoardHeight(e.endCoordinates.height - 50);
+        }
+        else {
+          setKeyBoardHeight(e.endCoordinates.height);
+        }
+      });
+      Keyboard.addListener("keyboardDidHide", () => {
         setKeyBoardHeight(h2p(20));
-      }
-    });
-  }, []);
+      });
+    }
+  }, [route.params?.type]);
 
   if ((route.params?.loading && !writeData.satisfaction) || addReviewMutation.isLoading || editReviewMutation.isLoading) {
     return (
@@ -430,7 +435,9 @@ const Write = ({ navigation, route }: WriteProp) => {
               }
             </View>
             <Pressable onPress={() => inputRef.current?.focus()}
-              style={{ height: h2p(290) }}
+              style={{
+                height: h2p(290)
+              }}
             >
               <TextInput
                 value={writeData.content}
@@ -446,10 +453,11 @@ const Write = ({ navigation, route }: WriteProp) => {
                 autoCapitalize="none"
                 ref={inputRef}
                 multiline
+                // onContentSizeChange={e => setNumberLine(Math.round(e.nativeEvent.contentSize.height / 20))}
                 placeholder={`${route.params?.nickname}님은 어떻게 생각하세요?`}
                 placeholderTextColor={theme.color.grayscale.a09ca4}
                 style={[{
-                  paddingTop: 0, fontSize: 16, color: theme.color.black,
+                  paddingTop: 0, padding: 0, fontSize: 16, color: theme.color.black,
                 }, FONT.Regular]} />
             </Pressable>
           </View>
@@ -536,18 +544,18 @@ const Write = ({ navigation, route }: WriteProp) => {
             );
           }))}
         </ScrollView>
-        <View style={{
-          position: "absolute", right: d2p(10),
-          bottom: keyboardHeight > 100 ? keyboardHeight + h2p(20) :
-            (route.params?.type === "reKnewWrite" || route.params?.type === "reknew" ? h2p(94) : h2p(184)),
-          backgroundColor: "rgba(0,0,0,0.1)",
-          padding: d2p(5),
-          borderRadius: 5
-        }}>
-          <Text style={[FONT.Regular, {
-            color: writeData.content.length === 300 ? theme.color.main : theme.color.grayscale.a09ca4
-          }]}>{writeData.content.length}/300</Text>
-        </View>
+      </View>
+      <View style={{
+        position: "absolute", right: d2p(10),
+        bottom: keyboardHeight > 100 ? keyboardHeight + h2p(20) :
+          ((route.params?.type === "reKnewWrite" || route.params?.type === "reknew") ? h2p(94) : h2p(184)),
+        backgroundColor: "rgba(0,0,0,0.1)",
+        padding: d2p(5),
+        borderRadius: 5
+      }}>
+        <Text style={[FONT.Regular, {
+          color: writeData.content.length === 300 ? theme.color.main : theme.color.grayscale.a09ca4
+        }]}>{writeData.content.length}/300</Text>
       </View>
 
       {/* 태그 선택 바텀시트 */}
@@ -670,7 +678,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     marginTop: "auto",
-    marginBottom: h2p(114)
+    marginBottom: (!isIphoneX() && Platform.OS === "ios") ? h2p(114) : h2p(94)
   },
   select: {
     flexDirection: "row",
