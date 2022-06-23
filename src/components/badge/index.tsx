@@ -58,7 +58,7 @@ const Badge = ({ layoutType = "normal", text, type, badge, isClick, idx, userBad
             }
           }} style={[styles.tag, !isClick ? styles.basic : styles.checked, viewStyle]}>
           {isClick && <Image source={colorCheck} resizeMode="contain" style={{ width: d2p(10), height: d2p(8), marginRight: d2p(5) }} />}
-          <Text style={[styles.text, !isClick ? styles.blackText : styles.colorText, FONT.Medium]}>{text}</Text>
+          <Text style={[!isClick ? styles.blackText : styles.colorText, FONT.Medium]}>{text}</Text>
         </TouchableOpacity>
       );
     case 'unabled':
@@ -99,9 +99,6 @@ const styles = StyleSheet.create({
     paddingRight: d2p(15),
     paddingLeft: d2p(10)
   },
-  text: {
-    fontWeight: '500'
-  },
   blackText: {
     color: theme.color.black,
   },
@@ -126,6 +123,6 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   badgeText: {
-    fontSize: 10, color: theme.color.grayscale.C_443e49, fontWeight: "500"
+    fontSize: 10, color: theme.color.grayscale.C_443e49
   }
 });

@@ -15,7 +15,7 @@ import CloseIcon from '~/components/icon/closeIcon';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { myIdState, okPopupState, popupState, tokenState } from '~/recoil/atoms';
-import { ReviewListType, WriteImagesType, WriteReviewType } from '~/types/review';
+import { MarketType, ReviewListType, WriteImagesType, WriteReviewType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
@@ -28,9 +28,7 @@ import { preSiginedImages, uploadImage } from '~/api';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { getMyProfile } from '~/api/user';
 import { MyProfileType } from '~/types/user';
-
-const marketList: Array<"선택 안함" | "마켓컬리" | "쿠팡프레시" | "SSG" | "B마트" | "윙잇" | "쿠캣마켓"> =
-  ["선택 안함", "마켓컬리", "쿠팡프레시", "SSG", "B마트", "윙잇", "쿠캣마켓"];
+import { marketList } from '~/utils/constant';
 
 interface WriteProp {
   navigation: NavigationStackProp;
@@ -58,7 +56,7 @@ const Write = ({ navigation, route }: WriteProp) => {
     images: [],
     content: "",
     satisfaction: "",
-    market: "선택 안함",
+    market: MarketType["판매처 선택"],
     parent: parentId,
     tags: {
       interest: [],
@@ -66,6 +64,7 @@ const Write = ({ navigation, route }: WriteProp) => {
       taste: []
     }
   });
+
   const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
   const inputRef = useRef<TextInput>(null);
   const tagRefRBSheet = useRef<RBSheet>(null);
@@ -120,7 +119,10 @@ const Write = ({ navigation, route }: WriteProp) => {
                 commentCount: 0,
                 created: new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString(),
                 id: data.id,
-                images: presignImg.map(img => ({ ...img, image: "https://knewnnew-s3.s3.amazonaws.com/" + img.image }))
+                images: presignImg.length > 0 ?
+                  presignImg.map(img => ({ ...img, image: "https://knewnnew-s3.s3.amazonaws.com/" + img.image }))
+                  :
+                  writeData.images?.map(img => ({ ...img, image: "https://knewnnew-s3.s3.amazonaws.com/" + img.image }))
               }, ...reviewQuery.pages.flat()]]
             };
           }
@@ -163,7 +165,10 @@ const Write = ({ navigation, route }: WriteProp) => {
                         :
                         null,
                     market: (writeData.market === "판매처 선택" || writeData.market === "선택 안함") ? undefined : writeData.market,
-                    images: presignImg.map(img => ({ ...img, image: "https://knewnnew-s3.s3.amazonaws.com/" + img.image }))
+                    images: presignImg.length > 0 ?
+                      presignImg.map(img => ({ ...img, image: "https://knewnnew-s3.s3.amazonaws.com/" + img.image }))
+                      :
+                      writeData.images?.map(img => ({ ...img, image: "https://knewnnew-s3.s3.amazonaws.com/" + img.image }))
                   };
                 }
                 return v;
@@ -244,12 +249,27 @@ const Write = ({ navigation, route }: WriteProp) => {
       }
     }
     setBlockSubmit(true);
-    presignMutation.mutate(imageList);
+    // * 이미지 업로드할때
+    if (uploadBody.length > 0) {
+      presignMutation.mutate(imageList);
+    }
+    else {
+      // * 수정할때 (이미지 업로드x)
+      if (route.params?.isEdit && route.params.review?.id) {
+        editReviewMutation.mutate({
+          writeProps:
+            { ...writeData, parent: route.params.review.parent?.isActive ? writeData.parent : undefined },
+          id: route.params.review?.id
+        });
+      }
+      else {
+        addReviewMutation.mutate(writeData);
+      }
+    }
   };
 
   useEffect(() => {
     if (route.params?.review && route.params.type !== "reKnewWrite") {
-
       setImageList(route.params.review.images.map(v => v.image));
       setUserBadge({
         interest: userBadge.interest.map(v => {
@@ -277,7 +297,7 @@ const Write = ({ navigation, route }: WriteProp) => {
         images: route.params.review.images.map(v => ({ ...v, image: "review" + v.image?.split("review")[1] })),
         content: route.params.review.content,
         satisfaction: route.params.review.satisfaction,
-        market: route.params.review.market ? route.params.review.market : "선택 안함",
+        market: route.params.review.market ? route.params.review.market : MarketType['선택 안함'],
         tags: {
           ...route.params.review.tags,
           taste: route.params.review.tags.taste || []
@@ -292,7 +312,7 @@ const Write = ({ navigation, route }: WriteProp) => {
         images: [],
         content: "",
         satisfaction: "",
-        market: "판매처 선택",
+        market: MarketType['판매처 선택'],
         parent: parentId,
         tags: {
           interest: [],
@@ -354,7 +374,7 @@ const Write = ({ navigation, route }: WriteProp) => {
                   images: [],
                   content: "",
                   satisfaction: "",
-                  market: "선택 안함",
+                  market: MarketType['판매처 선택'],
                   parent: parentId,
                   tags: {
                     interest: [],
@@ -520,19 +540,24 @@ const Write = ({ navigation, route }: WriteProp) => {
         paddingTop: h2p(20),
         backgroundColor: theme.color.white
       }}>
-        <Pressable onPress={pickImage} style={[styles.images, { marginLeft: d2p(20), marginRight: d2p(15) }]}>
-          <View style={{ alignItems: "center" }}>
-            <Image source={photo} style={{ width: d2p(20), height: h2p(20), marginTop: h2p(12) }} />
-            <Text style={[{ fontSize: 12, color: theme.color.grayscale.d3d0d5, marginVertical: h2p(8) }, FONT.Regular]}>{imageList.length}/5</Text>
-          </View>
-        </Pressable>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        {(!route.params?.isEdit || !route.params.review?.id) &&
+          <Pressable onPress={pickImage} style={[styles.images, { marginLeft: d2p(20), marginRight: d2p(15) }]}>
+            <View style={{ alignItems: "center" }}>
+              <Image source={photo} style={{ width: d2p(20), height: h2p(20), marginTop: h2p(12) }} />
+              <Text style={[{ fontSize: 12, color: theme.color.grayscale.d3d0d5, marginVertical: h2p(8) }, FONT.Regular]}>{imageList.length}/5</Text>
+            </View>
+          </Pressable>
+        }
+        <ScrollView
+          style={{ paddingLeft: (!route.params?.isEdit || !route.params.review?.id) ? 0 : d2p(20) }}
+          horizontal showsHorizontalScrollIndicator={false}>
           {React.Children.toArray(imageList.map((image, idx) => {
             return (
               <View style={[styles.images, { marginRight: (idx === imageList.length - 1) ? d2p(20) : d2p(5) }]}>
                 <View style={{ alignItems: "center" }}>
                   <Image source={{ uri: image }} style={{ width: d2p(96), height: h2p(64), borderRadius: 4 }} />
                   <Pressable onPress={() => {
+                    setWriteData({ ...writeData, images: writeData.images?.filter((_, filterIdx) => idx !== filterIdx) });
                     setImageList(imageList.filter((_, filterIdx) => idx !== filterIdx));
                     setUploadBody(uploadBody.filter((_, filterIdx) => idx !== filterIdx));
                   }}
@@ -641,7 +666,7 @@ const Write = ({ navigation, route }: WriteProp) => {
                 paddingVertical: h2p(12.5), paddingHorizontal: d2p(10),
                 borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc
               }}>
-              <Text style={[{ fontWeight: "500" }, FONT.Medium]}>{market}</Text>
+              <Text style={FONT.Medium}>{market}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>

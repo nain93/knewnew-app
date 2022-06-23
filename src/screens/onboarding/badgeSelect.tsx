@@ -86,8 +86,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: d2p(20)
   },
   title: {
-    fontSize: 26,
-    fontWeight: '600',
+    fontSize: 26
   },
   select: {
     borderWidth: 1, borderColor: theme.color.grayscale.eae7ec,

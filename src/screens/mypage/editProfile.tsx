@@ -462,11 +462,6 @@ const styles = StyleSheet.create({
     flexDirection: "row", alignItems: "center", borderWidth: 1,
     borderColor: theme.color.grayscale.eae7ec
   },
-  title: {
-    color: theme.color.black,
-    fontSize: 26,
-    fontWeight: '600',
-  },
   badgeGuide: {
     color: theme.color.main,
     marginTop: h2p(20),

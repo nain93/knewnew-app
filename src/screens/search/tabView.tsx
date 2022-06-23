@@ -20,10 +20,14 @@ interface SearchTabViewProps {
   userList?: userNormalType[],
   keyword: string,
   reviewNext: () => void,
-  userNext: () => void
+  userNext: () => void,
+  searchCount: {
+    reviewCount: number,
+    userCount: number
+  }
 }
 
-const SearchTabView = ({ searchList, userList, keyword, reviewNext, userNext }: SearchTabViewProps) => {
+const SearchTabView = ({ searchCount, searchList, userList, keyword, reviewNext, userNext }: SearchTabViewProps) => {
   const navigation = useNavigation<StackNavigationProp>();
   const [index, setIndex] = useState(0);
   const [routes] = useState([
@@ -48,7 +52,7 @@ const SearchTabView = ({ searchList, userList, keyword, reviewNext, userNext }: 
           case "menu":
             return (
               <View style={styles.container}>
-                <Text style={[styles.searchResult, FONT.Regular]}>검색결과 · {searchList.length}건</Text>
+                <Text style={[styles.searchResult, FONT.Regular]}>검색결과 · {searchCount.reviewCount}건</Text>
                 <FlatList
                   onEndReached={reviewNext}
                   onEndReachedThreshold={0.8}
@@ -86,7 +90,7 @@ const SearchTabView = ({ searchList, userList, keyword, reviewNext, userNext }: 
           case "user":
             return (
               <View style={styles.container}>
-                <Text style={[styles.searchResult, { marginBottom: h2p(30) }, FONT.Regular]}>검색결과 · {userList.length}건</Text>
+                <Text style={[styles.searchResult, { marginBottom: h2p(30) }, FONT.Regular]}>검색결과 · {searchCount.userCount}건</Text>
                 <FlatList
                   onEndReached={userNext}
                   onEndReachedThreshold={0.8}

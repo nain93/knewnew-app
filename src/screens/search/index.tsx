@@ -1,5 +1,5 @@
 import { Dimensions, Image, StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import CloseIcon from '~/components/icon/closeIcon';
@@ -8,7 +8,6 @@ import { mainSearchIcon, searchIcon } from '~/assets/icons';
 import theme from '~/styles/theme';
 import { d2p, h2p } from '~/utils';
 
-import { useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { NavigationRoute } from 'react-navigation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -32,12 +31,17 @@ const Search = ({ navigation }: SearchProps) => {
   const [keyword, setKeyword] = useState("");
   const [searchWords, setSearchWords] = useState("");
   const [recentKeywords, setRecentKeyWords] = useState<Array<string>>([]);
+  const [searchCount, setSearchCount] = useState({
+    reviewCount: 0,
+    userCount: 0
+  });
 
   const token = useRecoilValue(tokenState);
 
   const searchListQuery = useInfiniteQuery<ReviewListType[], Error>(["searchList", token, textForRefresh], async ({ pageParam = 0 }) => {
-    const queryData = await getSearchList({ token, keyword, offset: pageParam });
-    return queryData;
+    const queryData: { list: ReviewListType[], searchCount: number } = await getSearchList({ token, keyword, offset: pageParam });
+    setSearchCount({ ...searchCount, reviewCount: queryData.searchCount });
+    return queryData.list;
   }, {
     enabled: !!textForRefresh,
     getNextPageParam: (next, all) => all.flat().length,
@@ -45,8 +49,9 @@ const Search = ({ navigation }: SearchProps) => {
   });
 
   const userListQuery = useInfiniteQuery<userNormalType[], Error>(["userList", token, textForRefresh], async ({ pageParam = 0 }) => {
-    const queryData = await getSearchUserList({ token, nickname: keyword, offset: pageParam });
-    return queryData;
+    const queryData: { list: userNormalType[], searchCount: number } = await getSearchUserList({ token, nickname: keyword, offset: pageParam });
+    setSearchCount({ ...searchCount, userCount: queryData.searchCount });
+    return queryData.list;
   }, {
     enabled: !!textForRefresh,
     getNextPageParam: (next, all) => all.flat().length,
@@ -157,7 +162,9 @@ const Search = ({ navigation }: SearchProps) => {
           }}
           keyword={searchWords}
           userList={userListQuery.data?.pages.flat()}
-          searchList={searchListQuery.data?.pages.flat()} />
+          searchList={searchListQuery.data?.pages.flat()}
+          searchCount={searchCount}
+        />
         :
         <View style={styles.container}>
           <Text style={[{ fontSize: 12, color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>최근 검색어</Text>
