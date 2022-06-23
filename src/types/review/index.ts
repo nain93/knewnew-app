@@ -5,6 +5,18 @@ export interface WriteImagesType {
   priority: number,
   image: string,
 }
+
+export enum MarketType {
+  "선택 안함" = "선택 안함",
+  "마켓컬리" = "마켓컬리",
+  "쿠팡프레시" = "쿠팡프레시",
+  "SSG" = "SSG",
+  "B마트" = "B마트",
+  "윙잇" = "윙잇",
+  "쿠캣마켓" = "쿠캣마켓",
+  "판매처 선택" = "판매처 선택"
+}
+
 export interface WriteReviewType {
   images?: Array<WriteImagesType>,
   content: string,
@@ -13,7 +25,7 @@ export interface WriteReviewType {
   parent?: number,
   parentReview?: ReviewParentType,
   cart?: number,
-  market: "선택 안함" | "마켓컬리" | "쿠팡프레시" | "SSG" | "B마트" | "윙잇" | "쿠캣마켓" | "판매처 선택",
+  market: MarketType,
   tags: {
     interest: Array<string>,
     household: Array<string>,
@@ -32,7 +44,7 @@ export interface ReviewParentType {
   isActive: boolean
   id: number,
   images: Array<WriteImagesType>,
-  market: "선택 안함" | "마켓컬리" | "쿠팡프레시" | "SSG" | "B마트" | "윙잇" | "쿠캣마켓",
+  market: MarketType,
   product: string | null,
   satisfaction: "best" | "good" | "bad",
   tags: {
@@ -56,7 +68,7 @@ export interface ReviewListType {
   dislikeCount: number,
   images: Array<WriteImagesType>,
   likeCount: number,
-  market: "선택 안함" | "마켓컬리" | "쿠팡프레시" | "SSG" | "B마트" | "윙잇" | "쿠캣마켓",
+  market: MarketType,
   parent?: ReviewParentType,
   product: string | null,
   satisfaction: "best" | "good" | "bad",

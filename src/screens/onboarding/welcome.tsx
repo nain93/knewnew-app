@@ -69,7 +69,7 @@ const Welcome = ({ navigation, route }: NavigationType) => {
           borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
           paddingHorizontal: d2p(15), paddingVertical: h2p(5), height: h2p(28), borderRadius: 14
         }}>
-          <Text style={[{ color: theme.color.black, fontWeight: "500" }, FONT.Medium]}>{masterBadge}</Text>
+          <Text style={[{ color: theme.color.black }, FONT.Medium]}>{masterBadge}</Text>
         </View>
         <View style={{ flexDirection: "row" }}>
           {React.Children.toArray(badge?.map(v => <Text style={[styles.tag, FONT.SemiBold]}>#{v} </Text>))}
@@ -93,12 +93,11 @@ const styles = StyleSheet.create({
     flexWrap: "wrap"
   },
   mainText: {
-    fontSize: 26,
-    fontWeight: '600',
+    fontSize: 26
   },
   tag: {
     color: theme.color.main,
-    fontSize: 16, fontWeight: "600"
+    fontSize: 16
   },
   subText: {
     color: theme.color.grayscale.C_79737e,

@@ -41,8 +41,8 @@ const OnepickLayout = ({ userBadge, setUserBadge, remainingPeriod }: OnepickLayo
               return (
                 <View
                   style={[styles.tag, { borderColor: theme.color.main }]}>
-                  <Image source={colorCheck} resizeMode="contain" style={{ width: 10, height: 8, marginRight: 5 }} />
-                  <Text style={{ color: theme.color.main, fontWeight: "500" }}>{item.title}</Text>
+                  <Image source={colorCheck} resizeMode="contain" style={{ width: d2p(10), height: d2p(8), marginRight: d2p(5) }} />
+                  <Text style={[FONT.Medium, { color: theme.color.main }]}>{item.title}</Text>
                 </View>
               );
             }
@@ -62,7 +62,7 @@ const OnepickLayout = ({ userBadge, setUserBadge, remainingPeriod }: OnepickLayo
                       })
                     });
                   }}>
-                  <Text style={{ color: theme.color.black, fontWeight: "500" }}>{item.title}</Text>
+                  <Text style={[FONT.Medium, { color: theme.color.black }]}>{item.title}</Text>
                 </TouchableOpacity>
               );
             }
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     marginBottom: h2p(5)
   },
   guide: {
-    marginLeft: 15,
+    marginLeft: d2p(15),
     color: theme.color.grayscale.a09ca4,
     fontSize: 12
   },

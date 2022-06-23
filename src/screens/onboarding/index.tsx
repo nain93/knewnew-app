@@ -171,7 +171,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
   return (
     <View style={styles.container}>
       <View style={{ marginBottom: "auto" }}>
-        <Text style={[{ fontSize: 20, fontWeight: "600", textAlign: "center" }, FONT.SemiBold]}>
+        <Text style={[{ fontSize: 20, textAlign: "center" }, FONT.SemiBold]}>
           제대로 된 맛있는 발견</Text>
         <Image source={mainLogo} style={styles.logo} />
       </View>

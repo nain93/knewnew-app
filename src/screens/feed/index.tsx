@@ -277,7 +277,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
             justifyContent: "space-between",
             alignItems: "center", marginBottom: h2p(40)
           }}>
-          <Text style={[{ color: theme.color.grayscale.C_79737e, fontWeight: "500" }, FONT.Medium]}>
+          <Text style={[{ color: theme.color.grayscale.C_79737e }, FONT.Medium]}>
             보고싶은 태그를 하나만 선택해주세요
           </Text>
           <TouchableOpacity
@@ -359,6 +359,6 @@ const styles = StyleSheet.create({
   },
   tagBtn: {
     color: theme.color.white,
-    fontSize: 12, fontWeight: '500'
+    fontSize: 12
   }
 });
