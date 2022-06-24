@@ -1,4 +1,4 @@
-import { View, Text, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView, Keyboard, FlatList } from 'react-native';
+import { View, Text, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView, Keyboard, FlatList, Button, BackHandler } from 'react-native';
 import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
@@ -8,7 +8,7 @@ import ReviewIcon from '~/components/icon/reviewIcon';
 import Badge from '~/components/badge';
 import ReactionIcon from '~/components/icon/reactionIcon';
 import { commentMore, more, tag } from '~/assets/icons';
-import { getBottomSpace } from 'react-native-iphone-x-helper';
+import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { myIdState, okPopupState, popupState, refreshState, tokenState } from '~/recoil/atoms';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
@@ -25,6 +25,12 @@ import { addReviewComment, deleteReviewComment, editReviewComment, getReviewComm
 import ReKnew from '~/components/review/reKnew';
 import More from '~/components/more';
 import { hitslop } from '~/utils/constant';
+import { CacheManager, CachedImage } from '@georstat/react-native-image-cache';
+import { Dirs } from 'react-native-file-access';
+import {
+  ImageGallery,
+  ImageObject,
+} from '@georstat/react-native-image-gallery';
 import axios from 'axios';
 interface FeedDetailProps {
   navigation: NavigationStackProp
@@ -48,6 +54,14 @@ interface CommentListType {
   likeCount: string;
 }
 
+CacheManager.config = {
+  baseDir: `${Dirs.CacheDir}/images_cache/`,
+  blurRadius: 15,
+  sourceAnimationDuration: 1000,
+  thumbnailAnimationDuration: 1000,
+  cacheLimit: 0
+};
+
 const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [inputHeight, setInputHeight] = useState(getBottomSpace());
   const token = useRecoilValue(tokenState);
@@ -69,6 +83,14 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const setRefresh = useSetRecoilState(refreshState);
   const setModalOpen = useSetRecoilState(okPopupState);
   const setIspopupOpen = useSetRecoilState(popupState);
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [initialIndex, setInitialIndex] = useState(0);
+  const openGallery = (idx: number) => {
+    setIsOpen(true);
+    setInitialIndex(idx);
+  };
+  const closeGallery = () => setIsOpen(false);
 
   const reviewDetailQuery = useQuery<ReviewListType, Error>(["reviewDetail", token, route.params?.id],
     async () => {
@@ -154,18 +176,72 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   };
 
   const imageKey = useCallback((v) => String(v.id), []);
+
+  const renderCustomImage = (image: ImageObject, currentIndex: number) => {
+    return (
+      <Pressable
+        onPress={closeGallery}
+        style={{
+          alignItems: 'center',
+          borderRadius: 11,
+          height: '100%',
+          justifyContent: 'center',
+          paddingHorizontal: d2p(24),
+          width: '100%',
+        }}>
+        <CachedImage
+          resizeMode="cover"
+          source={image.url}
+          style={{
+            borderWidth: 1,
+            borderColor: theme.color.grayscale.e9e7ec,
+            overflow: 'hidden',
+            aspectRatio: 1,
+            width: Dimensions.get("window").width - d2p(30),
+          }}
+          thumbnailSource={image.thumbUrl}
+        />
+      </Pressable>
+    );
+  };
+
+  const renderHeaderComponent = () => {
+    return (
+      <View
+        style={{
+          paddingHorizontal: d2p(20),
+          marginTop: isIphoneX() ? getStatusBarHeight() : 0,
+          paddingVertical: h2p(20),
+        }}>
+        <LeftArrowIcon
+          onBackClick={closeGallery}
+          imageStyle={{ width: d2p(11), height: d2p(25), tintColor: theme.color.white }}
+        />
+      </View>
+    );
+  };
+
   const imageRenderItem = useCallback((image) =>
-    <FastImage
+    <Pressable
+      onPress={() => openGallery(image.index)}
       style={{
+        aspectRatio: 1.7,
+        height: h2p(180),
+        borderRadius: 18,
         marginHorizontal: d2p(15),
         borderWidth: 1,
         borderColor: theme.color.grayscale.e9e7ec,
         width: Dimensions.get('window').width - d2p(30),
-        aspectRatio: 1.7,
-        height: h2p(180),
-        borderRadius: 18
       }}
-      source={{ uri: image.item.image }} />
+    >
+      <FastImage
+        style={{
+          width: Dimensions.get('window').width - d2p(30),
+          height: "100%",
+          borderRadius: 18
+        }}
+        source={{ uri: image.item.image }} />
+    </Pressable>
     , []);
 
   // * 키보드 높이 컨트롤
@@ -202,6 +278,16 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
 
   return (
     <Fragment>
+      <ImageGallery
+        initialIndex={initialIndex}
+        close={closeGallery}
+        images={reviewDetailQuery.data?.images.map(v => ({ id: v.id, url: v.image, thumbUrl: v.image })) || []}
+        isOpen={isOpen}
+        renderCustomImage={renderCustomImage}
+        renderHeaderComponent={renderHeaderComponent}
+        resizeMode="contain"
+        thumbSize={84}
+      />
       <Header
         isBorder={true}
         headerLeft={<LeftArrowIcon onBackClick={() => {
