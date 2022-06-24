@@ -26,9 +26,11 @@ const OnepickLayout = ({ userBadge, setUserBadge, remainingPeriod }: OnepickLayo
           <Text style={FONT.Regular}>를 선택해주세요.</Text>
         </View>
         <Text style={[styles.badgeGuide, FONT.Regular]}>대표 뱃지는 저장 후 7일동안 다시 변경할 수 없습니다.</Text>
-        {(remainingPeriod && remainingPeriod > 0) &&
+        {(remainingPeriod && remainingPeriod > 0) ?
           <Text style={[{ fontSize: 12, marginTop: 0, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
             ({remainingPeriod}일 후에 수정 가능합니다)</Text>
+          :
+          null
         }
       </View>
       <View style={{ flex: 1 }}>
@@ -94,7 +96,7 @@ const OnepickLayout = ({ userBadge, setUserBadge, remainingPeriod }: OnepickLayo
           )))}
         </View>
       </View>
-    </ScrollView>
+    </ScrollView >
   );
 };
 

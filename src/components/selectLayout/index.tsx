@@ -33,7 +33,7 @@ const SelectLayout = ({ headerComponent, isInitial, userBadge, setUserBadge, typ
         showsVerticalScrollIndicator={false}>
         {headerComponent}
         <View style={{ flexDirection: 'row' }}>
-          <Text style={[{ ...styles.menu, marginTop: 0 }, FONT.Regular]}>관심사 </Text>
+          <Text style={[styles.menu, { marginTop: 0 }, FONT.Regular]}>관심사 </Text>
           {type === "normal" &&
             <Text style={{ color: theme.color.main }}>*</Text>
           }

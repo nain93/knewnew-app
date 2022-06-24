@@ -5,7 +5,7 @@ import theme from '~/styles/theme';
 import Header from '~/components/header';
 import mainLogo from '~/assets/logo';
 import FeedReview from '~/components/review/feedReview';
-import { tagfilter } from '~/assets/icons';
+import { colorCheck, tagfilter } from '~/assets/icons';
 
 import RBSheet from "react-native-raw-bottom-sheet";
 import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
@@ -58,6 +58,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const setMyId = useSetRecoilState(myIdState);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [filterBadge, setFilterBadge] = useState("");
+  const [allClick, setAllClick] = useState(false);
   const [refresh, setRefresh] = useRecoilState(refreshState);
   const flatListRef = useRef<FlatList>(null);
 
@@ -66,7 +67,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
     onSuccess: (data) => {
       if (data) {
         // * 최초 유저 대표뱃지로 필터링 설정
-        if (!filterBadge) {
+        if (!filterBadge && !allClick) {
           setFilterBadge(data.representBadge);
         }
         setMyId(data.id);
@@ -83,32 +84,47 @@ const Feed = ({ navigation, route }: FeedProps) => {
   });
 
   const reviewListQuery = useInfiniteQuery<ReviewListType[], Error>(["reviewList", token, filterBadge], async ({ pageParam = 0 }) => {
-    const queryData = await getReviewList({ token, tag: filterBadge, offset: pageParam });
-    return queryData;
+    if (allClick) {
+      const queryData = await getReviewList({ token, tag: "", offset: pageParam });
+      return queryData;
+    }
+    else {
+      const queryData = await getReviewList({ token, tag: filterBadge, offset: pageParam });
+      return queryData;
+    }
   }, {
-    enabled: !!filterBadge,
     getNextPageParam: (next, all) => all.flat().length,
     onSettled: () => {
       SplashScreen.hide();
     }
   });
-
   const reviewKey = useCallback((review) => String(review.id), []);
   const reviewHeader = useCallback(() =>
     <>
       <View style={styles.main}>
         <Text style={[styles.mainText, FONT.Bold]}>뉴뉴는 지금</Text>
         <View style={{ flexDirection: 'row' }}>
-          <Text style={[styles.mainText, { color: theme.color.main, marginTop: Platform.OS === "ios" ? h2p(2) : 0 }, FONT.Bold]}>
-            {filterBadge ? `#${filterBadge}` : `#${getMyProfileQuery.data?.representBadge}`} </Text>
-          <Text style={[styles.mainText, FONT.Bold]}>관련 메뉴 추천 중 👀</Text>
+          {filterBadge ?
+            <>
+              <Text style={[styles.mainText, { color: theme.color.main, marginTop: Platform.OS === "ios" ? h2p(2) : 0 }, FONT.Bold]}>
+                {filterBadge ? `#${filterBadge}` : `#${getMyProfileQuery.data?.representBadge}`} </Text>
+              <Text style={[styles.mainText, FONT.Bold]}>관련 메뉴 추천 중 👀</Text>
+            </>
+            :
+            <>
+              <Text style={[styles.mainText, { color: theme.color.main, marginTop: Platform.OS === "ios" ? h2p(2) : 0 }, FONT.Bold]}>
+                모든 메뉴 </Text>
+              <Text style={[styles.mainText, FONT.Bold]}>추천 중 👀</Text>
+            </>
+          }
+
         </View>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
         <TouchableOpacity
           onPress={() => tagRefRBSheet.current?.open()}
           style={styles.filter}>
-          <Image source={tagfilter} style={{ width: 11, height: 10, marginRight: d2p(10) }} />
+          <Image source={tagfilter} style={{ width: d2p(11), height: d2p(10), marginRight: d2p(10) }} />
           <Text style={FONT.Medium}>태그 변경</Text>
         </TouchableOpacity>
       </View>
@@ -171,7 +187,15 @@ const Feed = ({ navigation, route }: FeedProps) => {
     }
   }, [route.params]);
 
-  if ((reviewListQuery.isFetching && refresh) || !filterBadge) {
+  useEffect(() => {
+    if (!userBadge.household.every(v => !v.isClick) ||
+      !userBadge.interest.every(v => !v.isClick) ||
+      !userBadge.taste.every(v => !v.isClick)) {
+      setAllClick(false);
+    }
+  }, [userBadge]);
+
+  if (reviewListQuery.isFetching && refresh) {
     return <Loading />;
   }
 
@@ -195,9 +219,15 @@ const Feed = ({ navigation, route }: FeedProps) => {
         }
         headerLeft={scrollOffset >= h2p(130) ?
           <Animated.View style={{ opacity: fadeAnim ? fadeAnim : 1, zIndex: 10 }}>
-            <Text style={[{ fontSize: 16 }, FONT.Bold]}>
-              {filterBadge ? `#${filterBadge}` : `#${getMyProfileQuery.data?.representBadge}`}
-            </Text>
+            {allClick ?
+              <Text style={[{ fontSize: 16 }, FONT.Bold]}>
+                모든 메뉴
+              </Text>
+              :
+              <Text style={[{ fontSize: 16 }, FONT.Bold]}>
+                {filterBadge ? `#${filterBadge}` : `#${getMyProfileQuery.data?.representBadge}`}
+              </Text>
+            }
           </Animated.View> : <Image source={mainLogo} resizeMode="contain" style={{ width: d2p(96), height: d2p(20) }} />}
         isBorder={scrollOffset >= h2p(130) ? true : false} bgColor={scrollOffset >= h2p(130) ? theme.color.white : theme.color.grayscale.f7f7fc}
       />
@@ -275,7 +305,8 @@ const Feed = ({ navigation, route }: FeedProps) => {
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
-            alignItems: "center", marginBottom: h2p(40)
+            alignItems: "center",
+            marginBottom: h2p(20)
           }}>
           <Text style={[{ color: theme.color.grayscale.C_79737e }, FONT.Medium]}>
             보고싶은 태그를 하나만 선택해주세요
@@ -285,12 +316,17 @@ const Feed = ({ navigation, route }: FeedProps) => {
               // * 태그 선택 안했을경우
               if (userBadge.household.every(v => !v.isClick) &&
                 userBadge.interest.every(v => !v.isClick) &&
-                userBadge.taste.every(v => !v.isClick)
+                userBadge.taste.every(v => !v.isClick) &&
+                !allClick
               ) {
                 setIsPopupOpen({ isOpen: true, content: "태그를 선택해주세요" });
                 return;
               }
-
+              if (allClick) {
+                setFilterBadge("");
+                tagRefRBSheet.current?.close();
+                return;
+              }
               // * 태그 선택후 대표 뱃지 적용
               const copy: { [index: string]: Array<{ isClick: boolean, title: string }> } = { ...userBadge };
               const badge = Object.keys(userBadge).reduce((acc, cur) => {
@@ -314,6 +350,29 @@ const Feed = ({ navigation, route }: FeedProps) => {
             <Text style={[styles.tagBtn, FONT.Medium]}>태그 적용</Text>
           </TouchableOpacity>
         </View>
+        <TouchableOpacity
+          onPress={() => {
+            setAllClick(!allClick);
+            setUserBadge(initialBadgeData);
+          }}
+          style={{
+            paddingHorizontal: d2p(15),
+            paddingVertical: h2p(5),
+            maxWidth: d2p(140),
+            borderRadius: 20,
+            backgroundColor: theme.color.white,
+            borderWidth: 1,
+            borderColor: allClick ? theme.color.main : theme.color.grayscale.d2d0d5,
+            flexDirection: "row",
+            alignItems: "center", justifyContent: "center",
+            marginBottom: h2p(20)
+          }}>
+          {allClick && <Image source={colorCheck} resizeMode="contain" style={{ width: d2p(10), height: d2p(8), marginRight: d2p(5) }} />}
+          <Text style={[FONT.Medium, {
+            color: allClick ? theme.color.main : theme.color.black,
+            includeFontPadding: false
+          }]}>모든 메뉴 보기 👀</Text>
+        </TouchableOpacity>
         <SelectLayout type="filter" userBadge={userBadge} setUserBadge={setUserBadge} />
         {isPopupOpen.isOpen &&
           <Animated.View style={{ opacity: fadeHook.fadeAnim ? fadeHook.fadeAnim : 1, zIndex: fadeHook.fadeAnim ? fadeHook.fadeAnim : -1 }}>

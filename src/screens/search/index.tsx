@@ -39,8 +39,8 @@ const Search = ({ navigation }: SearchProps) => {
   const token = useRecoilValue(tokenState);
 
   const searchListQuery = useInfiniteQuery<ReviewListType[], Error>(["searchList", token, textForRefresh], async ({ pageParam = 0 }) => {
-    const queryData: { list: ReviewListType[], searchCount: number } = await getSearchList({ token, keyword, offset: pageParam });
-    setSearchCount({ ...searchCount, reviewCount: queryData.searchCount });
+    const queryData: { list: ReviewListType[], totalLength: number } = await getSearchList({ token, keyword, offset: pageParam });
+    setSearchCount({ ...searchCount, reviewCount: queryData.totalLength });
     return queryData.list;
   }, {
     enabled: !!textForRefresh,
@@ -49,8 +49,8 @@ const Search = ({ navigation }: SearchProps) => {
   });
 
   const userListQuery = useInfiniteQuery<userNormalType[], Error>(["userList", token, textForRefresh], async ({ pageParam = 0 }) => {
-    const queryData: { list: userNormalType[], searchCount: number } = await getSearchUserList({ token, nickname: keyword, offset: pageParam });
-    setSearchCount({ ...searchCount, userCount: queryData.searchCount });
+    const queryData: { list: userNormalType[], totalLength: number } = await getSearchUserList({ token, nickname: keyword, offset: pageParam });
+    setSearchCount({ ...searchCount, userCount: queryData.totalLength });
     return queryData.list;
   }, {
     enabled: !!textForRefresh,

@@ -1,0 +1,31 @@
+diff --git a/node_modules/@georstat/react-native-image-gallery/src/ImageGallery.tsx b/node_modules/@georstat/react-native-image-gallery/src/ImageGallery.tsx
+index 2b1eb28..97029c8 100644
+--- a/node_modules/@georstat/react-native-image-gallery/src/ImageGallery.tsx
++++ b/node_modules/@georstat/react-native-image-gallery/src/ImageGallery.tsx
+@@ -74,6 +74,7 @@ const ImageGallery = (props: IProps & typeof defaultProps) => {
+     }
+   };
+ 
++
+   const renderItem = ({ item, index }: RenderImageProps) => {
+     return (
+       <ImagePreview
+@@ -100,12 +101,12 @@ const ImageGallery = (props: IProps & typeof defaultProps) => {
+             style={
+               activeIndex === index
+                 ? [
+-                    styles.thumb,
+-                    styles.activeThumb,
+-                    { borderColor: thumbColor },
+-                    { width: thumbSize, height: thumbSize },
+-                  ]
+-                : [styles.thumb, { width: thumbSize, height: thumbSize }]
++                  styles.thumb,
++                  styles.activeThumb,
++                  { borderColor: thumbColor },
++                  { width: 84, height: 56 },
++                ]
++                : [styles.thumb, { width: 84, height: 56 }]
+             }
+             source={{ uri: item.thumbUrl ? item.thumbUrl : item.url }}
+           />
