@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
-import { Animated, Linking } from 'react-native';
+import { Alert, Animated, Linking, Platform } from 'react-native';
 import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import SplashScreen from 'react-native-splash-screen';
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useRecoilState } from 'recoil';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import messaging from '@react-native-firebase/messaging';
 
 import GlobalNav from './src/navigators/globalNav';
 import AlertPopup from '~/components/popup/alertPopup';
@@ -26,6 +27,13 @@ const App = () => {
       const storageToken = await AsyncStorage.getItem("token");
       if (storageToken) {
         setToken(storageToken);
+        // todo api link
+        // messaging().getToken().then(fcmToken => {
+        // 	// console.log(fcmToken);
+        // 	registerNotification(fcmToken, Platform.OS)
+        // 		.then((v: any) => console.log(v))
+        // 		.catch((e: any) => console.warn(e));
+        // });
       }
       else {
         SplashScreen.hide();
@@ -60,6 +68,28 @@ const App = () => {
       }
     },
   };
+
+  // * FCM
+  React.useEffect(() => {
+    messaging().requestPermission();
+    if (Platform.OS === "ios") {
+      messaging()
+        .getIsHeadless()
+        .then(isHeadless => {
+          console.log(isHeadless, 'isHeadless');
+          // do sth with isHeadless
+        });
+    }
+    // fetchConfig().catch(console.warn);
+    messaging().getToken().then(fcmToken =>
+      console.log(fcmToken, 'fcmToken')
+    );
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      console.log(remoteMessage, 'remoteMessage');
+      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+    });
+    return unsubscribe;
+  }, []);
 
   return (
     <SafeAreaProvider>

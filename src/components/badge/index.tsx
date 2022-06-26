@@ -7,6 +7,7 @@ import { BadgeType } from "~/types";
 import { d2p, h2p } from "~/utils";
 
 interface BadgeProp {
+  onPress?: () => void,
   text: string,
   type: "picker" | "feed" | "mypage" | "unabled",
   layoutType?: "filter" | "wrtie" | "normal",
@@ -18,45 +19,52 @@ interface BadgeProp {
   viewStyle?: ViewStyle
 }
 
-const Badge = ({ layoutType = "normal", text, type, badge, isClick, idx, userBadge, setUserBadge, viewStyle }: BadgeProp) => {
+const Badge = ({
+  onPress,
+  layoutType = "normal",
+  text, type, badge,
+  isClick, idx, userBadge, setUserBadge, viewStyle }: BadgeProp) => {
 
   switch (type) {
     case 'picker':
       return (
         <TouchableOpacity
-          onPress={() => {
-            if (badge && userBadge && setUserBadge) {
-              // * 필터 ui 태그 하나만 석탠 할 수있슴
-              if (layoutType === "filter") {
-                setUserBadge(
-                  userBadge[badge].map((v, i) => {
-                    if (i === idx) {
-                      return { isClick: !v.isClick, title: v.title };
-                    }
-                    else {
-                      return { isClick: false, title: v.title };
-                    }
-                  })
-                );
+          onPress=
+          {onPress ?
+            onPress :
+            () => {
+              if (badge && userBadge && setUserBadge) {
+                // * 필터 ui 태그 하나만 선택 할 수있슴
+                if (layoutType === "filter") {
+                  setUserBadge(
+                    userBadge[badge].map((v, i) => {
+                      if (i === idx) {
+                        return { isClick: !v.isClick, title: v.title };
+                      }
+                      else {
+                        return { isClick: false, title: v.title };
+                      }
+                    })
+                  );
+                }
+                // * 관심사, 입맛 여러개 선택가능
+                else {
+                  setUserBadge(
+                    userBadge[badge].map((v, i) => {
+                      if (i === idx) {
+                        return { isClick: !v.isClick, title: v.title };
+                      }
+                      if (badge === "household") {
+                        return { isClick: false, title: v.title };
+                      }
+                      else {
+                        return v;
+                      }
+                    })
+                  );
+                }
               }
-              // * 관심사, 입맛 여러개 선택가능
-              else {
-                setUserBadge(
-                  userBadge[badge].map((v, i) => {
-                    if (i === idx) {
-                      return { isClick: !v.isClick, title: v.title };
-                    }
-                    if (badge === "household") {
-                      return { isClick: false, title: v.title };
-                    }
-                    else {
-                      return v;
-                    }
-                  })
-                );
-              }
-            }
-          }} style={[styles.tag, !isClick ? styles.basic : styles.checked, viewStyle]}>
+            }} style={[styles.tag, !isClick ? styles.basic : styles.checked, viewStyle]}>
           {isClick && <Image source={colorCheck} resizeMode="contain" style={{ width: d2p(10), height: d2p(8), marginRight: d2p(5) }} />}
           <Text style={[!isClick ? styles.blackText : styles.colorText, FONT.Medium]}>{text}</Text>
         </TouchableOpacity>

@@ -5,7 +5,7 @@ import App from '~/../App';
 
 import axios from 'axios';
 
-const AppHoc = () => {
+const AppHoc = ({ isHeadless }: any) => {
   // * react query 글로벌 에러 핸들링 세팅
   const queryClient = new QueryClient({
     queryCache: new QueryCache({
@@ -23,6 +23,10 @@ const AppHoc = () => {
       }
     })
   });
+
+  if (isHeadless) {
+    return null;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>

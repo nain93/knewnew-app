@@ -382,7 +382,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
               return;
             }
             if (
-              (userBadge.interest.filter(v => v.masterBadge)[0].title !== route.params?.profile.representBadge) &&
+              (isBadgeNext && userBadge.interest.filter(v => v.masterBadge)[0].title !== route.params?.profile.representBadge) &&
               profileInfo.remainingPeriod && profileInfo.remainingPeriod > 0 && isBadgeNext) {
               setUserBadge({
                 ...userBadge,
@@ -412,7 +412,8 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
           </TouchableOpacity>
         </View>
         {isBadgeNext ?
-          <OnepickLayout remainingPeriod={profileInfo.remainingPeriod} userBadge={userBadge} setUserBadge={(badge: BadgeType) => setUserBadge(badge)} />
+          <OnepickLayout remainingPeriod={profileInfo.remainingPeriod}
+            userBadge={userBadge} setUserBadge={(badge: BadgeType) => setUserBadge(badge)} />
           :
           <>
             <View style={{ marginBottom: h2p(40), marginTop: h2p(20) }}>
@@ -422,7 +423,11 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
               </View>
               <Text style={FONT.Regular}>최소 2개 최대 10개까지 고를 수 있어요.</Text>
             </View>
-            <SelectLayout isInitial={isBadgeNext ? false : true} userBadge={userBadge} setUserBadge={(badge: BadgeType) => setUserBadge(badge)} />
+            <SelectLayout
+              setIsPopupOpen={(popup: { isOpen: boolean, content: string }) => setIsPopupOpen(popup)}
+              remainingPeriod={profileInfo.remainingPeriod}
+              isInitial={isBadgeNext ? false : true} userBadge={userBadge}
+              setUserBadge={(badge: BadgeType) => setUserBadge(badge)} />
           </>
         }
         {isPopupOpen.isOpen &&
