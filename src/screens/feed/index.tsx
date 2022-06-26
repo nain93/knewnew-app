@@ -130,6 +130,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
       </View>
     </>
     , [filterBadge, getMyProfileQuery.data?.representBadge]);
+
   const reviewFooter = useCallback(() => <View style={{ height: h2p(117) }} />, []);
 
   const reviewRenderItem = useCallback(({ item, index }) =>
@@ -195,7 +196,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
     }
   }, [userBadge]);
 
-  if (reviewListQuery.isFetching && refresh) {
+  if (reviewListQuery.isLoading || refresh) {
     return <Loading />;
   }
 

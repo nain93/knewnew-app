@@ -40,6 +40,7 @@ const Search = ({ navigation }: SearchProps) => {
 
   const searchListQuery = useInfiniteQuery<ReviewListType[], Error>(["searchList", token, textForRefresh], async ({ pageParam = 0 }) => {
     const queryData: { list: ReviewListType[], totalLength: number } = await getSearchList({ token, keyword, offset: pageParam });
+    console.log(queryData, 'queryData');
     setSearchCount({ ...searchCount, reviewCount: queryData.totalLength });
     return queryData.list;
   }, {

@@ -1,4 +1,4 @@
-import { Dimensions, FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, FlatList, Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
@@ -17,6 +17,7 @@ import { NavigationRoute } from 'react-navigation';
 import BasicButton from '~/components/button/basicButton';
 import { ReviewListType } from '~/types/review';
 import { useFocusEffect } from '@react-navigation/native';
+import { bookmarkReview } from '~/api/review';
 
 interface MypageProps {
   navigation: NavigationStackProp;
@@ -139,18 +140,22 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     return null;
   }, [userReviewListQuery.isLoading, route.params?.id]);
 
+  const reviewHeader = useCallback(() => {
+    if (userReviewListQuery.isLoading) {
+      return (
+        <Loading viewStyle={{
+          position: "relative",
+          top: h2p(90)
+        }} />
+      );
+    }
+    return null;
+  }, [userReviewListQuery.isLoading]);
+
   const reviewRenderItem = useCallback(
     (review) => {
       if (userReviewListQuery.isLoading) {
-        return (
-          <View style={{
-            position: "absolute",
-            alignSelf: "center",
-            top: h2p(-90)
-          }}>
-            <Loading />
-          </View>
-        );
+        return null;
       }
       return (
         <Pressable
@@ -168,6 +173,8 @@ const Mypage = ({ navigation, route }: MypageProps) => {
       );
     }
     , [selectedIndex, userReviewListQuery.isLoading]);
+
+  const reviewFooter = useCallback(() => <View style={{ height: h2p(100) }} />, []);
 
   const bookmarkKey = useCallback((v) => (v.id).toString(), []);
   const bookmarkEmpty = useCallback(() => {
@@ -194,15 +201,21 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     return null;
   }, [userBookmarkListQuery.isLoading, route.params?.id]);
 
+  const bookmarkHeader = useCallback(() => {
+    if (userBookmarkListQuery.isLoading) {
+      return (
+        <Loading viewStyle={{
+          position: "relative",
+          top: h2p(90)
+        }} />
+      );
+    }
+    return null;
+  }, [userBookmarkListQuery.isLoading]);
+
   const bookmarkRenderItem = useCallback((bookmarks) => {
     if (userBookmarkListQuery.isLoading) {
-      return <View style={{
-        position: "absolute",
-        alignSelf: "center",
-        top: h2p(-90)
-      }}>
-        <Loading />
-      </View>;
+      return null;
     }
     return (
       <Pressable
@@ -219,6 +232,8 @@ const Mypage = ({ navigation, route }: MypageProps) => {
       </Pressable>
     );
   }, [userBookmarkListQuery.isLoading, selectedIndex]);
+
+  const bookmarkFooter = useCallback(() => <View style={{ height: h2p(100) }} />, []);
 
   useEffect(() => {
     // * 로그아웃시 온보딩화면으로
@@ -268,6 +283,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
           name={`작성 글 ${getMyProfileQuery.data?.reviewCount}`}>
           <Tabs.FlatList
             ref={reviewRef}
+            ListHeaderComponent={Platform.OS === "android" ? reviewHeader : null}
             ListEmptyComponent={reviewEmpty}
             onEndReached={() => {
               if (userReviewListQuery.data &&
@@ -282,15 +298,17 @@ const Mypage = ({ navigation, route }: MypageProps) => {
               getMyProfileQuery.refetch();
             }}
             showsVerticalScrollIndicator={false}
-            ListFooterComponent={() => <View style={{ height: h2p(100) }} />}
+            ListFooterComponent={reviewFooter}
             data={userReviewListQuery.data?.pages.flat()}
             renderItem={reviewRenderItem}
             keyExtractor={reviewKey}
           />
+
         </Tabs.Tab>
         <Tabs.Tab name={`담은 글 ${getMyProfileQuery.data?.bookmarkCount}`}>
           <Tabs.FlatList
             ref={bookmarkRef}
+            ListHeaderComponent={Platform.OS === "android" ? bookmarkHeader : null}
             ListEmptyComponent={bookmarkEmpty}
             onEndReached={() => {
               if (userBookmarkListQuery.data &&
@@ -305,7 +323,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
               getMyProfileQuery.refetch();
             }}
             showsVerticalScrollIndicator={false}
-            ListFooterComponent={() => <View style={{ height: h2p(100) }} />}
+            ListFooterComponent={bookmarkFooter}
             data={userBookmarkListQuery.data?.pages.flat()}
             renderItem={bookmarkRenderItem}
             keyExtractor={bookmarkKey}

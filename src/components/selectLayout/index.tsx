@@ -7,16 +7,20 @@ import { initialize } from '~/assets/icons';
 import { BadgeType } from '~/types';
 import { FONT } from '~/styles/fonts';
 import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
+import { useSetRecoilState } from 'recoil';
+import { popupState } from '~/recoil/atoms';
 
 interface SelectLayoutProps {
   userBadge: BadgeType;
   setUserBadge: (badgeProp: BadgeType) => void;
   isInitial?: boolean;
   type?: "filter" | "write" | "normal",
-  headerComponent?: JSX.Element
+  headerComponent?: JSX.Element,
+  remainingPeriod?: number
+  setIsPopupOpen?: (popup: { isOpen: boolean, content: string }) => void
 }
 
-const SelectLayout = ({ headerComponent, isInitial, userBadge, setUserBadge, type = "normal" }: SelectLayoutProps) => {
+const SelectLayout = ({ setIsPopupOpen, remainingPeriod, headerComponent, isInitial, userBadge, setUserBadge, type = "normal" }: SelectLayoutProps) => {
   const resetIsClick = () => {
     setUserBadge({
       interest: userBadge.interest.map(v => ({ title: v.title, isClick: false })),
@@ -40,22 +44,59 @@ const SelectLayout = ({ headerComponent, isInitial, userBadge, setUserBadge, typ
         </View>
         <View
           style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-          {React.Children.toArray(userBadge.interest.map((item, idx) => (
-            <Badge type="picker" layoutType={type === "filter" ? "filter" : "normal"} badge="interest" text={item.title} idx={idx} isClick={userBadge.interest[idx].isClick}
-              userBadge={userBadge} setUserBadge={(interestProp) => {
-                if (type === "filter") {
-                  setUserBadge({
-                    household: userBadge.household.map(v => ({ ...v, isClick: false })),
-                    taste: userBadge.taste.map(v => ({ ...v, isClick: false })),
-                    interest: interestProp
-                  });
-                }
-                else {
-                  setUserBadge({ ...userBadge, interest: interestProp });
-                }
+          {React.Children.toArray(userBadge.interest.map((item, idx) => {
+            if (item.masterBadge) {
+              if (remainingPeriod && remainingPeriod > 0) {
+                return (
+                  <Badge type="picker"
+                    layoutType={type === "filter" ? "filter" : "normal"} badge="interest"
+                    text={item.title} idx={idx} isClick={userBadge.interest[idx].isClick}
+                    userBadge={userBadge} onPress={() => {
+                      if (setIsPopupOpen) {
+                        setIsPopupOpen({
+                          isOpen: true,
+                          content: `대표뱃지는 ${remainingPeriod}일 후에 수정 가능합니다`
+                        });
+                      }
+                    }} />
+                );
               }
-              } />
-          )))}
+              return (
+                <Badge type="picker"
+                  layoutType={type === "filter" ? "filter" : "normal"} badge="interest"
+                  text={item.title} idx={idx} isClick={userBadge.interest[idx].isClick}
+                  userBadge={userBadge} setUserBadge={(interestProp) => {
+                    if (type === "filter") {
+                      setUserBadge({
+                        household: userBadge.household.map(v => ({ ...v, isClick: false })),
+                        taste: userBadge.taste.map(v => ({ ...v, isClick: false })),
+                        interest: interestProp
+                      });
+                    }
+                    else {
+                      setUserBadge({ ...userBadge, interest: interestProp });
+                    }
+                  }} />
+              );
+            }
+            return (
+              <Badge type="picker" layoutType={type === "filter" ? "filter" : "normal"} badge="interest"
+                text={item.title} idx={idx} isClick={userBadge.interest[idx].isClick}
+                userBadge={userBadge} setUserBadge={(interestProp) => {
+                  if (type === "filter") {
+                    setUserBadge({
+                      household: userBadge.household.map(v => ({ ...v, isClick: false })),
+                      taste: userBadge.taste.map(v => ({ ...v, isClick: false })),
+                      interest: interestProp
+                    });
+                  }
+                  else {
+                    setUserBadge({ ...userBadge, interest: interestProp });
+                  }
+                }
+                } />
+            );
+          }))}
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', ...styles.menu }}>
           <Text style={FONT.Regular}>가족구성 </Text>
@@ -128,7 +169,7 @@ const styles = StyleSheet.create({
     marginBottom: h2p(5)
   },
   guide: {
-    marginLeft: 15,
+    marginLeft: d2p(15),
     fontSize: 12,
     color: theme.color.grayscale.a09ca4,
   }

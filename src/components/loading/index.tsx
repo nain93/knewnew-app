@@ -23,6 +23,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     zIndex: 10,
     top: (Dimensions.get("window").height / 2) - h2p(120),
-    alignSelf: "center"
+    alignSelf: "center",
   }
 });

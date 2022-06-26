@@ -32,6 +32,7 @@ import {
   ImageObject,
 } from '@georstat/react-native-image-gallery';
 import axios from 'axios';
+import { loading } from '~/assets/gif';
 interface FeedDetailProps {
   navigation: NavigationStackProp
   route: NavigationRoute<{
@@ -458,99 +459,98 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
               isState={(isState: boolean) => setLike(isState)} mutation={likeReviewMutation} id={route.params?.id} />
           </View>
           <Text style={[styles.commentMeta, FONT.Bold]}>작성된 댓글 {commentListQuery.data?.length}개</Text>
-          <Pressable onPress={() => {
-            setCommentSelectedIdx(-1);
-          }}>
-            {React.Children.toArray(commentListQuery.data?.map((item, index) => {
-              if (commentListQuery.isLoading) {
-                return (
-                  <Loading />
-                );
-              }
-              return (
-                <>
-                  <View
-                    style={{
-                      paddingHorizontal: d2p(20),
-                      paddingTop: h2p(10),
-                      backgroundColor: (index === modifyingIdx) && commentIsEdit ? "#F7F7FC" : theme.color.white
-                    }}>
-                    <View style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                    }}>
-                      <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: item.author.id })}
-                        style={styles.commentProfileLine}
-                      >
-                        <FastImage source={item.author.profileImage ? { uri: item.author.profileImage } : noProfile}
-                          style={styles.commentImg} />
-                      </TouchableOpacity>
-                      <View style={{
-                        flexDirection: "row", justifyContent: "space-between",
-                        width: Dimensions.get("window").width - d2p(70),
-                      }}>
-                        <View style={{ marginLeft: d2p(10) }}>
-                          <View style={{ flexDirection: "row" }}>
-                            <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: item.author.id })}>
-                              <Text style={FONT.Medium}>{item.author.nickname}</Text>
-                            </TouchableOpacity>
-                            <Text style={[styles.commentDate, FONT.Regular]}>{dateCommentFormat(item.created)}</Text>
+          {commentListQuery.isLoading ?
+            <Loading viewStyle={{ top: h2p(0), position: "relative" }} />
+            :
+            <>
+              <Pressable onPress={() => setCommentSelectedIdx(-1)}>
+                {React.Children.toArray(commentListQuery.data?.map((item, index) => {
+                  return (
+                    <>
+                      <View
+                        style={{
+                          paddingHorizontal: d2p(20),
+                          paddingTop: h2p(10),
+                          backgroundColor: (index === modifyingIdx) && commentIsEdit ? "#F7F7FC" : theme.color.white
+                        }}>
+                        <View style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                        }}>
+                          <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: item.author.id })}
+                            style={styles.commentProfileLine}
+                          >
+                            <FastImage source={item.author.profileImage ? { uri: item.author.profileImage } : noProfile}
+                              style={styles.commentImg} />
+                          </TouchableOpacity>
+                          <View style={{
+                            flexDirection: "row", justifyContent: "space-between",
+                            width: Dimensions.get("window").width - d2p(70),
+                          }}>
+                            <View style={{ marginLeft: d2p(10) }}>
+                              <View style={{ flexDirection: "row" }}>
+                                <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: item.author.id })}>
+                                  <Text style={FONT.Medium}>{item.author.nickname}</Text>
+                                </TouchableOpacity>
+                                <Text style={[styles.commentDate, FONT.Regular]}>{dateCommentFormat(item.created)}</Text>
+                              </View>
+                            </View>
+                            {myId === item.author.id &&
+                              <TouchableOpacity onPress={() => {
+                                if (commentSelectedIdx === index) {
+                                  setCommentSelectedIdx(-1);
+                                } else {
+                                  setCommentSelectedIdx(index);
+                                }
+                              }}>
+                                <Image
+                                  source={commentMore}
+                                  resizeMode="contain"
+                                  style={{ width: d2p(12), height: d2p(16) }}
+                                />
+                              </TouchableOpacity>
+                            }
                           </View>
                         </View>
-                        {myId === item.author.id &&
-                          <TouchableOpacity onPress={() => {
-                            if (commentSelectedIdx === index) {
-                              setCommentSelectedIdx(-1);
-                            } else {
-                              setCommentSelectedIdx(index);
-                            }
-                          }}>
-                            <Image
-                              source={commentMore}
-                              resizeMode="contain"
-                              style={{ width: d2p(12), height: d2p(16) }}
-                            />
-                          </TouchableOpacity>
+                        <Text style={[styles.commentContent, FONT.Regular]}>{item.content}</Text>
+                        <View style={styles.commentLine} />
+                        {commentSelectedIdx === index &&
+                          <View style={[styles.clickBox, { right: d2p(32) }]}>
+                            <Pressable
+                              style={{
+                                justifyContent: "center", alignItems: "center", width: d2p(70), height: d2p(35)
+                              }}
+                              onPress={() => {
+                                setContent(item.content);
+                                setCommentIsEdit(true);
+                                setModifyingIdx(commentSelectedIdx);
+                                setEditCommentId(item.id);
+                                setCommentSelectedIdx(-1);
+                              }}>
+                              <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
+                            </Pressable>
+                            <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
+                            <Pressable
+                              style={{ justifyContent: "center", alignItems: "center", width: d2p(70), height: d2p(35) }}
+                              onPress={() => {
+                                setModalOpen({
+                                  isOpen: true,
+                                  content: "댓글을 삭제할까요?",
+                                  okButton: () => deleteCommentMutation.mutate(item.id)
+                                });
+                                setCommentSelectedIdx(-1);
+                              }}>
+                              <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
+                            </Pressable>
+                          </View>
                         }
                       </View>
-                    </View>
-                    <Text style={[styles.commentContent, FONT.Regular]}>{item.content}</Text>
-                    <View style={styles.commentLine} />
-                    {commentSelectedIdx === index &&
-                      <View style={[styles.clickBox, { right: d2p(32) }]}>
-                        <Pressable
-                          style={{
-                            justifyContent: "center", alignItems: "center", width: d2p(70), height: d2p(35)
-                          }}
-                          onPress={() => {
-                            setContent(item.content);
-                            setCommentIsEdit(true);
-                            setModifyingIdx(commentSelectedIdx);
-                            setEditCommentId(item.id);
-                            setCommentSelectedIdx(-1);
-                          }}>
-                          <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
-                        </Pressable>
-                        <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-                        <Pressable
-                          style={{ justifyContent: "center", alignItems: "center", width: d2p(70), height: d2p(35) }}
-                          onPress={() => {
-                            setModalOpen({
-                              isOpen: true,
-                              content: "댓글을 삭제할까요?",
-                              okButton: () => deleteCommentMutation.mutate(item.id)
-                            });
-                            setCommentSelectedIdx(-1);
-                          }}>
-                          <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
-                        </Pressable>
-                      </View>
-                    }
-                  </View>
-                </>
-              );
-            }))}
-          </Pressable>
+                    </>
+                  );
+                }))}
+              </Pressable>
+            </>
+          }
         </ScrollView>
         <Pressable
           onPress={() => inputRef.current?.focus()}
