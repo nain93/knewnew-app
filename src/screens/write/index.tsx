@@ -540,7 +540,8 @@ const Write = ({ navigation, route }: WriteProp) => {
         paddingTop: h2p(20),
         backgroundColor: theme.color.white
       }}>
-        {(!route.params?.isEdit || !route.params.review?.id) &&
+        {
+          (!route.params?.isEdit || !route.params.review?.id) &&
           <Pressable onPress={pickImage} style={[styles.images, { marginLeft: d2p(20), marginRight: d2p(15) }]}>
             <View style={{ alignItems: "center" }}>
               <Image source={photo} style={{ width: d2p(20), height: h2p(20), marginTop: h2p(12) }} />
@@ -679,7 +680,7 @@ export default Write;
 
 const styles = StyleSheet.create({
   container: {
-    minHeight: Dimensions.get("window").height - h2p(94)
+    minHeight: Dimensions.get("window").height - h2p(104),
   },
   textInput: {
     paddingHorizontal: d2p(20),
@@ -703,7 +704,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     marginTop: "auto",
-    marginBottom: Platform.OS === "ios" ? h2p(114) : h2p(94)
+    marginBottom: Platform.OS === "ios" ? h2p(104) : h2p(94)
   },
   select: {
     flexDirection: "row",
