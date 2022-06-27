@@ -83,10 +83,17 @@ const Mypage = ({ navigation, route }: MypageProps) => {
           source={getMyProfileQuery.data?.profileImage ? { uri: getMyProfileQuery.data?.profileImage } : noProfile} />
       </View>
       <View style={styles.profileInfo}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={[FONT.Bold, { fontSize: 24, marginRight: d2p(10) }]}>{getMyProfileQuery.data?.nickname}</Text>
+        <View style={{
+          flexDirection: "row",
+          alignItems: "center",
+          width: Dimensions.get("window").width - d2p(40),
+          justifyContent: "center",
+          flexWrap: "wrap"
+        }}>
+          <Text style={[FONT.Bold, { fontSize: 24 }]}>{getMyProfileQuery.data?.nickname}</Text>
           <View style={{
             height: h2p(20), minWidth: d2p(55),
+            marginLeft: d2p(10),
             marginRight: d2p(5),
             justifyContent: "center", alignItems: "center",
             paddingHorizontal: d2p(10), paddingVertical: h2p(3),
