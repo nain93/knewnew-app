@@ -194,6 +194,9 @@ const Feed = ({ navigation, route }: FeedProps) => {
       !userBadge.taste.every(v => !v.isClick)) {
       setAllClick(false);
     }
+    else {
+      setAllClick(true);
+    }
   }, [userBadge]);
 
   if (reviewListQuery.isLoading || refresh) {
@@ -220,13 +223,13 @@ const Feed = ({ navigation, route }: FeedProps) => {
         }
         headerLeft={scrollOffset >= h2p(130) ?
           <Animated.View style={{ opacity: fadeAnim ? fadeAnim : 1, zIndex: 10 }}>
-            {allClick ?
+            {filterBadge ?
               <Text style={[{ fontSize: 16 }, FONT.Bold]}>
-                모든 메뉴
+                {filterBadge ? `#${filterBadge}` : `#${getMyProfileQuery.data?.representBadge}`}
               </Text>
               :
               <Text style={[{ fontSize: 16 }, FONT.Bold]}>
-                {filterBadge ? `#${filterBadge}` : `#${getMyProfileQuery.data?.representBadge}`}
+                모든 메뉴
               </Text>
             }
           </Animated.View> : <Image source={mainLogo} resizeMode="contain" style={{ width: d2p(96), height: d2p(20) }} />}

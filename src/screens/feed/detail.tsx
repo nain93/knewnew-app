@@ -1,4 +1,4 @@
-import { View, Text, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView, Keyboard, FlatList, Button, BackHandler } from 'react-native';
+import { View, Text, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView, Keyboard, FlatList } from 'react-native';
 import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
@@ -32,7 +32,6 @@ import {
   ImageObject,
 } from '@georstat/react-native-image-gallery';
 import axios from 'axios';
-import { loading } from '~/assets/gif';
 interface FeedDetailProps {
   navigation: NavigationStackProp
   route: NavigationRoute<{
@@ -284,6 +283,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
         close={closeGallery}
         images={reviewDetailQuery.data?.images.map(v => ({ id: v.id, url: v.image, thumbUrl: v.image })) || []}
         isOpen={isOpen}
+        setIsOpen={(open: boolean) => setIsOpen(open)}
         renderCustomImage={renderCustomImage}
         renderHeaderComponent={renderHeaderComponent}
         resizeMode="contain"

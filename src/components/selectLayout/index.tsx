@@ -7,8 +7,6 @@ import { initialize } from '~/assets/icons';
 import { BadgeType } from '~/types';
 import { FONT } from '~/styles/fonts';
 import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
-import { useSetRecoilState } from 'recoil';
-import { popupState } from '~/recoil/atoms';
 
 interface SelectLayoutProps {
   userBadge: BadgeType;
