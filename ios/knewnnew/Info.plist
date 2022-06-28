@@ -59,6 +59,8 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>CodePushDeploymentKey</key>
+	<string>$(CODEPUSH_KEY)</string>
 	<key>KAKAO_APP_KEY</key>
 	<string>7637c35cfedcb6c01b1f17ce7cd42f05</string>
 	<key>LSApplicationQueriesSchemes</key>
