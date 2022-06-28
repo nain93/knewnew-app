@@ -147,8 +147,8 @@ android {
         applicationId "com.mealing.knewnnew"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 112
-        versionName "1.1.2"
+        versionCode project.env.get("AOS_BUILD_VERSION").toInteger()
+        versionName project.env.get("AOS_APP_VERSION")
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
         vectorDrawables.useSupportLibrary = true
         resValue "string", "build_config_package", "com.mealing.knewnnew"
