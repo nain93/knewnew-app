@@ -1,8 +1,94 @@
+diff --git a/node_modules/@georstat/react-native-image-gallery/lib/typescript/types.d.ts b/node_modules/@georstat/react-native-image-gallery/lib/typescript/types.d.ts
+index e634255..82b55f8 100644
+--- a/node_modules/@georstat/react-native-image-gallery/lib/typescript/types.d.ts
++++ b/node_modules/@georstat/react-native-image-gallery/lib/typescript/types.d.ts
+@@ -1,43 +1,44 @@
+ import React from 'react';
+ import { ImageResizeMode } from 'react-native';
+ export interface IProps {
+-    close: () => void;
+-    hideThumbs?: boolean;
+-    images: ImageObject[];
+-    initialIndex?: number;
+-    isOpen: boolean;
+-    resizeMode?: ImageResizeMode;
+-    thumbColor?: string;
+-    thumbSize?: number;
+-    thumbResizeMode?: ImageResizeMode;
+-    disableSwipe?: boolean;
+-    renderCustomThumb?: (item: ImageObject, index: number, isSelected: boolean) => React.ReactNode;
+-    renderCustomImage?: (item: ImageObject, index: number, isSelected: boolean) => React.ReactNode;
+-    renderHeaderComponent?: (item: ImageObject, currentIndex: number) => React.ReactNode;
+-    renderFooterComponent?: (item: ImageObject, currentIndex: number) => React.ReactNode;
++  close: () => void;
++  hideThumbs?: boolean;
++  images: ImageObject[];
++  initialIndex?: number;
++  isOpen: boolean;
++  setIsOpen: (open: boolean) => void;
++  resizeMode?: ImageResizeMode;
++  thumbColor?: string;
++  thumbSize?: number;
++  thumbResizeMode?: ImageResizeMode;
++  disableSwipe?: boolean;
++  renderCustomThumb?: (item: ImageObject, index: number, isSelected: boolean) => React.ReactNode;
++  renderCustomImage?: (item: ImageObject, index: number, isSelected: boolean) => React.ReactNode;
++  renderHeaderComponent?: (item: ImageObject, currentIndex: number) => React.ReactNode;
++  renderFooterComponent?: (item: ImageObject, currentIndex: number) => React.ReactNode;
+ }
+ export interface HeaderProps {
+-    currentIndex: number;
+-    item?: ImageObject;
++  currentIndex: number;
++  item?: ImageObject;
+ }
+ export interface FooterProps {
+-    currentIndex: number;
+-    total: number;
++  currentIndex: number;
++  total: number;
+ }
+ export interface ImageObject {
+-    id?: string | number;
+-    thumbUrl?: string;
+-    url: string;
++  id?: string | number;
++  thumbUrl?: string;
++  url: string;
+ }
+ export interface ImagePreviewProps {
+-    index: number;
+-    isSelected: boolean;
+-    item: ImageObject;
+-    resizeMode?: ImageResizeMode;
+-    renderCustomImage?: (item: ImageObject, index: number, isSelected: boolean) => React.ReactNode;
++  index: number;
++  isSelected: boolean;
++  item: ImageObject;
++  resizeMode?: ImageResizeMode;
++  renderCustomImage?: (item: ImageObject, index: number, isSelected: boolean) => React.ReactNode;
+ }
+ export interface RenderImageProps {
+-    item: ImageObject;
+-    index: number;
+-    resizeMode?: ImageResizeMode;
++  item: ImageObject;
++  index: number;
++  resizeMode?: ImageResizeMode;
+ }
 diff --git a/node_modules/@georstat/react-native-image-gallery/src/ImageGallery.tsx b/node_modules/@georstat/react-native-image-gallery/src/ImageGallery.tsx
-index 2b1eb28..97029c8 100644
+index 2b1eb28..8b5925a 100644
 --- a/node_modules/@georstat/react-native-image-gallery/src/ImageGallery.tsx
 +++ b/node_modules/@georstat/react-native-image-gallery/src/ImageGallery.tsx
-@@ -74,6 +74,7 @@ const ImageGallery = (props: IProps & typeof defaultProps) => {
+@@ -29,6 +29,7 @@ const ImageGallery = (props: IProps & typeof defaultProps) => {
+     images,
+     initialIndex,
+     isOpen,
++    setIsOpen,
+     renderCustomImage,
+     renderCustomThumb,
+     renderFooterComponent,
+@@ -74,6 +75,7 @@ const ImageGallery = (props: IProps & typeof defaultProps) => {
      }
    };
  
@@ -10,7 +96,7 @@ index 2b1eb28..97029c8 100644
    const renderItem = ({ item, index }: RenderImageProps) => {
      return (
        <ImagePreview
-@@ -100,12 +101,12 @@ const ImageGallery = (props: IProps & typeof defaultProps) => {
+@@ -100,12 +102,12 @@ const ImageGallery = (props: IProps & typeof defaultProps) => {
              style={
                activeIndex === index
                  ? [
@@ -29,3 +115,26 @@ index 2b1eb28..97029c8 100644
              }
              source={{ uri: item.thumbUrl ? item.thumbUrl : item.url }}
            />
+@@ -147,7 +149,9 @@ const ImageGallery = (props: IProps & typeof defaultProps) => {
+   );
+ 
+   return (
+-    <Modal animationType={isOpen ? 'slide' : 'fade'} visible={isOpen}>
++    <Modal
++      onRequestClose={() => setIsOpen(false)}
++      animationType={isOpen ? 'slide' : 'fade'} visible={isOpen}>
+       <View style={styles.container}>
+         <SwipeContainer
+           disableSwipe={disableSwipe}
+diff --git a/node_modules/@georstat/react-native-image-gallery/src/types.ts b/node_modules/@georstat/react-native-image-gallery/src/types.ts
+index 6a8ca1f..d4841f7 100644
+--- a/node_modules/@georstat/react-native-image-gallery/src/types.ts
++++ b/node_modules/@georstat/react-native-image-gallery/src/types.ts
+@@ -7,6 +7,7 @@ export interface IProps {
+   images: ImageObject[];
+   initialIndex?: number;
+   isOpen: boolean;
++  setIsOpen: (open: boolean) => void;
+   resizeMode?: ImageResizeMode;
+   thumbColor?: string;
+   thumbSize?: number;

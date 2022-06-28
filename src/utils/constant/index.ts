@@ -6,5 +6,5 @@ export const marketList: Array<MarketType> =
 
 export const hitslop = { top: d2p(20), left: d2p(20), right: d2p(20), bottom: d2p(20) };
 
-export const versioningIOS = "v1.0.8-demo";
-export const versioningAOS = "v1.1.1-demo"; 
+export const versioningIOS = "v1.1.0-demo";
+export const versioningAOS = "v1.1.3-demo"; 
