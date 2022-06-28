@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import com.facebook.react.bridge.JSIModulePackage; // reanimated2 라이브러리
 import com.swmansion.reanimated.ReanimatedJSIModulePackage; // reanimated2 라이브러리
+import com.microsoft.codepush.react.CodePush;
 
 
 public class MainApplication extends Application implements ReactApplication {
@@ -41,7 +42,11 @@ public class MainApplication extends Application implements ReactApplication {
         @Override
         protected JSIModulePackage getJSIModulePackage() {
           return new ReanimatedJSIModulePackage(); // reanimated2 라이브러리
-      }
+        }
+        @Override
+        protected String getJSBundleFile() {
+            return CodePush.getJSBundleFile(); // code push
+        }
       };
 
   private final ReactNativeHost mNewArchitectureNativeHost =
