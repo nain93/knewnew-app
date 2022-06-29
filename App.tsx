@@ -15,7 +15,10 @@ import OkPopup from '~/components/popup/okPopup';
 import Loading from '~/components/loading';
 import FadeInOut from '~/hooks/fadeInOut';
 
+import * as Sentry from "@sentry/react-native";
+
 export const navigationRef = createNavigationContainerRef();
+
 const App = () => {
   const [isPopupOpen, setIsPopupOpen] = useRecoilState(popupState);
   const [modalOpen, setModalOpen] = useRecoilState(okPopupState);
@@ -173,6 +176,14 @@ const App = () => {
     </SafeAreaProvider>
   );
 };
+
+Sentry.init({
+  // TODO Need to separate in dotenv
+  dsn: "https://16e08b19073a4ce28fbf16241c48aed4@o1302410.ingest.sentry.io/6539779",
+  // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+  // We recommend adjusting this value in production.
+  tracesSampleRate: 1.0,
+});
 
 let codePushOptions = {
   checkFrequency: codePush.CheckFrequency.MANUAL
