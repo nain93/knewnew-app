@@ -31,36 +31,27 @@ const Search = ({ navigation }: SearchProps) => {
   const [keyword, setKeyword] = useState("");
   const [searchWords, setSearchWords] = useState("");
   const [recentKeywords, setRecentKeyWords] = useState<Array<string>>([]);
-  const [searchCount, setSearchCount] = useState({
-    reviewCount: 0,
-    userCount: 0
-  });
+  const [reviewCount, setReviewCount] = useState(0);
+  const [userCount, setUserCount] = useState(0);
 
   const token = useRecoilValue(tokenState);
 
   const searchListQuery = useInfiniteQuery<ReviewListType[], Error>(["searchList", token, textForRefresh], async ({ pageParam = 0 }) => {
-    // const queryData: { list: ReviewListType[], totalLength: number } = await getSearchList({ token, keyword, offset: pageParam });
-    const queryData = await getSearchList({ token, keyword, offset: pageParam });
-    // console.log(queryData, 'queryData');
-    // setSearchCount({ ...searchCount, reviewCount: queryData.totalLength });
-    // return queryData.list;
-    return queryData;
+    const queryData: { result: ReviewListType[], totalLength: number } = await getSearchList({ token, keyword, offset: pageParam });
+    setReviewCount(queryData.totalLength);
+    return queryData.result;
   }, {
     enabled: !!textForRefresh,
-    getNextPageParam: (next, all) => all.flat().length,
-    getPreviousPageParam: (prev) => (prev.length - 20) ?? undefined,
+    getNextPageParam: (next, all) => all.flat().length
   });
 
   const userListQuery = useInfiniteQuery<userNormalType[], Error>(["userList", token, textForRefresh], async ({ pageParam = 0 }) => {
-    // const queryData: { list: userNormalType[], totalLength: number } = await getSearchUserList({ token, nickname: keyword, offset: pageParam });
-    const queryData = await getSearchUserList({ token, nickname: keyword, offset: pageParam });
-    // setSearchCount({ ...searchCount, userCount: queryData.totalLength });
-    // return queryData.list;
-    return queryData;
+    const queryData: { result: userNormalType[], totalLength: number } = await getSearchUserList({ token, nickname: keyword, offset: pageParam });
+    setUserCount(queryData.totalLength);
+    return queryData.result;
   }, {
     enabled: !!textForRefresh,
-    getNextPageParam: (next, all) => all.flat().length,
-    getPreviousPageParam: (prev) => (prev.length - 20) ?? undefined,
+    getNextPageParam: (next, all) => all.flat().length
   });
 
   const handleSearch = async (searchKeyword: string) => {
@@ -168,7 +159,8 @@ const Search = ({ navigation }: SearchProps) => {
           keyword={searchWords}
           userList={userListQuery.data?.pages.flat()}
           searchList={searchListQuery.data?.pages.flat()}
-          searchCount={searchCount}
+          reviewCount={reviewCount}
+          userCount={userCount}
         />
         :
         <View style={styles.container}>

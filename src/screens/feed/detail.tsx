@@ -41,7 +41,8 @@ interface FeedDetailProps {
     badge: string,
     isLike: boolean,
     isBookmark: boolean,
-    authorId: number
+    authorId: number,
+    toComment?: boolean
   }>;
 }
 
@@ -62,7 +63,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const myId = useRecoilValue(myIdState);
   const queryClient = useQueryClient();
 
-  const [commentIsEdit, setCommentIsEdit] = useState<boolean>();
+  const [commentIsEdit, setCommentIsEdit] = useState<boolean>(false);
   const [modifyingIdx, setModifyingIdx] = useState(-1);
   const [editCommentId, setEditCommentId] = useState<number>(-1);
   const [tags, setTags] = useState<Array<string>>([]);
@@ -80,6 +81,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const setModalOpen = useSetRecoilState(okPopupState);
   const setIspopupOpen = useSetRecoilState(popupState);
 
+  const detailScrollRef = useRef<ScrollView>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [initialIndex, setInitialIndex] = useState(0);
   const openGallery = (idx: number) => {
@@ -159,9 +161,10 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     }
   });
 
-  const editCommentMutation = useMutation('editComment', ({ reviewId, commentId, comment }: { reviewId: number, commentId: number, comment: string }) =>
+  const editCommentMutation = useMutation('editComment', async ({ reviewId, commentId, comment }: { reviewId: number, commentId: number, comment: string }) =>
     editReviewComment({ token, reviewId, commentId, content: comment }), {
     onSuccess: () => {
+      setCommentIsEdit(false);
       queryClient.invalidateQueries('getCommentList');
       Keyboard.dismiss();
     }
@@ -186,7 +189,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     if (route.params) {
       if (commentIsEdit) {
         editCommentMutation.mutate({ reviewId: route.params?.id, commentId: editCommentId, comment: content });
-        setCommentIsEdit(false);
       } else {
         if (recommentMode && commentParentId) {
           addCommentMutation.mutate({ reviewId: route.params?.id, comment: content, parentId: commentParentId });
@@ -296,6 +298,13 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     );
   }, [reviewDetailQuery.data?.tags]);
 
+  // * 댓글위치로 스크롤
+  useEffect(() => {
+    if (route.params?.toComment) {
+      detailScrollRef.current?.scrollToEnd();
+    }
+  }, [route.params, reviewDetailQuery.isFetching]);
+
   if (reviewDetailQuery.isLoading || reviewDetailQuery.isFetching) {
     return <Loading />;
   }
@@ -332,6 +341,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
         style={{ flex: 1 }}
       >
         <ScrollView
+          ref={detailScrollRef}
           contentContainerStyle={{ paddingBottom: h2p(30) }}
           showsVerticalScrollIndicator={false}
           style={{ paddingTop: h2p(20), flex: 1 }}
@@ -495,15 +505,15 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                         style={{
                           paddingHorizontal: d2p(20),
                           paddingTop: h2p(10),
-                          backgroundColor: (index === modifyingIdx) && commentIsEdit ? "#F7F7FC" : theme.color.white
+                          paddingBottom: h2p(14.5),
+                          backgroundColor: (index === modifyingIdx) && commentIsEdit ? theme.color.grayscale.f7f7fc : theme.color.white
                         }}>
                         <View style={{
                           flexDirection: "row",
                           alignItems: "center",
                         }}>
                           <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: item.author.id })}
-                            style={styles.commentProfileLine}
-                          >
+                            style={styles.commentProfileLine}>
                             <FastImage source={item.author.profileImage ? { uri: item.author.profileImage } : noProfile}
                               style={styles.commentImg} />
                           </TouchableOpacity>
@@ -512,7 +522,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                             width: Dimensions.get("window").width - d2p(70),
                           }}>
                             <View style={{ marginLeft: d2p(10) }}>
-                              <View style={{ flexDirection: "row" }}>
+                              <View style={{ flexDirection: "row", alignItems: "center" }}>
                                 <TouchableOpacity
                                   style={{ flexDirection: "row" }}
                                   onPress={() => navigation.navigate("Mypage", { id: item.author.id })}>
@@ -551,7 +561,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                           </View>
                         </View>
                         <Text style={[styles.commentContent, FONT.Regular]}>{item.content}</Text>
-                        <View style={{ flexDirection: "row", alignItems: "center", marginLeft: d2p(40), marginTop: h2p(10) }}>
+                        {/* 대댓글 api 기능 추가후 주석해제 */}
+                        {/* <View style={{ flexDirection: "row", alignItems: "center", marginLeft: d2p(40), marginTop: h2p(10) }}>
                           <TouchableOpacity onPress={() => {
                             setCommentParentId(item.id);
                             setRecommentName(item.author.nickname);
@@ -565,13 +576,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                               fontSize: 12, color: (item.likeCount > 0) ? theme.color.grayscale.C_443e49 : theme.color.grayscale.C_79737e
                             }]}>좋아요 {item.likeCount}</Text>
                           </TouchableOpacity>
-                        </View>
-                        {/* 대댓글 ui */}
-                        {item.child ?
-                          <Recomment child={item.child} authorName={item.author.nickname} />
-                          :
-                          <View style={styles.commentLine} />
-                        }
+                        </View> */}
                         {commentSelectedIdx === index &&
                           <View style={[styles.clickBox, { right: d2p(32) }]}>
                             <Pressable
@@ -603,6 +608,20 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                           </View>
                         }
                       </View>
+                      {/* 대댓글 ui */}
+                      {item.child ?
+                        <Recomment
+                          modifyingIdx={modifyingIdx}
+                          commentIsEdit={commentIsEdit}
+                          setModifyingIdx={(mdIdx: number) => setModifyingIdx(mdIdx)}
+                          setContent={(reContent: string) => setContent(reContent)}
+                          setCommentIsEdit={(isEdit: boolean) => setCommentIsEdit(isEdit)}
+                          setEditCommentId={(editId: number) => setEditCommentId(editId)}
+                          setCommentSelectedIdx={(selectIdx: number) => setCommentSelectedIdx(selectIdx)}
+                          child={item.child} authorName={item.author.nickname} />
+                        :
+                        <View style={styles.commentLine} />
+                      }
                     </>
                   );
                 }))}
@@ -670,7 +689,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             }}
             placeholder="댓글을 남겨보세요." placeholderTextColor={theme.color.grayscale.d3d0d5} />
           <Pressable hitSlop={hitslop} onPress={handleWriteComment} style={{ alignSelf: "center" }}>
-            <Text style={[{ color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>{!commentIsEdit ? "작성" : "수정"}</Text>
+            <Text style={[{ color: content ? theme.color.main : theme.color.grayscale.a09ca4 }, FONT.Regular]}>{!commentIsEdit ? "작성" : "수정"}</Text>
           </Pressable>
         </Pressable>
       </KeyboardAvoidingView>

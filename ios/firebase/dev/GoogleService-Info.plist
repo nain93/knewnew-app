@@ -3,7 +3,8 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>381936778966-trliq7q4vkv0h2m9sjhese5nlgqu3re9.apps.googleusercontent.com</string>
+	<!-- <string>381936778966-trliq7q4vkv0h2m9sjhese5nlgqu3re9.apps.googleusercontent.com</string> -->
+	<string>19978958503-8i0hoibbfta64msltteflpdseev3ruv9.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
 	<string>com.googleusercontent.apps.381936778966-trliq7q4vkv0h2m9sjhese5nlgqu3re9</string>
 	<key>API_KEY</key>

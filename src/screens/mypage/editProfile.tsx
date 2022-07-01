@@ -55,6 +55,7 @@ interface EditProfileProps {
   navigation: NavigationStackProp;
   route: NavigationRoute<{
     profile: ProfileType
+    foucsHeadLine?: boolean
   }>;
 }
 
@@ -193,6 +194,13 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
           return v;
         })
       });
+    }
+  }, [route.params]);
+
+  // * 자기소개 input 포커스
+  useEffect(() => {
+    if (route.params?.foucsHeadLine) {
+      selfInputRef.current?.focus();
     }
   }, [route.params]);
 

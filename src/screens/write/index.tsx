@@ -8,7 +8,6 @@ import { blackclose, cart, circle, graycircle, grayclose, grayheart, heart, main
 import { photo, photoClose } from '~/assets/images';
 import { d2p, h2p } from '~/utils';
 
-import ImageCropPicker from 'react-native-image-crop-picker';
 import RBSheet from "react-native-raw-bottom-sheet";
 import SelectLayout from '~/components/selectLayout';
 import CloseIcon from '~/components/icon/closeIcon';
@@ -19,7 +18,7 @@ import { MarketType, ReviewListType, WriteImagesType, WriteReviewType } from '~/
 import { FONT } from '~/styles/fonts';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
-import { editReview, writeReview } from '~/api/review';
+import { deleteReviewImage, editReview, writeReview } from '~/api/review';
 import { initialBadgeData } from '~/utils/data';
 import FeedReview from '~/components/review/feedReview';
 import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
@@ -29,6 +28,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { getMyProfile } from '~/api/user';
 import { MyProfileType } from '~/types/user';
 import { marketList } from '~/utils/constant';
+import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
 
 interface WriteProp {
   navigation: NavigationStackProp;
@@ -69,20 +69,23 @@ const Write = ({ navigation, route }: WriteProp) => {
   const inputRef = useRef<TextInput>(null);
   const tagRefRBSheet = useRef<RBSheet>(null);
   const marketRefRBSheet = useRef<RBSheet>(null);
-  const [imageList, setImageList] = useState<string[]>([]);
   const [keyboardHeight, setKeyBoardHeight] = useState(0);
   const queryClient = useQueryClient();
   const token = useRecoilValue(tokenState);
-  const setIspopupOpen = useSetRecoilState(popupState);
   const [presignImg, setPresignImg] = useState<WriteImagesType[]>([]);
   const [blockSubmit, setBlockSubmit] = useState(false);
   const setModalOpen = useSetRecoilState(okPopupState);
+  const setIspopupOpen = useSetRecoilState(popupState);
   const myId = useRecoilValue(myIdState);
   const [uploadBody, setUploadBody] = useState<{
     uri: string,
     name: string | undefined,
     type: string
   }[]>([]);
+
+  const [imageList, setImageList] = React.useState<string[]>([]);
+  const [images, setImages] = useState<any[]>([]);
+  const [imageIds, setImageIds] = useState<number[]>([]);
 
   const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", token], () => getMyProfile(token), {
     enabled: !!token
@@ -137,7 +140,9 @@ const Write = ({ navigation, route }: WriteProp) => {
   const editReviewMutation = useMutation(["editReview", token],
     ({ writeProps, id }: { writeProps: WriteReviewType, id: number }) =>
       editReview({ token, id, ...writeProps }), {
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      // * 이미지 삭제 api
+      await Promise.all(imageIds.map(v => mutateAsync(v)));
       if (data) {
         queryClient.setQueriesData("reviewList", (reviewQuery: any) => {
           if (reviewQuery && getMyProfileQuery.data) {
@@ -191,47 +196,31 @@ const Write = ({ navigation, route }: WriteProp) => {
           await uploadImage(v, data[i]);
         });
         //@ts-ignore
-        const images = data.reduce<Array<{ priority: number, image: string }>>((acc, cur, idx) => {
+        const reducedImages = data.reduce<Array<{ priority: number, image: string }>>((acc, cur, idx) => {
           acc = acc.concat({ priority: idx, image: cur.fields.key });
           return acc;
         }, []);
-        setPresignImg(images);
+        setPresignImg(reducedImages);
+
         if (route.params?.isEdit && route.params.review?.id) {
           editReviewMutation.mutate({
             writeProps:
-              { ...writeData, parent: route.params.review.parent?.isActive ? writeData.parent : undefined, images },
+              { ...writeData, parent: route.params.review.parent?.isActive ? writeData.parent : undefined, images: reducedImages },
             id: route.params.review?.id
           });
         }
         else {
-          addReviewMutation.mutate({ ...writeData, images });
+          addReviewMutation.mutate({ ...writeData, images: reducedImages });
         }
       }
     });
 
-  const pickImage = () => {
-    if (imageList.length >= 5) {
-      return;
+  const { mutateAsync } = useMutation("deleteImages", (id: number) => deleteReviewImage(token, id), {
+    onSuccess: (data) => {
+      console.log(data, 'data');
     }
+  });
 
-    ImageCropPicker.openPicker({
-      mediaType: "photo",
-      crop: "true",
-      includeBase64: true,
-      compressImageMaxWidth: 720,
-      compressImageMaxHeight: 720
-    }).then(v => {
-      setUploadBody(uploadBody.concat(
-        {
-          uri: v.path,
-          type: v.mime,
-          name: Platform.OS === 'ios' ? v.filename : `${Date.now()}.${v.mime === 'image/jpeg' ? 'jpg' : 'png'}`,
-        }
-      ));
-      setImageList(imageList.concat(`data:${v.mime};base64,${v.data}`));
-    }
-    );
-  };
   const handleAddWrite = async () => {
     if (writeData.satisfaction === "") {
       setIspopupOpen({ isOpen: true, content: "선호도를 표시해주세요", popupStyle: { bottom: keyboardHeight + h2p(20) } });
@@ -256,6 +245,11 @@ const Write = ({ navigation, route }: WriteProp) => {
     else {
       // * 수정할때 (이미지 업로드x)
       if (route.params?.isEdit && route.params.review?.id) {
+        const reducedImages = images.reduce<Array<{ priority: number, image: string }>>((acc, cur, idx) => {
+          acc = acc.concat({ priority: idx, image: "review" + cur.image.split("review")[1] });
+          return acc;
+        }, []);
+        setPresignImg(reducedImages);
         editReviewMutation.mutate({
           writeProps:
             { ...writeData, parent: route.params.review.parent?.isActive ? writeData.parent : undefined },
@@ -269,7 +263,10 @@ const Write = ({ navigation, route }: WriteProp) => {
   };
 
   useEffect(() => {
+    setUploadBody([]);
+    setImageIds([]);
     if (route.params?.review && route.params.type !== "reKnewWrite") {
+      setImages(route.params.review.images);
       setImageList(route.params.review.images.map(v => v.image));
       setUserBadge({
         interest: userBadge.interest.map(v => {
@@ -306,8 +303,8 @@ const Write = ({ navigation, route }: WriteProp) => {
     }
     else {
       setUserBadge(initialBadgeData);
-      setUploadBody([]);
       setImageList([]);
+      setImages([]);
       setWriteData({
         images: [],
         content: "",
@@ -346,6 +343,34 @@ const Write = ({ navigation, route }: WriteProp) => {
       });
     }
   }, [route.params?.type]);
+
+  const openPicker = async () => {
+    try {
+      const response = await MultipleImagePicker.openPicker({
+        selectedAssets: images,
+        mediaType: "image",
+        usedCameraButton: false,
+        // maxVideo: 1,
+        // isExportThumbnail: true,
+        // isCrop: true,
+        // isCropCircle: true,
+      });
+      if (response.length > 5) {
+        setIspopupOpen({ isOpen: true, content: "이미지는 최대 5장까지 올릴 수 있습니다." });
+        return;
+      }
+      setUploadBody(response.map(v => ({
+        uri: v.path,
+        type: v.mime,
+        name: Platform.OS === 'ios' ? v.fileName : `${Date.now()}.${v.mime === 'image/jpeg' ? 'jpg' : 'png'}`,
+      })));
+      setImageList(response.map(v => Platform.OS === 'ios' ? v.fileName : (`${Date.now()}.${v.mime === 'image/jpeg' ? 'jpg' : 'png'}`)));
+      setImages(response);
+    } catch (e) {
+      //@ts-ignore
+      console.log(e.code, e.message);
+    }
+  };
 
   if ((route.params?.loading && !writeData.satisfaction) || addReviewMutation.isLoading || editReviewMutation.isLoading) {
     return (
@@ -542,22 +567,31 @@ const Write = ({ navigation, route }: WriteProp) => {
       }}>
         {
           (!route.params?.isEdit || !route.params.review?.id) &&
-          <Pressable onPress={pickImage} style={[styles.images, { marginLeft: d2p(20), marginRight: d2p(15) }]}>
+          <Pressable onPress={openPicker} style={[styles.images, { marginLeft: d2p(20), marginRight: d2p(15) }]}>
             <View style={{ alignItems: "center" }}>
               <Image source={photo} style={{ width: d2p(20), height: h2p(20), marginTop: h2p(12) }} />
-              <Text style={[{ fontSize: 12, color: theme.color.grayscale.d3d0d5, marginVertical: h2p(8) }, FONT.Regular]}>{imageList.length}/5</Text>
+              <Text style={[{ fontSize: 12, color: theme.color.grayscale.d3d0d5, marginVertical: h2p(8) }, FONT.Regular]}>{images.length}/5</Text>
             </View>
           </Pressable>
         }
         <ScrollView
           style={{ paddingLeft: (!route.params?.isEdit || !route.params.review?.id) ? 0 : d2p(20) }}
           horizontal showsHorizontalScrollIndicator={false}>
-          {React.Children.toArray(imageList.map((image, idx) => {
+          {React.Children.toArray(images.map((image, idx) => {
             return (
               <View style={[styles.images, { marginRight: (idx === imageList.length - 1) ? d2p(20) : d2p(5) }]}>
                 <View style={{ alignItems: "center" }}>
-                  <Image source={{ uri: image }} style={{ width: d2p(96), height: h2p(64), borderRadius: 4 }} />
+                  <Image source={
+                    route.params?.review?.images ?
+                      { uri: route.params.review.images[idx].image }
+                      :
+                      {
+                        uri: Platform.OS === "ios" ? 'file://' + image.path : 'file://' + image.realPath,
+                      }
+                  } style={{ width: d2p(96), height: h2p(64), borderRadius: 4 }} />
                   <Pressable onPress={() => {
+                    setImageIds(imageIds.concat(image.id));
+                    setImages(images.filter((_, filterIdx) => idx !== filterIdx));
                     setWriteData({ ...writeData, images: writeData.images?.filter((_, filterIdx) => idx !== filterIdx) });
                     setImageList(imageList.filter((_, filterIdx) => idx !== filterIdx));
                     setUploadBody(uploadBody.filter((_, filterIdx) => idx !== filterIdx));
@@ -590,9 +624,6 @@ const Write = ({ navigation, route }: WriteProp) => {
         ref={tagRefRBSheet}
         closeOnDragDown
         dragFromTopOnly
-        onOpen={() => {
-
-        }}
         height={(!isIphoneX() && Platform.OS !== "android") ?
           Dimensions.get("window").height - h2p(204) : Dimensions.get("window").height - h2p(264)}
         openDuration={250}

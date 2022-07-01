@@ -53,6 +53,7 @@ interface editReviewCommentType {
   reviewId: number,
   commentId: number,
   content: string
+  parentId?: number
 }
 
 export const editReviewComment = async ({ token, reviewId, commentId, content }: editReviewCommentType) => {
