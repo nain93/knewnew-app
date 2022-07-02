@@ -26,6 +26,7 @@
     "@react-navigation/bottom-tabs": "^6.3.1",
     "@react-navigation/native": "^6.0.10",
     "@react-navigation/stack": "^6.2.1",
+    "@sentry/react-native": "^4.1.0",
     "appcenter": "^4.4.4",
     "appcenter-analytics": "^4.4.4",
     "appcenter-crashes": "^4.4.4",
