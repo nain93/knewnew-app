@@ -3,6 +3,7 @@ import { baseURL } from "~/api";
 import { WriteReviewType } from "~/types/review";
 
 export const getReviewList = async ({ token, tag, offset }: { token: string, tag?: string, offset: number }) => {
+  console.log(offset, 'offset');
   const res = await axios.get(baseURL + "review/", {
     params: {
       offset,

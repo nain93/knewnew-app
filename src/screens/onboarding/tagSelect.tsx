@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Image, Pressable, TextInput } from 'react-native';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import BasicButton from '~/components/button/basicButton';
@@ -12,6 +12,9 @@ import { useSetRecoilState } from 'recoil';
 import { UserInfoType } from '~/types/user';
 import { FONT } from '~/styles/fonts';
 import { initialBadgeData } from '~/utils/data';
+import SelectTag from '~/components/selectTag';
+import { checkIcon } from '~/assets/icons';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 interface BadgeSelectProps {
   navigation: NavigationStackProp
@@ -19,29 +22,34 @@ interface BadgeSelectProps {
 }
 
 const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
-
   const [userInfo, setUserInfo] = useState<UserInfoType>();
-
+  const [isSelect, setIsSelect] = useState<"가족 구성" | "생활 형태" | "푸드 라이프" | "">("푸드 라이프");
   const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
 
   const setIspopupOpen = useSetRecoilState(popupState);
 
   const handleNext = async () => {
-    if (userBadge.household.every(v => !v.isClick) ||
-      userBadge.interest.every(v => !v.isClick)) {
-      setIspopupOpen({ isOpen: true, content: "관심사(or가족구성)을 선택해주세요" });
-      return;
-    }
-    const copy: { [index: string]: Array<{ isClick: boolean, title: string }> } = { ...userBadge };
-    const badge = Object.keys(userBadge).reduce<Array<{ isClick: boolean, title: string }>>((acc, cur) => {
-      acc = acc.concat(copy[cur].filter(v => v.isClick));
-      return acc;
-    }, []);
-    if (badge.length > 10) {
-      setIspopupOpen({ isOpen: true, content: "태그는 10개까지만 선택할 수 있어요" });
-      return;
-    }
-    navigation.navigate("BadgeSelect", { userBadge, userInfo });
+    // if (userBadge.household.every(v => !v.isClick) ||
+    //   userBadge.interest.every(v => !v.isClick)) {
+    //   setIspopupOpen({ isOpen: true, content: "관심사(or가족구성)을 선택해주세요" });
+    //   return;
+    // }
+    // const copy: { [index: string]: Array<{ isClick: boolean, title: string }> } = { ...userBadge };
+    // const badge = Object.keys(userBadge).reduce<Array<{ isClick: boolean, title: string }>>((acc, cur) => {
+    //   acc = acc.concat(copy[cur].filter(v => v.isClick));
+    //   return acc;
+    // }, []);
+    // if (badge.length > 10) {
+    //   setIspopupOpen({ isOpen: true, content: "태그는 10개까지만 선택할 수 있어요" });
+    //   return;
+    // }
+    navigation.navigate("Welcome", {
+      userBadge: {
+        foodLife: userBadge.foodLife.filter(v => v.isClick)[0].title,
+        lifeStyle: userBadge.lifeStyle.filter(v => v.isClick)[0].title,
+        household: userBadge.household.filter(v => v.isClick)[0].title
+      }, userInfo
+    });
   };
 
   useEffect(() => {
@@ -49,30 +57,161 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
   }, [route.params]);
 
   return (
-    <View style={styles.container}>
-      <SelectLayout
-        headerComponent={
-          <View style={{ marginBottom: h2p(40), marginTop: h2p(42.5), }}>
-            <Text style={[styles.title, FONT.SemiBold]}>나를 소개하는 태그를</Text>
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={[styles.title, { color: theme.color.main }, FONT.SemiBold]}>2가지 이상 </Text>
-              <Text style={[styles.title, FONT.SemiBold]}>선택해주세요.</Text></View>
-            <View style={{ flexDirection: 'row', marginTop: d2p(20) }}>
-              <Text style={FONT.Bold}>나를 소개하는 태그</Text>
-              <Text style={FONT.Regular}>를 골라주세요.</Text>
-            </View>
-            <Text style={FONT.Regular}>최소 2개 최대 10개까지 고를 수 있어요.</Text>
+    <KeyboardAwareScrollView style={styles.container}
+      contentContainerStyle={{ flex: 1 }}
+      showsVerticalScrollIndicator={false} >
+      <View>
+        <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: h2p(30) }}>
+          <Text style={[FONT.SemiBold, { fontSize: 26, color: theme.color.main }]}>
+            {userInfo?.nickname}</Text>
+          <Text style={[FONT.SemiBold, { fontSize: 26 }]}>님</Text>
+          <Text style={[FONT.SemiBold, { fontSize: 26 }]}> 반가워요!</Text>
+        </View>
+        <Text style={[FONT.Bold, { marginTop: h2p(40) }]}>
+          슬기로운 뉴뉴생활을 위해 나를 소개해주세요.
+        </Text>
+        <Text style={[FONT.Regular, { marginTop: h2p(20) }]}>
+          {`작성하신 정보는 다른 유저들에게 보여지며,
+7일에 한 번 마이페이지에서 수정할 수 있습니다.`}
+        </Text>
+      </View>
+      <TouchableOpacity onPress={() => setIsSelect("푸드 라이프")} style={[styles.select, { marginTop: h2p(30) }]}>
+        <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
+          <Text style={[FONT.Bold, styles.step]}>Step.1</Text>
+          <View>
+            <Text style={[FONT.Bold, { fontSize: 16, color: isSelect === "푸드 라이프" ? theme.color.grayscale.C_443e49 : theme.color.grayscale.eae7ec }]}>
+              푸드 라이프 스타일 선택</Text>
+            {isSelect === "푸드 라이프" &&
+              <View style={{ paddingTop: h2p(10) }}>
+                {React.Children.toArray(userBadge.foodLife.map((badge, badgeIdx) => (
+                  <Pressable onPress={() => {
+                    setUserBadge({
+                      ...userBadge, foodLife: userBadge.foodLife.map((v, i) => {
+                        if (badgeIdx === i) {
+                          return { ...v, isClick: true };
+                        }
+                        return { ...v, isClick: false };
+                      })
+                    });
+                    setIsSelect("생활 형태");
+                  }}>
+                    <SelectTag viewStyle={{ paddingVertical: h2p(5) }} name={badge.title} isSelected={badge.isClick} />
+                  </Pressable>
+                )))}
+              </View>}
           </View>
-        }
-        userBadge={userBadge} setUserBadge={(badgeProp: BadgeType) => setUserBadge(badgeProp)}
-        isInitial={true} />
+          {
+            !userBadge.foodLife.every(v => !v.isClick) &&
+            <View style={{ flexDirection: "row", alignItems: "center", marginLeft: "auto" }}>
+              <Image source={checkIcon} style={{ width: d2p(10), height: d2p(8), marginRight: d2p(5) }} />
+              <Text style={[FONT.Bold, { fontSize: 12, color: theme.color.main }]}>완료</Text>
+            </View>
+          }
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => setIsSelect("생활 형태")} style={[styles.select, { marginTop: h2p(30) }]}>
+        <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
+          <Text style={[FONT.Bold, styles.step]}>Step.2</Text>
+          <View>
+            <Text style={[FONT.Bold, { fontSize: 16, color: isSelect === "생활 형태" ? theme.color.grayscale.C_443e49 : theme.color.grayscale.eae7ec }]}>
+              생활 형태 선택</Text>
+            {isSelect === "생활 형태" &&
+              <View style={{ paddingTop: h2p(10) }}>
+                {React.Children.toArray(userBadge.lifeStyle.map((badge, badgeIdx) => (
+                  <>
+                    <Pressable onPress={() => {
+                      setUserBadge({
+                        ...userBadge, lifeStyle: userBadge.lifeStyle.map((v, i) => {
+                          if (badgeIdx === i) {
+                            return { ...v, isClick: true };
+                          }
+                          if (v.content) {
+                            return { ...v, isClick: false, content: "" };
+                          }
+                          return { ...v, isClick: false };
+                        })
+                      });
+                      setIsSelect("가족 구성");
+                    }}>
+                      <SelectTag viewStyle={{ paddingVertical: h2p(5) }} name={badge.title} isSelected={badge.isClick} />
+                    </Pressable>
+                    {badge.title === "기타" &&
+                      <TextInput
+                        autoCapitalize="none"
+                        placeholder="직접 입력해주세요" placeholderTextColor={theme.color.grayscale.d3d0d5}
+                        value={badge.content}
+                        onChangeText={(e) => {
+                          setUserBadge({
+                            ...userBadge, lifeStyle: userBadge.lifeStyle.map((v) => {
+                              if (v.title === "기타") {
+                                return { ...v, content: e, isClick: true };
+                              }
+                              return { ...v, isClick: false };
+                            })
+                          });
+                        }}
+                        style={{
+                          width: Dimensions.get("window").width - d2p(140),
+                          paddingVertical: h2p(6),
+                          borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec
+                        }}
+                      />
+                    }
+                  </>
+                )))}
+              </View>}
+          </View>
+          {
+            (!userBadge.lifeStyle.every(v => !v.isClick) && userBadge.lifeStyle.every(v => {
+              if (v.title === "기타" && v.isClick && !v.content) {
+                return false;
+              }
+              return true;
+            })) &&
+            <View style={{ flexDirection: "row", alignItems: "center", marginLeft: "auto" }}>
+              <Image source={checkIcon} style={{ width: d2p(10), height: d2p(8), marginRight: d2p(5) }} />
+              <Text style={[FONT.Bold, { fontSize: 12, color: theme.color.main }]}>완료</Text>
+            </View>
+          }
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => setIsSelect("가족 구성")} style={[styles.select, { marginTop: h2p(30), marginBottom: "auto" }]}>
+        <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
+          <Text style={[FONT.Bold, styles.step]}>Step.3</Text>
+          <View>
+            <Text style={[FONT.Bold, { fontSize: 16, color: isSelect === "가족 구성" ? theme.color.grayscale.C_443e49 : theme.color.grayscale.eae7ec }]}>가구 구성 선택</Text>
+            {isSelect === "가족 구성" &&
+              <View style={{ paddingTop: h2p(10) }}>
+                {React.Children.toArray(userBadge.household.map((badge, badgeIdx) => (
+                  <Pressable onPress={() => {
+                    setUserBadge({
+                      ...userBadge, household: userBadge.household.map((v, i) => {
+                        if (badgeIdx === i) {
+                          return { ...v, isClick: true };
+                        }
+                        return { ...v, isClick: false };
+                      })
+                    });
+                    setIsSelect("");
+                  }}>
+                    <SelectTag viewStyle={{ paddingVertical: h2p(5) }} name={badge.title} isSelected={badge.isClick} />
+                  </Pressable>
+                )))}
+              </View>}
+          </View>
+          {
+            !userBadge.household.every(v => !v.isClick) &&
+            <View style={{ flexDirection: "row", alignItems: "center", marginLeft: "auto" }}>
+              <Image source={checkIcon} style={{ width: d2p(10), height: d2p(8), marginRight: d2p(5) }} />
+              <Text style={[FONT.Bold, { fontSize: 12, color: theme.color.main }]}>완료</Text>
+            </View>
+          }
+        </View>
+      </TouchableOpacity>
       <BasicButton onPress={handleNext} text="다음으로" bgColor={theme.color.white}
         textColor={theme.color.main}
-        viewStyle={{
-          marginTop: h2p(19),
-          marginBottom: h2p(40)
-        }} />
-    </View>
+        viewStyle={{ marginBottom: h2p(40) }} />
+    </KeyboardAwareScrollView>
   );
 };
 
@@ -87,11 +226,20 @@ const styles = StyleSheet.create({
     includeFontPadding: false,
   },
   select: {
-    borderWidth: 1, borderColor: theme.color.grayscale.eae7ec,
-    borderRadius: 16,
-    marginTop: d2p(8), marginRight: d2p(5),
-    paddingVertical: d2p(5), paddingHorizontal: d2p(15),
+    width: Dimensions.get("window").width - d2p(40),
+    borderColor: theme.color.grayscale.f7f7fc,
+    borderWidth: 1,
+    borderRadius: 10,
+    minHeight: h2p(50),
+    paddingHorizontal: d2p(20),
+    paddingVertical: h2p(15)
   },
+  step: {
+    fontSize: 12,
+    color: theme.color.grayscale.C_443e49,
+    marginRight: d2p(17),
+    marginTop: h2p(2)
+  }
 });
 
 export default TagSelect;

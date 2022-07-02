@@ -13,14 +13,18 @@ export interface InterestType {
 }
 
 export interface BadgeType {
-  interest: Array<InterestType>,
-  household: Array<{
-    title: string,
-    isClick: boolean
-  }>,
-  taste: Array<{
+  foodLife: Array<{
     title: string;
     isClick: boolean;
+  }>,
+  household: Array<{
+    title: string;
+    isClick: boolean;
+  }>,
+  lifeStyle: Array<{
+    title: string;
+    isClick: boolean;
+    content?: string
   }>
 }
 
