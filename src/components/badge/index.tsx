@@ -19,6 +19,7 @@ interface BadgeProp {
   viewStyle?: ViewStyle
 }
 
+//! will soon deprecate
 const Badge = ({
   onPress,
   layoutType = "normal",

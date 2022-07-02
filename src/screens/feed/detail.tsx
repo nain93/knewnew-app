@@ -80,6 +80,10 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [like, setLike] = useState<boolean>(false);
   const [cart, setCart] = useState<boolean>(false);
   const [numberLine, setNumberLine] = useState(1);
+
+  const [recommentMode, setRecommentMode] = useState(false);
+  const [recommentName, setRecommentName] = useState("");
+
   const setRefresh = useSetRecoilState(refreshState);
   const setModalOpen = useSetRecoilState(okPopupState);
   const setIspopupOpen = useSetRecoilState(popupState);
@@ -513,6 +517,17 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                           </View>
                         </View>
                         <Text style={[styles.commentContent, FONT.Regular]}>{item.content}</Text>
+                        <View style={{ flexDirection: "row", alignItems: "center", marginLeft: d2p(40), marginTop: h2p(10) }}>
+                          <TouchableOpacity onPress={() => {
+                            setRecommentName(item.author.nickname);
+                            setRecommentMode(true);
+                          }}>
+                            <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_79737e }]}>답글 달기</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity onPress={() => console.log("zz")}>
+                            <Text style={[FONT.Bold, { marginLeft: d2p(10), fontSize: 12, color: theme.color.grayscale.C_443e49 }]}>좋아요</Text>
+                          </TouchableOpacity>
+                        </View>
                         <View style={styles.commentLine} />
                         {commentSelectedIdx === index &&
                           <View style={[styles.clickBox, { right: d2p(32) }]}>
@@ -552,6 +567,27 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             </>
           }
         </ScrollView>
+        {recommentMode &&
+          <View style={{
+            backgroundColor: theme.color.grayscale.f7f7fc,
+            paddingVertical: h2p(10),
+            paddingHorizontal: d2p(20),
+            flexDirection: "row",
+            justifyContent: "space-between"
+          }}>
+            <View style={{ flexDirection: "row" }}>
+              <Text style={[FONT.SemiBold, { fontSize: 13, color: theme.color.grayscale.a09ca4 }]}>
+                {recommentName}
+              </Text>
+              <Text style={[FONT.Regular, { fontSize: 13, color: theme.color.grayscale.a09ca4 }]}>
+                님에게 답글을 남기는 중
+              </Text>
+            </View>
+            <TouchableOpacity onPress={() => setRecommentMode(false)}>
+              <Text style={[FONT.Bold, { fontSize: 13, color: theme.color.grayscale.a09ca4 }]}>취소</Text>
+            </TouchableOpacity>
+          </View>
+        }
         <Pressable
           onPress={() => inputRef.current?.focus()}
           style={{

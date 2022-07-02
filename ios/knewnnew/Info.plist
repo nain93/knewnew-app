@@ -88,6 +88,8 @@
 	<string></string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>카메라 롤에서 사진 및 동영상을 선택하여 게시글을 작성할 수 있도록 됩니다.</string>
+  <key>NSPhotoLibraryAddUsageDescription</key>
+  <string>카메라 롤에서 사진 및 동영상을 선택하여 게시글을 작성할 수 있도록 됩니다.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>SUIT-Bold.otf</string>

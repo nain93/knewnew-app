@@ -93,11 +93,15 @@ const Feed = ({ navigation, route }: FeedProps) => {
       return queryData;
     }
   }, {
-    getNextPageParam: (next, all) => all.flat().length,
+    getNextPageParam: (next, all) => {
+      console.log(all.flat().length, 'all.flat().length');
+      return all.flat().length;
+    },
     onSettled: () => {
       SplashScreen.hide();
     }
   });
+
   const reviewKey = useCallback((review) => String(review.id), []);
   const reviewHeader = useCallback(() =>
     <>

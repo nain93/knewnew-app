@@ -521,3 +521,4 @@ fabric.properties
 # Ruby / CocoaPods
 /ios/Pods/
 /vendor/bundle/
+tmp.xcconfig
