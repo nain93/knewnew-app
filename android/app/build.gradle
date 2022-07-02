@@ -1,4 +1,5 @@
 apply plugin: "com.android.application"
+apply plugin: 'com.google.gms.google-services'
 
 import com.android.build.OutputFile
 import org.apache.tools.ant.taskdefs.condition.Os
@@ -79,10 +80,19 @@ import org.apache.tools.ant.taskdefs.condition.Os
  */
 
 project.ext.react = [
-    enableHermes: false,  // clean and rebuild if changing
+    enableHermes: true,  // clean and rebuild if changing
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
+apply from: "../../node_modules/@sentry/react-native/sentry.gradle"
+apply from: "../../node_modules/react-native-code-push/android/codepush.gradle"
+
+project.ext.envConfigFiles = [
+        debug: ".env",
+        releasestaging: ".env",
+        release: ".env"
+]
+apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -135,12 +145,14 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        applicationId "com.cartpickapp"
+        applicationId "com.mealing.knewnnew"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode project.env.get("AOS_BUILD_VERSION").toInteger()
+        versionName project.env.get("AOS_APP_VERSION")
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
+        vectorDrawables.useSupportLibrary = true
+        resValue "string", "build_config_package", "com.mealing.knewnnew"
 
         if (isNewArchitectureEnabled()) {
             // We configure the NDK build only if you decide to opt-in for the New Architecture.
@@ -157,7 +169,7 @@ android {
                     cppFlags "-std=c++17"
                     // Make sure this target name is the same you specify inside the
                     // src/main/jni/Android.mk file for the `LOCAL_MODULE` variable.
-                    targets "cartpickapp_appmodules"
+                    targets "knewnnew_appmodules"
 
                     // Fix for windows limit on number of character in file paths and in command lines
                     if (Os.isFamily(Os.FAMILY_WINDOWS)) {
@@ -230,17 +242,32 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+          if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
+              storeFile file(MYAPP_UPLOAD_STORE_FILE)
+              storePassword MYAPP_UPLOAD_STORE_PASSWORD
+              keyAlias MYAPP_UPLOAD_KEY_ALIAS
+              keyPassword MYAPP_UPLOAD_KEY_PASSWORD
+          }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+            resValue "string", "CodePushDeploymentKey", '""'
         }
         release {
+            resValue "string", "CodePushDeploymentKey", "5gP1EAlJ7O1EFABvdnaH0k4kCqkkVB_AVMmIA"
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+        releaseStaging {
+            resValue "string", "CodePushDeploymentKey", "UhwhO3S3FhPV9Ov6e2kILRuFH51X2569j-M-R"
+            initWith release
+            matchingFallbacks = ['release']
         }
     }
 
@@ -266,8 +293,12 @@ dependencies {
 
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules
-
+	  implementation 'com.google.firebase:firebase-analytics:18.0.2'
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+    implementation 'androidx.core:core-splashscreen:1.0.0-beta01'
+    implementation 'com.facebook.fresco:animated-gif:2.5.0'
+    implementation 'com.facebook.fresco:fresco:2.5.0'
+    implementation platform('com.google.firebase:firebase-bom:30.2.0')
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.fbjni'

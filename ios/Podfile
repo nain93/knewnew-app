@@ -4,7 +4,7 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 platform :ios, '11.0'
 install! 'cocoapods', :deterministic_uuids => false
 
-target 'cartpickApp' do
+target 'knewnnew' do
   config = use_native_modules!
 
   # Flags change depending on the env values.
@@ -19,7 +19,8 @@ target 'cartpickApp' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  target 'cartpickAppTests' do
+
+  target 'knewnnewTests' do
     inherit! :complete
     # Pods for testing
   end
@@ -31,7 +32,12 @@ target 'cartpickApp' do
   use_flipper!()
 
   post_install do |installer|
-    react_native_post_install(installer)
-    __apply_Xcode_12_5_M1_post_install_workaround(installer)
+    installer.pods_project.build_configurations.each do |config|
+      config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+    end
   end
+  pod 'GoogleSignIn', '~> 6.1.0'
+  pod 'Firebase/Analytics'
+  # pod 'GoogleUtilities', :modular_headers => true
+  
 end
