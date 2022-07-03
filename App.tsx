@@ -16,6 +16,7 @@ import Loading from '~/components/loading';
 import FadeInOut from '~/hooks/fadeInOut';
 
 import * as Sentry from "@sentry/react-native";
+import Config from 'react-native-config';
 
 export const navigationRef = createNavigationContainerRef();
 
@@ -157,8 +158,6 @@ const App = () => {
     return Promise.race([checkAndUpdatePromise]);
   };
 
-  // if (!__DEV__) { }
-
   return (
     <SafeAreaProvider>
       {/*@ts-ignore*/}
@@ -176,14 +175,38 @@ const App = () => {
     </SafeAreaProvider>
   );
 };
-
-Sentry.init({
-  // TODO Need to separate in dotenv
-  dsn: "https://16e08b19073a4ce28fbf16241c48aed4@o1302410.ingest.sentry.io/6539779",
-  // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
-  // We recommend adjusting this value in production.
-  tracesSampleRate: 1.0,
-});
+// * 코드푸시떄 테스트
+// codePush.getUpdateMetadata().then(update => {
+//   console.log(update, 'update');
+//   if (update) {
+//     Sentry.init({
+//       // TODO Need to separate in dotenv
+//       dsn: "https://16e08b19073a4ce28fbf16241c48aed4@o1302410.ingest.sentry.io/6539779",
+//       // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+//       // We recommend adjusting this value in production.
+//       tracesSampleRate: 1.0,
+//     });
+//   }
+// });
+if (__DEV__) {
+  Sentry.init({
+    environment: "dev",
+    debug: true,
+    dsn: Config.CENTRY_DSN,
+    // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+    // We recommend adjusting this value in production.
+    tracesSampleRate: 1.0,
+  });
+}
+else {
+  Sentry.init({
+    environment: "production",
+    dsn: Config.CENTRY_DSN,
+    // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+    // We recommend adjusting this value in production.
+    tracesSampleRate: 1.0,
+  });
+}
 
 let codePushOptions = {
   checkFrequency: codePush.CheckFrequency.MANUAL
