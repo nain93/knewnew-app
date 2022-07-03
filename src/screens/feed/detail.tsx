@@ -21,7 +21,7 @@ import { ReviewListType } from '~/types/review';
 import Loading from '~/components/loading';
 import { FONT } from '~/styles/fonts';
 import { noProfile } from '~/assets/images';
-import { addReviewComment, deleteReviewComment, editReviewComment, getReviewComment } from '~/api/comment';
+import { addReviewComment, deleteReviewComment, editReviewComment, getReviewComment, likeComment } from '~/api/comment';
 import ReKnew from '~/components/review/reKnew';
 import More from '~/components/more';
 import { hitslop } from '~/utils/constant';
@@ -32,6 +32,8 @@ import {
   ImageObject,
 } from '@georstat/react-native-image-gallery';
 import axios from 'axios';
+import Recomment from '~/screens/feed/comment/recomment';
+import { CommentListType } from '~/types/comment';
 interface FeedDetailProps {
   navigation: NavigationStackProp
   route: NavigationRoute<{
@@ -41,17 +43,6 @@ interface FeedDetailProps {
     isBookmark: boolean,
     authorId: number
   }>;
-}
-interface CommentListType {
-  id: number;
-  author: {
-    id: number;
-    nickname: string;
-    profileImage: string;
-  };
-  content: string;
-  created: string;
-  likeCount: string;
 }
 
 CacheManager.config = {
@@ -80,6 +71,11 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [like, setLike] = useState<boolean>(false);
   const [cart, setCart] = useState<boolean>(false);
   const [numberLine, setNumberLine] = useState(1);
+
+  const [recommentMode, setRecommentMode] = useState(false);
+  const [recommentName, setRecommentName] = useState("");
+  const [commentParentId, setCommentParentId] = useState<number | null>(null);
+
   const setRefresh = useSetRecoilState(refreshState);
   const setModalOpen = useSetRecoilState(okPopupState);
   const setIspopupOpen = useSetRecoilState(popupState);
@@ -141,35 +137,63 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     enabled: !!route.params?.id
   });
 
-  const addCommentMutation = useMutation('addComment', ({ rid, comment }: { rid: number, comment: string }) => addReviewComment(token, rid, comment), {
+  const addCommentMutation = useMutation('addComment', async ({ reviewId, comment, parentId }: { reviewId: number, comment: string, parentId?: number }) => {
+    if (recommentMode) {
+      const addComments = addReviewComment({ token, reviewId, content: comment, parentId });
+      return addComments;
+    }
+    else {
+      const addComments = addReviewComment({ token, reviewId, content: comment });
+      return addComments;
+    }
+  }, {
     onSuccess: () => {
+      if (recommentMode) {
+        setRecommentMode(false);
+        setRecommentName("");
+        setCommentParentId(null);
+      }
       queryClient.invalidateQueries('getCommentList');
       queryClient.invalidateQueries("reviewList");
       Keyboard.dismiss();
     }
   });
 
-  const editCommentMutation = useMutation('editComment', ({ rId, cId, comment }: { rId: number, cId: number, comment: string }) => editReviewComment(token, rId, cId, comment), {
+  const editCommentMutation = useMutation('editComment', ({ reviewId, commentId, comment }: { reviewId: number, commentId: number, comment: string }) =>
+    editReviewComment({ token, reviewId, commentId, content: comment }), {
     onSuccess: () => {
       queryClient.invalidateQueries('getCommentList');
       Keyboard.dismiss();
     }
   });
 
-  const deleteCommentMutation = useMutation('deleteComment', (id: number) => deleteReviewComment(token, id), {
+  const deleteCommentMutation = useMutation('deleteComment', (id: number) =>
+    deleteReviewComment(token, id), {
     onSuccess: () => {
       queryClient.invalidateQueries('getCommentList');
       queryClient.invalidateQueries("reviewList");
+    }
+  });
+
+  const commentLikeMutation = useMutation("likeCount", ({ commentId, isLike }: { commentId: number, isLike: boolean }) =>
+    likeComment({ token, commentId, isLike }), {
+    onSuccess: (data) => {
+      console.log(data);
     }
   });
 
   const handleWriteComment = () => {
     if (route.params) {
-      if (!commentIsEdit) {
-        addCommentMutation.mutate({ rid: route.params?.id, comment: content });
-      } else {
-        editCommentMutation.mutate({ rId: route.params?.id, cId: editCommentId, comment: content });
+      if (commentIsEdit) {
+        editCommentMutation.mutate({ reviewId: route.params?.id, commentId: editCommentId, comment: content });
         setCommentIsEdit(false);
+      } else {
+        if (recommentMode && commentParentId) {
+          addCommentMutation.mutate({ reviewId: route.params?.id, comment: content, parentId: commentParentId });
+        }
+        else {
+          addCommentMutation.mutate({ reviewId: route.params?.id, comment: content });
+        }
       }
     }
     setContent("");
@@ -489,8 +513,22 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                           }}>
                             <View style={{ marginLeft: d2p(10) }}>
                               <View style={{ flexDirection: "row" }}>
-                                <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: item.author.id })}>
+                                <TouchableOpacity
+                                  style={{ flexDirection: "row" }}
+                                  onPress={() => navigation.navigate("Mypage", { id: item.author.id })}>
                                   <Text style={FONT.Medium}>{item.author.nickname}</Text>
+                                  {item.author.id === myId &&
+                                    <View style={{
+                                      width: d2p(38),
+                                      justifyContent: "center", alignItems: "center",
+                                      marginLeft: d2p(5),
+                                      backgroundColor: theme.color.white,
+                                      borderRadius: 4, borderWidth: 1, borderColor: theme.color.grayscale.d2d0d5
+                                    }}>
+                                      <Text style={[FONT.Medium, { fontSize: 10, color: theme.color.grayscale.C_79737e }]}>
+                                        작성자</Text>
+                                    </View>
+                                  }
                                 </TouchableOpacity>
                                 <Text style={[styles.commentDate, FONT.Regular]}>{dateCommentFormat(item.created)}</Text>
                               </View>
@@ -513,7 +551,27 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                           </View>
                         </View>
                         <Text style={[styles.commentContent, FONT.Regular]}>{item.content}</Text>
-                        <View style={styles.commentLine} />
+                        <View style={{ flexDirection: "row", alignItems: "center", marginLeft: d2p(40), marginTop: h2p(10) }}>
+                          <TouchableOpacity onPress={() => {
+                            setCommentParentId(item.id);
+                            setRecommentName(item.author.nickname);
+                            setRecommentMode(true);
+                          }}>
+                            <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_79737e }]}>답글 달기</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity onPress={() => console.log(item, 'item')}>
+                            <Text style={[FONT.Bold, {
+                              marginLeft: d2p(10),
+                              fontSize: 12, color: (item.likeCount > 0) ? theme.color.grayscale.C_443e49 : theme.color.grayscale.C_79737e
+                            }]}>좋아요 {item.likeCount}</Text>
+                          </TouchableOpacity>
+                        </View>
+                        {/* 대댓글 ui */}
+                        {item.child ?
+                          <Recomment child={item.child} authorName={item.author.nickname} />
+                          :
+                          <View style={styles.commentLine} />
+                        }
                         {commentSelectedIdx === index &&
                           <View style={[styles.clickBox, { right: d2p(32) }]}>
                             <Pressable
@@ -552,6 +610,27 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             </>
           }
         </ScrollView>
+        {recommentMode &&
+          <View style={{
+            backgroundColor: theme.color.grayscale.f7f7fc,
+            paddingVertical: h2p(10),
+            paddingHorizontal: d2p(20),
+            flexDirection: "row",
+            justifyContent: "space-between"
+          }}>
+            <View style={{ flexDirection: "row" }}>
+              <Text style={[FONT.SemiBold, { fontSize: 13, color: theme.color.grayscale.a09ca4 }]}>
+                {recommentName}
+              </Text>
+              <Text style={[FONT.Regular, { fontSize: 13, color: theme.color.grayscale.a09ca4 }]}>
+                님에게 답글을 남기는 중
+              </Text>
+            </View>
+            <TouchableOpacity onPress={() => setRecommentMode(false)}>
+              <Text style={[FONT.Bold, { fontSize: 13, color: theme.color.grayscale.a09ca4 }]}>취소</Text>
+            </TouchableOpacity>
+          </View>
+        }
         <Pressable
           onPress={() => inputRef.current?.focus()}
           style={{
@@ -661,7 +740,8 @@ const styles = StyleSheet.create({
   },
   commentContent: {
     color: theme.color.grayscale.C_443e49,
-    marginLeft: d2p(40)
+    marginLeft: d2p(40),
+    fontSize: 15
   },
   clickBox: {
     width: d2p(70),
