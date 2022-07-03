@@ -16,7 +16,6 @@
 		318DD4880F22437DAB9A78A3 /* SUIT-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DACD8C4D4A6F4EA193FC27FF /* SUIT-Bold.ttf */; };
 		3AFF09C2D19A4EF4800FBD34 /* SUIT-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 74E8A46D712A4575887E1968 /* SUIT-Regular.ttf */; };
 		58C2868856C84EE194C9C7FC /* SUIT-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = F94044C591CF4B68BC26FFB4 /* SUIT-SemiBold.otf */; };
-		6D1AE71628225DD30067F377 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6D1AE71528225DD30067F377 /* GoogleService-Info.plist */; };
 		6D28627B286AE84C0038FDC4 /* AppCenter-Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6D28627A286AE84C0038FDC4 /* AppCenter-Config.plist */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		917C7F65473744EBAD49DC19 /* SUIT-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A9041C88C1674E81869FC3F4 /* SUIT-Medium.ttf */; };
@@ -47,7 +46,6 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = knewnnew/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = knewnnew/main.m; sourceTree = "<group>"; };
 		1A2CE70CA9088756A488B313 /* Pods-knewnnew.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-knewnnew.release.xcconfig"; path = "Target Support Files/Pods-knewnnew/Pods-knewnnew.release.xcconfig"; sourceTree = "<group>"; };
-		6D1AE71528225DD30067F377 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "knewnnew/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6D2102FB282A3CB500ADC324 /* knewnnew.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = knewnnew.entitlements; path = knewnnew/knewnnew.entitlements; sourceTree = "<group>"; };
 		6D23C50E2820E626008D2205 /* libReact-Codegen.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libReact-Codegen.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D23C5102820E626008D2205 /* libReact-Core.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libReact-Core.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -88,6 +86,8 @@
 		6D23C556282101B0008D2205 /* libReact-RCTVibration.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libReact-RCTVibration.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D23C558282101B0008D2205 /* libReactCommon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReactCommon.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D28627A286AE84C0038FDC4 /* AppCenter-Config.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "AppCenter-Config.plist"; sourceTree = "<group>"; };
+		6D3F39C02871A83B00C4B17E /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		6D3F39C22871A83B00C4B17E /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6D8686A2286B410800434E95 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		6D8E1C4E281936A4002F2CF9 /* knewnnew-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "knewnnew-Bridging-Header.h"; sourceTree = "<group>"; };
 		74E8A46D712A4575887E1968 /* SUIT-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SUIT-Regular.ttf"; path = "../src/assets/fonts/SUIT-Regular.ttf"; sourceTree = "<group>"; };
@@ -149,13 +149,13 @@
 		13B07FAE1A68108700A75B9A /* knewnnew */ = {
 			isa = PBXGroup;
 			children = (
+				6D3F39BE2871A83B00C4B17E /* firebase */,
 				6D28627A286AE84C0038FDC4 /* AppCenter-Config.plist */,
 				6D2102FB282A3CB500ADC324 /* knewnnew.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
-				6D1AE71528225DD30067F377 /* GoogleService-Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				6D8E1C4E281936A4002F2CF9 /* knewnnew-Bridging-Header.h */,
@@ -209,6 +209,32 @@
 				E43CDF0FB2B3BB6809F5A0E2 /* libPods-knewnnew-knewnnewTests.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		6D3F39BE2871A83B00C4B17E /* firebase */ = {
+			isa = PBXGroup;
+			children = (
+				6D3F39BF2871A83B00C4B17E /* prod */,
+				6D3F39C12871A83B00C4B17E /* dev */,
+			);
+			name = firebase;
+			path = knewnnew/firebase;
+			sourceTree = "<group>";
+		};
+		6D3F39BF2871A83B00C4B17E /* prod */ = {
+			isa = PBXGroup;
+			children = (
+				6D3F39C02871A83B00C4B17E /* GoogleService-Info.plist */,
+			);
+			path = prod;
+			sourceTree = "<group>";
+		};
+		6D3F39C12871A83B00C4B17E /* dev */ = {
+			isa = PBXGroup;
+			children = (
+				6D3F39C22871A83B00C4B17E /* GoogleService-Info.plist */,
+			);
+			path = dev;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -304,6 +330,7 @@
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
+				6D3F39C32871A85000C4B17E /* Setup Firebase Environment GoogleService-Info.plist */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				824EE5BEAF8BADFB8F714600 /* [CP] Embed Pods Frameworks */,
@@ -370,7 +397,6 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				6D1AE71628225DD30067F377 /* GoogleService-Info.plist in Resources */,
 				FDC62677C4DC4294A84C0786 /* SUIT-Bold.otf in Resources */,
 				318DD4880F22437DAB9A78A3 /* SUIT-Bold.ttf in Resources */,
 				6D28627B286AE84C0038FDC4 /* AppCenter-Config.plist in Resources */,
@@ -400,6 +426,20 @@
 			shellPath = /bin/sh;
 			shellScript = "export SENTRY_PROPERTIES=sentry.properties\nexport EXTRA_PACKAGER_ARGS=\"--sourcemap-output $DERIVED_FILE_DIR/main.jsbundle.map\"\nset -e\n\nexport NODE_BINARY=node\n../node_modules/@sentry/cli/bin/sentry-cli react-native xcode ../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
+		1C01F735BC79408998D75C7B /* Upload Debug Symbols to Sentry */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Upload Debug Symbols to Sentry";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export SENTRY_PROPERTIES=sentry.properties\n../node_modules/@sentry/cli/bin/sentry-cli upload-dsym";
+		};
 		30B712C314562E9D04AFAADF /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -416,6 +456,24 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-knewnnew-knewnnewTests/Pods-knewnnew-knewnnewTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		6D3F39C32871A85000C4B17E /* Setup Firebase Environment GoogleService-Info.plist */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Setup Firebase Environment GoogleService-Info.plist";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Name of the resource we're selectively copying\nGOOGLESERVICE_INFO_PLIST=GoogleService-Info.plist\n# Get references to dev and prod versions of the GoogleService-Info.plist\n# NOTE: These should only live on the file system and should NOT be part of the target (since we'll be adding them to the target manually)\nGOOGLESERVICE_INFO_DEV=${PROJECT_DIR}/knewnnew/Firebase/Dev/${GOOGLESERVICE_INFO_PLIST}\nGOOGLESERVICE_INFO_PROD=${PROJECT_DIR}/knewnnew/Firebase/Prod/${GOOGLESERVICE_INFO_PLIST}\n# Make sure the dev version of GoogleService-Info.plist exists\necho \"Looking for ${GOOGLESERVICE_INFO_PLIST} in ${GOOGLESERVICE_INFO_DEV}\"\nif [ ! -f $GOOGLESERVICE_INFO_DEV ]\nthen\necho \"No Development GoogleService-Info.plist found. Please ensure it's in the proper directory.\"\nexit 1\nfi\n# Make sure the prod version of GoogleService-Info.plist exists\necho \"Looking for ${GOOGLESERVICE_INFO_PLIST} in ${GOOGLESERVICE_INFO_PROD}\"\nif [ ! -f $GOOGLESERVICE_INFO_PROD ]\nthen\necho \"No Production GoogleService-Info.plist found. Please ensure it's in the proper directory.\"\nexit 1\nfi\n# Get a reference to the destination location for the GoogleService-Info.plist\nPLIST_DESTINATION=${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\necho \"Will copy ${GOOGLESERVICE_INFO_PLIST} to final destination: ${PLIST_DESTINATION}\"\n# Copy over the prod GoogleService-Info.plist for Release builds\nif [ \"${CONFIGURATION}\" == \"Release\" ]\nthen\necho \"Using ${GOOGLESERVICE_INFO_PROD}\"\ncp \"${GOOGLESERVICE_INFO_PROD}\" \"${PLIST_DESTINATION}\"\nelse\necho \"Using ${GOOGLESERVICE_INFO_DEV}\"\ncp \"${GOOGLESERVICE_INFO_DEV}\" \"${PLIST_DESTINATION}\"\nfi\n";
 		};
 		824EE5BEAF8BADFB8F714600 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -543,20 +601,6 @@
 			shellPath = /bin/sh;
 			shellScript = "export RCT_METRO_PORT=\"${RCT_METRO_PORT:=8081}\"\necho \"export RCT_METRO_PORT=${RCT_METRO_PORT}\" > \"${SRCROOT}/../node_modules/react-native/scripts/.packager.env\"\nif [ -z \"${RCT_NO_LAUNCH_PACKAGER+xxx}\" ] ; then\n  if nc -w 5 -z localhost ${RCT_METRO_PORT} ; then\n    if ! curl -s \"http://localhost:${RCT_METRO_PORT}/status\" | grep -q \"packager-status:running\" ; then\n      echo \"Port ${RCT_METRO_PORT} already in use, packager is either not running or not running correctly\"\n      exit 2\n    fi\n  else\n    open \"$SRCROOT/../node_modules/react-native/scripts/launchPackager.command\" || echo \"Can't start packager automatically\"\n  fi\nfi\n";
 			showEnvVarsInLog = 0;
-		};
-		1C01F735BC79408998D75C7B /* Upload Debug Symbols to Sentry */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			name = "Upload Debug Symbols to Sentry";
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			shellPath = /bin/sh;
-			shellScript = "export SENTRY_PROPERTIES=sentry.properties\n../node_modules/@sentry/cli/bin/sentry-cli upload-dsym";
 		};
 /* End PBXShellScriptBuildPhase section */
 
