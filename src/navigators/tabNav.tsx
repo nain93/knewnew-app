@@ -152,7 +152,6 @@ const TabNavigator = () => {
                 }
                 headerRightPress={() => {
                   setOpenMore(!openMore);
-                  navigation.setParams({ openMore });
                 }}
               />
               {

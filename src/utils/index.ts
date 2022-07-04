@@ -1,4 +1,4 @@
-import { Dimensions } from "react-native";
+import { Dimensions, PermissionsAndroid } from "react-native";
 
 export function d2p(size: number) {
   //Zeplin에 나와있는 디자인을 iPhone에 맞춰 ppi 값에 따라서 배수를 곱해준다.
@@ -38,5 +38,16 @@ export function simpleDate(date: string, suffix?: string): string {
 }
 
 export function dateCommentFormat(date: string) {
-  return date.slice(0,4) + '.' + date.slice(5,7) + '.' + date.slice(8,10) + ' ' + date.slice(11,16);
+  return date.slice(0, 4) + '.' + date.slice(5, 7) + '.' + date.slice(8, 10) + ' ' + date.slice(11, 16);
+}
+
+export async function hasAndroidPermission() {
+  const permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
+  const hasPermission = await PermissionsAndroid.check(permission);
+  console.log(hasPermission);
+  if (hasPermission) {
+    return true;
+  }
+  const status = await PermissionsAndroid.request(permission);
+  return status === "granted";
 }

@@ -291,6 +291,11 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             <Text style={styles.reviewCount}>{bookmarkCount}</Text>
           </TouchableOpacity>
           <Pressable
+            onPress={() => navigation.navigate("FeedDetail", {
+              authorId: review.author.id,
+              id: review.id, badge: filterBadge,
+              isLike: review.isLike, isBookmark: review.isBookmark, toComment: true
+            })}
             style={styles.reviewIcon}>
             <Image source={comment} style={styles.reviewImg} />
             <Text style={styles.reviewCount}>{review.commentCount}</Text>
