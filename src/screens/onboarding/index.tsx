@@ -220,7 +220,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
           <Text style={[FONT.Regular, { textAlign: "center" }]}>에 동의하게 됩니다.</Text>
         </View>
         <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4, marginTop: h2p(5) }]}>
-          {Platform.OS === "ios" ? `v.${versioningIOS}-demo` : `v.${versioningAOS}-demo`}
+          {Platform.OS === "ios" ? `v.${versioningIOS}-dev` : `v.${versioningAOS}-dev`}
         </Text>
       </View>
     </View>
