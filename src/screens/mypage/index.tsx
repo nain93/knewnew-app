@@ -1,4 +1,4 @@
-import { Dimensions, FlatList, Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, FlatList, Image, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
@@ -17,14 +17,12 @@ import { NavigationRoute } from 'react-navigation';
 import BasicButton from '~/components/button/basicButton';
 import { ReviewListType } from '~/types/review';
 import { useFocusEffect } from '@react-navigation/native';
-import { bookmarkReview } from '~/api/review';
 
 interface MypageProps {
   navigation: NavigationStackProp;
   route: NavigationRoute<{
     id?: number,
-    refresh?: boolean,
-    openMore?: boolean
+    refresh?: boolean
   }>;
 }
 
@@ -73,7 +71,8 @@ const Mypage = ({ navigation, route }: MypageProps) => {
   });
 
   const tabHeader = useCallback(() => (
-    <View pointerEvents="none" >
+    // pointerEvents="none"
+    <View pointerEvents="box-none" >
       <View style={styles.profileImage} >
         <Image style={{
           width: d2p(60), height: d2p(60), borderRadius: 60,
@@ -103,12 +102,28 @@ const Mypage = ({ navigation, route }: MypageProps) => {
           </View>
           <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>{getMyProfileQuery.data?.household}</Text>
         </View>
-        <View style={styles.headline}>
+        <Pressable
+          onPress={() => {
+            navigation.navigate("editProfile",
+              {
+                profile:
+                {
+                  nickname: getMyProfileQuery?.data?.nickname,
+                  headline: getMyProfileQuery?.data?.headline,
+                  profileImage: getMyProfileQuery?.data?.profileImage,
+                  tags: getMyProfileQuery?.data?.tags,
+                  representBadge: getMyProfileQuery?.data?.representBadge,
+                  remainingPeriod: getMyProfileQuery?.data?.remainingPeriod
+                },
+                foucsHeadLine: true
+              });
+          }}
+          style={styles.headline}>
           <Text style={[FONT.Medium, {
             color: getMyProfileQuery.data?.headline ? theme.color.black : theme.color.grayscale.a09ca4
           }]}>
             {getMyProfileQuery.data?.headline ? getMyProfileQuery.data?.headline : "자기소개를 입력해주세요."}</Text>
-        </View>
+        </Pressable>
         <View style={{
           flexDirection: "row", flexWrap: "wrap",
           justifyContent: "center",

@@ -110,7 +110,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
     }
     setApiBlock(true);
     GoogleSignin.configure({
-      webClientId: "19978958503-rta621e9q96sp6qqgdk13cuijt3nc4ju.apps.googleusercontent.com"
+      webClientId: "19978958503-rta621e9q96sp6qqgdk13cuijt3nc4ju.apps.googleusercontent.com",
       // webClientId: "1025814485939-v9l5ad2bk5rr04h39e9dngnfodedjfeb.apps.googleusercontent.com"
     });
     await GoogleSignin.signIn();

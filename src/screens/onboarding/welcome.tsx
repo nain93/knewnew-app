@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { NavigationRoute } from 'react-navigation';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { useQuery } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { getMyProfile } from '~/api/user';
+import { handIcon } from '~/assets/icons';
 import BasicButton from '~/components/button/basicButton';
 import Header from '~/components/header';
 import CloseIcon from '~/components/icon/closeIcon';
@@ -31,7 +32,6 @@ const Welcome = ({ navigation, route }: NavigationType) => {
   });
 
   const handleSignIn = () => {
-    // todo sigin api 연결
     //@ts-ignore
     navigation.reset({ routes: [{ name: "TabNav" }] });
   };
@@ -74,22 +74,51 @@ const Welcome = ({ navigation, route }: NavigationType) => {
         <View style={{ flexDirection: "row" }}>
           {React.Children.toArray(badge?.map(v => <Text style={[styles.tag, FONT.SemiBold]}>#{v} </Text>))}
         </View>
-        <Text style={[styles.subText, FONT.Regular]}>맛있는 정보 함께 나눠요.</Text>
-        <BasicButton onPress={handleSignIn} text="입장하기" bgColor={theme.color.main} textColor={theme.color.white} />
       </View >
+      <View style={styles.alertContainer}>
+        <Image source={handIcon} style={{ width: d2p(39), height: d2p(39) }} />
+        <Text style={[FONT.Bold, { color: theme.color.main, fontSize: 30, marginTop: h2p(5), marginBottom: h2p(10) }]}>
+          잠깐!</Text>
+        <View style={{ flexDirection: "row" }}>
+          <Text style={[FONT.Bold, { fontSize: 20 }]}>뉴뉴 시작 전,</Text>
+          <Text style={[FONT.Bold, { fontSize: 20, color: theme.color.main }]}> 꼭 </Text>
+          <Text style={[FONT.Bold, { fontSize: 20 }]}>읽어주세요!</Text>
+        </View>
+        <View style={{ marginVertical: h2p(40), marginBottom: "auto" }}>
+          <View style={{ flexDirection: "row", marginBottom: h2p(20) }}>
+            <Text style={FONT.Regular}>
+              뉴뉴는 오로지
+            </Text>
+            <Text style={FONT.Bold}> 찐소비자</Text>
+            <Text style={FONT.Regular}>들을 위한 공간입니다.</Text>
+          </View>
+          <View style={{ flexDirection: "row" }}>
+            <Text style={[FONT.Regular, { lineHeight: 20 }]}>광고, 협찬 등 홍보 목적의 활동은 </Text>
+            <Text style={[FONT.Bold, { lineHeight: 20 }]}>엄격히 금지</Text>
+            <Text style={[FONT.Regular, { lineHeight: 20 }]}>합니다.</Text>
+          </View>
+          <Text style={[FONT.Regular, { lineHeight: 20 }]}>특히 뒷광고는 표시광고법 제3조 제1항에 의거하여</Text>
+          <View style={{ flexDirection: "row" }}>
+            <Text style={[FONT.Bold, { lineHeight: 20 }]}>엄연한 불법행위</Text>
+            <Text style={[FONT.Regular, { lineHeight: 20 }]}>임을 알려드립니다.</Text>
+          </View>
+        </View>
+        <BasicButton
+          viewStyle={{ marginBottom: h2p(40) }}
+          onPress={handleSignIn} text="확인하고 입장하기" bgColor={theme.color.main} textColor={theme.color.white} />
+      </View>
     </>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    paddingBottom: d2p(40),
     paddingHorizontal: d2p(20)
   },
   main: {
     flexDirection: 'row',
-    marginTop: d2p(173), marginBottom: d2p(40),
+    marginBottom: d2p(30),
+    marginTop: h2p(83),
     flexWrap: "wrap"
   },
   mainText: {
@@ -103,6 +132,13 @@ const styles = StyleSheet.create({
     color: theme.color.grayscale.C_79737e,
     fontSize: 14,
     marginTop: d2p(10), marginBottom: "auto"
+  },
+  alertContainer: {
+    flex: 1,
+    backgroundColor: theme.color.grayscale.f7f7fc,
+    paddingHorizontal: d2p(20),
+    paddingTop: h2p(40),
+    marginTop: h2p(60)
   }
 });
 

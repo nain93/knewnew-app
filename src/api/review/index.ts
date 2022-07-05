@@ -106,3 +106,14 @@ export const deleteReview = async (token: string, id: number) => {
     return res.data;
   }
 };
+
+export const deleteReviewImage = async (token: string, id: number) => {
+  const res = await axios.delete(baseURL + `review/image/${id}/`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+  if (res) {
+    return res.data;
+  }
+};

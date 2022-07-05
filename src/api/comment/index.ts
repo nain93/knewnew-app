@@ -1,10 +1,10 @@
 import axios from "axios";
 import { baseURL } from "~/api";
 
-export const getReviewComment = async (token: string, rid: number) => {
-  const res = await axios.get(baseURL + "comment/review/", { 
-    params: { 
-      rid 
+export const getReviewComment = async (token: string, reviewId: number) => {
+  const res = await axios.get(baseURL + "comment/review/", {
+    params: {
+      rid: reviewId
     },
     headers: {
       Authorization: `Bearer ${token}`,
@@ -15,11 +15,19 @@ export const getReviewComment = async (token: string, rid: number) => {
   }
 };
 
-export const addReviewComment = async (token: string, rid: number, content: string) => {
+interface addReviewCommentType {
+  token: string,
+  reviewId: number,
+  parentId?: number,
+  content: string
+}
+
+export const addReviewComment = async ({ token, reviewId, parentId, content }: addReviewCommentType) => {
   const res = await axios.post(baseURL + "comment/review/", {
-    review: rid,
+    review: reviewId,
+    parent: parentId,
     content
-  },{ 
+  }, {
     headers: {
       Authorization: `Bearer ${token}`,
     }
@@ -40,7 +48,15 @@ export const deleteReviewComment = async (token: string, id: number) => {
   }
 };
 
-export const editReviewComment = async (token: string, reviewId: number, commentId: number, content: string) => {
+interface editReviewCommentType {
+  token: string,
+  reviewId: number,
+  commentId: number,
+  content: string
+  parentId?: number
+}
+
+export const editReviewComment = async ({ token, reviewId, commentId, content }: editReviewCommentType) => {
   const res = await axios.patch(baseURL + `comment/review/${commentId}/`, {
     review: reviewId,
     content
@@ -49,6 +65,26 @@ export const editReviewComment = async (token: string, reviewId: number, comment
       Authorization: `Bearer ${token}`,
     }
   });
+  if (res) {
+    return res.data;
+  }
+};
+
+interface likeCommentType {
+  token: string,
+  commentId: number,
+  isLike: boolean
+}
+
+export const likeComment = async ({ token, commentId, isLike }: likeCommentType) => {
+  const res = await axios.post(baseURL + `comment/review/${commentId}/like/`, {
+    isLike
+  },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
   if (res) {
     return res.data;
   }

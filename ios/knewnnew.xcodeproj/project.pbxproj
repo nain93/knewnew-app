@@ -90,6 +90,8 @@
 		6D3F39C22871A83B00C4B17E /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6D8686A2286B410800434E95 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		6D8E1C4E281936A4002F2CF9 /* knewnnew-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "knewnnew-Bridging-Header.h"; sourceTree = "<group>"; };
+		6DA3AB702872F24700482CD2 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		6DA3AB722872F24700482CD2 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		74E8A46D712A4575887E1968 /* SUIT-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SUIT-Regular.ttf"; path = "../src/assets/fonts/SUIT-Regular.ttf"; sourceTree = "<group>"; };
 		77AD43A301654D7596CEC4CB /* SUIT-Regular.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SUIT-Regular.otf"; path = "../src/assets/fonts/SUIT-Regular.otf"; sourceTree = "<group>"; };
 		7A9820B3EADD0603DC5B2D28 /* Pods-knewnnew-knewnnewTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-knewnnew-knewnnewTests.debug.xcconfig"; path = "Target Support Files/Pods-knewnnew-knewnnewTests/Pods-knewnnew-knewnnewTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -211,28 +213,28 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		6D3F39BE2871A83B00C4B17E /* firebase */ = {
+		6DA3AB6E2872F24700482CD2 /* firebase */ = {
 			isa = PBXGroup;
 			children = (
-				6D3F39BF2871A83B00C4B17E /* prod */,
-				6D3F39C12871A83B00C4B17E /* dev */,
+				6DA3AB6F2872F24700482CD2 /* prod */,
+				6DA3AB712872F24700482CD2 /* dev */,
 			);
-			name = firebase;
-			path = knewnnew/firebase;
+			path = firebase;
 			sourceTree = "<group>";
 		};
-		6D3F39BF2871A83B00C4B17E /* prod */ = {
+		6DA3AB6F2872F24700482CD2 /* prod */ = {
 			isa = PBXGroup;
 			children = (
-				6D3F39C02871A83B00C4B17E /* GoogleService-Info.plist */,
+				6DA3AB702872F24700482CD2 /* GoogleService-Info.plist */,
+
 			);
 			path = prod;
 			sourceTree = "<group>";
 		};
-		6D3F39C12871A83B00C4B17E /* dev */ = {
+		6DA3AB712872F24700482CD2 /* dev */ = {
 			isa = PBXGroup;
 			children = (
-				6D3F39C22871A83B00C4B17E /* GoogleService-Info.plist */,
+				6DA3AB722872F24700482CD2 /* GoogleService-Info.plist */,
 			);
 			path = dev;
 			sourceTree = "<group>";
@@ -247,6 +249,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				6DA3AB6E2872F24700482CD2 /* firebase */,
 				6D8686A2286B410800434E95 /* Config.xcconfig */,
 				13B07FAE1A68108700A75B9A /* knewnnew */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -330,7 +333,7 @@
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
-				6D3F39C32871A85000C4B17E /* Setup Firebase Environment GoogleService-Info.plist */,
+				6DA3AB732872FB4100482CD2 /* Setup Firebase Environment GoogleService-Info.plist */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				824EE5BEAF8BADFB8F714600 /* [CP] Embed Pods Frameworks */,
@@ -457,7 +460,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-knewnnew-knewnnewTests/Pods-knewnnew-knewnnewTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		6D3F39C32871A85000C4B17E /* Setup Firebase Environment GoogleService-Info.plist */ = {
+		6DA3AB732872FB4100482CD2 /* Setup Firebase Environment GoogleService-Info.plist */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -473,7 +476,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Name of the resource we're selectively copying\nGOOGLESERVICE_INFO_PLIST=GoogleService-Info.plist\n# Get references to dev and prod versions of the GoogleService-Info.plist\n# NOTE: These should only live on the file system and should NOT be part of the target (since we'll be adding them to the target manually)\nGOOGLESERVICE_INFO_DEV=${PROJECT_DIR}/knewnnew/Firebase/Dev/${GOOGLESERVICE_INFO_PLIST}\nGOOGLESERVICE_INFO_PROD=${PROJECT_DIR}/knewnnew/Firebase/Prod/${GOOGLESERVICE_INFO_PLIST}\n# Make sure the dev version of GoogleService-Info.plist exists\necho \"Looking for ${GOOGLESERVICE_INFO_PLIST} in ${GOOGLESERVICE_INFO_DEV}\"\nif [ ! -f $GOOGLESERVICE_INFO_DEV ]\nthen\necho \"No Development GoogleService-Info.plist found. Please ensure it's in the proper directory.\"\nexit 1\nfi\n# Make sure the prod version of GoogleService-Info.plist exists\necho \"Looking for ${GOOGLESERVICE_INFO_PLIST} in ${GOOGLESERVICE_INFO_PROD}\"\nif [ ! -f $GOOGLESERVICE_INFO_PROD ]\nthen\necho \"No Production GoogleService-Info.plist found. Please ensure it's in the proper directory.\"\nexit 1\nfi\n# Get a reference to the destination location for the GoogleService-Info.plist\nPLIST_DESTINATION=${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\necho \"Will copy ${GOOGLESERVICE_INFO_PLIST} to final destination: ${PLIST_DESTINATION}\"\n# Copy over the prod GoogleService-Info.plist for Release builds\nif [ \"${CONFIGURATION}\" == \"Release\" ]\nthen\necho \"Using ${GOOGLESERVICE_INFO_PROD}\"\ncp \"${GOOGLESERVICE_INFO_PROD}\" \"${PLIST_DESTINATION}\"\nelse\necho \"Using ${GOOGLESERVICE_INFO_DEV}\"\ncp \"${GOOGLESERVICE_INFO_DEV}\" \"${PLIST_DESTINATION}\"\nfi\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n# Name of the resource we're selectively copying\nGOOGLESERVICE_INFO_PLIST=GoogleService-Info.plist\n# Get references to dev and prod versions of the GoogleService-Info.plist\n# NOTE: These should only live on the file system and should NOT be part of the target (since we'll be adding them to the target manually)\nGOOGLESERVICE_INFO_DEV=${PROJECT_DIR}/firebase/dev/${GOOGLESERVICE_INFO_PLIST}\nGOOGLESERVICE_INFO_PROD=${PROJECT_DIR}/firebase/prod/${GOOGLESERVICE_INFO_PLIST}\n# Make sure the dev version of GoogleService-Info.plist exists\necho \"Looking for ${GOOGLESERVICE_INFO_PLIST} in ${GOOGLESERVICE_INFO_DEV}\"\nif [ ! -f $GOOGLESERVICE_INFO_DEV ]\nthen\necho \"No Development GoogleService-Info.plist found. Please ensure it's in the proper directory.\"\nexit 1\nfi\n# Make sure the prod version of GoogleService-Info.plist exists\necho \"Looking for ${GOOGLESERVICE_INFO_PLIST} in ${GOOGLESERVICE_INFO_PROD}\"\nif [ ! -f $GOOGLESERVICE_INFO_PROD ]\nthen\necho \"No Production GoogleService-Info.plist found. Please ensure it's in the proper directory.\"\nexit 1\nfi\n# Get a reference to the destination location for the GoogleService-Info.plist\nPLIST_DESTINATION=${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\necho \"Will copy ${GOOGLESERVICE_INFO_PLIST} to final destination: ${PLIST_DESTINATION}\"\n# Copy over the prod GoogleService-Info.plist for Release builds\nif [ \"${CONFIGURATION}\" == \"Release\" ]\nthen\necho \"Using ${GOOGLESERVICE_INFO_PROD}\"\ncp \"${GOOGLESERVICE_INFO_PROD}\" \"${PLIST_DESTINATION}\"\nelse\necho \"Using ${GOOGLESERVICE_INFO_DEV}\"\ncp \"${GOOGLESERVICE_INFO_DEV}\" \"${PLIST_DESTINATION}\"\nfi\n";
 		};
 		824EE5BEAF8BADFB8F714600 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;

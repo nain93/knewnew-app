@@ -78,24 +78,26 @@ const App = () => {
   React.useEffect(() => {
     // * 코드푸시 업데이트 체크
     installUpdateIfAvailable();
-    if (Platform.OS === "ios") {
-      messaging().requestPermission();
-      messaging()
-        .getIsHeadless()
-        .then(isHeadless => {
-          console.log('isHeadless');
-          // do sth with isHeadless
-        });
+    if (__DEV__) {
+      if (Platform.OS === "ios") {
+        messaging().requestPermission();
+        messaging()
+          .getIsHeadless()
+          .then(isHeadless => {
+            console.log('isHeadless');
+            // do sth with isHeadless
+          });
+      }
+      // fetchConfig().catch(console.warn);
+      messaging().getToken().then(fcmToken =>
+        console.log('fcmToken')
+      );
+      const unsubscribe = messaging().onMessage(async remoteMessage => {
+        // console.log(remoteMessage, 'remoteMessage');
+        Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+      });
+      return unsubscribe;
     }
-    // fetchConfig().catch(console.warn);
-    messaging().getToken().then(fcmToken =>
-      console.log('fcmToken')
-    );
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
-      // console.log(remoteMessage, 'remoteMessage');
-      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
-    });
-    return unsubscribe;
   }, []);
 
   // * CODE PUSH
@@ -188,17 +190,8 @@ const App = () => {
 //     });
 //   }
 // });
-if (__DEV__) {
-  Sentry.init({
-    environment: "dev",
-    debug: true,
-    dsn: Config.CENTRY_DSN,
-    // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
-    // We recommend adjusting this value in production.
-    tracesSampleRate: 1.0,
-  });
-}
-else {
+
+if (!__DEV__) {
   Sentry.init({
     environment: "production",
     dsn: Config.CENTRY_DSN,
