@@ -583,7 +583,7 @@ const Write = ({ navigation, route }: WriteProp) => {
                 <View style={{ alignItems: "center" }}>
                   <Image source={
                     route.params?.review?.images ?
-                      { uri: route.params.review.images[idx].image }
+                      { uri: images[idx].image }
                       :
                       {
                         uri: Platform.OS === "ios" ? 'file://' + image.path : 'file://' + image.realPath,
@@ -735,7 +735,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     marginTop: "auto",
-    marginBottom: Platform.OS === "ios" ? h2p(104) : h2p(94)
+    marginBottom: Platform.OS === "ios" ? h2p(104) : h2p(84)
   },
   select: {
     flexDirection: "row",
