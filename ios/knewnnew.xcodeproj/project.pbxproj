@@ -86,6 +86,8 @@
 		6D23C556282101B0008D2205 /* libReact-RCTVibration.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libReact-RCTVibration.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D23C558282101B0008D2205 /* libReactCommon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReactCommon.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D28627A286AE84C0038FDC4 /* AppCenter-Config.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "AppCenter-Config.plist"; sourceTree = "<group>"; };
+		6D3F39C02871A83B00C4B17E /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		6D3F39C22871A83B00C4B17E /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6D8686A2286B410800434E95 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		6D8E1C4E281936A4002F2CF9 /* knewnnew-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "knewnnew-Bridging-Header.h"; sourceTree = "<group>"; };
 		6DA3AB702872F24700482CD2 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -149,6 +151,7 @@
 		13B07FAE1A68108700A75B9A /* knewnnew */ = {
 			isa = PBXGroup;
 			children = (
+				6D3F39BE2871A83B00C4B17E /* firebase */,
 				6D28627A286AE84C0038FDC4 /* AppCenter-Config.plist */,
 				6D2102FB282A3CB500ADC324 /* knewnnew.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
@@ -223,6 +226,7 @@
 			isa = PBXGroup;
 			children = (
 				6DA3AB702872F24700482CD2 /* GoogleService-Info.plist */,
+
 			);
 			path = prod;
 			sourceTree = "<group>";

@@ -190,6 +190,7 @@ const App = () => {
 //     });
 //   }
 // });
+
 if (!__DEV__) {
   Sentry.init({
     environment: "production",
