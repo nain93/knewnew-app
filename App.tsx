@@ -29,20 +29,22 @@ const App = () => {
   useEffect(() => {
     const getToken = async () => {
       // TODO refresh api
-      const storageToken = await AsyncStorage.getItem("token");
-      if (storageToken) {
-        setToken(storageToken);
-        // todo api link
-        // messaging().getToken().then(fcmToken => {
-        // 	// console.log(fcmToken);
-        // 	registerNotification(fcmToken, Platform.OS)
-        // 		.then((v: any) => console.log(v))
-        // 		.catch((e: any) => console.warn(e));
-        // });
-      }
-      else {
-        SplashScreen.hide();
-      }
+      AsyncStorage.setItem("token", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU5NTk2OTQzLCJpYXQiOjE2NTcwMDQ5NDMsImp0aSI6IjI2NmZkNDY1ZDczZjRhZTE5MDJiYzUwMmNiYWUzZmZlIiwidXNlcl9pZCI6M30.hR4UnXzVbi7F5HODp8wLW5McNjDfgVJMzYwSFTFMKqI");
+      setToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU5NTk2OTQzLCJpYXQiOjE2NTcwMDQ5NDMsImp0aSI6IjI2NmZkNDY1ZDczZjRhZTE5MDJiYzUwMmNiYWUzZmZlIiwidXNlcl9pZCI6M30.hR4UnXzVbi7F5HODp8wLW5McNjDfgVJMzYwSFTFMKqI");
+      // const storageToken = await AsyncStorage.getItem("token");
+      // if (storageToken) {
+      //   setToken(storageToken);
+      //   // todo api link
+      //   // messaging().getToken().then(fcmToken => {
+      //   // 	// console.log(fcmToken);
+      //   // 	registerNotification(fcmToken, Platform.OS)
+      //   // 		.then((v: any) => console.log(v))
+      //   // 		.catch((e: any) => console.warn(e));
+      //   // });
+      // }
+      // else {
+      //   SplashScreen.hide();
+      // }
     };
     getToken();
   }, []);
@@ -78,26 +80,24 @@ const App = () => {
   React.useEffect(() => {
     // * 코드푸시 업데이트 체크
     installUpdateIfAvailable();
-    if (__DEV__) {
-      if (Platform.OS === "ios") {
-        messaging().requestPermission();
-        messaging()
-          .getIsHeadless()
-          .then(isHeadless => {
-            console.log('isHeadless');
-            // do sth with isHeadless
-          });
-      }
-      // fetchConfig().catch(console.warn);
-      messaging().getToken().then(fcmToken =>
-        console.log('fcmToken')
-      );
-      const unsubscribe = messaging().onMessage(async remoteMessage => {
-        // console.log(remoteMessage, 'remoteMessage');
-        Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
-      });
-      return unsubscribe;
+    if (Platform.OS === "ios") {
+      messaging().requestPermission();
+      messaging()
+        .getIsHeadless()
+        .then(isHeadless => {
+          console.log('isHeadless');
+          // do sth with isHeadless
+        });
     }
+    // fetchConfig().catch(console.warn);
+    messaging().getToken().then(fcmToken =>
+      console.log('fcmToken')
+    );
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      // console.log(remoteMessage, 'remoteMessage');
+      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+    });
+    return unsubscribe;
   }, []);
 
   // * CODE PUSH
