@@ -8,7 +8,7 @@ import theme from '~/styles/theme';
 import { FONT } from '~/styles/fonts';
 import { userLogin } from '~/api/user';
 import { useSetRecoilState } from 'recoil';
-import { popupState, tokenState } from '~/recoil/atoms';
+import { tokenState } from '~/recoil/atoms';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
