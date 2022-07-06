@@ -44,6 +44,7 @@ import tagFood from "./tagFood.png";
 import tagHome from "./tagHome.png";
 import tagLife from "./tagLife.png";
 import handIcon from "./handIcon.png";
+import recommentIcon from "./recommentIcon.png";
 
 export {
   tagFood, tagHome, tagLife, handIcon,
@@ -51,6 +52,6 @@ export {
   searchIcon, mainSearchIcon, colorLike, tagfilter, tag, cart, colorCart, retweetfrom,
   colorCheck, initialize, grayclose, graytriangle, grayheart, bad, graycircle, blackclose,
   graywrite, graylogo, graymypage, graysearch, mainmypage, tagIcon, selectTagIcon,
-  mainlogoIcon, write, plusIcon, eyeIcon, colorEyeIcon, checkIcon, alertIcon, emailicon
+  mainlogoIcon, write, plusIcon, eyeIcon, colorEyeIcon, checkIcon, alertIcon, emailicon, recommentIcon
 };
 

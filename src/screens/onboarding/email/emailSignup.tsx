@@ -35,7 +35,7 @@ const EmailSignup = ({ navigation, route }: EmailSignupProps) => {
   });
 
   const handleNext = () => {
-    navigation.navigate("TagSelect");
+    navigation.navigate("TagSelect", userInput);
   };
 
   useEffect(() => {

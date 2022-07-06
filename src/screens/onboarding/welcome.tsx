@@ -4,6 +4,7 @@ import { NavigationRoute } from 'react-navigation';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { useRecoilValue } from 'recoil';
 import { handIcon, tagFood, tagHome, tagLife } from '~/assets/icons';
+import { getMyProfile } from '~/api/user';
 import BasicButton from '~/components/button/basicButton';
 import Header from '~/components/header';
 import CloseIcon from '~/components/icon/closeIcon';
@@ -29,7 +30,6 @@ const Welcome = ({ navigation, route }: NavigationType) => {
   const token = useRecoilValue(tokenState);
 
   const handleSignIn = () => {
-    // todo sigin api 연결
     //@ts-ignore
     // navigation.reset({ routes: [{ name: "TabNav" }] });
   };
@@ -44,17 +44,17 @@ const Welcome = ({ navigation, route }: NavigationType) => {
       />
       <View style={styles.container}>
         <View style={{ marginTop: h2p(50) }}>
-          <View style={{ flexDirection: "row", marginBottom: h2p(10) }}>
+          <View style={{ flexDirection: "row", alignItems: "center", marginBottom: h2p(10) }}>
             <Image source={tagHome} style={{ marginRight: d2p(12), width: d2p(16), height: d2p(16) }} />
             <Text style={[FONT.SemiBold, { fontSize: 18, color: theme.color.grayscale.C_79737e }]}>
               {route?.params?.userBadge.household}</Text>
           </View>
-          <View style={{ flexDirection: "row", marginBottom: h2p(10) }}>
+          <View style={{ flexDirection: "row", alignItems: "center", marginBottom: h2p(10) }}>
             <Image source={tagLife} style={{ marginRight: d2p(12), width: d2p(16), height: d2p(16) }} />
             <Text style={[FONT.SemiBold, { fontSize: 18, color: theme.color.grayscale.C_79737e }]}>
               {route?.params?.userBadge.lifeStyle}</Text>
           </View>
-          <View style={{ flexDirection: "row", marginBottom: h2p(10) }}>
+          <View style={{ flexDirection: "row", alignItems: "center", marginBottom: h2p(10) }}>
             <Image source={tagFood} style={{ marginRight: d2p(12), width: d2p(16), height: d2p(16) }} />
             <Text style={[FONT.SemiBold, { fontSize: 18, color: theme.color.grayscale.C_79737e }]}>
               {route?.params?.userBadge.foodLife}</Text>
@@ -110,17 +110,27 @@ const styles = StyleSheet.create({
   },
   main: {
     flexDirection: 'row',
-    marginBottom: d2p(50),
+    marginBottom: h2p(50),
     marginTop: h2p(20),
     flexWrap: "wrap"
   },
   mainText: {
     fontSize: 26
   },
+  tag: {
+    color: theme.color.main,
+    fontSize: 16
+  },
+  subText: {
+    color: theme.color.grayscale.C_79737e,
+    fontSize: 14,
+    marginTop: h2p(10), marginBottom: "auto"
+  },
   alertContainer: {
     flex: 1,
     backgroundColor: theme.color.grayscale.f7f7fc,
-    padding: d2p(20)
+    paddingHorizontal: d2p(20),
+    paddingTop: h2p(40)
   }
 });
 

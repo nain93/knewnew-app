@@ -1,4 +1,4 @@
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React, { useState } from 'react';
 import Feed from '~/screens/feed';
@@ -13,7 +13,7 @@ import { myIdState } from '~/recoil/atoms';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import MypageHeader from '~/screens/mypage/mypageHeader';
-import { getStatusBarHeight } from 'react-native-iphone-x-helper';
+import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { getFocusedRouteNameFromRoute, useRoute } from '@react-navigation/native';
 
 const Tabs = createBottomTabNavigator();
@@ -40,14 +40,19 @@ const TabNavigator = () => {
     <Tabs.Navigator
       screenOptions={{
         tabBarLabelStyle: {
-          backgroundColor: "transparent",
+          fontFamily: "SUIT-Regular",
+          fontSize: 12,
+          marginTop: h2p(10),
+          backgroundColor: "transparent"
         },
+        tabBarActiveTintColor: theme.color.main,
+        tabBarInactiveTintColor: theme.color.grayscale.a09ca4,
         // tabBarHideOnKeyboard: true,
         tabBarStyle: {
           position: "absolute",
           height: h2p(77),
           paddingTop: h2p(20),
-          paddingBottom: h2p(30),
+          paddingBottom: isIphoneX() ? h2p(25) : h2p(20),
           borderTopLeftRadius: 30,
           borderTopRightRadius: 30,
           shadowOffset: {
@@ -57,8 +62,7 @@ const TabNavigator = () => {
           shadowOpacity: 0.4,
           shadowRadius: 10,
           elevation: 24,
-        },
-        tabBarLabel: ""
+        }
       }}
       sceneContainerStyle={{
         backgroundColor: theme.color.white,
@@ -74,6 +78,7 @@ const TabNavigator = () => {
           },
         })}
         options={{
+          tabBarLabel: "홈",
           headerShown: false,
           tabBarIcon: ({ focused }) => (
             <Image
@@ -93,6 +98,7 @@ const TabNavigator = () => {
           },
         })}
         options={{
+          tabBarLabel: "글쓰기",
           headerShown: false,
           tabBarStyle: { display: "none" },
           tabBarIcon: () => (
@@ -107,6 +113,7 @@ const TabNavigator = () => {
         name="Search"
         component={Search}
         options={{
+          tabBarLabel: "검색",
           headerShown: false,
           tabBarIcon: ({ focused }) => (
             <Image
@@ -127,6 +134,7 @@ const TabNavigator = () => {
           },
         })}
         options={{
+          tabBarLabel: "마이뉴뉴",
           header: ({ route: { params }, navigation }) => (
             <>
               <StatusBarPlaceHolder />
@@ -152,7 +160,6 @@ const TabNavigator = () => {
                 }
                 headerRightPress={() => {
                   setOpenMore(!openMore);
-                  navigation.setParams({ openMore });
                 }}
               />
               {

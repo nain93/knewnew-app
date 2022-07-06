@@ -18,7 +18,7 @@ import { MarketType, ReviewListType, WriteImagesType, WriteReviewType } from '~/
 import { FONT } from '~/styles/fonts';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
-import { editReview, writeReview } from '~/api/review';
+import { deleteReviewImage, editReview, writeReview } from '~/api/review';
 import { initialBadgeData } from '~/utils/data';
 import FeedReview from '~/components/review/feedReview';
 import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
@@ -85,6 +85,7 @@ const Write = ({ navigation, route }: WriteProp) => {
 
   const [imageList, setImageList] = React.useState<string[]>([]);
   const [images, setImages] = useState<any[]>([]);
+  const [imageIds, setImageIds] = useState<number[]>([]);
 
   const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", token], () => getMyProfile(token), {
     enabled: !!token
@@ -139,7 +140,9 @@ const Write = ({ navigation, route }: WriteProp) => {
   const editReviewMutation = useMutation(["editReview", token],
     ({ writeProps, id }: { writeProps: WriteReviewType, id: number }) =>
       editReview({ token, id, ...writeProps }), {
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      // * 이미지 삭제 api
+      await Promise.all(imageIds.map(v => mutateAsync(v)));
       if (data) {
         queryClient.setQueriesData("reviewList", (reviewQuery: any) => {
           if (reviewQuery && getMyProfileQuery.data) {
@@ -212,6 +215,11 @@ const Write = ({ navigation, route }: WriteProp) => {
       }
     });
 
+  const { mutateAsync } = useMutation("deleteImages", (id: number) => deleteReviewImage(token, id), {
+    onSuccess: (data) => {
+      console.log(data, 'data');
+    }
+  });
 
   const handleAddWrite = async () => {
     if (writeData.satisfaction === "") {
@@ -237,6 +245,11 @@ const Write = ({ navigation, route }: WriteProp) => {
     else {
       // * 수정할때 (이미지 업로드x)
       if (route.params?.isEdit && route.params.review?.id) {
+        const reducedImages = images.reduce<Array<{ priority: number, image: string }>>((acc, cur, idx) => {
+          acc = acc.concat({ priority: idx, image: "review" + cur.image.split("review")[1] });
+          return acc;
+        }, []);
+        setPresignImg(reducedImages);
         editReviewMutation.mutate({
           writeProps:
             { ...writeData, parent: route.params.review.parent?.isActive ? writeData.parent : undefined },
@@ -250,7 +263,10 @@ const Write = ({ navigation, route }: WriteProp) => {
   };
 
   useEffect(() => {
+    setUploadBody([]);
+    setImageIds([]);
     if (route.params?.review && route.params.type !== "reKnewWrite") {
+      setImages(route.params.review.images);
       setImageList(route.params.review.images.map(v => v.image));
       setUserBadge({
         interest: userBadge.interest.map(v => {
@@ -287,8 +303,8 @@ const Write = ({ navigation, route }: WriteProp) => {
     }
     else {
       setUserBadge(initialBadgeData);
-      setUploadBody([]);
       setImageList([]);
+      setImages([]);
       setWriteData({
         images: [],
         content: "",
@@ -419,7 +435,7 @@ const Write = ({ navigation, route }: WriteProp) => {
             style={styles.reviewIcon}>
             <Image source={(writeData.satisfaction === "best") ? heart : grayheart} style={{ width: d2p(20), height: h2p(20) }} />
             <Text style={[{ color: (writeData.satisfaction === "best") ? theme.color.main : theme.color.grayscale.a09ca4, marginLeft: d2p(5) },
-            (writeData.satisfaction === "best") ? FONT.Bold : FONT.Regular]}>최고에요</Text>
+            (writeData.satisfaction === "best") ? FONT.Bold : FONT.Regular]}>최고예요</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setWriteData({ ...writeData, satisfaction: "good" })}
@@ -433,7 +449,7 @@ const Write = ({ navigation, route }: WriteProp) => {
             style={styles.reviewIcon}>
             <Image source={(writeData.satisfaction === "bad") ? blackclose : grayclose} style={{ width: d2p(20), height: h2p(20) }} />
             <Text style={[{ color: (writeData.satisfaction === "bad") ? theme.color.black : theme.color.grayscale.a09ca4, marginLeft: d2p(5) },
-            (writeData.satisfaction === "bad") ? FONT.Bold : FONT.Regular]}>별로에요</Text>
+            (writeData.satisfaction === "bad") ? FONT.Bold : FONT.Regular]}>별로예요</Text>
           </TouchableOpacity>
         </View>
         {(route.params?.type === "reknew" || route.params?.type === "reKnewWrite") ?
@@ -565,13 +581,16 @@ const Write = ({ navigation, route }: WriteProp) => {
             return (
               <View style={[styles.images, { marginRight: (idx === imageList.length - 1) ? d2p(20) : d2p(5) }]}>
                 <View style={{ alignItems: "center" }}>
-                  <Image source={{
-                    uri:
-                      image?.type === 'video'
-                        ? image?.thumbnail ?? ''
-                        : 'file://' + (image?.crop?.cropPath ?? image.path),
-                  }} style={{ width: d2p(96), height: h2p(64), borderRadius: 4 }} />
+                  <Image source={
+                    route.params?.review?.images ?
+                      { uri: images[idx].image }
+                      :
+                      {
+                        uri: Platform.OS === "ios" ? 'file://' + image.path : 'file://' + image.realPath,
+                      }
+                  } style={{ width: d2p(96), height: h2p(64), borderRadius: 4 }} />
                   <Pressable onPress={() => {
+                    setImageIds(imageIds.concat(image.id));
                     setImages(images.filter((_, filterIdx) => idx !== filterIdx));
                     setWriteData({ ...writeData, images: writeData.images?.filter((_, filterIdx) => idx !== filterIdx) });
                     setImageList(imageList.filter((_, filterIdx) => idx !== filterIdx));
@@ -580,12 +599,12 @@ const Write = ({ navigation, route }: WriteProp) => {
                     style={{ position: "absolute", right: 0, top: 0 }}>
                     <Image source={photoClose} style={{ width: d2p(16), height: h2p(16) }} />
                   </Pressable>
-                </View>
-              </View>
+                </View >
+              </View >
             );
           }))}
-        </ScrollView>
-      </View>
+        </ScrollView >
+      </View >
       <View style={{
         position: "absolute", right: d2p(10),
         bottom: keyboardHeight > 100 ? keyboardHeight + h2p(20) :
@@ -716,7 +735,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     marginTop: "auto",
-    marginBottom: Platform.OS === "ios" ? h2p(104) : h2p(94)
+    marginBottom: Platform.OS === "ios" ? h2p(104) : h2p(84)
   },
   select: {
     flexDirection: "row",

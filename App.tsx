@@ -29,6 +29,8 @@ const App = () => {
   useEffect(() => {
     const getToken = async () => {
       // TODO refresh api
+      // AsyncStorage.setItem("token", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU5NTk2OTQzLCJpYXQiOjE2NTcwMDQ5NDMsImp0aSI6IjI2NmZkNDY1ZDczZjRhZTE5MDJiYzUwMmNiYWUzZmZlIiwidXNlcl9pZCI6M30.hR4UnXzVbi7F5HODp8wLW5McNjDfgVJMzYwSFTFMKqI");
+      // setToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU5NTk2OTQzLCJpYXQiOjE2NTcwMDQ5NDMsImp0aSI6IjI2NmZkNDY1ZDczZjRhZTE5MDJiYzUwMmNiYWUzZmZlIiwidXNlcl9pZCI6M30.hR4UnXzVbi7F5HODp8wLW5McNjDfgVJMzYwSFTFMKqI");
       const storageToken = await AsyncStorage.getItem("token");
       if (storageToken) {
         setToken(storageToken);
@@ -188,17 +190,8 @@ const App = () => {
 //     });
 //   }
 // });
-if (__DEV__) {
-  Sentry.init({
-    environment: "dev",
-    debug: true,
-    dsn: Config.CENTRY_DSN,
-    // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
-    // We recommend adjusting this value in production.
-    tracesSampleRate: 1.0,
-  });
-}
-else {
+
+if (!__DEV__) {
   Sentry.init({
     environment: "production",
     dsn: Config.CENTRY_DSN,
