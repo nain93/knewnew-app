@@ -527,7 +527,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                                   style={{ flexDirection: "row" }}
                                   onPress={() => navigation.navigate("Mypage", { id: item.author.id })}>
                                   <Text style={FONT.Medium}>{item.author.nickname}</Text>
-                                  {item.author.id === myId &&
+                                  {item.author.id === reviewDetailQuery.data?.author.id &&
                                     <View style={{
                                       width: d2p(38),
                                       justifyContent: "center", alignItems: "center",
