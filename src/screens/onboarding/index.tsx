@@ -24,6 +24,7 @@ import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 import theme from '~/styles/theme';
 import { useFocusEffect } from '@react-navigation/native';
 import { versioningAOS, versioningIOS } from '~/utils/constant';
+import { emailicon } from '~/assets/icons';
 
 const iosKeys = {
   kConsumerKey: Config.NAVER_KEY,
@@ -176,8 +177,18 @@ const Onboarding = ({ navigation }: NavigationType) => {
         <Image source={mainLogo} style={styles.logo} />
       </View>
       <View style={{ marginBottom: h2p(145) }}>
-        <Text style={[{ textAlign: "center", fontSize: 16 }, FONT.Bold]}>SNS로 시작하기</Text>
-        <View style={{ flexDirection: "row", marginTop: d2p(20), alignSelf: "center" }}>
+        <View style={{ flexDirection: "row", justifyContent: "center" }}>
+          <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>매일매일 </Text>
+          <Text style={[FONT.Bold, { color: theme.color.grayscale.C_443e49 }]}>
+            새로운 발견
+          </Text>
+          <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>
+            이 있는
+          </Text>
+        </View>
+        <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49, textAlign: "center" }]}>
+          뉴뉴를 시작하세요</Text>
+        <View style={{ flexDirection: "row", marginTop: d2p(30), alignSelf: "center" }}>
           <TouchableOpacity onPress={handleKakaoLogin}>
             <Image source={kakaoImg} style={styles.snsImg} />
           </TouchableOpacity>
@@ -193,14 +204,22 @@ const Onboarding = ({ navigation }: NavigationType) => {
             </TouchableOpacity>}
         </View>
         <TouchableOpacity
-          onPress={() => navigation.navigate("emailLogin")}
+          onPress={() => navigation.navigate("emailCheck")}
           style={{
-            marginTop: h2p(20),
+            marginTop: h2p(23),
             borderRadius: 5,
-            borderWidth: 1, borderColor: theme.color.grayscale.a09ca4,
-            paddingVertical: h2p(10)
+            borderWidth: 1, borderColor: theme.color.grayscale.d3d0d5,
+            paddingVertical: h2p(14),
+            width: Dimensions.get("window").width - d2p(40),
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center"
           }}>
-          <Text style={[FONT.Bold, { fontSize: 16, textAlign: "center" }]}>이메일 로그인</Text>
+          <Image source={emailicon} style={{ marginRight: d2p(10), width: d2p(13), height: d2p(10) }} />
+          <Text style={[FONT.Bold, {
+            textAlign: "center",
+            color: theme.color.grayscale.a09ca4
+          }]}>이메일로 시작하기</Text>
         </TouchableOpacity>
       </View>
       <View style={{
@@ -208,16 +227,24 @@ const Onboarding = ({ navigation }: NavigationType) => {
         position: "absolute",
         bottom: isIphoneX() ? getBottomSpace() + h2p(20) : h2p(40)
       }}>
-        <Text style={FONT.Regular}>회원가입 시 뉴뉴 서비스 필수 동의 항목</Text>
+        <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4 }]}>
+          회원가입 시 뉴뉴 서비스 필수 동의 항목</Text>
         <View style={{ flexDirection: "row" }}>
           <TouchableOpacity onPress={() => navigation.navigate("privacy")}>
-            <Text style={[FONT.Bold, { color: theme.color.grayscale.ff5d5d }]}>개인정보처리방침</Text>
+            <Text style={[FONT.Bold, {
+              color: theme.color.grayscale.C_443e49,
+              textDecorationLine: "underline"
+            }]}>개인정보처리방침</Text>
           </TouchableOpacity>
-          <Text style={FONT.Regular}>과 </Text>
+          <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4 }]}>과 </Text>
           <TouchableOpacity onPress={() => navigation.navigate("term")}>
-            <Text style={[FONT.Bold, { color: theme.color.grayscale.ff5d5d }]}>서비스 이용약관</Text>
+            <Text style={[FONT.Bold, {
+              color: theme.color.grayscale.C_443e49,
+              textDecorationLine: "underline"
+            }]}>서비스 이용약관</Text>
           </TouchableOpacity>
-          <Text style={[FONT.Regular, { textAlign: "center" }]}>에 동의하게 됩니다.</Text>
+          <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4, textAlign: "center" }]}>
+            에 동의하게 됩니다.</Text>
         </View>
         <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4, marginTop: h2p(5) }]}>
           {Platform.OS === "ios" ? `v.${versioningIOS}-demo` : `v.${versioningAOS}-demo`}

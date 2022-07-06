@@ -104,19 +104,21 @@ const Mypage = ({ navigation, route }: MypageProps) => {
         </View>
         <Pressable
           onPress={() => {
-            navigation.navigate("editProfile",
-              {
-                profile:
+            if (route.params?.id === myId) {
+              navigation.navigate("editProfile",
                 {
-                  nickname: getMyProfileQuery?.data?.nickname,
-                  headline: getMyProfileQuery?.data?.headline,
-                  profileImage: getMyProfileQuery?.data?.profileImage,
-                  tags: getMyProfileQuery?.data?.tags,
-                  representBadge: getMyProfileQuery?.data?.representBadge,
-                  remainingPeriod: getMyProfileQuery?.data?.remainingPeriod
-                },
-                foucsHeadLine: true
-              });
+                  profile:
+                  {
+                    nickname: getMyProfileQuery?.data?.nickname,
+                    headline: getMyProfileQuery?.data?.headline,
+                    profileImage: getMyProfileQuery?.data?.profileImage,
+                    tags: getMyProfileQuery?.data?.tags,
+                    representBadge: getMyProfileQuery?.data?.representBadge,
+                    remainingPeriod: getMyProfileQuery?.data?.remainingPeriod
+                  },
+                  foucsHeadLine: true
+                });
+            }
           }}
           style={styles.headline}>
           <Text style={[FONT.Medium, {

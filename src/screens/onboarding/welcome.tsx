@@ -117,8 +117,8 @@ const styles = StyleSheet.create({
   },
   main: {
     flexDirection: 'row',
-    marginBottom: d2p(30),
-    marginTop: h2p(83),
+    marginBottom: h2p(30),
+    marginTop: h2p(63),
     flexWrap: "wrap"
   },
   mainText: {
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   subText: {
     color: theme.color.grayscale.C_79737e,
     fontSize: 14,
-    marginTop: d2p(10), marginBottom: "auto"
+    marginTop: h2p(10), marginBottom: "auto"
   },
   alertContainer: {
     flex: 1,
