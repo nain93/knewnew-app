@@ -12,7 +12,7 @@ import { commentMore, recommentIcon } from '~/assets/icons';
 import { noProfile } from '~/assets/images';
 import { RecommentType } from '~/types/comment';
 import { useMutation, useQueryClient } from 'react-query';
-import { deleteReviewComment } from '~/api/comment';
+import { deleteReviewComment, likeComment } from '~/api/comment';
 
 interface RecommentProps {
   authorName: string
@@ -50,12 +50,19 @@ const Recomment = ({ child, authorName,
     }
   });
 
+  const commentLikeMutation = useMutation("likeCount", ({ commentId, isLike }: { commentId: number, isLike: boolean }) =>
+    likeComment({ token, commentId, isLike }), {
+    onSuccess: () => {
+      queryClient.invalidateQueries("getCommentList");
+    }
+  });
+
   useEffect(() => {
     if (modifyingIdx !== -1) {
       setReModifyingIdx(-1);
     }
   }, [setModifyingIdx]);
-
+  // console.log(child, 'child');
   return (
     <>
       {
@@ -119,14 +126,16 @@ const Recomment = ({ child, authorName,
               </View>
               <View style={styles.commentContent}>
                 <Text style={[FONT.Regular, { fontSize: 15, color: theme.color.main }]}>@{authorName} </Text>
-                <Text style={[{ color: theme.color.grayscale.C_443e49, fontSize: 15 }, FONT.Regular]}>{item.content}</Text>
+                <Text style={[{
+                  color: theme.color.grayscale.C_443e49, fontSize: 15
+                }, FONT.Regular]}>{item.content}</Text>
               </View>
               <TouchableOpacity
                 style={{ marginLeft: d2p(49), marginTop: h2p(10) }}
-                onPress={() => console.log(item, 'item')}>
+                onPress={() => commentLikeMutation.mutate({ commentId: item.id, isLike: !item.isLike })}>
                 <Text style={[FONT.Bold, {
-                  fontSize: 12, color: (item.likeCount > 0) ? theme.color.grayscale.C_443e49 : theme.color.grayscale.C_79737e,
-                }]}>좋아요 {item.likeCount}</Text>
+                  fontSize: 12, color: item.isLike ? theme.color.grayscale.C_443e49 : theme.color.grayscale.C_79737e,
+                }]}>좋아요 {item.likeCount > 0 && item.likeCount}</Text>
               </TouchableOpacity>
               {recommentSelectedIdx === index &&
                 <View style={styles.clickBox}>
@@ -192,7 +201,8 @@ const styles = StyleSheet.create({
   },
   commentContent: {
     marginLeft: d2p(49),
-    flexDirection: "row"
+    flexDirection: "row",
+    flexWrap: "wrap"
   },
   clickBox: {
     width: d2p(70),
