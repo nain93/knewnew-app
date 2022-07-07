@@ -1,4 +1,4 @@
-ENV=PRODUCT
+ENV=DEVELOPMENT
 APP_ID=com.mealing.knewnnew
 APP_NAME=knewnew
 AOS_BUILD_VERSION=002

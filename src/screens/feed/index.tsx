@@ -94,7 +94,6 @@ const Feed = ({ navigation, route }: FeedProps) => {
     }
   }, {
     getNextPageParam: (next, all) => {
-      console.log(all.flat().length, 'all.flat().length');
       return all.flat().length;
     },
     onSettled: () => {
