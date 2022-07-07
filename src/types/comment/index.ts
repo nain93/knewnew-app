@@ -9,6 +9,7 @@ export interface RecommentType {
     content: string;
     created: string;
     likeCount: number;
+    isLike: boolean
   }>
 }
 
@@ -21,6 +22,7 @@ export interface CommentListType {
   };
   content: string;
   created: string;
+  isLike: boolean;
   likeCount: number;
   childCount: number
   child: Array<{
@@ -33,5 +35,6 @@ export interface CommentListType {
     content: string;
     created: string;
     likeCount: number;
+    isLike: boolean
   }>
 }
