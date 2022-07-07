@@ -88,9 +88,10 @@ apply from: "../../node_modules/@sentry/react-native/sentry.gradle"
 apply from: "../../node_modules/react-native-code-push/android/codepush.gradle"
 
 project.ext.envConfigFiles = [
-        debug: ".env",
-        releasestaging: ".env",
-        release: ".env"
+        debug: "env/.env.development",
+        productdebug: "env/.env.production",
+        releaseStaging: "env/.env.stage",
+        release: "env/.env.production"
 ]
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 
@@ -255,6 +256,7 @@ android {
         debug {
             signingConfig signingConfigs.debug
             resValue "string", "CodePushDeploymentKey", '""'
+            matchingFallbacks = ['debug', 'release']
         }
         release {
             resValue "string", "CodePushDeploymentKey", "5gP1EAlJ7O1EFABvdnaH0k4kCqkkVB_AVMmIA"

@@ -180,8 +180,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
 
   const commentLikeMutation = useMutation("likeCount", ({ commentId, isLike }: { commentId: number, isLike: boolean }) =>
     likeComment({ token, commentId, isLike }), {
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: () => {
+      queryClient.invalidateQueries("getCommentList");
     }
   });
 
@@ -561,8 +561,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                           </View>
                         </View>
                         <Text style={[styles.commentContent, FONT.Regular]}>{item.content}</Text>
-                        {/* 대댓글 api 기능 추가후 주석해제 */}
-                        {/* <View style={{ flexDirection: "row", alignItems: "center", marginLeft: d2p(40), marginTop: h2p(10) }}>
+                        {/* 대댓글 */}
+                        <View style={{ flexDirection: "row", alignItems: "center", marginLeft: d2p(40), marginTop: h2p(10) }}>
                           <TouchableOpacity onPress={() => {
                             setCommentParentId(item.id);
                             setRecommentName(item.author.nickname);
@@ -570,13 +570,13 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                           }}>
                             <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_79737e }]}>답글 달기</Text>
                           </TouchableOpacity>
-                          <TouchableOpacity onPress={() => console.log(item, 'item')}>
+                          <TouchableOpacity onPress={() => commentLikeMutation.mutate({ commentId: item.id, isLike: !item.isLike })}>
                             <Text style={[FONT.Bold, {
                               marginLeft: d2p(10),
-                              fontSize: 12, color: (item.likeCount > 0) ? theme.color.grayscale.C_443e49 : theme.color.grayscale.C_79737e
-                            }]}>좋아요 {item.likeCount}</Text>
+                              fontSize: 12, color: item.isLike ? theme.color.grayscale.C_443e49 : theme.color.grayscale.C_79737e
+                            }]}>좋아요 {item.likeCount > 0 && item.likeCount}</Text>
                           </TouchableOpacity>
-                        </View> */}
+                        </View>
                         {commentSelectedIdx === index &&
                           <View style={[styles.clickBox, { right: d2p(32) }]}>
                             <Pressable
