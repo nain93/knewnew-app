@@ -25,6 +25,10 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
   const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
   const scrollRef = useRef<KeyboardAwareScrollView>(null);
   const [dataSourceCords, setDataSourceCords] = useState<number[]>([]);
+  const [isStepFocus, setIsStepFocus] = useState({
+    step2: false,
+    step3: false
+  });
 
   const setToken = useSetRecoilState(tokenState);
   const setIspopupOpen = useSetRecoilState(popupState);
@@ -90,7 +94,7 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
         <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
           <Text style={[FONT.Bold, styles.step]}>Step.1</Text>
           <View>
-            <Text style={[FONT.Bold, { fontSize: 16, color: !userBadge.foodLife.every(v => !v.isClick) ? theme.color.grayscale.C_443e49 : theme.color.grayscale.eae7ec }]}>
+            <Text style={[FONT.Bold, { fontSize: 16, color: theme.color.grayscale.C_443e49 }]}>
               푸드 스타일을 알려주세요!
             </Text>
             <View style={{ paddingTop: h2p(10) }}>
@@ -105,6 +109,7 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
                     })
                   });
                   scrollRef.current?.scrollToPosition(0, dataSourceCords[1], true);
+                  setIsStepFocus({ ...isStepFocus, step2: true });
                 }}>
                   <SelectTag viewStyle={{ paddingVertical: h2p(5) }} name={badge.title} isSelected={badge.isClick} />
                 </Pressable>
@@ -130,7 +135,7 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
         <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
           <Text style={[FONT.Bold, styles.step]}>Step.2</Text>
           <View>
-            <Text style={[FONT.Bold, { fontSize: 16, color: !userBadge.household.every(v => !v.isClick) ? theme.color.grayscale.C_443e49 : theme.color.grayscale.eae7ec }]}>
+            <Text style={[FONT.Bold, { fontSize: 16, color: isStepFocus.step2 ? theme.color.grayscale.C_443e49 : theme.color.grayscale.eae7ec }]}>
               몇명이서 살고 계신가요?
             </Text>
             <View style={{ paddingTop: h2p(10) }}>
@@ -145,6 +150,7 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
                     })
                   });
                   scrollRef.current?.scrollToPosition(0, dataSourceCords[2], true);
+                  setIsStepFocus({ ...isStepFocus, step3: true });
                 }}>
                   <SelectTag viewStyle={{ paddingVertical: h2p(5) }} name={badge.title} isSelected={badge.isClick} />
                 </Pressable>
@@ -170,7 +176,7 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
         <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
           <Text style={[FONT.Bold, styles.step]}>Step.3</Text>
           <View>
-            <Text style={[FONT.Bold, { fontSize: 16, color: !userBadge.lifeStyle.every(v => !v.isClick) ? theme.color.grayscale.C_443e49 : theme.color.grayscale.eae7ec }]}>
+            <Text style={[FONT.Bold, { fontSize: 16, color: isStepFocus.step3 ? theme.color.grayscale.C_443e49 : theme.color.grayscale.eae7ec }]}>
               무슨 일을 하시나요?
             </Text>
             <View style={{ paddingTop: h2p(10) }}>
