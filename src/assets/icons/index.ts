@@ -39,12 +39,13 @@ import tagFood from "./tagFood.png";
 import tagHome from "./tagHome.png";
 import tagLife from "./tagLife.png";
 import emailicon from "./emailicon.png";
+import noticeIcon from "./noticeIcon.png";
 
 export {
   close, leftArrow, more, heart, like, reKnew, comment, commentMore, circle, maincart, maintag,
   searchIcon, mainSearchIcon, colorLike, tagfilter, tag, cart, colorCart, retweetfrom,
   colorCheck, initialize, grayclose, graytriangle, grayheart, bad, graycircle, blackclose,
   graywrite, graylogo, graymypage, graysearch, mainmypage, mainlogoIcon, write, plusIcon, recommentIcon,
-  handIcon, tagFood, tagHome, tagLife, emailicon
+  handIcon, tagFood, tagHome, tagLife, emailicon, noticeIcon
 };
 

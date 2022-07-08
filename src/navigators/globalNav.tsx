@@ -15,6 +15,7 @@ import Report from '~/screens/report';
 import Term from '~/screens/setting';
 import Privacy from '~/screens/setting/privacy';
 import EmailLogin from '~/screens/onboarding/emailLogin';
+import Notification from '~/screens/feed/notification';
 
 const Stack = createStackNavigator();
 
@@ -112,6 +113,13 @@ const GlobalNav = ({ token }: { token: string }) => {
         <Stack.Screen
           name="emailLogin"
           component={EmailLogin}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="notification"
+          component={Notification}
           options={{
             headerShown: false
           }}
