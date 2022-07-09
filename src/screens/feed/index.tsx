@@ -5,12 +5,12 @@ import theme from '~/styles/theme';
 import Header from '~/components/header';
 import mainLogo from '~/assets/logo';
 import FeedReview from '~/components/review/feedReview';
-import { colorCheck, tagfilter } from '~/assets/icons';
+import { colorCheck, noticeIcon, tagfilter } from '~/assets/icons';
 
 import RBSheet from "react-native-raw-bottom-sheet";
 import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
-import SelectLayout from '~/components/selectLayout';
-import { BadgeType } from '~/types';
+import SelectLayout from '~/components/layout/SelectLayout';
+import { BadgeType, InterestTagType } from '~/types';
 import AlertPopup from '~/components/popup/alertPopup';
 import { useInfiniteQuery, useQuery } from 'react-query';
 import { getReviewList } from '~/api/review';
@@ -21,13 +21,14 @@ import { getMyProfile } from '~/api/user';
 import { MyProfileType } from '~/types/user';
 import { ReviewListType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
-import { initialBadgeData } from '~/utils/data';
+import { initialBadgeData, interestTagData } from '~/utils/data';
 import { useFocusEffect } from '@react-navigation/native';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import FadeInOut from '~/hooks/fadeInOut';
 import SplashScreen from 'react-native-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { hitslop } from '~/utils/constant';
 
 
 function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
@@ -53,7 +54,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const fadeHook = FadeInOut({ isPopupOpen, setIsPopupOpen });
   const [scrollOffset, setScrollOffset] = useState(0);
   const tagRefRBSheet = useRef<RBSheet>(null);
-  const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
+  const [userBadge, setUserBadge] = useState<InterestTagType>(interestTagData);
   const [token, setToken] = useRecoilState(tokenState);
   const setMyId = useSetRecoilState(myIdState);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -192,9 +193,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
   }, [route.params]);
 
   useEffect(() => {
-    if (!userBadge.household.every(v => !v.isClick) ||
-      !userBadge.interest.every(v => !v.isClick) ||
-      !userBadge.taste.every(v => !v.isClick)) {
+    if (!userBadge.interest.every(v => !v.isClick)) {
       setAllClick(false);
     }
     else {
@@ -221,7 +220,10 @@ const Feed = ({ navigation, route }: FeedProps) => {
                 style={[styles.filter, { marginRight: 0, marginBottom: 0 }]}>
                 <Image source={tagfilter} style={{ width: d2p(11), height: d2p(10), marginRight: d2p(10) }} />
                 <Text style={FONT.Medium}>태그 변경</Text>
-              </TouchableOpacity> : <View />}
+              </TouchableOpacity>
+              :
+              <View />
+            }
           </Animated.View>
         }
         headerLeft={scrollOffset >= h2p(130) ?
@@ -235,7 +237,20 @@ const Feed = ({ navigation, route }: FeedProps) => {
                 모든 메뉴
               </Text>
             }
-          </Animated.View> : <Image source={mainLogo} resizeMode="contain" style={{ width: d2p(96), height: d2p(20) }} />}
+          </Animated.View>
+          :
+          <View style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            width: Dimensions.get("window").width - d2p(40)
+          }}>
+            <Image source={mainLogo} resizeMode="contain" style={{ width: d2p(96), height: d2p(20) }} />
+            <Pressable hitSlop={hitslop} onPress={() => navigation.navigate("notification")} >
+              <Image source={noticeIcon} style={{ width: d2p(24), height: d2p(24) }} />
+            </Pressable>
+          </View>
+        }
         isBorder={scrollOffset >= h2p(130) ? true : false} bgColor={scrollOffset >= h2p(130) ? theme.color.white : theme.color.grayscale.f7f7fc}
       />
       <View>
@@ -268,18 +283,6 @@ const Feed = ({ navigation, route }: FeedProps) => {
         onOpen={() =>
           setUserBadge({
             interest: userBadge.interest.map(v => {
-              if (v.title === filterBadge) {
-                return { title: v.title, isClick: true };
-              }
-              return { title: v.title, isClick: false };
-            }),
-            household: userBadge.household.map(v => {
-              if (v.title === filterBadge) {
-                return { title: v.title, isClick: true };
-              }
-              return { title: v.title, isClick: false };
-            }),
-            taste: userBadge.taste.map(v => {
               if (v.title === filterBadge) {
                 return { title: v.title, isClick: true };
               }
@@ -321,9 +324,8 @@ const Feed = ({ navigation, route }: FeedProps) => {
           <TouchableOpacity
             onPress={() => {
               // * 태그 선택 안했을경우
-              if (userBadge.household.every(v => !v.isClick) &&
+              if (
                 userBadge.interest.every(v => !v.isClick) &&
-                userBadge.taste.every(v => !v.isClick) &&
                 !allClick
               ) {
                 setIsPopupOpen({ isOpen: true, content: "태그를 선택해주세요" });
@@ -360,7 +362,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
         <TouchableOpacity
           onPress={() => {
             setAllClick(!allClick);
-            setUserBadge(initialBadgeData);
+            setUserBadge(interestTagData);
           }}
           style={{
             paddingHorizontal: d2p(15),
@@ -380,7 +382,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
             includeFontPadding: false
           }]}>모든 메뉴 보기 👀</Text>
         </TouchableOpacity>
-        <SelectLayout type="filter" userBadge={userBadge} setUserBadge={setUserBadge} />
+        <SelectLayout type="filter" interestTag={userBadge} setInterestTag={setUserBadge} />
         {isPopupOpen.isOpen &&
           <Animated.View style={{ opacity: fadeHook.fadeAnim ? fadeHook.fadeAnim : 1, zIndex: fadeHook.fadeAnim ? fadeHook.fadeAnim : -1 }}>
             <AlertPopup text={isPopupOpen.content} popupStyle={{ bottom: h2p(20) }} />

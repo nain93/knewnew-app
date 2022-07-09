@@ -4,7 +4,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
-        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -16,16 +16,17 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="SplashIcon" translatesAutoresizingMaskIntoConstraints="NO" id="UWQ-wj-y0i">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" image="SplashIcon" translatesAutoresizingMaskIntoConstraints="NO" id="LwL-z4-sgf">
+                                <rect key="frame" x="87.099598578450696" y="283.5" width="200.00000000000009" height="99.999999999999943"/>
                             </imageView>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <viewLayoutGuide key="safeArea" id="5BX-0l-p6J"/>
+                        <color key="backgroundColor" red="0.92549026010000002" green="0.40784314269999999" blue="0.38823530080000002" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                         <constraints>
-                            <constraint firstItem="UWQ-wj-y0i" firstAttribute="top" secondItem="DN1-qc-RwI" secondAttribute="top" id="AoB-gc-cJL"/>
-                            <constraint firstItem="UWQ-wj-y0i" firstAttribute="leading" secondItem="DN1-qc-RwI" secondAttribute="leading" id="Tx6-aH-B6t"/>
-                            <constraint firstAttribute="trailing" secondItem="UWQ-wj-y0i" secondAttribute="trailing" id="VOv-Vd-Wpp"/>
-                            <constraint firstAttribute="bottom" secondItem="UWQ-wj-y0i" secondAttribute="bottom" id="jY6-vx-Y5F"/>
+                            <constraint firstItem="LwL-z4-sgf" firstAttribute="centerX" secondItem="DN1-qc-RwI" secondAttribute="centerX" id="7B0-wh-iFy"/>
+                            <constraint firstItem="LwL-z4-sgf" firstAttribute="centerY" secondItem="DN1-qc-RwI" secondAttribute="centerY" id="EFH-Yy-sdG"/>
+                            <constraint firstItem="LwL-z4-sgf" firstAttribute="centerY" secondItem="DN1-qc-RwI" secondAttribute="centerY" id="Kca-LG-lmc"/>
+                            <constraint firstItem="LwL-z4-sgf" firstAttribute="centerX" secondItem="DN1-qc-RwI" secondAttribute="centerX" id="Nt0-qx-4Dp"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -35,9 +36,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="SplashIcon" width="180" height="380"/>
-        <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
+        <image name="SplashIcon" width="100" height="100"/>
     </resources>
 </document>

@@ -12,8 +12,14 @@ export interface InterestType {
   masterBadge?: boolean
 }
 
+export interface InterestTagType {
+  interest: Array<{
+    title: string;
+    isClick: boolean;
+  }>
+}
 export interface BadgeType {
-  foodLife: Array<{
+  foodStyle: Array<{
     title: string;
     isClick: boolean;
   }>,
@@ -21,7 +27,7 @@ export interface BadgeType {
     title: string;
     isClick: boolean;
   }>,
-  lifeStyle: Array<{
+  occupation: Array<{
     title: string;
     isClick: boolean;
     content?: string

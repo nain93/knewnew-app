@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { Alert, Animated, Linking, Platform } from 'react-native';
 import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import SplashScreen from 'react-native-splash-screen';
@@ -7,6 +7,7 @@ import { useRecoilState } from 'recoil';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 import codePush from "react-native-code-push";
+import { FileLogger } from "react-native-file-logger";
 
 import GlobalNav from './src/navigators/globalNav';
 import AlertPopup from '~/components/popup/alertPopup';
@@ -26,11 +27,30 @@ const App = () => {
   const { fadeAnim } = FadeInOut({ isPopupOpen, setIsPopupOpen });
   const [token, setToken] = useRecoilState(tokenState);
 
+  // const sendLoggedFiles = useCallback(() => {
+  //   FileLogger.sendLogFilesByEmail({
+  //     to: 'rnrb555@gmail.com',
+  //     subject: 'App logs',
+  //     body: 'Attached logs',
+  //   })
+  //     .then(() => {
+  //       setTimeout(() => {
+  //         FileLogger.deleteLogFiles();
+  //       }, 5000);
+  //     })
+  //     .catch((err) => {
+  //       if ('message' in err) {
+  //         FileLogger.error(err.message);
+  //       } else {
+  //         FileLogger.error(JSON.stringify(err));
+  //       }
+  //     });
+  // }, []);
+
   useEffect(() => {
     const getToken = async () => {
       // TODO refresh api
-      // AsyncStorage.setItem("token", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU5NTk2OTQzLCJpYXQiOjE2NTcwMDQ5NDMsImp0aSI6IjI2NmZkNDY1ZDczZjRhZTE5MDJiYzUwMmNiYWUzZmZlIiwidXNlcl9pZCI6M30.hR4UnXzVbi7F5HODp8wLW5McNjDfgVJMzYwSFTFMKqI");
-      // setToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU5NTk2OTQzLCJpYXQiOjE2NTcwMDQ5NDMsImp0aSI6IjI2NmZkNDY1ZDczZjRhZTE5MDJiYzUwMmNiYWUzZmZlIiwidXNlcl9pZCI6M30.hR4UnXzVbi7F5HODp8wLW5McNjDfgVJMzYwSFTFMKqI");
+      // sendLoggedFiles();
       const storageToken = await AsyncStorage.getItem("token");
       if (storageToken) {
         setToken(storageToken);

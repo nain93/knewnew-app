@@ -166,8 +166,6 @@ const Recomment = ({ child, authorName,
                     }}>
                     <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
                   </Pressable>
-                  {console.log(recommentSelectedIdx, 'commentSelectedIdx')}
-                  {console.log(index, 'index')}
                 </View>
               }
             </View>

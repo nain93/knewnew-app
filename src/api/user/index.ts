@@ -1,5 +1,6 @@
 import axios from "axios";
 import { baseURL } from "~/api";
+import { BadgeType } from "~/types";
 import { UserInfoType } from "~/types/user";
 
 export const getMyProfile = async (token: string) => {
@@ -31,8 +32,7 @@ interface EditPrfoileType {
     nickname: string,
     profileImage: string | null,
     headline: string,
-    representBadge: string,
-    tags: Array<string>
+    tags: BadgeType
   }
 }
 

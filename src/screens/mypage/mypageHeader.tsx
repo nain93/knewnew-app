@@ -10,7 +10,7 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { myIdState, okPopupState, tokenState } from '~/recoil/atoms';
 import { useQuery, useQueryClient } from 'react-query';
 import { isIphoneX } from 'react-native-iphone-x-helper';
-import { MyProfileType } from '~/types/user';
+import { MyProfileType, UserInfoTagType } from '~/types/user';
 import { getMyProfile } from '~/api/user';
 
 interface MypageHeaderProps {
@@ -22,7 +22,7 @@ interface ProfileType {
   profileImage: string | null,
   headline: string,
   representBadge: string,
-  tags: Array<string>,
+  tags: UserInfoTagType,
   remainingPeriod: number
 }
 
@@ -39,7 +39,11 @@ const MypageHeader = ({ setOpenMore }: MypageHeaderProps) => {
       nickname: "",
       headline: "",
       profileImage: "",
-      tags: [],
+      tags: {
+        foodStyle: [],
+        household: [],
+        occupation: []
+      },
       representBadge: "",
       remainingPeriod: 0
     }
@@ -64,7 +68,7 @@ const MypageHeader = ({ setOpenMore }: MypageHeaderProps) => {
         setProfile(state);
       }
     }, [queryClient]));
-
+  console.log(getMyProfileQuery.data);
   return (
     <View style={styles.clickBox}>
       <TouchableOpacity
@@ -81,7 +85,11 @@ const MypageHeader = ({ setOpenMore }: MypageHeaderProps) => {
                   nickname: profile.nickname,
                   headline: profile.headline,
                   profileImage: profile.profileImage,
-                  tags: profile.tags,
+                  tags: {
+                    foodStyle: profile.tags.foodStyle.map(v => ({ title: v, isClick: true })),
+                    household: profile.tags.household.map(v => ({ title: v, isClick: true })),
+                    occupation: profile.tags.occupation.map(v => ({ title: v, isClick: true })),
+                  },
                   representBadge: profile.representBadge,
                   remainingPeriod: profile.remainingPeriod
                 }

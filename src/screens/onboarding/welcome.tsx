@@ -2,13 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { NavigationRoute } from 'react-navigation';
 import { NavigationStackProp } from 'react-navigation-stack';
-import { useRecoilValue } from 'recoil';
 import { handIcon, tagFood, tagHome, tagLife } from '~/assets/icons';
-import { getMyProfile } from '~/api/user';
 import BasicButton from '~/components/button/basicButton';
 import Header from '~/components/header';
 import CloseIcon from '~/components/icon/closeIcon';
-import { tokenState } from '~/recoil/atoms';
 import { FONT } from '~/styles/fonts';
 import theme from '~/styles/theme';
 import { UserInfoType } from '~/types/user';
@@ -27,11 +24,10 @@ export interface NavigationType {
 }
 
 const Welcome = ({ navigation, route }: NavigationType) => {
-  const token = useRecoilValue(tokenState);
 
   const handleSignIn = () => {
     //@ts-ignore
-    // navigation.reset({ routes: [{ name: "TabNav" }] });
+    navigation.reset({ routes: [{ name: "TabNav" }] });
   };
 
   return (
