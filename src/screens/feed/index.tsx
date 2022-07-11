@@ -215,12 +215,19 @@ const Feed = ({ navigation, route }: FeedProps) => {
         customRight={
           <Animated.View style={{ opacity: fadeAnim ? fadeAnim : 1, zIndex: 10 }}>
             {scrollOffset >= h2p(130) ?
-              <TouchableOpacity
-                onPress={() => tagRefRBSheet.current?.open()}
-                style={[styles.filter, { marginRight: 0, marginBottom: 0 }]}>
-                <Image source={tagfilter} style={{ width: d2p(11), height: d2p(10), marginRight: d2p(10) }} />
-                <Text style={FONT.Medium}>태그 변경</Text>
-              </TouchableOpacity>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <TouchableOpacity
+                  onPress={() => tagRefRBSheet.current?.open()}
+                  style={[styles.filter, { marginRight: 0, marginBottom: 0 }]}>
+                  <Image source={tagfilter} style={{ width: d2p(11), height: d2p(10), marginRight: d2p(10) }} />
+                  <Text style={FONT.Medium}>태그 변경</Text>
+                </TouchableOpacity>
+                <Pressable
+                  style={{ marginLeft: d2p(10) }}
+                  hitSlop={hitslop} onPress={() => navigation.navigate("notification")} >
+                  <Image source={noticeIcon} style={{ width: d2p(24), height: d2p(24) }} />
+                </Pressable>
+              </View>
               :
               <View />
             }

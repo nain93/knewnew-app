@@ -161,7 +161,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     if (!userReviewListQuery.isLoading) {
       return (
         <View style={{ paddingTop: h2p(100) }}>
-          <View style={{ marginBottom: h2p(80) }}>
+          <View style={{ marginBottom: h2p(180) }}>
             <Text style={[FONT.Regular,
             {
               color: theme.color.grayscale.C_79737e,
@@ -222,7 +222,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     if (!userBookmarkListQuery.isLoading) {
       return (
         <View style={{ paddingTop: h2p(100) }}>
-          <View style={{ marginBottom: h2p(80) }}>
+          <View style={{ marginBottom: h2p(180) }}>
             <Text style={[FONT.Regular,
             {
               color: theme.color.grayscale.C_79737e,
