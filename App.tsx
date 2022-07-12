@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { Alert, Animated, Linking, Platform } from 'react-native';
 import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import SplashScreen from 'react-native-splash-screen';
@@ -7,6 +7,7 @@ import { useRecoilState } from 'recoil';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 import codePush from "react-native-code-push";
+import { FileLogger } from "react-native-file-logger";
 
 import GlobalNav from './src/navigators/globalNav';
 import AlertPopup from '~/components/popup/alertPopup';
@@ -25,6 +26,26 @@ const App = () => {
   const [modalOpen, setModalOpen] = useRecoilState(okPopupState);
   const { fadeAnim } = FadeInOut({ isPopupOpen, setIsPopupOpen });
   const [token, setToken] = useRecoilState(tokenState);
+
+  // const sendLoggedFiles = useCallback(() => {
+  //   FileLogger.sendLogFilesByEmail({
+  //     to: 'rnrb555@gmail.com',
+  //     subject: 'App logs',
+  //     body: 'Attached logs',
+  //   })
+  //     .then(() => {
+  //       setTimeout(() => {
+  //         FileLogger.deleteLogFiles();
+  //       }, 5000);
+  //     })
+  //     .catch((err) => {
+  //       if ('message' in err) {
+  //         FileLogger.error(err.message);
+  //       } else {
+  //         FileLogger.error(JSON.stringify(err));
+  //       }
+  //     });
+  // }, []);
 
   useEffect(() => {
     const getToken = async () => {

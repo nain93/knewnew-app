@@ -50,10 +50,10 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
   const bookmarkMutation = useMutation("bookmark",
     ({ id, isBookmark }: { id: number, isBookmark: boolean }) => bookmarkReview(token, id, isBookmark), {
     onSuccess: async () => {
-      queryClient.invalidateQueries("myProfile");
-      queryClient.invalidateQueries("reviewList");
-      queryClient.invalidateQueries("userBookmarkList");
-      queryClient.invalidateQueries("userReviewList");
+      await queryClient.invalidateQueries("myProfile");
+      await queryClient.invalidateQueries("reviewList");
+      await queryClient.invalidateQueries("userBookmarkList");
+      await queryClient.invalidateQueries("userReviewList");
       setApiBlock(false);
     }
   });
@@ -61,10 +61,10 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
   const likeReviewFeedMutation = useMutation('likeReviewFeed',
     ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state), {
     onSuccess: async () => {
-      queryClient.invalidateQueries("myProfile");
-      queryClient.invalidateQueries("reviewList");
-      queryClient.invalidateQueries("userBookmarkList");
-      queryClient.invalidateQueries("userReviewList");
+      await queryClient.invalidateQueries("myProfile");
+      await queryClient.invalidateQueries("reviewList");
+      await queryClient.invalidateQueries("userBookmarkList");
+      await queryClient.invalidateQueries("userReviewList");
       setApiBlock(false);
     }
   });
@@ -274,16 +274,16 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
         <View style={styles.reactionContainer}>
           <TouchableOpacity
             onPress={() => {
-              setApiBlock(true);
-              if (isBookmarkState) {
-                setIsBookmarkState(false);
-                setBookmarkCount(prev => prev - 1);
-              }
-              else {
-                setIsBookmarkState(true);
-                setBookmarkCount(prev => prev + 1);
-              }
               if (!apiBlock) {
+                setApiBlock(true);
+                if (isBookmarkState) {
+                  setIsBookmarkState(false);
+                  setBookmarkCount(prev => prev - 1);
+                }
+                else {
+                  setIsBookmarkState(true);
+                  setBookmarkCount(prev => prev + 1);
+                }
                 bookmarkMutation.mutate({ id: review.id, isBookmark: !isBookmarkState });
               }
             }}
@@ -304,15 +304,15 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           <TouchableOpacity
             onPress={() => {
               setApiBlock(true);
-              if (isLike) {
-                setIsLike(false);
-                setLikeCount(prev => prev - 1);
-              }
-              else {
-                setIsLike(true);
-                setLikeCount(prev => prev + 1);
-              }
               if (!apiBlock) {
+                if (isLike) {
+                  setIsLike(false);
+                  setLikeCount(prev => prev - 1);
+                }
+                else {
+                  setIsLike(true);
+                  setLikeCount(prev => prev + 1);
+                }
                 likeReviewFeedMutation.mutate({ id: review.id, state: !isLike });
               }
             }}

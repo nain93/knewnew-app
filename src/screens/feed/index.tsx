@@ -5,7 +5,7 @@ import theme from '~/styles/theme';
 import Header from '~/components/header';
 import mainLogo from '~/assets/logo';
 import FeedReview from '~/components/review/feedReview';
-import { colorCheck, tagfilter } from '~/assets/icons';
+import { colorCheck, noticeIcon, tagfilter } from '~/assets/icons';
 
 import RBSheet from "react-native-raw-bottom-sheet";
 import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
@@ -28,6 +28,7 @@ import FadeInOut from '~/hooks/fadeInOut';
 import SplashScreen from 'react-native-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { loading } from '~/assets/gif';
+import { hitslop } from '~/utils/constant';
 
 
 function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
@@ -217,7 +218,10 @@ const Feed = ({ navigation, route }: FeedProps) => {
                 style={[styles.filter, { marginRight: 0, marginBottom: 0 }]}>
                 <Image source={tagfilter} style={{ width: d2p(11), height: d2p(10), marginRight: d2p(10) }} />
                 <Text style={FONT.Medium}>태그 변경</Text>
-              </TouchableOpacity> : <View />}
+              </TouchableOpacity>
+              :
+              <View />
+            }
           </Animated.View>
         }
         headerLeft={scrollOffset >= h2p(130) ?
@@ -231,7 +235,20 @@ const Feed = ({ navigation, route }: FeedProps) => {
                 모든 메뉴
               </Text>
             }
-          </Animated.View> : <Image source={mainLogo} resizeMode="contain" style={{ width: d2p(96), height: d2p(20) }} />}
+          </Animated.View>
+          :
+          <View style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            width: Dimensions.get("window").width - d2p(40)
+          }}>
+            <Image source={mainLogo} resizeMode="contain" style={{ width: d2p(96), height: d2p(20) }} />
+            <Pressable hitSlop={hitslop} onPress={() => navigation.navigate("notification")} >
+              <Image source={noticeIcon} style={{ width: d2p(24), height: d2p(24) }} />
+            </Pressable>
+          </View>
+        }
         isBorder={scrollOffset >= h2p(130) ? true : false} bgColor={scrollOffset >= h2p(130) ? theme.color.white : theme.color.grayscale.f7f7fc}
       />
       <View>
