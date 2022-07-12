@@ -76,6 +76,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [recommentMode, setRecommentMode] = useState(false);
   const [recommentName, setRecommentName] = useState("");
   const [commentParentId, setCommentParentId] = useState<number | null>(null);
+  const [apiBlock, setApiBlock] = useState(false);
 
   const setRefresh = useSetRecoilState(refreshState);
   const setModalOpen = useSetRecoilState(okPopupState);
@@ -180,8 +181,9 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
 
   const commentLikeMutation = useMutation("likeCount", ({ commentId, isLike }: { commentId: number, isLike: boolean }) =>
     likeComment({ token, commentId, isLike }), {
-    onSuccess: () => {
-      queryClient.invalidateQueries("getCommentList");
+    onSuccess: async () => {
+      await queryClient.invalidateQueries("getCommentList");
+      setApiBlock(false);
     }
   });
 
@@ -570,7 +572,12 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                           }}>
                             <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_79737e }]}>답글 달기</Text>
                           </TouchableOpacity>
-                          <TouchableOpacity onPress={() => commentLikeMutation.mutate({ commentId: item.id, isLike: !item.isLike })}>
+                          <TouchableOpacity onPress={() => {
+                            setApiBlock(true);
+                            if (!apiBlock) {
+                              commentLikeMutation.mutate({ commentId: item.id, isLike: !item.isLike });
+                            }
+                          }}>
                             <Text style={[FONT.Bold, {
                               marginLeft: d2p(10),
                               fontSize: 12, color: item.isLike ? theme.color.grayscale.C_443e49 : theme.color.grayscale.C_79737e
@@ -611,6 +618,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                       {/* 대댓글 ui */}
                       {item.child ?
                         <Recomment
+                          reviewId={item.id}
                           modifyingIdx={modifyingIdx}
                           commentIsEdit={commentIsEdit}
                           setModifyingIdx={(mdIdx: number) => setModifyingIdx(mdIdx)}
