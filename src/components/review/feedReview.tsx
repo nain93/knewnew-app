@@ -1,5 +1,5 @@
 import { View, Text, Pressable, StyleSheet, Dimensions, Image, TouchableOpacity, ViewStyle } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import theme from '~/styles/theme';
 import { d2p, h2p, simpleDate } from '~/utils';
 import Badge from '../badge';
@@ -117,6 +117,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             borderRadius: 40,
             borderColor: theme.color.grayscale.e9e7ec,
             borderWidth: 1,
+            overflow: "hidden"
           }}>
           <Image source={review.author.profileImage ? { uri: review.author.profileImage } : noProfile}
             style={{
@@ -355,7 +356,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
   );
 };
 
-export default FeedReview;
+export default memo(FeedReview);
 
 const styles = StyleSheet.create({
   titleContainer: {

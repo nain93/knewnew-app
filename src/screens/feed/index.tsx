@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, Animated, Pressable } from 'react-native';
+import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, Animated, Pressable, ActivityIndicator } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
@@ -15,19 +15,19 @@ import AlertPopup from '~/components/popup/alertPopup';
 import { useInfiniteQuery, useQuery } from 'react-query';
 import { getReviewList } from '~/api/review';
 import { useRecoilState, useSetRecoilState } from 'recoil';
-import { myIdState, refreshState, tokenState } from '~/recoil/atoms';
+import { myIdState, tokenState } from '~/recoil/atoms';
 import Loading from '~/components/loading';
 import { getMyProfile } from '~/api/user';
 import { MyProfileType } from '~/types/user';
 import { ReviewListType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
 import { initialBadgeData } from '~/utils/data';
-import { useFocusEffect } from '@react-navigation/native';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import FadeInOut from '~/hooks/fadeInOut';
 import SplashScreen from 'react-native-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { loading } from '~/assets/gif';
 
 
 function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
@@ -59,7 +59,6 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [filterBadge, setFilterBadge] = useState("");
   const [allClick, setAllClick] = useState(false);
-  const [refresh, setRefresh] = useRecoilState(refreshState);
   const flatListRef = useRef<FlatList>(null);
 
   const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", token, filterBadge], () => getMyProfile(token), {
@@ -79,6 +78,8 @@ const Feed = ({ navigation, route }: FeedProps) => {
     onError: () => {
       setToken("");
       AsyncStorage.removeItem("token");
+      //@ts-ignore
+      navigation.reset({ index: 0, routes: [{ name: "OnBoarding" }] });
       SplashScreen.hide();
     }
   });
@@ -93,7 +94,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
       return queryData;
     }
   }, {
-    getNextPageParam: (next, all) => all.flat().length,
+    getNextPageParam: (next, all) => all.flat().length ?? undefined,
     onSettled: () => {
       SplashScreen.hide();
     }
@@ -117,7 +118,6 @@ const Feed = ({ navigation, route }: FeedProps) => {
               <Text style={[styles.mainText, FONT.Bold]}>추천 중 👀</Text>
             </>
           }
-
         </View>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
@@ -132,6 +132,11 @@ const Feed = ({ navigation, route }: FeedProps) => {
     , [filterBadge, getMyProfileQuery.data?.representBadge]);
 
   const reviewFooter = useCallback(() => <View style={{ height: h2p(117) }} />, []);
+
+  const footerLoading = useCallback(() =>
+    <View style={{ height: h2p(117) }}>
+      <Image source={loading} style={{ alignSelf: "center", width: d2p(70), height: d2p(70) }} />
+    </View>, []);
 
   const reviewRenderItem = useCallback(({ item, index }) =>
     <Pressable onPress={() =>
@@ -175,12 +180,6 @@ const Feed = ({ navigation, route }: FeedProps) => {
     }
   }, [isPopupOpen, fadeAnim, scrollOffset]);
 
-  useFocusEffect(
-    useCallback(() => {
-      if (refresh) {
-        setRefresh(false);
-      }
-    }, [refresh]));
 
   useEffect(() => {
     if (route.params?.refresh) {
@@ -199,7 +198,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
     }
   }, [userBadge]);
 
-  if (reviewListQuery.isLoading || refresh) {
+  if (reviewListQuery.isLoading) {
     return <Loading />;
   }
 
@@ -239,19 +238,23 @@ const Feed = ({ navigation, route }: FeedProps) => {
         <FlatList
           ref={flatListRef}
           onEndReached={() => {
-            if (reviewListQuery.data &&
-              reviewListQuery.data.pages.flat().length > 19) {
+            // hasNextPage
+            if (reviewListQuery.hasNextPage) {
               reviewListQuery.fetchNextPage();
             }
+            // if (reviewListQuery.data &&
+            //   reviewListQuery.data.pages.flat().length > 19) {
+            //   reviewListQuery.fetchNextPage();
+            // }
           }}
-          onEndReachedThreshold={0.8}
+          onEndReachedThreshold={0.5}
           refreshing={reviewListQuery.isLoading}
           onRefresh={reviewListQuery.refetch}
           data={reviewListQuery.data?.pages.flat()}
           ListHeaderComponent={reviewHeader}
           showsVerticalScrollIndicator={false}
           renderItem={reviewRenderItem}
-          ListFooterComponent={reviewFooter}
+          ListFooterComponent={reviewListQuery.isFetchingNextPage ? footerLoading : reviewFooter}
           style={{ marginTop: 0, marginBottom: h2p(80), backgroundColor: theme.color.grayscale.f7f7fc }}
           keyExtractor={reviewKey}
           onScroll={(event) => {
