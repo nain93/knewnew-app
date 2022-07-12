@@ -14,6 +14,7 @@ import Loading from '~/components/loading';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 import { FONT } from '~/styles/fonts';
+import FastImage from 'react-native-fast-image';
 
 interface SearchTabViewProps {
   searchList?: ReviewListType[],
@@ -103,8 +104,10 @@ const SearchTabView = ({ reviewCount, userCount, searchList, userList, keyword, 
                     <TouchableOpacity
                       onPress={() => navigation.navigate('Mypage', { id: user.item.id })}
                       style={{ marginBottom: h2p(30), flexDirection: "row", alignItems: "center" }}>
-                      <Image source={user.item.profileImage ? { uri: user.item.profileImage } : noProfile}
-                        style={{ marginRight: d2p(10), borderColor: theme.color.grayscale.e9e7ec, borderWidth: 1, width: d2p(24), height: d2p(24), borderRadius: 24 }} />
+                      <View style={{ overflow: "hidden", borderRadius: 24, width: d2p(24), height: d2p(24), marginRight: d2p(10) }}>
+                        <FastImage source={user.item.profileImage ? { uri: user.item.profileImage } : noProfile}
+                          style={{ borderColor: theme.color.grayscale.e9e7ec, borderWidth: 1, width: d2p(24), height: d2p(24), borderRadius: 24 }} />
+                      </View>
                       <View style={{ flexDirection: "row", width: Dimensions.get("window").width - d2p(84) }}>
                         <Highlighter
                           highlightStyle={[FONT.Bold, { fontSize: 16, color: theme.color.main }]}

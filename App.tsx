@@ -48,7 +48,7 @@ const App = () => {
   }, []);
 
   const linking = {
-    // prefixes: ["kakao7637c35cfedcb6c01b1f17ce7cd42f05://"],
+    // prefixes: ["https://"],
     prefixes: ["knewnnew://"],
     config: {
       screens: {
