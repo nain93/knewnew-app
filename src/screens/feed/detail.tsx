@@ -34,6 +34,7 @@ import {
 import axios from 'axios';
 import Recomment from '~/screens/feed/comment/recomment';
 import { CommentListType } from '~/types/comment';
+import SplashScreen from 'react-native-splash-screen';
 interface FeedDetailProps {
   navigation: NavigationStackProp
   route: NavigationRoute<{
@@ -110,7 +111,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           navigation.goBack();
         }
       }
-    }
+    },
+    onSettled: () => SplashScreen.hide()
   });
 
   const likeReviewMutation = useMutation('likeReview',
@@ -365,6 +367,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                 borderRadius: 40,
                 height: d2p(40),
                 width: d2p(40),
+                overflow: "hidden"
               }}>
               <Image source={reviewDetailQuery.data?.author.profileImage ?
                 { uri: reviewDetailQuery.data?.author.profileImage } : noProfile}

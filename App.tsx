@@ -50,9 +50,6 @@ const App = () => {
   useEffect(() => {
     const getToken = async () => {
       // TODO refresh api
-      // AsyncStorage.setItem("token", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU5NTk2OTQzLCJpYXQiOjE2NTcwMDQ5NDMsImp0aSI6IjI2NmZkNDY1ZDczZjRhZTE5MDJiYzUwMmNiYWUzZmZlIiwidXNlcl9pZCI6M30.hR4UnXzVbi7F5HODp8wLW5McNjDfgVJMzYwSFTFMKqI");
-      // setToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU5NTk2OTQzLCJpYXQiOjE2NTcwMDQ5NDMsImp0aSI6IjI2NmZkNDY1ZDczZjRhZTE5MDJiYzUwMmNiYWUzZmZlIiwidXNlcl9pZCI6M30.hR4UnXzVbi7F5HODp8wLW5McNjDfgVJMzYwSFTFMKqI");
-      // sendLoggedFiles();
       const storageToken = await AsyncStorage.getItem("token");
       if (storageToken) {
         setToken(storageToken);
@@ -72,7 +69,7 @@ const App = () => {
   }, []);
 
   const linking = {
-    // prefixes: ["kakao7637c35cfedcb6c01b1f17ce7cd42f05://"],
+    // prefixes: ["https://"],
     prefixes: ["knewnnew://"],
     config: {
       screens: {
@@ -102,24 +99,27 @@ const App = () => {
   React.useEffect(() => {
     // * 코드푸시 업데이트 체크
     installUpdateIfAvailable();
-    if (Platform.OS === "ios") {
-      messaging().requestPermission();
-      messaging()
-        .getIsHeadless()
-        .then(isHeadless => {
-          console.log('isHeadless');
-          // do sth with isHeadless
-        });
+    // ! 알람 개발후 production으로 전환
+    if (__DEV__) {
+      if (Platform.OS === "ios") {
+        messaging().requestPermission();
+        messaging()
+          .getIsHeadless()
+          .then(isHeadless => {
+            console.log('isHeadless');
+            // do sth with isHeadless
+          });
+      }
+      // fetchConfig().catch(console.warn);
+      messaging().getToken().then(fcmToken =>
+        console.log('fcmToken')
+      );
+      const unsubscribe = messaging().onMessage(async remoteMessage => {
+        // console.log(remoteMessage, 'remoteMessage');
+        Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+      });
+      return unsubscribe;
     }
-    // fetchConfig().catch(console.warn);
-    messaging().getToken().then(fcmToken =>
-      console.log('fcmToken')
-    );
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
-      // console.log(remoteMessage, 'remoteMessage');
-      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
-    });
-    return unsubscribe;
   }, []);
 
   // * CODE PUSH

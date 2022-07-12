@@ -73,7 +73,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
   const tabHeader = useCallback(() => (
     // pointerEvents="none"
     <View pointerEvents="box-none" >
-      <View style={styles.profileImage} >
+      <View style={[styles.profileImage, { overflow: "hidden" }]} >
         <Image style={{
           width: d2p(60), height: d2p(60), borderRadius: 60,
           borderWidth: 1,
