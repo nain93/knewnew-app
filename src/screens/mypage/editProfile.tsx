@@ -96,8 +96,19 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
     type: string
   }>();
 
+  interface postProfileType {
+    nickname: string,
+    headline: string,
+    profileImage: string | null,
+    tags: {
+      foodStyle: Array<string>,
+      household: Array<string>,
+      occupation: Array<string>
+    }
+  }
+
   const editProfileMutation = useMutation(["editprofile", token],
-    (profileprop: ProfileType) => editUserProfile({ token, id: myId, profile: profileprop }), {
+    (profileprop: postProfileType) => editUserProfile({ token, id: myId, profile: profileprop }), {
     onSuccess: async () => {
       await queryClient.invalidateQueries("myProfile");
       navigation.goBack();
@@ -122,7 +133,18 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
           profileImage: profile.includes("https") ? profile.split("com/")[1] : data[0].fields.key,
           nickname: profileInfo.nickname,
           headline: profileInfo.headline,
-          tags: userBadge
+          tags: {
+            foodStyle: userBadge.foodStyle.map(v => v.title),
+            household: userBadge.household.map(v => v.title),
+            occupation: userBadge.occupation.map(v => {
+              if (v.content) {
+                return v.content;
+              }
+              else {
+                return v.title;
+              }
+            })
+          }
         });
         queryClient.setQueryData("myProfile", {
           profileImage: profile.includes("https") ? profile.split("com/")[1] : data[0].fields.key,
@@ -219,20 +241,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
         isBorder={true}
         headerLeft={<LeftArrowIcon onBackClick={() => navigation.goBack()} imageStyle={{ width: d2p(11), height: d2p(25) }} />}
         title="프로필 수정"
-        headerRightPress={() => {
-          if (!profileInfo.profileImage && !profile) {
-            editProfileMutation.mutate({
-              profileImage: null,
-              nickname: profileInfo.nickname,
-              headline: profileInfo.headline,
-              tags: userBadge
-            });
-          }
-          else {
-            presignMutation.mutate([profile]);
-          }
-        }}
-        headerRight={<Text style={[{ color: theme.color.main }, FONT.Regular]}>완료</Text>} />
+      />
       <KeyboardAwareScrollView
         ref={scrollRef}
         enableAutomaticScroll
@@ -352,7 +361,8 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
                 alignItems: "flex-start",
                 marginTop: h2p(30),
                 paddingHorizontal: d2p(20),
-                paddingVertical: h2p(15)
+                paddingVertical: h2p(15),
+                width: Dimensions.get("window").width - d2p(40)
               }}>
                 <Text style={[FONT.Bold, { fontSize: 12, marginRight: d2p(18), marginTop: h2p(2) }]}>Bonus</Text>
                 <View>
@@ -378,7 +388,30 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
           </View>
         </View>
         <BasicButton viewStyle={{ alignSelf: "center", marginTop: h2p(40) }}
-          onPress={() => tagRefRBSheet.current?.open()}
+          onPress={() => {
+            if (!profileInfo.profileImage && !profile) {
+              editProfileMutation.mutate({
+                profileImage: null,
+                nickname: profileInfo.nickname,
+                headline: profileInfo.headline,
+                tags: {
+                  foodStyle: userBadge.foodStyle.map(v => v.title),
+                  household: userBadge.household.map(v => v.title),
+                  occupation: userBadge.occupation.map(v => {
+                    if (v.content) {
+                      return v.content;
+                    }
+                    else {
+                      return v.title;
+                    }
+                  })
+                }
+              });
+            }
+            else {
+              presignMutation.mutate([profile]);
+            }
+          }}
           text="수정 완료" textColor={theme.color.main} bgColor={theme.color.white} />
         <TouchableOpacity
           onPress={() => {

@@ -68,7 +68,6 @@ const MypageHeader = ({ setOpenMore }: MypageHeaderProps) => {
         setProfile(state);
       }
     }, [queryClient]));
-  console.log(getMyProfileQuery.data);
   return (
     <View style={styles.clickBox}>
       <TouchableOpacity

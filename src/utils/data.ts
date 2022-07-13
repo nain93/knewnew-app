@@ -1,8 +1,8 @@
 export const interestTagData = {
   interest:
     [{ title: "빵식가", isClick: false }, { title: "애주가", isClick: false }, { title: "디저트러버", isClick: false },
-    { title: "캠핑족", isClick: false }, { title: "속편한식사", isClick: false }, { title: "다이어터", isClick: false },
-    { title: "비건", isClick: false }, { title: "간편식", isClick: false }, { title: "한끼식사", isClick: false }]
+    { title: "캠퍼", isClick: false }, { title: "오늘한끼", isClick: false }, { title: "다이어터", isClick: false },
+    { title: "비건", isClick: false }, { title: "홈카페", isClick: false }, { title: "신상탐험대", isClick: false }]
 };
 
 export const initialBadgeData = {
@@ -17,7 +17,9 @@ export const initialBadgeData = {
 };
 
 export const bonusTagData = [
+  { title: "느끼만렙", isClick: false },
   { title: "맵찔이", isClick: false },
   { title: "맵고수", isClick: false },
-  { title: "3인이상가구", isClick: false }
+  { title: "달달함파", isClick: false },
+  { title: "짭조름파", isClick: false }
 ];

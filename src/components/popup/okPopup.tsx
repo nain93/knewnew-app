@@ -14,6 +14,7 @@ interface OkPopupProps {
 }
 
 const OkPopup = (props: OkPopupProps) => {
+  console.log('zz');
   return (
     <Modal
       isVisible={props.modalOpen}

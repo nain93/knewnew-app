@@ -54,7 +54,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const fadeHook = FadeInOut({ isPopupOpen, setIsPopupOpen });
   const [scrollOffset, setScrollOffset] = useState(0);
   const tagRefRBSheet = useRef<RBSheet>(null);
-  const [userBadge, setUserBadge] = useState<InterestTagType>(interestTagData);
+  const [interestTag, setInterestTag] = useState<InterestTagType>(interestTagData);
   const [token, setToken] = useRecoilState(tokenState);
   const setMyId = useSetRecoilState(myIdState);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -121,7 +121,6 @@ const Feed = ({ navigation, route }: FeedProps) => {
               <Text style={[styles.mainText, FONT.Bold]}>추천 중 👀</Text>
             </>
           }
-
         </View>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
@@ -193,13 +192,13 @@ const Feed = ({ navigation, route }: FeedProps) => {
   }, [route.params]);
 
   useEffect(() => {
-    if (!userBadge.interest.every(v => !v.isClick)) {
+    if (!interestTag.interest.every(v => !v.isClick)) {
       setAllClick(false);
     }
     else {
       setAllClick(true);
     }
-  }, [userBadge]);
+  }, [interestTag]);
 
   if (reviewListQuery.isLoading || refresh) {
     return <Loading />;
@@ -288,8 +287,8 @@ const Feed = ({ navigation, route }: FeedProps) => {
       <RBSheet
         ref={tagRefRBSheet}
         onOpen={() =>
-          setUserBadge({
-            interest: userBadge.interest.map(v => {
+          setInterestTag({
+            interest: interestTag.interest.map(v => {
               if (v.title === filterBadge) {
                 return { title: v.title, isClick: true };
               }
@@ -332,7 +331,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
             onPress={() => {
               // * 태그 선택 안했을경우
               if (
-                userBadge.interest.every(v => !v.isClick) &&
+                interestTag.interest.every(v => !v.isClick) &&
                 !allClick
               ) {
                 setIsPopupOpen({ isOpen: true, content: "태그를 선택해주세요" });
@@ -344,8 +343,8 @@ const Feed = ({ navigation, route }: FeedProps) => {
                 return;
               }
               // * 태그 선택후 대표 뱃지 적용
-              const copy: { [index: string]: Array<{ isClick: boolean, title: string }> } = { ...userBadge };
-              const badge = Object.keys(userBadge).reduce((acc, cur) => {
+              const copy: { [index: string]: Array<{ isClick: boolean, title: string }> } = { ...interestTag };
+              const badge = Object.keys(interestTag).reduce((acc, cur) => {
                 if (!copy[cur].every(v => !v.isClick)) {
                   acc = copy[cur].filter(v => v.isClick)[0].title;
                 }
@@ -369,7 +368,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
         <TouchableOpacity
           onPress={() => {
             setAllClick(!allClick);
-            setUserBadge(interestTagData);
+            setInterestTag(interestTagData);
           }}
           style={{
             paddingHorizontal: d2p(15),
@@ -389,7 +388,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
             includeFontPadding: false
           }]}>모든 메뉴 보기 👀</Text>
         </TouchableOpacity>
-        <SelectLayout type="filter" interestTag={userBadge} setInterestTag={setUserBadge} />
+        <SelectLayout type="filter" interestTag={interestTag} setInterestTag={setInterestTag} />
         {isPopupOpen.isOpen &&
           <Animated.View style={{ opacity: fadeHook.fadeAnim ? fadeHook.fadeAnim : 1, zIndex: fadeHook.fadeAnim ? fadeHook.fadeAnim : -1 }}>
             <AlertPopup text={isPopupOpen.content} popupStyle={{ bottom: h2p(20) }} />

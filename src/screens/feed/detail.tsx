@@ -562,6 +562,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                             }
                           </View>
                         </View>
+                        {/* {console.log(item, 'item')} */}
                         <Text style={[styles.commentContent, FONT.Regular]}>{item.content}</Text>
                         {/* 대댓글 */}
                         <View style={{ flexDirection: "row", alignItems: "center", marginLeft: d2p(40), marginTop: h2p(10) }}>

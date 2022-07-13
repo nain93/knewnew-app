@@ -32,7 +32,11 @@ interface EditPrfoileType {
     nickname: string,
     profileImage: string | null,
     headline: string,
-    tags: BadgeType
+    tags: {
+      foodStyle: Array<string>,
+      household: Array<string>,
+      occupation: Array<string>
+    }
   }
 }
 

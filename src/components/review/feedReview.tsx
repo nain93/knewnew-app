@@ -50,10 +50,14 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
   const bookmarkMutation = useMutation("bookmark",
     ({ id, isBookmark }: { id: number, isBookmark: boolean }) => bookmarkReview(token, id, isBookmark), {
     onSuccess: async () => {
-      await queryClient.invalidateQueries("myProfile");
-      await queryClient.invalidateQueries("reviewList");
-      await queryClient.invalidateQueries("userBookmarkList");
-      await queryClient.invalidateQueries("userReviewList");
+      await Promise.all(
+        [
+          queryClient.invalidateQueries("myProfile"),
+          queryClient.invalidateQueries("reviewList"),
+          queryClient.invalidateQueries("userBookmarkList"),
+          queryClient.invalidateQueries("userReviewList")
+        ]
+      );
       setApiBlock(false);
     }
   });
@@ -61,10 +65,14 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
   const likeReviewFeedMutation = useMutation('likeReviewFeed',
     ({ id, state }: { id: number, state: boolean }) => likeReview(token, id, state), {
     onSuccess: async () => {
-      await queryClient.invalidateQueries("myProfile");
-      await queryClient.invalidateQueries("reviewList");
-      await queryClient.invalidateQueries("userBookmarkList");
-      await queryClient.invalidateQueries("userReviewList");
+      await Promise.all(
+        [
+          queryClient.invalidateQueries("myProfile"),
+          queryClient.invalidateQueries("reviewList"),
+          queryClient.invalidateQueries("userBookmarkList"),
+          queryClient.invalidateQueries("userReviewList")
+        ]
+      );
       setApiBlock(false);
     }
   });
@@ -133,8 +141,9 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             onPress={() => navigation.navigate("Mypage", { id: review.author.id })}>
             <Text style={[styles.title, FONT.Medium]}>{review.author.nickname}</Text>
           </TouchableOpacity>
-          <Badge type="feed" text={review.author.representBadge} />
-          <Text style={[{ fontSize: 12, marginLeft: d2p(5), color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>{review.author.household}</Text>
+          {/* 뱃지 기능 추가후 작업  */}
+          {/* <Badge type="feed" text={review.author.representBadge} /> */}
+          {/* <Text style={[{ fontSize: 12, color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>{review.author.household}</Text> */}
           {review.isEdit &&
             <Text style={[FONT.Regular,
             { fontSize: 12, color: theme.color.grayscale.d3d0d5, marginLeft: d2p(5) }]}>
@@ -158,6 +167,9 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             />
           </TouchableOpacity>}
       </View>
+      <Text style={[FONT.Regular, { marginTop: h2p(5), fontSize: 12, color: theme.color.grayscale.a09ca4, marginLeft: d2p(50) }]}>
+        {getMyProfileQuery.data?.tags.foodStyle} {getMyProfileQuery.data?.tags.household} {getMyProfileQuery.data?.tags.occupation}
+      </Text>
       <View style={styles.titleContainer}>
         <ReviewIcon viewStyle={{ marginTop: h2p(15), marginBottom: h2p(10) }} review={review.satisfaction} />
         {type === "normal" &&
@@ -271,25 +283,16 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
       }
       {type === "normal" &&
         <View style={styles.reactionContainer}>
-          <TouchableOpacity
-            onPress={() => {
-              if (!apiBlock) {
-                setApiBlock(true);
-                if (isBookmarkState) {
-                  setIsBookmarkState(false);
-                  setBookmarkCount(prev => prev - 1);
-                }
-                else {
-                  setIsBookmarkState(true);
-                  setBookmarkCount(prev => prev + 1);
-                }
-                bookmarkMutation.mutate({ id: review.id, isBookmark: !isBookmarkState });
-              }
-            }}
-            style={styles.reviewIcon}>
-            <Image source={isBookmarkState ? colorCart : cart} style={styles.reviewImg} />
-            <Text style={styles.reviewCount}>{bookmarkCount}</Text>
-          </TouchableOpacity>
+          {/* 인용글에서는 리트윗 아이콘 삭제 */}
+          {!review.parent &&
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Write",
+                { loading: false, isEdit: false, type: "reKnewWrite", review, nickname: getMyProfileQuery.data?.nickname, filterBadge })}
+              style={styles.reviewIcon}>
+              <Image source={reKnew} style={styles.reviewImg} />
+              <Text style={styles.reviewCount}>{review.childCount}</Text>
+            </TouchableOpacity>
+          }
           <Pressable
             onPress={() => navigation.navigate("FeedDetail", {
               authorId: review.author.id,
@@ -319,16 +322,25 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             <Image source={isLike ? colorLike : like} style={styles.reviewImg} />
             <Text style={styles.reviewCount}>{likeCount}</Text>
           </TouchableOpacity>
-          {/* 인용글에서는 리트윗 아이콘 삭제 */}
-          {!review.parent &&
-            <TouchableOpacity
-              onPress={() => navigation.navigate("Write",
-                { loading: false, isEdit: false, type: "reKnewWrite", review, nickname: getMyProfileQuery.data?.nickname, filterBadge })}
-              style={styles.reviewIcon}>
-              <Image source={reKnew} style={styles.reviewImg} />
-              <Text style={styles.reviewCount}>{review.childCount}</Text>
-            </TouchableOpacity>
-          }
+          <TouchableOpacity
+            onPress={() => {
+              if (!apiBlock) {
+                setApiBlock(true);
+                if (isBookmarkState) {
+                  setIsBookmarkState(false);
+                  setBookmarkCount(prev => prev - 1);
+                }
+                else {
+                  setIsBookmarkState(true);
+                  setBookmarkCount(prev => prev + 1);
+                }
+                bookmarkMutation.mutate({ id: review.id, isBookmark: !isBookmarkState });
+              }
+            }}
+            style={styles.reviewIcon}>
+            <Image source={isBookmarkState ? colorCart : cart} style={styles.reviewImg} />
+            <Text style={styles.reviewCount}>{bookmarkCount}</Text>
+          </TouchableOpacity>
         </View>
       }
       {review.parent &&

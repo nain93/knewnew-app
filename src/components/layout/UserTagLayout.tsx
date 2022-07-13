@@ -1,5 +1,5 @@
 import { Dimensions, Image, Pressable, StyleSheet, Text, TextInput, View, ViewStyle } from 'react-native';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import { FONT } from '~/styles/fonts';
@@ -17,6 +17,7 @@ interface UserTagLayoutProp {
 
 const UserTagLayout = ({ viewStyle, scrollRef, userBadge, setUserBadge }: UserTagLayoutProp) => {
   const [dataSourceCords, setDataSourceCords] = useState<number[]>([]);
+  const inputRef = useRef<TextInput>(null);
 
   return (
     <View style={{ paddingTop: h2p(40), ...viewStyle }}>
@@ -51,7 +52,9 @@ const UserTagLayout = ({ viewStyle, scrollRef, userBadge, setUserBadge }: UserTa
                       return { ...v, isClick: false };
                     })
                   });
-                  scrollRef.current?.scrollToPosition(0, dataSourceCords[1], true);
+                  if (userBadge.foodStyle.every(v => !v.isClick)) {
+                    scrollRef.current?.scrollToPosition(0, dataSourceCords[1], true);
+                  }
                 }}>
                   <SelectTag viewStyle={{ paddingVertical: h2p(5) }} name={badge.title} isSelected={badge.isClick} />
                 </Pressable>
@@ -91,7 +94,9 @@ const UserTagLayout = ({ viewStyle, scrollRef, userBadge, setUserBadge }: UserTa
                       return { ...v, isClick: false };
                     })
                   });
-                  scrollRef.current?.scrollToPosition(0, dataSourceCords[2], true);
+                  if (userBadge.household.every(v => !v.isClick)) {
+                    scrollRef.current?.scrollToPosition(0, dataSourceCords[2], true);
+                  }
                 }}>
                   <SelectTag viewStyle={{ paddingVertical: h2p(5) }} name={badge.title} isSelected={badge.isClick} />
                 </Pressable>
@@ -135,12 +140,20 @@ const UserTagLayout = ({ viewStyle, scrollRef, userBadge, setUserBadge }: UserTa
                         return { ...v, isClick: false };
                       })
                     });
-                    scrollRef.current?.scrollToEnd();
+                    if (badge.title === "기타") {
+                      inputRef.current?.focus();
+                    }
+                    else {
+                      if (userBadge.occupation.every(v => !v.isClick)) {
+                        scrollRef.current?.scrollToEnd();
+                      }
+                    }
                   }}>
                     <SelectTag viewStyle={{ paddingVertical: h2p(5) }} name={badge.title} isSelected={badge.isClick} />
                   </Pressable>
                   {badge.title === "기타" &&
                     <TextInput
+                      ref={inputRef}
                       autoCapitalize="none"
                       placeholder="직접 입력해주세요" placeholderTextColor={theme.color.grayscale.d3d0d5}
                       value={badge.content}

@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect } from 'react';
-import { Alert, Animated, Linking, Platform } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Alert, Animated, Linking, Platform, Text, TouchableOpacity } from 'react-native';
 import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import SplashScreen from 'react-native-splash-screen';
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -11,46 +11,50 @@ import { FileLogger } from "react-native-file-logger";
 
 import GlobalNav from './src/navigators/globalNav';
 import AlertPopup from '~/components/popup/alertPopup';
-import { okPopupState, popupState, tokenState } from '~/recoil/atoms';
+import { notificationPopup, okPopupState, popupState, tokenState } from '~/recoil/atoms';
 import OkPopup from '~/components/popup/okPopup';
 import Loading from '~/components/loading';
 import FadeInOut from '~/hooks/fadeInOut';
 
 import * as Sentry from "@sentry/react-native";
 import Config from 'react-native-config';
+import NotificationPopup from '~/components/popup/notificationPopup';
 
 export const navigationRef = createNavigationContainerRef();
 
 const App = () => {
   const [isPopupOpen, setIsPopupOpen] = useRecoilState(popupState);
   const [modalOpen, setModalOpen] = useRecoilState(okPopupState);
+  const [notiOpen, setNotiOpen] = useRecoilState(notificationPopup);
   const { fadeAnim } = FadeInOut({ isPopupOpen, setIsPopupOpen });
   const [token, setToken] = useRecoilState(tokenState);
 
-  // const sendLoggedFiles = useCallback(() => {
-  //   FileLogger.sendLogFilesByEmail({
-  //     to: 'rnrb555@gmail.com',
-  //     subject: 'App logs',
-  //     body: 'Attached logs',
-  //   })
-  //     .then(() => {
-  //       setTimeout(() => {
-  //         FileLogger.deleteLogFiles();
-  //       }, 5000);
-  //     })
-  //     .catch((err) => {
-  //       if ('message' in err) {
-  //         FileLogger.error(err.message);
-  //       } else {
-  //         FileLogger.error(JSON.stringify(err));
-  //       }
-  //     });
-  // }, []);
+  const [isVisible, setIsVisible] = useState(false);
+
+  const sendLoggedFiles = useCallback(() => {
+    FileLogger.sendLogFilesByEmail({
+      to: 'rnrb555@gmail.com',
+      subject: 'App logs',
+      body: 'Attached logs',
+    })
+      .then(() => {
+        setTimeout(() => {
+          FileLogger.deleteLogFiles();
+        }, 5000);
+      })
+      .catch((err) => {
+        if ('message' in err) {
+          FileLogger.error(err.message);
+        } else {
+          FileLogger.error(JSON.stringify(err));
+        }
+      });
+  }, []);
 
   useEffect(() => {
     const getToken = async () => {
       // TODO refresh api
-      // sendLoggedFiles();
+      sendLoggedFiles();
       const storageToken = await AsyncStorage.getItem("token");
       if (storageToken) {
         setToken(storageToken);
@@ -180,16 +184,35 @@ const App = () => {
     return Promise.race([checkAndUpdatePromise]);
   };
 
+  useEffect(() => {
+    if (notiOpen.isOpen) {
+      setIsVisible(true);
+    }
+  }, [notiOpen.isOpen]);
+
   return (
     <SafeAreaProvider>
       {/*@ts-ignore*/}
       <NavigationContainer linking={linking} ref={navigationRef} fallback={<Loading />}>
         <GlobalNav token={token} />
       </NavigationContainer>
-      <OkPopup title={modalOpen.content}
-        handleOkayButton={modalOpen.okButton}
-        modalOpen={modalOpen.isOpen}
-        setModalOpen={(isModalOpen: boolean) => setModalOpen({ ...modalOpen, isOpen: isModalOpen })} />
+      {/* 위에서 내려오는 알림 팝업 */}
+      {isVisible &&
+        <NotificationPopup
+          setIsVisible={(view: boolean) => setIsVisible(view)}
+          content={notiOpen.content}
+          modalOpen={notiOpen.isOpen}
+          setModalOpen={(isOpen: boolean) => setNotiOpen({ ...notiOpen, isOpen })}
+        />
+      }
+      {/* 확인, 취소 버튼 팝업 */}
+      {modalOpen.isOpen &&
+        <OkPopup title={modalOpen.content}
+          handleOkayButton={modalOpen.okButton}
+          modalOpen={modalOpen.isOpen}
+          setModalOpen={(isModalOpen: boolean) => setModalOpen({ ...modalOpen, isOpen: isModalOpen })} />
+      }
+      {/* 자동으로 사라지는 경고 팝업 */}
       {isPopupOpen.isOpen &&
         <Animated.View style={{ opacity: fadeAnim ? fadeAnim : 1, zIndex: fadeAnim ? fadeAnim : -1 }}>
           <AlertPopup text={isPopupOpen.content} popupStyle={isPopupOpen.popupStyle} />
