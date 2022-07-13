@@ -247,7 +247,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
             에 동의하게 됩니다.</Text>
         </View>
         <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4, marginTop: h2p(5) }]}>
-          {Platform.OS === "ios" ? `v.${versioningIOS}-dev` : `v.${versioningAOS}-dev`}
+          {Platform.OS === "ios" ? `v.${versioningIOS}` : `v.${versioningAOS}`}
         </Text>
       </View>
     </View>
