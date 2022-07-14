@@ -1,4 +1,5 @@
-import { View, Text, Pressable, StyleSheet, Dimensions, Image, TouchableOpacity, ViewStyle } from 'react-native';
+import { View, Pressable, StyleSheet, Dimensions, Image, TouchableOpacity, ViewStyle } from 'react-native';
+import Text from '~/components/style/CustomText';
 import React, { useCallback, useEffect, useState } from 'react';
 import theme from '~/styles/theme';
 import { d2p, h2p, simpleDate } from '~/utils';
@@ -167,13 +168,13 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             />
           </TouchableOpacity>}
       </View>
-      <Text style={[FONT.Regular, { marginTop: h2p(5), fontSize: 12, color: theme.color.grayscale.a09ca4, marginLeft: d2p(50) }]}>
+      <Text style={[FONT.Regular, { fontSize: 12, marginTop: h2p(5), color: theme.color.grayscale.a09ca4, marginLeft: d2p(50) }]}>
         {getMyProfileQuery.data?.tags.foodStyle} {getMyProfileQuery.data?.tags.household} {getMyProfileQuery.data?.tags.occupation}
       </Text>
       <View style={styles.titleContainer}>
         <ReviewIcon viewStyle={{ marginTop: h2p(15), marginBottom: h2p(10) }} review={review.satisfaction} />
         {type === "normal" &&
-          <Text style={[{ fontSize: 10, color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>{simpleDate(review.created, ' 전')}</Text>
+          <Text style={[FONT.Regular, { fontSize: 10, color: theme.color.grayscale.a09ca4 }]}>{simpleDate(review.created, ' 전')}</Text>
         }
       </View>
       {keyword ?
@@ -185,7 +186,8 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
         />
         :
         <Text style={[{ color: theme.color.black, marginBottom: h2p(10), marginLeft: d2p(50) }, FONT.Regular]}>
-          {review.content}</Text>
+          {review.content}
+        </Text>
       }
       {!review.parent &&
         <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: d2p(10), marginLeft: d2p(50) }}>

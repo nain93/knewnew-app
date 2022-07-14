@@ -1,4 +1,4 @@
-import { Dimensions, Image, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, Platform, Pressable, StyleSheet, TouchableOpacity, View, Text } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import theme from '~/styles/theme';
 import { useNavigation } from '@react-navigation/native';
@@ -209,7 +209,8 @@ const styles = StyleSheet.create({
   commentContent: {
     marginLeft: d2p(49),
     flexDirection: "row",
-    flexWrap: "wrap"
+    flexWrap: "wrap",
+    marginTop: h2p(5)
   },
   clickBox: {
     width: d2p(70),

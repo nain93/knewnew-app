@@ -19,7 +19,7 @@ import { FONT } from '~/styles/fonts';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import { deleteReviewImage, editReview, writeReview } from '~/api/review';
-import { initialBadgeData, interestTagData } from '~/utils/data';
+import { interestTagData } from '~/utils/data';
 import FeedReview from '~/components/review/feedReview';
 import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 import Loading from '~/components/loading';

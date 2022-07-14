@@ -19,7 +19,7 @@ const ReviewIcon = ({ review, imageStyle, viewStyle }: ReviewIconProp) => {
         resizeMode="contain"
         style={[{ width: d2p(20), height: d2p(20) }, imageStyle]}
       />
-      <Text style={[{ paddingLeft: 5, }, FONT.Bold, review === 'best' ? styles.best : (review === 'good' ? styles.good : styles.bad)]}>
+      <Text style={[{ paddingLeft: 5 }, FONT.Bold, review === 'best' ? styles.best : (review === 'good' ? styles.good : styles.bad)]}>
         {reviewItem(review)?.text}</Text>
     </View >
   );

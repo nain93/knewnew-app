@@ -1,4 +1,5 @@
-import { View, Text, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView, Keyboard, FlatList } from 'react-native';
+import { View, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView, Keyboard, FlatList } from 'react-native';
+import Text from '~/components/style/CustomText';
 import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
@@ -528,7 +529,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                                 <TouchableOpacity
                                   style={{ flexDirection: "row" }}
                                   onPress={() => navigation.navigate("Mypage", { id: item.author.id })}>
-                                  <Text style={FONT.Medium}>{item.author.nickname}</Text>
+                                  <Text style={[FONT.Medium, { fontSize: 14 }]}>{item.author.nickname}</Text>
                                   {item.author.id === reviewDetailQuery.data?.author.id &&
                                     <View style={{
                                       width: d2p(38),

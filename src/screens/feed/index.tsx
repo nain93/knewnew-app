@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, Animated, Pressable } from 'react-native';
+import { StyleSheet, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, Animated, Pressable, Text } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
@@ -128,7 +128,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
           onPress={() => tagRefRBSheet.current?.open()}
           style={styles.filter}>
           <Image source={tagfilter} style={{ width: d2p(11), height: d2p(10), marginRight: d2p(10) }} />
-          <Text style={FONT.Medium}>태그 변경</Text>
+          <Text style={[FONT.Medium, { fontSize: 12 }]}>태그 변경</Text>
         </TouchableOpacity>
       </View>
     </>
@@ -219,7 +219,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
                   onPress={() => tagRefRBSheet.current?.open()}
                   style={[styles.filter, { marginRight: 0, marginBottom: 0 }]}>
                   <Image source={tagfilter} style={{ width: d2p(11), height: d2p(10), marginRight: d2p(10) }} />
-                  <Text style={FONT.Medium}>태그 변경</Text>
+                  <Text style={[FONT.Medium, { fontSize: 12 }]}>태그 변경</Text>
                 </TouchableOpacity>
                 <Pressable
                   style={{ marginLeft: d2p(10) }}
