@@ -197,10 +197,10 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
               if (v === filterBadge) {
                 return;
               }
-              return <Text>#{v} </Text>;
+              return <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_79737e }]}>#{v} </Text>;
             }))}
             {filterBadge &&
-              <Text style={{ color: theme.color.main, fontSize: 12 }}>#{filterBadge}</Text>
+              <Text style={[FONT.Regular, { color: theme.color.main, fontSize: 12 }]}>#{filterBadge}</Text>
             }
           </Text>
         </View>}
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
   },
   reactionContainer: {
     marginLeft: d2p(50),
-    marginTop: h2p(5),
+    marginTop: h2p(10),
     marginRight: d2p(40),
     justifyContent: "space-between",
     flexDirection: 'row',
@@ -423,7 +423,6 @@ const styles = StyleSheet.create({
   imageWrap: {
     borderWidth: 1,
     marginLeft: d2p(50),
-    marginBottom: h2p(5),
     marginTop: h2p(10),
     borderColor: theme.color.grayscale.d3d0d5,
     borderRadius: 10,

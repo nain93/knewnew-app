@@ -143,15 +143,6 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             source={graywrite}
           />
         </Pressable>
-        {/* <View style={{
-          flexDirection: "row", flexWrap: "wrap",
-          justifyContent: "center",
-          width: Dimensions.get("window").width - d2p(40)
-        }}>
-          {React.Children.toArray(getMyProfileQuery.data?.tags.map(v =>
-            <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>#{v} </Text>
-          ))}
-        </View> */}
       </View>
     </View>
   ), [getMyProfileQuery.data]);
@@ -283,12 +274,6 @@ const Mypage = ({ navigation, route }: MypageProps) => {
       navigation.reset({ index: 0, routes: [{ name: "OnBoarding" }] });
     }
   }, [token]);
-
-  useFocusEffect(
-    useCallback(() => {
-      // * 프로필 수정화면으로 넘겨줄 데이터 쿼리에 저장
-      queryClient.setQueryData("myProfile", getMyProfileQuery.data);
-    }, [getMyProfileQuery.data, queryClient]));
 
   if (getMyProfileQuery.isLoading) {
     return (

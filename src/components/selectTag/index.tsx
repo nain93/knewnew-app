@@ -1,4 +1,4 @@
-import { Image, Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { Image, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import React from 'react';
 import { tagIcon, selectTagIcon } from '~/assets/icons';
 import { d2p } from '~/utils';

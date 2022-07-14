@@ -34,11 +34,11 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
   const setIspopupOpen = useSetRecoilState(popupState);
 
   const signupMutation = useMutation("signup", (signupData: UserInfoType) => userSignup(signupData), {
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data) {
         setToken(data.accessToken);
-        AsyncStorage.setItem("token", data.accessToken);
-        AsyncStorage.setItem("refreshToken", data.refreshToken);
+        await AsyncStorage.setItem("token", data.accessToken);
+        await AsyncStorage.setItem("refreshToken", data.refreshToken);
         navigation.navigate("Welcome", {
           userBadge: {
             foodLife: userBadge.foodStyle.filter(v => v.isClick)[0].title,
@@ -49,10 +49,6 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
       }
     }
   });
-
-  const handleSignup = () => {
-
-  };
 
   const handleNext = async () => {
     // * 유효성 체크
@@ -108,6 +104,7 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
       style={styles.container}
       // contentContainerStyle={{ flex: 1 }}
       showsVerticalScrollIndicator={false} >
+      {/* <View style={{ backgroundColor: "rgba(0,0,0,0.5)" }} /> */}
       <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: h2p(30) }}>
         <Text style={[FONT.SemiBold, { fontSize: 26, color: theme.color.main }]}>
           {userInfo?.nickname}</Text>

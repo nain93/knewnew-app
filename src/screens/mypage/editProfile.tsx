@@ -1,4 +1,4 @@
-import { Dimensions, Image, Pressable, StyleSheet, Text, TouchableOpacity, View, Animated, Platform } from 'react-native';
+import { Dimensions, Image, Pressable, StyleSheet, Text, TouchableOpacity, View, Platform } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import Header from '~/components/header';
@@ -10,25 +10,17 @@ import BasicButton from '~/components/button/basicButton';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import { noProfile } from '~/assets/images';
-import RBSheet from 'react-native-raw-bottom-sheet';
-import CloseIcon from '~/components/icon/closeIcon';
-import SelectLayout from '~/components/layout/SelectLayout';
 import { FONT } from '~/styles/fonts';
-import { BadgeType, InterestTagType } from '~/types';
-import { bonusTagData, initialBadgeData, interestTagData } from '~/utils/data';
-import OnepickLayout from '~/components/layout/OnepickLayout';
+import { BadgeType } from '~/types';
+import { bonusTagData, initialBadgeData } from '~/utils/data';
 import { useMutation, useQueryClient } from 'react-query';
-import { deleteUser, editUserProfile } from '~/api/user';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { myIdState, okPopupState, tokenState } from '~/recoil/atoms';
+import { editUserProfile } from '~/api/user';
+import { useRecoilValue } from 'recoil';
+import { myIdState, tokenState } from '~/recoil/atoms';
 import ImageCropPicker from 'react-native-image-crop-picker';
-import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 import Loading from '~/components/loading';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { preSiginedImages, uploadImage } from '~/api';
 import { hitslop } from '~/utils/constant';
-import AlertPopup from '~/components/popup/alertPopup';
-import FadeInOut from '~/hooks/fadeInOut';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import UserTagLayout from '~/components/layout/UserTagLayout';
 import SelectTag from '~/components/selectTag';
@@ -68,7 +60,6 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
   const nameInputRef = useRef<TextInput>(null);
   const selfInputRef = useRef<TextInput>(null);
   const scrollRef = useRef<KeyboardAwareScrollView>(null);
-  const tagRefRBSheet = useRef<RBSheet>(null);
   const [profileInfo, setProfileInfo] = useState<ProfileEditType>({
     nickname: "",
     headline: "",
@@ -83,13 +74,10 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
 
   const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
   const [bonusBadge, setBonusBadge] = useState<BonusBadgeType[]>(bonusTagData);
-  const [token, setToken] = useRecoilState(tokenState);
+  const [token] = useRecoilValue(tokenState);
   const myId = useRecoilValue(myIdState);
-  const setModalOpen = useSetRecoilState(okPopupState);
   const queryClient = useQueryClient();
   const [profile, setProfile] = useState(route.params?.profile.profileImage || "");
-  const [isPopupOpen, setIsPopupOpen] = useState({ isOpen: false, content: "" });
-  const { fadeAnim } = FadeInOut({ isPopupOpen, setIsPopupOpen });
   const [uploadBody, setUploadBody] = useState<{
     uri: string,
     name: string | undefined,
@@ -114,12 +102,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
       navigation.goBack();
     }
   });
-  const deleteUserMutation = useMutation("deleteUser", () => deleteUser({ token, id: myId }), {
-    onSuccess: () => {
-      setToken("");
-      AsyncStorage.removeItem("token");
-    }
-  });
+
   const presignMutation = useMutation("presignImages",
     async (fileName: Array<string>) => preSiginedImages({ token, fileName, route: "user" }),
     {
@@ -146,12 +129,6 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
             })
           }
         });
-        queryClient.setQueryData("myProfile", {
-          profileImage: profile.includes("https") ? profile.split("com/")[1] : data[0].fields.key,
-          nickname: profileInfo.nickname,
-          headline: profileInfo.headline,
-          tags: userBadge
-        });
       }
     });
 
@@ -175,14 +152,6 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
   };
 
   useEffect(() => {
-    // * 회원탈퇴시 온보딩화면으로
-    if (!token) {
-      //@ts-ignore
-      navigation.reset({ index: 0, routes: [{ name: "OnBoarding" }] });
-    }
-  }, [token]);
-
-  useEffect(() => {
     if (route.params) {
       setProfileInfo({
         ...route.params?.profile,
@@ -196,19 +165,19 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
 
       setUserBadge({
         foodStyle: userBadge.foodStyle.map(v => {
-          if (route.params && (v.title === route.params.profile.tags.foodStyle[0].title)) {
+          if ((v.title === route.params?.profile.tags.foodStyle[0].title)) {
             return { ...v, isClick: true };
           }
           return { ...v, isClick: false };
         }),
         household: userBadge.household.map(v => {
-          if (route.params && (v.title === route.params.profile.tags.household[0].title)) {
+          if ((v.title === route.params?.profile.tags.household[0].title)) {
             return { ...v, isClick: true };
           }
           return { ...v, isClick: false };
         }),
         occupation: userBadge.occupation.map(v => {
-          if (route.params && (v.title === route.params.profile.tags.occupation[0].title)) {
+          if ((v.title === route.params?.profile.tags.occupation[0].title)) {
             return { ...v, isClick: true };
           }
           return { ...v, isClick: false };
@@ -224,6 +193,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
     //   })
     // });
   }, [route.params]);
+
   // * 자기소개 input 포커스
   useEffect(() => {
     if (route.params?.foucsHeadLine) {
@@ -413,28 +383,6 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
             }
           }}
           text="수정 완료" textColor={theme.color.main} bgColor={theme.color.white} />
-        <TouchableOpacity
-          onPress={() => {
-            setModalOpen({
-              isOpen: true,
-              content: `탈퇴 후 재가입시 데이터는 복구되지 않습니다.\n 정말 탈퇴하시겠습니까?`,
-              okButton: () => {
-                deleteUserMutation.mutate();
-                AsyncStorage.removeItem("token");
-                setToken("");
-              }
-            });
-          }}
-          style={{
-            position: 'absolute',
-            right: d2p(20),
-            bottom: getBottomSpace() + h2p(65)
-          }}>
-          <Text style={[FONT.Bold,
-          { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
-            회원탈퇴
-          </Text>
-        </TouchableOpacity>
       </KeyboardAwareScrollView>
     </>
   );

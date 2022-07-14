@@ -47,6 +47,9 @@ import handIcon from "./handIcon.png";
 import recommentIcon from "./recommentIcon.png";
 import noticeIcon from "./noticeIcon.png";
 import knewnewIcon from "./knewnewIcon.png";
+import settingIcon from "./settingIcon.png";
+import rightArrow from "./rightArrow.png";
+import settingKnewnew from "./settingKnewnew.png";
 
 export {
   close, leftArrow, more, heart, like, reKnew, comment, commentMore, circle, maincart, maintag,
@@ -54,6 +57,6 @@ export {
   colorCheck, initialize, grayclose, graytriangle, grayheart, bad, graycircle, blackclose,
   graywrite, graylogo, graymypage, graysearch, mainmypage, mainlogoIcon, write, plusIcon, recommentIcon,
   handIcon, tagFood, tagHome, tagLife, emailicon, noticeIcon, alertIcon, eyeIcon, colorEyeIcon, checkIcon, tagIcon,
-  selectTagIcon, knewnewIcon
+  selectTagIcon, knewnewIcon, settingIcon, rightArrow, settingKnewnew
 };
 

@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, Platform, Dimensions } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import {
   kakaoImg,
@@ -22,7 +22,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FONT } from '~/styles/fonts';
 import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import theme from '~/styles/theme';
-import { useFocusEffect } from '@react-navigation/native';
 import { versioningAOS, versioningIOS } from '~/utils/constant';
 import { emailicon } from '~/assets/icons';
 
@@ -247,7 +246,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
             에 동의하게 됩니다.</Text>
         </View>
         <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4, marginTop: h2p(5) }]}>
-          {Platform.OS === "ios" ? `v.${versioningIOS}-dev` : `v.${versioningAOS}-dev`}
+          {(Platform.OS === "ios" ? `v.${versioningIOS}` : `v.${versioningAOS}`)}
         </Text>
       </View>
     </View>
