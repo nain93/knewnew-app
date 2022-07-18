@@ -1,7 +1,8 @@
 import { Image, Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
+import messaging from "@react-native-firebase/messaging";
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import { d2p, h2p } from '~/utils';
@@ -16,6 +17,7 @@ import { myIdState, okPopupState, tokenState } from '~/recoil/atoms';
 import { useMutation } from 'react-query';
 import { deleteUser } from '~/api/user';
 import ToggleButton from '~/components/button/toggleButton';
+import Loading from '~/components/loading';
 
 interface SettingProps {
   navigation: NavigationStackProp;
@@ -34,6 +36,20 @@ const Setting = ({ navigation }: SettingProps) => {
       AsyncStorage.removeItem("token");
     }
   });
+
+  useEffect(() => {
+    if (isOn) {
+      messaging().registerDeviceForRemoteMessages();
+      // AsyncStorage.setItem(AsyncStorageKeys.setAllNotification, (1).toString());
+    } else {
+      messaging().unregisterDeviceForRemoteMessages();
+      // AsyncStorage.setItem(AsyncStorageKeys.setAllNotification, (0).toString());
+    }
+  }, [isOn]);
+
+  if (deleteUserMutation.isLoading) {
+    return <Loading />;
+  }
 
   return (
     <>

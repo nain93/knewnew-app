@@ -35,6 +35,7 @@ import {
 import axios from 'axios';
 import Recomment from '~/screens/feed/comment/recomment';
 import { CommentListType } from '~/types/comment';
+import SplashScreen from 'react-native-splash-screen';
 interface FeedDetailProps {
   navigation: NavigationStackProp
   route: NavigationRoute<{
@@ -91,7 +92,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     setInitialIndex(idx);
   };
   const closeGallery = () => setIsOpen(false);
-
   const reviewDetailQuery = useQuery<ReviewListType, Error>(["reviewDetail", token, route.params?.id],
     async () => {
       if (route.params) {
@@ -104,6 +104,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
       setLike(data.isLike);
       setCart(data.isBookmark);
     },
+    onSettled: () => SplashScreen.hide(),
     onError: (error) => {
       if (axios.isAxiosError(error) && error.response) {
         //@ts-ignore
@@ -184,8 +185,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     likeComment({ token, commentId, isLike }), {
     onSuccess: async () => {
       await queryClient.invalidateQueries("getCommentList");
-      setApiBlock(false);
-    }
+    },
+    onSettled: () => setApiBlock(false)
   });
 
   const handleWriteComment = () => {

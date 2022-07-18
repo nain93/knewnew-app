@@ -60,7 +60,8 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
         ]
       );
       setApiBlock(false);
-    }
+    },
+    onError: () => setApiBlock(false)
   });
 
   const likeReviewFeedMutation = useMutation('likeReviewFeed',
@@ -75,7 +76,8 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
         ]
       );
       setApiBlock(false);
-    }
+    },
+    onError: () => setApiBlock(false)
   });
 
   const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", token], () => getMyProfile(token), {

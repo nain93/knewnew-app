@@ -1,4 +1,4 @@
-import { Dimensions, FlatList, Image, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
@@ -16,7 +16,6 @@ import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import BasicButton from '~/components/button/basicButton';
 import { ReviewListType } from '~/types/review';
-import { useFocusEffect } from '@react-navigation/native';
 import { graywrite } from '~/assets/icons';
 
 interface MypageProps {
@@ -73,7 +72,6 @@ const Mypage = ({ navigation, route }: MypageProps) => {
   });
 
   const tabHeader = useCallback(() => (
-    // pointerEvents="none"
     <View pointerEvents="box-none" style={{ paddingHorizontal: d2p(20) }} >
       <View style={styles.profileImage} >
         <View>
@@ -127,8 +125,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
                     },
                     representBadge: getMyProfileQuery?.data?.representBadge,
                     remainingPeriod: getMyProfileQuery?.data?.remainingPeriod
-                  },
-                  foucsHeadLine: true
+                  }
                 });
             }
           }}
@@ -317,7 +314,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
                 userReviewListQuery.fetchNextPage();
               }
             }}
-            onEndReachedThreshold={0.8}
+            onEndReachedThreshold={0.5}
             refreshing={userReviewListQuery.isLoading}
             onRefresh={() => {
               userReviewListQuery.refetch();

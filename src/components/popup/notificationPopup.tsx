@@ -37,9 +37,10 @@ const NotificationPopup = ({ content, modalOpen, setIsVisible, setModalOpen }: N
   useEffect(() => {
     if (modalOpen) {
       moveDown();
-      // setTimeout(() => {
-      //   setModalOpen(false);
-      // }, 2000);
+      // * 5초뒤 팝업 자동 종료
+      setTimeout(() => {
+        setModalOpen(false);
+      }, 5000);
     }
     else {
       moveUp();
@@ -54,10 +55,15 @@ const NotificationPopup = ({ content, modalOpen, setIsVisible, setModalOpen }: N
       <Pressable
         style={styles.pressable}
         onPress={() => console.log("noti")}>
-        <View style={{ width: d2p(30), height: d2p(30), justifyContent: "center", alignItems: "center" }}>
+        <View style={{
+          width: d2p(30), height: d2p(30), justifyContent: "center",
+          alignItems: "center", marginRight: d2p(10)
+        }}>
           <Image source={knewnewIcon} style={{ width: d2p(18), height: d2p(18) }} />
         </View>
-        <Text style={FONT.Regular}>{content}</Text>
+        <View style={{ width: Dimensions.get("window").width - d2p(100) }}>
+          <Text style={FONT.Regular}>{content}</Text>
+        </View>
       </Pressable>
     </Animated.View>
   );
@@ -73,11 +79,12 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     backgroundColor: theme.color.white,
     borderRadius: 8,
-    shadowColor: "rgba(0, 0, 0, 0.1)",
+    shadowColor: "rgba(0, 0, 0, 0.3)",
     shadowOffset: {
       width: 0,
       height: 3
     },
+    elevation: 24,
     shadowRadius: 6,
     shadowOpacity: 1
   },
@@ -87,6 +94,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: d2p(10),
     paddingVertical: h2p(15),
     minHeight: h2p(72),
-    borderRadius: 8
+    borderRadius: 8,
   }
 });

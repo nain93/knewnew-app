@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, Animated, Linking, Platform, Text, TouchableOpacity } from 'react-native';
-import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
+import { Alert, Animated, Linking, Platform, PlatformOSType, Text, TouchableOpacity } from 'react-native';
+import { createNavigationContainerRef, NavigationContainer, useFocusEffect } from '@react-navigation/native';
 import SplashScreen from 'react-native-splash-screen';
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useRecoilState } from 'recoil';
@@ -19,6 +19,8 @@ import FadeInOut from '~/hooks/fadeInOut';
 import * as Sentry from "@sentry/react-native";
 import Config from 'react-native-config';
 import NotificationPopup from '~/components/popup/notificationPopup';
+import { registerNotification } from '~/api/setting';
+import { useMutation } from 'react-query';
 
 export const navigationRef = createNavigationContainerRef();
 
@@ -28,8 +30,15 @@ const App = () => {
   const [notiOpen, setNotiOpen] = useRecoilState(notificationPopup);
   const { fadeAnim } = FadeInOut({ isPopupOpen, setIsPopupOpen });
   const [token, setToken] = useRecoilState(tokenState);
-
   const [isVisible, setIsVisible] = useState(false);
+
+  const notificationMutation = useMutation("registerNotification", ({ FCMToken, type }: { FCMToken: string, type: PlatformOSType }) =>
+    registerNotification({ token, FCMToken, type }),
+    {
+      onSuccess: (data) => {
+        console.log(data, "data");
+      },
+    });
 
   const sendLoggedFiles = useCallback(() => {
     FileLogger.sendLogFilesByEmail({
@@ -51,6 +60,7 @@ const App = () => {
       });
   }, []);
 
+  // * 스플래시 로딩중 토큰 저장
   useEffect(() => {
     const getToken = async () => {
       // TODO refresh api
@@ -58,13 +68,11 @@ const App = () => {
       const storageToken = await AsyncStorage.getItem("token");
       if (storageToken) {
         setToken(storageToken);
-        // todo api link
-        // messaging().getToken().then(fcmToken => {
-        // 	// console.log(fcmToken);
-        // 	registerNotification(fcmToken, Platform.OS)
-        // 		.then((v: any) => console.log(v))
-        // 		.catch((e: any) => console.warn(e));
-        // });
+        // * 알람 기기등록 (등록안되어있을 경우)
+        messaging().getToken().then(FCMToken => {
+          console.log(FCMToken, "FCMToken");
+          notificationMutation.mutate({ FCMToken, type: Platform.OS });
+        });
       }
       else {
         SplashScreen.hide();
@@ -101,7 +109,7 @@ const App = () => {
   };
 
   // * FCM
-  React.useEffect(() => {
+  useEffect(() => {
     // * 코드푸시 업데이트 체크
     installUpdateIfAvailable();
     if (Platform.OS === "ios") {
@@ -113,14 +121,17 @@ const App = () => {
           // do sth with isHeadless
         });
     }
-    // fetchConfig().catch(console.warn);
-    messaging().getToken().then(fcmToken =>
-      console.log('fcmToken')
-    );
+    // * 알람 수신후 핸들링
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      // console.log(remoteMessage, 'remoteMessage');
-      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+      console.log(remoteMessage, 'remoteMessage');
+      if (remoteMessage.notification?.body) {
+        setNotiOpen({ isOpen: true, content: remoteMessage.notification.body });
+      }
+      if (navigationRef.isReady()) {
+        // todo 알람팝업 클릭시 화면 navigate
+      }
     });
+
     return unsubscribe;
   }, []);
 

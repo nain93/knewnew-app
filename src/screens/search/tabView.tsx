@@ -64,7 +64,7 @@ const SearchTabView = ({ reviewCount, userCount, searchList, userList, keyword, 
                   renderItem={(review) => {
                     return (
                       <Pressable onPress={() => navigation.navigate("FeedDetail",
-                        { id: review.item.id, isLike: review.item.isLike })}
+                        { id: review.item.id, isLike: review.item.isLike, authorId: review.item.author.id })}
                         style={{
                           marginHorizontal: d2p(20), marginTop: h2p(25),
                           paddingBottom: h2p(14.5),

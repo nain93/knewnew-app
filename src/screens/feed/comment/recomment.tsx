@@ -58,7 +58,8 @@ const Recomment = ({ child, authorName,
     onSuccess: async () => {
       await queryClient.invalidateQueries("getCommentList");
       setApiBlock(false);
-    }
+    },
+    onError: () => setApiBlock(false)
   });
 
   useEffect(() => {

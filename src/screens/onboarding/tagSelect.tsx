@@ -64,7 +64,6 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
       setIspopupOpen({ isOpen: true, content: "step3을 선택해주세요" });
       return;
     }
-
     if (route.params) {
       signupMutation.mutate({
         ...route.params,
