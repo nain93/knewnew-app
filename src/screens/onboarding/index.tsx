@@ -205,7 +205,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
             </TouchableOpacity>}
         </View>
         <TouchableOpacity
-          onPress={() => navigation.navigate("emailCheck")}
+          onPress={() => navigation.navigate("emailLogin")}
           style={{
             marginTop: h2p(23),
             borderRadius: 5,

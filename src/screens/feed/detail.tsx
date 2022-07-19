@@ -113,7 +113,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           navigation.goBack();
         }
       }
-    }
+    },
+    onSettled: () => SplashScreen.hide()
   });
 
   const likeReviewMutation = useMutation('likeReview',
@@ -387,6 +388,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                 borderRadius: 40,
                 height: d2p(40),
                 width: d2p(40),
+                overflow: "hidden"
               }}>
               <Image source={reviewDetailQuery.data?.author.profileImage ?
                 { uri: reviewDetailQuery.data?.author.profileImage } : noProfile}

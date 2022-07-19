@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Animated, Linking, Platform, PlatformOSType } from 'react-native';
 import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import SplashScreen from 'react-native-splash-screen';
@@ -78,7 +78,7 @@ const App = () => {
   }, []);
 
   const linking = {
-    // prefixes: ["kakao7637c35cfedcb6c01b1f17ce7cd42f05://"],
+    // prefixes: ["https://"],
     prefixes: ["knewnnew://"],
     config: {
       screens: {
@@ -124,15 +124,12 @@ const App = () => {
           isOpen: true, content: remoteMessage.notification.body,
           onPress: () => {
             if (navigationRef.isReady()) {
-              // todo 알람팝업 클릭시 화면 navigate
+              // * 알람팝업 클릭시 화면 navigate
               //@ts-ignore
               navigationRef.navigate("FeedDetail", { id: remoteMessage.data.link.split("/")[1] });
             }
           }
         });
-      }
-      if (navigationRef.isReady()) {
-        // todo 알람팝업 클릭시 화면 navigate
       }
     });
 
