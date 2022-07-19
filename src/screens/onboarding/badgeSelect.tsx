@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import BasicButton from '~/components/button/basicButton';
-import Badge from '~/components/badge';
 import { NavigationStackProp } from "react-navigation-stack";
 import { NavigationRoute } from "react-navigation";
 import { BadgeType } from '~/types';
 import { userSignup } from '~/api/user';
-import { colorCheck } from '~/assets/icons';
 import { useSetRecoilState } from 'recoil';
 import { popupState, tokenState } from '~/recoil/atoms';
 import AsyncStorage from '@react-native-async-storage/async-storage';

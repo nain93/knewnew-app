@@ -24,7 +24,8 @@ export interface CommentListType {
   created: string;
   isLike: boolean;
   likeCount: number;
-  childCount: number
+  childCount: number;
+  isActive: false;
   child: Array<{
     id: number;
     author: {

@@ -1,4 +1,4 @@
-import { Dimensions, Image, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, Platform, Pressable, StyleSheet, TouchableOpacity, View, Text } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import theme from '~/styles/theme';
 import { useNavigation } from '@react-navigation/native';
@@ -23,6 +23,7 @@ interface RecommentProps {
   setModifyingIdx: (mdIdx: number) => void;
   commentIsEdit: boolean
   modifyingIdx: number
+  reviewId: number | undefined
 }
 
 const Recomment = ({ child, authorName,
@@ -32,7 +33,8 @@ const Recomment = ({ child, authorName,
   setEditCommentId,
   setCommentSelectedIdx,
   setModifyingIdx,
-  modifyingIdx
+  modifyingIdx,
+  reviewId
 }: RecommentProps & RecommentType) => {
   const navigation = useNavigation<StackNavigationProp>();
   const setModalOpen = useSetRecoilState(okPopupState);
@@ -41,6 +43,7 @@ const Recomment = ({ child, authorName,
   const queryClient = useQueryClient();
   const [recommentSelectedIdx, setRecommentSelectedIdx] = useState(-1);
   const [reModifyingIdx, setReModifyingIdx] = useState(-1);
+  const [apiBlock, setApiBlock] = useState(false);
 
   const deleteCommentMutation = useMutation('deleteComment', (id: number) =>
     deleteReviewComment(token, id), {
@@ -52,9 +55,11 @@ const Recomment = ({ child, authorName,
 
   const commentLikeMutation = useMutation("likeCount", ({ commentId, isLike }: { commentId: number, isLike: boolean }) =>
     likeComment({ token, commentId, isLike }), {
-    onSuccess: () => {
-      queryClient.invalidateQueries("getCommentList");
-    }
+    onSuccess: async () => {
+      await queryClient.invalidateQueries("getCommentList");
+      setApiBlock(false);
+    },
+    onError: () => setApiBlock(false)
   });
 
   useEffect(() => {
@@ -89,7 +94,7 @@ const Recomment = ({ child, authorName,
                       style={{ flexDirection: "row" }}
                       onPress={() => navigation.navigate("Mypage", { id: item.author.id })}>
                       <Text style={FONT.Medium}>{item.author.nickname}</Text>
-                      {item.author.id === myId &&
+                      {item.author.id === reviewId &&
                         <View style={{
                           width: d2p(38),
                           justifyContent: "center", alignItems: "center",
@@ -132,7 +137,12 @@ const Recomment = ({ child, authorName,
               </View>
               <TouchableOpacity
                 style={{ marginLeft: d2p(49), marginTop: h2p(10) }}
-                onPress={() => commentLikeMutation.mutate({ commentId: item.id, isLike: !item.isLike })}>
+                onPress={() => {
+                  setApiBlock(true);
+                  if (!apiBlock) {
+                    commentLikeMutation.mutate({ commentId: item.id, isLike: !item.isLike });
+                  }
+                }}>
                 <Text style={[FONT.Bold, {
                   fontSize: 12, color: item.isLike ? theme.color.grayscale.C_443e49 : theme.color.grayscale.C_79737e,
                 }]}>좋아요 {item.likeCount > 0 && item.likeCount}</Text>
@@ -166,8 +176,6 @@ const Recomment = ({ child, authorName,
                     }}>
                     <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
                   </Pressable>
-                  {console.log(recommentSelectedIdx, 'commentSelectedIdx')}
-                  {console.log(index, 'index')}
                 </View>
               }
             </View>
@@ -202,7 +210,8 @@ const styles = StyleSheet.create({
   commentContent: {
     marginLeft: d2p(49),
     flexDirection: "row",
-    flexWrap: "wrap"
+    flexWrap: "wrap",
+    marginTop: h2p(5)
   },
   clickBox: {
     width: d2p(70),

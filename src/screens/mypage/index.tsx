@@ -1,4 +1,4 @@
-import { Dimensions, FlatList, Image, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
@@ -16,7 +16,7 @@ import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import BasicButton from '~/components/button/basicButton';
 import { ReviewListType } from '~/types/review';
-import { useFocusEffect } from '@react-navigation/native';
+import { graywrite } from '~/assets/icons';
 
 interface MypageProps {
   navigation: NavigationStackProp;
@@ -50,6 +50,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
       queryClient.setQueryData("myProfile", data);
     },
   });
+
   const userReviewListQuery = useInfiniteQuery<ReviewListType[], Error>(["userReviewList", route.params?.id], async ({ pageParam = 0 }) => {
     if (route.params?.id) {
       const queryData = await getUserReviewList({ token, id: route.params?.id, offset: pageParam });
@@ -71,37 +72,42 @@ const Mypage = ({ navigation, route }: MypageProps) => {
   });
 
   const tabHeader = useCallback(() => (
-    // pointerEvents="none"
-    <View pointerEvents="box-none" >
-      <View style={[styles.profileImage, { overflow: "hidden" }]} >
+    <View pointerEvents="box-none" style={{ paddingHorizontal: d2p(20) }} >
+      <View style={styles.profileImage} >
+        <View>
+          {/* <Text style={[FONT.Bold, { color: theme.color.main, marginBottom: h2p(5) }]}>
+            느끼만렙 맵찔이
+          </Text> */}
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={[FONT.Bold, { fontSize: 20 }]}>
+              {getMyProfileQuery.data?.nickname}
+            </Text>
+            {/* 뱃지 기능 추가후 주석해제 */}
+            {/* <View style={{
+              marginLeft: d2p(10),
+              borderWidth: 1,
+              borderRadius: 10, height: d2p(20),
+              backgroundColor: "#fff8db",
+              borderColor: "#ffd991",
+              alignItems: "center",
+              justifyContent: "center",
+              paddingHorizontal: d2p(10)
+            }}>
+              <Text style={[FONT.Medium, { fontSize: 10, color: "rgb(255,107,41)" }]}>{`다이어터 >`}</Text>
+            </View> */}
+          </View>
+          <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4, marginTop: h2p(10) }]}>
+            {`${getMyProfileQuery.data?.tags.foodStyle} ${getMyProfileQuery.data?.tags.household} ${getMyProfileQuery.data?.tags.occupation}`}
+          </Text>
+        </View>
         <Image style={{
-          width: d2p(60), height: d2p(60), borderRadius: 60,
+          width: d2p(70), height: d2p(70), borderRadius: 70,
           borderWidth: 1,
           borderColor: theme.color.grayscale.eae7ec
         }}
           source={getMyProfileQuery.data?.profileImage ? { uri: getMyProfileQuery.data?.profileImage } : noProfile} />
       </View>
       <View style={styles.profileInfo}>
-        <View style={{
-          flexDirection: "row",
-          alignItems: "center",
-          width: Dimensions.get("window").width - d2p(40),
-          justifyContent: "center",
-          flexWrap: "wrap"
-        }}>
-          <Text style={[FONT.Bold, { fontSize: 24 }]}>{getMyProfileQuery.data?.nickname}</Text>
-          <View style={{
-            height: h2p(20), minWidth: d2p(55),
-            marginLeft: d2p(10),
-            marginRight: d2p(5),
-            justifyContent: "center", alignItems: "center",
-            paddingHorizontal: d2p(10), paddingVertical: h2p(3),
-            borderRadius: 10, backgroundColor: theme.color.grayscale.f7f7fc, borderWidth: 1, borderColor: theme.color.grayscale.d2d0d5
-          }}>
-            <Text style={[FONT.Medium, { fontSize: 10 }]}>{getMyProfileQuery.data?.representBadge}</Text>
-          </View>
-          <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>{getMyProfileQuery.data?.household}</Text>
-        </View>
         <Pressable
           onPress={() => {
             if (route.params?.id === myId) {
@@ -112,11 +118,14 @@ const Mypage = ({ navigation, route }: MypageProps) => {
                     nickname: getMyProfileQuery?.data?.nickname,
                     headline: getMyProfileQuery?.data?.headline,
                     profileImage: getMyProfileQuery?.data?.profileImage,
-                    tags: getMyProfileQuery?.data?.tags,
+                    tags: {
+                      foodStyle: getMyProfileQuery?.data?.tags.foodStyle.map(v => ({ title: v, isClick: true })),
+                      household: getMyProfileQuery?.data?.tags.household.map(v => ({ title: v, isClick: true })),
+                      occupation: getMyProfileQuery?.data?.tags.occupation.map(v => ({ title: v, isClick: true })),
+                    },
                     representBadge: getMyProfileQuery?.data?.representBadge,
                     remainingPeriod: getMyProfileQuery?.data?.remainingPeriod
-                  },
-                  foucsHeadLine: true
+                  }
                 });
             }
           }}
@@ -124,17 +133,13 @@ const Mypage = ({ navigation, route }: MypageProps) => {
           <Text style={[FONT.Medium, {
             color: getMyProfileQuery.data?.headline ? theme.color.black : theme.color.grayscale.a09ca4
           }]}>
-            {getMyProfileQuery.data?.headline ? getMyProfileQuery.data?.headline : "자기소개를 입력해주세요."}</Text>
+            {getMyProfileQuery.data?.headline ? getMyProfileQuery.data?.headline : "자기소개를 입력해주세요."}
+          </Text>
+          <Image
+            style={{ width: d2p(10.5), height: d2p(10.5) }}
+            source={graywrite}
+          />
         </Pressable>
-        <View style={{
-          flexDirection: "row", flexWrap: "wrap",
-          justifyContent: "center",
-          width: Dimensions.get("window").width - d2p(40)
-        }}>
-          {React.Children.toArray(getMyProfileQuery.data?.tags.map(v =>
-            <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>#{v} </Text>
-          ))}
-        </View>
       </View>
     </View>
   ), [getMyProfileQuery.data]);
@@ -144,7 +149,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     if (!userReviewListQuery.isLoading) {
       return (
         <View style={{ paddingTop: h2p(100) }}>
-          <View style={{ marginBottom: h2p(80) }}>
+          <View style={{ marginBottom: h2p(180) }}>
             <Text style={[FONT.Regular,
             {
               color: theme.color.grayscale.C_79737e,
@@ -205,7 +210,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     if (!userBookmarkListQuery.isLoading) {
       return (
         <View style={{ paddingTop: h2p(100) }}>
-          <View style={{ marginBottom: h2p(80) }}>
+          <View style={{ marginBottom: h2p(180) }}>
             <Text style={[FONT.Regular,
             {
               color: theme.color.grayscale.C_79737e,
@@ -267,12 +272,6 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     }
   }, [token]);
 
-  useFocusEffect(
-    useCallback(() => {
-      // * 프로필 수정화면으로 넘겨줄 데이터 쿼리에 저장
-      queryClient.setQueryData("myProfile", getMyProfileQuery.data);
-    }, [getMyProfileQuery.data, queryClient]));
-
   if (getMyProfileQuery.isLoading) {
     return (
       <Loading />
@@ -315,7 +314,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
                 userReviewListQuery.fetchNextPage();
               }
             }}
-            onEndReachedThreshold={0.8}
+            onEndReachedThreshold={0.5}
             refreshing={userReviewListQuery.isLoading}
             onRefresh={() => {
               userReviewListQuery.refetch();
@@ -367,16 +366,13 @@ const styles = StyleSheet.create({
     backgroundColor: theme.color.grayscale.f7f7fc
   },
   profileImage: {
-    width: d2p(60),
-    height: d2p(60),
-    borderRadius: 60,
-    marginBottom: h2p(25),
-    marginTop: h2p(30),
-    alignSelf: "center"
+    marginVertical: h2p(30),
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
   },
   profileInfo: {
-    alignItems: "center",
-    marginBottom: h2p(30)
+    alignItems: "center"
   },
   headline: {
     width: Dimensions.get("window").width - d2p(40),
@@ -387,9 +383,9 @@ const styles = StyleSheet.create({
     borderColor: theme.color.grayscale.ec6863,
     borderRadius: 10,
     borderBottomRightRadius: 0,
-    marginTop: h2p(20),
     marginBottom: h2p(15),
-    justifyContent: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center"
   },
   review: {

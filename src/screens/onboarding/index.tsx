@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, Platform, Dimensions } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import {
   kakaoImg,
@@ -20,10 +20,8 @@ import { tokenState } from '~/recoil/atoms';
 import { useSetRecoilState } from 'recoil';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FONT } from '~/styles/fonts';
-import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
+import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import theme from '~/styles/theme';
-import { useFocusEffect } from '@react-navigation/native';
-import { versioningAOS, versioningIOS } from '~/utils/constant';
 import { emailicon } from '~/assets/icons';
 
 const iosKeys = {
@@ -53,13 +51,24 @@ const Onboarding = ({ navigation }: NavigationType) => {
     navigation.navigate("TagSelect", userData);
   };
 
-  const handleKakaoLogin = async () => {
+  // * 버튼 연속클릭 방지
+  const handleApiBlock = () => {
     if (apiBlock) {
+      setTimeout(() => {
+        setApiBlock(false);
+      }, 2000);
       return;
     }
-    setApiBlock(true);
+    else {
+      setApiBlock(true);
+    }
+  };
+
+  const handleKakaoLogin = async () => {
+    handleApiBlock();
     const { accessToken } = await login();
     const data = await userLogin({ token: accessToken, providerType: "kakao" });
+    setApiBlock(false);
     if (data.accessToken) {
       // * 이미 가입된 유저
       setToken(data.accessToken);
@@ -75,10 +84,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
   };
 
   const handleNaverLogin = async () => {
-    if (apiBlock) {
-      return;
-    }
-    setApiBlock(true);
+    handleApiBlock();
     return new Promise((resolve, reject) => {
       NaverLogin.login(Platform.OS === "ios" ? iosKeys : aosKeys, async (err, token) => {
         if (token) {
@@ -100,22 +106,23 @@ const Onboarding = ({ navigation }: NavigationType) => {
           reject(err);
           return;
         }
+        setApiBlock(false);
         resolve(token);
       });
     });
   };
 
   const handleGoogleLogin = async () => {
-    if (apiBlock) {
-      return;
-    }
-    setApiBlock(true);
+    handleApiBlock();
     GoogleSignin.configure({
+      iosClientId: "19978958503-8i0hoibbfta64msltteflpdseev3ruv9.apps.googleusercontent.com",
+      // webClientId: "381936778966-ed1p2hj7111sk00dtbvi3ma5lkk1g4kt.apps.googleusercontent.com"
       webClientId: "19978958503-rta621e9q96sp6qqgdk13cuijt3nc4ju.apps.googleusercontent.com",
-      // webClientId: "1025814485939-v9l5ad2bk5rr04h39e9dngnfodedjfeb.apps.googleusercontent.com"
     });
+
     await GoogleSignin.signIn();
     const { accessToken } = await GoogleSignin.getTokens();
+    setApiBlock(false);
     if (accessToken) {
       const data = await userLogin({ token: accessToken, providerType: "google" });
       if (data.accessToken) {
@@ -133,10 +140,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
   };
 
   const handleAppleLogin = async () => {
-    if (apiBlock) {
-      return;
-    }
-    setApiBlock(true);
+    handleApiBlock();
     const appleAuthRequestResponse = await appleAuth.performRequest({
       requestedOperation: appleAuth.Operation.LOGIN,
       requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
@@ -160,14 +164,6 @@ const Onboarding = ({ navigation }: NavigationType) => {
       }
     }
   };
-
-  useEffect(() => {
-    if (apiBlock) {
-      setTimeout(() => {
-        setApiBlock(false);
-      }, 2000);
-    }
-  }, [apiBlock]);
 
   return (
     <View style={styles.container}>
@@ -246,9 +242,6 @@ const Onboarding = ({ navigation }: NavigationType) => {
           <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4, textAlign: "center" }]}>
             에 동의하게 됩니다.</Text>
         </View>
-        <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4, marginTop: h2p(5) }]}>
-          {Platform.OS === "ios" ? `v.${versioningIOS}` : `v.${versioningAOS}`}
-        </Text>
       </View>
     </View>
   );
@@ -257,7 +250,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: h2p(250),
+    paddingTop: getStatusBarHeight() + h2p(140),
     alignItems: "center"
   },
   logo: {

@@ -33,18 +33,30 @@ import plusIcon from './plusIcon.png';
 import blackclose from "./blackclose.png";
 import maincart from "./maincart.png";
 import maintag from "./maintag.png";
-import recommentIcon from "./recommentIcon.png";
-import handIcon from "./handIcon.png";
+import emailicon from "./emailicon.png";
+import alertIcon from "./alertIcon.png";
+import eyeIcon from "./eyeIcon.png";
+import colorEyeIcon from "./colorEyeIcon.png";
+import checkIcon from "./checkIcon.png";
+import tagIcon from "./tagIcon.png";
+import selectTagIcon from "./selectTagIcon.png";
 import tagFood from "./tagFood.png";
 import tagHome from "./tagHome.png";
 import tagLife from "./tagLife.png";
-import emailicon from "./emailicon.png";
+import handIcon from "./handIcon.png";
+import recommentIcon from "./recommentIcon.png";
+import noticeIcon from "./noticeIcon.png";
+import knewnewIcon from "./knewnewIcon.png";
+import settingIcon from "./settingIcon.png";
+import rightArrow from "./rightArrow.png";
+import settingKnewnew from "./settingKnewnew.png";
 
 export {
   close, leftArrow, more, heart, like, reKnew, comment, commentMore, circle, maincart, maintag,
   searchIcon, mainSearchIcon, colorLike, tagfilter, tag, cart, colorCart, retweetfrom,
   colorCheck, initialize, grayclose, graytriangle, grayheart, bad, graycircle, blackclose,
   graywrite, graylogo, graymypage, graysearch, mainmypage, mainlogoIcon, write, plusIcon, recommentIcon,
-  handIcon, tagFood, tagHome, tagLife, emailicon
+  handIcon, tagFood, tagHome, tagLife, emailicon, noticeIcon, alertIcon, eyeIcon, colorEyeIcon, checkIcon, tagIcon,
+  selectTagIcon, knewnewIcon, settingIcon, rightArrow, settingKnewnew
 };
 

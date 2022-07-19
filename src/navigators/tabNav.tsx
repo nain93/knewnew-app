@@ -1,18 +1,17 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import React, { useState } from 'react';
+import React from 'react';
 import Feed from '~/screens/feed';
 import Write from '~/screens/write';
 import Search from '~/screens/search';
 import Mypage from '~/screens/mypage';
 import theme from '~/styles/theme';
 import { d2p, h2p } from '~/utils';
-import { mainSearchIcon, graylogo, graymypage, graysearch, graywrite, mainmypage, mainlogoIcon, more } from '~/assets/icons';
+import { mainSearchIcon, graylogo, graymypage, graysearch, graywrite, mainmypage, mainlogoIcon, more, settingIcon } from '~/assets/icons';
 import { useRecoilValue } from 'recoil';
 import { myIdState } from '~/recoil/atoms';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
-import MypageHeader from '~/screens/mypage/mypageHeader';
 import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { getFocusedRouteNameFromRoute, useRoute } from '@react-navigation/native';
 
@@ -32,7 +31,6 @@ function StatusBarPlaceHolder() {
 
 const TabNavigator = () => {
   const myId = useRecoilValue(myIdState);
-  const [openMore, setOpenMore] = useState(false);
   const screen = useRoute();
   const routeName = getFocusedRouteNameFromRoute(screen);
 
@@ -129,7 +127,6 @@ const TabNavigator = () => {
         listeners={({ navigation }) => ({
           tabPress: e => {
             e.preventDefault();
-            setOpenMore(false);
             navigation.navigate('Mypage', { id: myId, refresh: true });
           },
         })}
@@ -154,19 +151,12 @@ const TabNavigator = () => {
                 headerRight={
                   //@ts-ignore
                   (params?.id === myId || !params?.id) ?
-                    <Image source={more} style={{ width: d2p(26), height: h2p(16) }} />
+                    <Image source={settingIcon} style={{ width: d2p(16), height: d2p(16) }} />
                     :
                     undefined
                 }
-                headerRightPress={() => {
-                  setOpenMore(!openMore);
-                }}
+                headerRightPress={() => navigation.navigate("setting")}
               />
-              {
-                //@ts-ignore
-                (openMore && params?.id === myId) &&
-                <MypageHeader setOpenMore={(isOpen: boolean) => setOpenMore(isOpen)} />
-              }
             </>
           ),
           tabBarIcon: ({ focused }) => (

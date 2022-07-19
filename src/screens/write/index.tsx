@@ -3,13 +3,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import theme from '~/styles/theme';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
-import { BadgeType } from '~/types';
+import { BadgeType, InterestTagType } from '~/types';
 import { blackclose, cart, circle, graycircle, grayclose, grayheart, heart, maincart, maintag, tag } from '~/assets/icons';
 import { photo, photoClose } from '~/assets/images';
 import { d2p, h2p } from '~/utils';
 
 import RBSheet from "react-native-raw-bottom-sheet";
-import SelectLayout from '~/components/selectLayout';
+import SelectLayout from '~/components/layout/SelectLayout';
 import CloseIcon from '~/components/icon/closeIcon';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
@@ -19,7 +19,7 @@ import { FONT } from '~/styles/fonts';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import { deleteReviewImage, editReview, writeReview } from '~/api/review';
-import { initialBadgeData } from '~/utils/data';
+import { interestTagData } from '~/utils/data';
 import FeedReview from '~/components/review/feedReview';
 import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 import Loading from '~/components/loading';
@@ -59,13 +59,11 @@ const Write = ({ navigation, route }: WriteProp) => {
     market: MarketType["판매처 선택"],
     parent: parentId,
     tags: {
-      interest: [],
-      household: [],
-      taste: []
+      interest: []
     }
   });
 
-  const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
+  const [interestTag, setInterestTag] = useState<InterestTagType>(interestTagData);
   const inputRef = useRef<TextInput>(null);
   const tagRefRBSheet = useRef<RBSheet>(null);
   const marketRefRBSheet = useRef<RBSheet>(null);
@@ -215,11 +213,7 @@ const Write = ({ navigation, route }: WriteProp) => {
       }
     });
 
-  const { mutateAsync } = useMutation("deleteImages", (id: number) => deleteReviewImage(token, id), {
-    onSuccess: (data) => {
-      console.log(data, 'data');
-    }
-  });
+  const { mutateAsync } = useMutation("deleteImages", (id: number) => deleteReviewImage(token, id));
 
   const handleAddWrite = async () => {
     if (writeData.satisfaction === "") {
@@ -231,8 +225,7 @@ const Write = ({ navigation, route }: WriteProp) => {
       return;
     }
     if (route.params && route.params.type !== "reknew" && route.params?.type !== "reKnewWrite") {
-      if (writeData.tags.interest.length === 0 ||
-        writeData.tags.household.length === 0) {
+      if (writeData.tags.interest.length === 0) {
         setIspopupOpen({ isOpen: true, content: "태그를 선택해주세요", popupStyle: { bottom: keyboardHeight + h2p(20) } });
         return;
       }
@@ -268,26 +261,13 @@ const Write = ({ navigation, route }: WriteProp) => {
     if (route.params?.review && route.params.type !== "reKnewWrite") {
       setImages(route.params.review.images);
       setImageList(route.params.review.images.map(v => v.image));
-      setUserBadge({
-        interest: userBadge.interest.map(v => {
+      setInterestTag({
+        interest: interestTag.interest.map(v => {
           if (route.params?.review?.tags.interest.includes(v.title)) {
             return { isClick: true, title: v.title };
           }
           return { isClick: false, title: v.title };
-        }),
-        household: userBadge.household.map(v => {
-          if (route.params?.review?.tags.household.includes(v.title)) {
-            return { isClick: true, title: v.title };
-          }
-          return { isClick: false, title: v.title };
-        }),
-        taste: userBadge.taste.map(v => {
-          if (route.params?.review?.tags.taste &&
-            route.params?.review?.tags.taste.includes(v.title)) {
-            return { isClick: true, title: v.title };
-          }
-          return { isClick: false, title: v.title };
-        }),
+        })
       });
       setWriteData({
         ...writeData,
@@ -296,13 +276,12 @@ const Write = ({ navigation, route }: WriteProp) => {
         satisfaction: route.params.review.satisfaction,
         market: route.params.review.market ? route.params.review.market : MarketType['선택 안함'],
         tags: {
-          ...route.params.review.tags,
-          taste: route.params.review.tags.taste || []
+          ...route.params.review.tags
         },
       });
     }
     else {
-      setUserBadge(initialBadgeData);
+      setInterestTag(interestTagData);
       setImageList([]);
       setImages([]);
       setWriteData({
@@ -312,9 +291,7 @@ const Write = ({ navigation, route }: WriteProp) => {
         market: MarketType['판매처 선택'],
         parent: parentId,
         tags: {
-          interest: [],
-          household: [],
-          taste: []
+          interest: []
         }
       });
     }
@@ -349,11 +326,7 @@ const Write = ({ navigation, route }: WriteProp) => {
       const response = await MultipleImagePicker.openPicker({
         selectedAssets: images,
         mediaType: "image",
-        usedCameraButton: false,
-        // maxVideo: 1,
-        // isExportThumbnail: true,
-        // isCrop: true,
-        // isCropCircle: true,
+        usedCameraButton: false
       });
       if (response.length > 5) {
         setIspopupOpen({ isOpen: true, content: "이미지는 최대 5장까지 올릴 수 있습니다." });
@@ -387,9 +360,7 @@ const Write = ({ navigation, route }: WriteProp) => {
             || writeData.satisfaction
             || writeData.images && writeData.images.length > 0
             || writeData.market && (writeData.market !== "판매처 선택")
-            || writeData.tags.interest.length > 0
-            || writeData.tags.household.length > 0
-            || writeData.tags.taste.length > 0) {
+            || writeData.tags.interest.length > 0) {
             setModalOpen({
               isOpen: true,
               content: "앗! 지금까지 작성하신 내용이 사라져요",
@@ -402,9 +373,7 @@ const Write = ({ navigation, route }: WriteProp) => {
                   market: MarketType['판매처 선택'],
                   parent: parentId,
                   tags: {
-                    interest: [],
-                    household: [],
-                    taste: []
+                    interest: []
                   }
                 });
               }
@@ -533,17 +502,11 @@ const Write = ({ navigation, route }: WriteProp) => {
                 onPress={() => tagRefRBSheet.current?.open()}
                 style={[styles.select, { marginRight: d2p(10) }]}>
                 <View style={{ position: "relative" }}>
-                  <Image source={((
-                    writeData.tags.interest.length +
-                    writeData.tags.household.length +
-                    writeData.tags.taste.length) === 0) ? tag : maintag} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
-                  {(writeData.tags.interest.length +
-                    writeData.tags.household.length +
-                    writeData.tags.taste.length) !== 0 &&
+                  <Image source={
+                    writeData.tags.interest.length > 0 ? maintag : tag} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
+                  {(writeData.tags.interest.length) !== 0 &&
                     <Text style={{ fontSize: 8, color: theme.color.white, top: h2p(3), left: "22%", position: "absolute" }}>
-                      {(writeData.tags.interest.length +
-                        writeData.tags.household.length +
-                        writeData.tags.taste.length)}</Text>}
+                      {(writeData.tags.interest.length)}</Text>}
                 </View>
                 <Text style={FONT.Medium}>태그 선택</Text>
                 <Text style={[{ fontSize: 12, color: theme.color.main }, FONT.Medium]}> *</Text>
@@ -599,12 +562,12 @@ const Write = ({ navigation, route }: WriteProp) => {
                     style={{ position: "absolute", right: 0, top: 0 }}>
                     <Image source={photoClose} style={{ width: d2p(16), height: h2p(16) }} />
                   </Pressable>
-                </View>
-              </View>
+                </View >
+              </View >
             );
           }))}
-        </ScrollView>
-      </View>
+        </ScrollView >
+      </View >
       <View style={{
         position: "absolute", right: d2p(10),
         bottom: keyboardHeight > 100 ? keyboardHeight + h2p(20) :
@@ -645,9 +608,7 @@ const Write = ({ navigation, route }: WriteProp) => {
           <TouchableOpacity onPress={() => {
             setWriteData({
               ...writeData, tags: {
-                interest: userBadge.interest.filter(v => v.isClick).map(v => v.title),
-                household: userBadge.household.filter(v => v.isClick).map(v => v.title),
-                taste: userBadge.taste.filter(v => v.isClick).map(v => v.title)
+                interest: interestTag.interest.filter(v => v.isClick).map(v => v.title)
               }
             });
             tagRefRBSheet.current?.close();
@@ -655,7 +616,7 @@ const Write = ({ navigation, route }: WriteProp) => {
             <Text style={[{ color: theme.color.grayscale.ff5d5d }, FONT.Regular]}>완료</Text>
           </TouchableOpacity>
         </View>
-        <SelectLayout isInitial={true} userBadge={userBadge} setUserBadge={setUserBadge} />
+        <SelectLayout isInitial={true} type={"write"} interestTag={interestTag} setInterestTag={setInterestTag} />
       </RBSheet>
 
       {/* 판매처 선택 바텀시트 */}
@@ -682,7 +643,7 @@ const Write = ({ navigation, route }: WriteProp) => {
         }}>
           <CloseIcon onPress={() => marketRefRBSheet.current?.close()}
             imageStyle={{ width: d2p(15), height: h2p(15) }} />
-          <Text style={[{ fontSize: 16 }, FONT.Bold]}>판매처 선택</Text>
+          <Text style={[{ fontSize: 16 }, FONT.Bold]}>구매처별 보기</Text>
           <View />
         </View>
         <ScrollView

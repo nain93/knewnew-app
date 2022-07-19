@@ -10,16 +10,17 @@ interface BasicButtonProp {
   textColor: string;
   viewStyle?: ViewStyle;
   onPress: () => void;
-  borderColor?: string
+  borderColor?: string;
+  disabled?: boolean
 }
 
-const BasicButton = ({ text, bgColor, textColor, borderColor, viewStyle, onPress }: BasicButtonProp) => {
+const BasicButton = ({ disabled, text, bgColor, textColor, borderColor, viewStyle, onPress }: BasicButtonProp) => {
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity
+      disabled={disabled}
+      onPress={onPress}>
       <View style={[styles.container, viewStyle, { backgroundColor: bgColor }, { borderColor: borderColor ? borderColor : textColor }]}>
-        <View style={styles.textContainer}>
-          <Text style={[styles.text, { color: textColor }, FONT.Bold]}>{text}</Text>
-        </View>
+        <Text style={[styles.text, { color: textColor }, FONT.Bold]}>{text}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -33,9 +34,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     height: d2p(45),
     borderWidth: 1,
-  },
-  textContainer: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
   },
