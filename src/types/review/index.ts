@@ -27,9 +27,7 @@ export interface WriteReviewType {
   cart?: number,
   market: MarketType,
   tags: {
-    interest: Array<string>,
-    household: Array<string>,
-    taste: Array<string>
+    interest: Array<string>
   }
 }
 

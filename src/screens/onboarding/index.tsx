@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, Platform, Dimensions } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import {
   kakaoImg,
@@ -20,9 +20,8 @@ import { tokenState } from '~/recoil/atoms';
 import { useSetRecoilState } from 'recoil';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FONT } from '~/styles/fonts';
-import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
+import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import theme from '~/styles/theme';
-import { useFocusEffect } from '@react-navigation/native';
 import { versioningAOS, versioningIOS } from '~/utils/constant';
 import { emailicon } from '~/assets/icons';
 
@@ -111,9 +110,11 @@ const Onboarding = ({ navigation }: NavigationType) => {
     }
     setApiBlock(true);
     GoogleSignin.configure({
+      iosClientId: "19978958503-8i0hoibbfta64msltteflpdseev3ruv9.apps.googleusercontent.com",
+      // webClientId: "381936778966-ed1p2hj7111sk00dtbvi3ma5lkk1g4kt.apps.googleusercontent.com"
       webClientId: "19978958503-rta621e9q96sp6qqgdk13cuijt3nc4ju.apps.googleusercontent.com",
-      // webClientId: "1025814485939-v9l5ad2bk5rr04h39e9dngnfodedjfeb.apps.googleusercontent.com"
     });
+
     await GoogleSignin.signIn();
     const { accessToken } = await GoogleSignin.getTokens();
     if (accessToken) {
@@ -247,7 +248,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
             에 동의하게 됩니다.</Text>
         </View>
         <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4, marginTop: h2p(5) }]}>
-          {Platform.OS === "ios" ? `v.${versioningIOS}-dev` : `v.${versioningAOS}-dev`}
+          {(Platform.OS === "ios" ? `v.${versioningIOS}` : `v.${versioningAOS}`)}
         </Text>
       </View>
     </View>
@@ -257,7 +258,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: h2p(250),
+    paddingTop: getStatusBarHeight() + h2p(140),
     alignItems: "center"
   },
   logo: {

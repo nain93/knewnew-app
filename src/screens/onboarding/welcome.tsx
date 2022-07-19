@@ -1,51 +1,34 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { NavigationRoute } from 'react-navigation';
 import { NavigationStackProp } from 'react-navigation-stack';
-import { useQuery } from 'react-query';
-import { useRecoilValue } from 'recoil';
-import { getMyProfile } from '~/api/user';
-import { handIcon } from '~/assets/icons';
+import { handIcon, tagFood, tagHome, tagLife } from '~/assets/icons';
 import BasicButton from '~/components/button/basicButton';
 import Header from '~/components/header';
 import CloseIcon from '~/components/icon/closeIcon';
-import Loading from '~/components/loading';
-import { tokenState } from '~/recoil/atoms';
 import { FONT } from '~/styles/fonts';
 import theme from '~/styles/theme';
-import { InterestType } from '~/types';
-import { MyProfileType } from '~/types/user';
+import { UserInfoType } from '~/types/user';
 import { d2p, h2p } from '~/utils';
 
 export interface NavigationType {
   navigation: NavigationStackProp;
-  route?: NavigationRoute<Array<InterestType>>;
+  route?: NavigationRoute<{
+    userInfo: UserInfoType,
+    userBadge: {
+      foodLife: string,
+      lifeStyle: string,
+      household: string
+    }
+  }>;
 }
 
 const Welcome = ({ navigation, route }: NavigationType) => {
-  const [masterBadge, setMasterBadge] = useState("");
-  const [badge, setBadge] = useState<Array<string>>();
-  const token = useRecoilValue(tokenState);
-
-  const { data, isLoading } = useQuery<MyProfileType, Error>(["myProfile", token], () => getMyProfile(token), {
-    enabled: !!token
-  });
 
   const handleSignIn = () => {
     //@ts-ignore
     navigation.reset({ routes: [{ name: "TabNav" }] });
   };
-
-  useEffect(() => {
-    if (route?.params) {
-      setMasterBadge(route.params.filter(v => v.masterBadge)[0].title);
-      setBadge((route?.params.filter(v => !v.masterBadge)).map(v => v.title));
-    }
-  }, [route?.params]);
-
-  if (isLoading) {
-    return <Loading />;
-  }
 
   return (
     <>
@@ -56,25 +39,31 @@ const Welcome = ({ navigation, route }: NavigationType) => {
         }} />}
       />
       <View style={styles.container}>
+        <View style={{ marginTop: h2p(50) }}>
+          <View style={{ flexDirection: "row", alignItems: "center", marginBottom: h2p(10) }}>
+            <Image source={tagHome} style={{ marginRight: d2p(12), width: d2p(16), height: d2p(16) }} />
+            <Text style={[FONT.SemiBold, { fontSize: 18, color: theme.color.grayscale.C_79737e }]}>
+              {route?.params?.userBadge.household}</Text>
+          </View>
+          <View style={{ flexDirection: "row", alignItems: "center", marginBottom: h2p(10) }}>
+            <Image source={tagLife} style={{ marginRight: d2p(12), width: d2p(16), height: d2p(16) }} />
+            <Text style={[FONT.SemiBold, { fontSize: 18, color: theme.color.grayscale.C_79737e }]}>
+              {route?.params?.userBadge.lifeStyle}</Text>
+          </View>
+          <View style={{ flexDirection: "row", alignItems: "center", marginBottom: h2p(10) }}>
+            <Image source={tagFood} style={{ marginRight: d2p(12), width: d2p(16), height: d2p(16) }} />
+            <Text style={[FONT.SemiBold, { fontSize: 18, color: theme.color.grayscale.C_79737e }]}>
+              {route?.params?.userBadge.foodLife}</Text>
+          </View>
+        </View>
         <View style={styles.main}>
-          <Text style={[styles.mainText, { color: theme.color.main }, { lineHeight: 28 }, FONT.SemiBold]}>
-            {data?.nickname}</Text>
-          <Text style={[styles.mainText, { lineHeight: 29 }, FONT.SemiBold]}>님 반가워요!</Text>
+          <Text style={[styles.mainText, { color: theme.color.main }, { lineHeight: 36 }, FONT.SemiBold]}>
+            {route?.params?.userInfo.nickname}</Text>
+          <Text style={[styles.mainText, { lineHeight: 36 }, FONT.SemiBold]}>님,</Text>
+          <Text style={[styles.mainText, { lineHeight: 36 }, FONT.SemiBold]}>
+            뉴뉴에 오신 것을 환영해요!</Text>
         </View>
-        <View style={{
-          marginBottom: h2p(10),
-          justifyContent: "center",
-          alignItems: "center",
-          width: d2p(96),
-          borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
-          paddingHorizontal: d2p(15), paddingVertical: h2p(5), height: h2p(28), borderRadius: 14
-        }}>
-          <Text style={[{ color: theme.color.black }, FONT.Medium]}>{masterBadge}</Text>
-        </View>
-        <View style={{ flexDirection: "row" }}>
-          {React.Children.toArray(badge?.map(v => <Text style={[styles.tag, FONT.SemiBold]}>#{v} </Text>))}
-        </View>
-      </View >
+      </View>
       <View style={styles.alertContainer}>
         <Image source={handIcon} style={{ width: d2p(39), height: d2p(39) }} />
         <Text style={[FONT.Bold, { color: theme.color.main, fontSize: 30, marginTop: h2p(5), marginBottom: h2p(10) }]}>
@@ -105,7 +94,7 @@ const Welcome = ({ navigation, route }: NavigationType) => {
         </View>
         <BasicButton
           viewStyle={{ marginBottom: h2p(40) }}
-          onPress={handleSignIn} text="확인하고 입장하기" bgColor={theme.color.main} textColor={theme.color.white} />
+          onPress={handleSignIn} text="후다닥 입장하기" bgColor={theme.color.main} textColor={theme.color.white} />
       </View>
     </>
   );
@@ -117,8 +106,8 @@ const styles = StyleSheet.create({
   },
   main: {
     flexDirection: 'row',
-    marginBottom: h2p(30),
-    marginTop: h2p(63),
+    marginBottom: h2p(50),
+    marginTop: h2p(20),
     flexWrap: "wrap"
   },
   mainText: {
@@ -137,8 +126,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.color.grayscale.f7f7fc,
     paddingHorizontal: d2p(20),
-    paddingTop: h2p(40),
-    marginTop: h2p(60)
+    paddingTop: h2p(40)
   }
 });
 

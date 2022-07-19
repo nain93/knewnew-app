@@ -115,7 +115,7 @@ const More = ({ setSelectedIndex, isGobacK, handleCloseMore, userId, isMoreClick
     Share.open({
       title: "뉴뉴",
       url: `knewnnew://FeedDetail/${review.id}`
-      // url: `https://knewnnew/link/FeedDetail/${review.id}`
+      // url: `https://knewnnew.co.kr/FeedDetail/${review.id}`
     })
       .then((res) => {
         console.log(res);

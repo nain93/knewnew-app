@@ -12,10 +12,15 @@ import EditProfile from '~/screens/mypage/editProfile';
 import theme from '~/styles/theme';
 import FeedDetail from '~/screens/feed/detail';
 import Report from '~/screens/report';
-import Term from '~/screens/setting';
-import Privacy from '~/screens/setting/privacy';
-import EmailLogin from '~/screens/onboarding/emailLogin';
+import EmailCheck from '~/screens/onboarding/email/emailCheck';
+import EmailLogin from '~/screens/onboarding/email/emailLogin';
+import EmailSignup from '~/screens/onboarding/email/emailSignup';
 import Notification from '~/screens/feed/notification';
+import Setting from '~/screens/setting';
+import Privacy from '~/screens/setting/term/privacy';
+import Term from '~/screens/setting/term/term';
+import TermScreen from '~/screens/setting/term';
+import OpenSource from '~/screens/setting/openSource';
 
 const Stack = createStackNavigator();
 
@@ -97,6 +102,27 @@ const GlobalNav = ({ token }: { token: string }) => {
           }}
         />
         <Stack.Screen
+          name="setting"
+          component={Setting}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="openSource"
+          component={OpenSource}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="termScreen"
+          component={TermScreen}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
           name="term"
           component={Term}
           options={{
@@ -111,8 +137,22 @@ const GlobalNav = ({ token }: { token: string }) => {
           }}
         />
         <Stack.Screen
+          name="emailCheck"
+          component={EmailCheck}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
           name="emailLogin"
           component={EmailLogin}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="emailSignup"
+          component={EmailSignup}
           options={{
             headerShown: false
           }}

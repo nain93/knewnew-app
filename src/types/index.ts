@@ -12,15 +12,25 @@ export interface InterestType {
   masterBadge?: boolean
 }
 
-export interface BadgeType {
-  interest: Array<InterestType>,
-  household: Array<{
-    title: string,
-    isClick: boolean
-  }>,
-  taste: Array<{
+export interface InterestTagType {
+  interest: Array<{
     title: string;
     isClick: boolean;
+  }>
+}
+export interface BadgeType {
+  foodStyle: Array<{
+    title: string;
+    isClick: boolean;
+  }>,
+  household: Array<{
+    title: string;
+    isClick: boolean;
+  }>,
+  occupation: Array<{
+    title: string;
+    isClick: boolean;
+    content?: string
   }>
 }
 
