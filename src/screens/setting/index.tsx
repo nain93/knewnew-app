@@ -1,8 +1,7 @@
-import { Image, Linking, Platform, PlatformOSType, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
-import messaging from "@react-native-firebase/messaging";
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import { d2p, h2p } from '~/utils';
@@ -14,13 +13,14 @@ import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { myIdState, okPopupState, tokenState } from '~/recoil/atoms';
-import { useMutation } from 'react-query';
-import { deleteUser } from '~/api/user';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { deleteUser, getMyProfile } from '~/api/user';
 import ToggleButton from '~/components/button/toggleButton';
 import Loading from '~/components/loading';
-import { deleteNotification, registerNotification } from '~/api/setting';
+import messaging from '@react-native-firebase/messaging';
 //@ts-ignore
 import VersionCheck from 'react-native-version-check';
+import { MyProfileType } from '~/types/user';
 
 interface SettingProps {
   navigation: NavigationStackProp;
@@ -31,8 +31,17 @@ const Setting = ({ navigation }: SettingProps) => {
   const [token, setToken] = useRecoilState(tokenState);
   const myId = useRecoilValue(myIdState);
   const setModalOpen = useSetRecoilState(okPopupState);
-  const [isOn, setIsOn] = useState(true);
   const [isLatestVersion, setIsLatestVersion] = useState<boolean>(false);
+  const queryClient = useQueryClient();
+  const [isOn, setIsOn] = useState(true);
+
+
+  const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile"], async () => {
+    const queryData = await getMyProfile(token);
+    queryClient.setQueryData("myProfile", queryData);
+    return queryData;
+  });
+
 
   const deleteUserMutation = useMutation("deleteUser", () => deleteUser({ token, id: myId }), {
     onSuccess: async () => {
@@ -42,62 +51,46 @@ const Setting = ({ navigation }: SettingProps) => {
     }
   });
 
-  const notificationMutation = useMutation("registerNotification", ({ FCMToken, type }: { FCMToken: string, type: PlatformOSType }) =>
-    registerNotification({ token, FCMToken, type }));
-
-  const deleteNotiMutation = useMutation("deleteNotification", (id: string) => deleteNotification({ token, id }));
-
-
-  // * 알람 디바이스 등록 
-  const registerDevice = () => {
-    messaging().getToken().then(FCMToken => {
-      notificationMutation.mutate({ FCMToken, type: Platform.OS });
-    });
-  };
-
   // * 알람 디바이스 해제
-  const unregisterDevice = () => {
-    messaging().getToken().then(FCMToken => {
-      deleteNotiMutation.mutate(FCMToken);
-    });
+  const unregisterDevice = async () => {
+    messaging().unregisterDeviceForRemoteMessages();
   };
 
   useEffect(() => {
-    if (isOn) {
-      registerDevice();
-      // messaging().registerDeviceForRemoteMessages();
-    } else {
-      unregisterDevice();
-      // messaging().unregisterDeviceForRemoteMessages();
+    if (getMyProfileQuery.data) {
+      setIsOn(getMyProfileQuery.data?.isNotifiable);
     }
-  }, [isOn]);
+  }, [getMyProfileQuery.data]);
+
 
   useEffect(() => {
     // * 최신버전 체크
-    if (Platform.OS === "ios") {
-      VersionCheck.getLatestVersion({
-        provider: "appStore"
-      }).then((latestVersion: string) => {
-        if (latestVersion === versioningIOS) {
-          setIsLatestVersion(true);
-        }
-        else {
-          setIsLatestVersion(false);
-        }
-      });
-    }
+    if (!__DEV__) {
+      if (Platform.OS === "ios") {
+        VersionCheck.getLatestVersion({
+          provider: "appStore"
+        }).then((latestVersion: string) => {
+          if (latestVersion === versioningIOS) {
+            setIsLatestVersion(true);
+          }
+          else {
+            setIsLatestVersion(false);
+          }
+        });
+      }
 
-    if (Platform.OS === "android") {
-      VersionCheck.getLatestVersion({
-        provider: "playStore"
-      }).then((latestVersion: string) => {
-        if (latestVersion === versioningAOS) {
-          setIsLatestVersion(true);
-        }
-        else {
-          setIsLatestVersion(false);
-        }
-      });
+      if (Platform.OS === "android") {
+        VersionCheck.getLatestVersion({
+          provider: "playStore"
+        }).then((latestVersion: string) => {
+          if (latestVersion === versioningAOS) {
+            setIsLatestVersion(true);
+          }
+          else {
+            setIsLatestVersion(false);
+          }
+        });
+      }
     }
 
   }, []);

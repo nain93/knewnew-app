@@ -1,7 +1,13 @@
 import { Animated, Easing, Pressable, StyleSheet } from 'react-native';
 import React, { useEffect, useRef } from 'react';
 import { d2p, h2p } from '~/utils';
+import messaging from '@react-native-firebase/messaging';
 import theme from '~/styles/theme';
+import { useMutation, useQueryClient } from 'react-query';
+import { useRecoilValue } from 'recoil';
+import { myIdState, tokenState } from '~/recoil/atoms';
+import { postProfileType } from '~/types/user';
+import { editUserProfile } from '~/api/user';
 
 interface ToggleButtonProps {
   isOn: boolean
@@ -10,6 +16,13 @@ interface ToggleButtonProps {
 
 const ToggleButton = ({ isOn, setIsOn }: ToggleButtonProps) => {
   const moveAnim = useRef(new Animated.Value(2)).current;
+  const queryClient = useQueryClient();
+  const myId = useRecoilValue(myIdState);
+  const token = useRecoilValue(tokenState);
+
+  const editProfileMutation = useMutation(["editprofile", token],
+    (profileprop: postProfileType) => editUserProfile({ token, id: myId, profile: profileprop }));
+
 
   const moveOn = () => {
     Animated.timing(moveAnim, {
@@ -29,6 +42,31 @@ const ToggleButton = ({ isOn, setIsOn }: ToggleButtonProps) => {
     }).start();
   };
 
+
+  // * 알람 디바이스 등록 
+  const registerDevice = async () => {
+    messaging().registerDeviceForRemoteMessages();
+    const profileData: (postProfileType | undefined) = await queryClient.getQueryData("myProfile");
+    if (profileData) {
+      editProfileMutation.mutate({
+        ...profileData,
+        profileImage: "user" + profileData.profileImage?.split("user")[1], isNotifiable: true
+      });
+    }
+  };
+
+  // * 알람 디바이스 해제
+  const unregisterDevice = async () => {
+    messaging().unregisterDeviceForRemoteMessages();
+    const profileData: (postProfileType | undefined) = await queryClient.getQueryData("myProfile");
+    if (profileData) {
+      editProfileMutation.mutate({
+        ...profileData,
+        profileImage: "user" + profileData.profileImage?.split("user")[1], isNotifiable: false
+      });
+    }
+  };
+
   useEffect(() => {
     if (isOn) {
       moveOn();
@@ -40,7 +78,15 @@ const ToggleButton = ({ isOn, setIsOn }: ToggleButtonProps) => {
 
   return (
     <Pressable
-      onPress={() => setIsOn(!isOn)}
+      onPress={() => {
+        if (isOn) {
+          unregisterDevice();
+        }
+        else {
+          registerDevice();
+        }
+        setIsOn(!isOn);
+      }}
       style={[
         styles.container,
         {

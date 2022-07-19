@@ -261,14 +261,10 @@ const Feed = ({ navigation, route }: FeedProps) => {
         <FlatList
           ref={flatListRef}
           onEndReached={() => {
-            // hasNextPage
-            if (reviewListQuery.hasNextPage) {
+            if (reviewListQuery.data &&
+              reviewListQuery.data.pages.flat().length > 19) {
               reviewListQuery.fetchNextPage();
             }
-            // if (reviewListQuery.data &&
-            //   reviewListQuery.data.pages.flat().length > 19) {
-            //   reviewListQuery.fetchNextPage();
-            // }
           }}
           onEndReachedThreshold={0.5}
           refreshing={reviewListQuery.isLoading}

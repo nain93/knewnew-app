@@ -3,7 +3,7 @@ import { Animated, Linking, Platform, PlatformOSType } from 'react-native';
 import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import SplashScreen from 'react-native-splash-screen';
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 import codePush from "react-native-code-push";
@@ -11,7 +11,7 @@ import { FileLogger } from "react-native-file-logger";
 
 import GlobalNav from './src/navigators/globalNav';
 import AlertPopup from '~/components/popup/alertPopup';
-import { notificationPopup, okPopupState, popupState, tokenState } from '~/recoil/atoms';
+import { myIdState, notificationPopup, okPopupState, popupState, tokenState } from '~/recoil/atoms';
 import OkPopup from '~/components/popup/okPopup';
 import Loading from '~/components/loading';
 import FadeInOut from '~/hooks/fadeInOut';
@@ -20,7 +20,9 @@ import * as Sentry from "@sentry/react-native";
 import Config from 'react-native-config';
 import NotificationPopup from '~/components/popup/notificationPopup';
 import { registerNotification } from '~/api/setting';
-import { useMutation } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
+import { MyProfileType, postProfileType } from '~/types/user';
+import { editUserProfile, getMyProfile } from '~/api/user';
 
 export const navigationRef = createNavigationContainerRef();
 
@@ -30,6 +32,7 @@ const App = () => {
   const [notiOpen, setNotiOpen] = useRecoilState(notificationPopup);
   const { fadeAnim } = FadeInOut({ isPopupOpen, setIsPopupOpen });
   const [token, setToken] = useRecoilState(tokenState);
+  const myId = useRecoilValue(myIdState);
   const [isVisible, setIsVisible] = useState(false);
 
   const notificationMutation = useMutation("registerNotification", ({ FCMToken, type }: { FCMToken: string, type: PlatformOSType }) =>
@@ -62,7 +65,7 @@ const App = () => {
       const storageToken = await AsyncStorage.getItem("token");
       if (storageToken) {
         setToken(storageToken);
-        // * 알람 기기등록 
+        // * 알람 기기등록 (등록 안돼있을경우)
         messaging().getToken().then(FCMToken => {
           notificationMutation.mutate({ FCMToken, type: Platform.OS });
         });
@@ -109,7 +112,11 @@ const App = () => {
     // * 코드푸시 업데이트 체크
     installUpdateIfAvailable();
     if (Platform.OS === "ios") {
-      messaging().requestPermission();
+      messaging().requestPermission().then(isPermission => {
+        if (!isPermission) {
+          // todo nofi false처리
+        }
+      });
       messaging()
         .getIsHeadless()
         .then(isHeadless => {
