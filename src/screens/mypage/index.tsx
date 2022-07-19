@@ -42,6 +42,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     }
     else {
       const queryData = await getMyProfile(token);
+      queryClient.setQueryData("myProfile", queryData);
       return queryData;
     }
   }, {

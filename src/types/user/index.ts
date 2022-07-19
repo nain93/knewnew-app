@@ -50,9 +50,10 @@ export interface MyProfileType {
   created: string,
   reviewCount: number,
   bookmarkCount: number,
-  remainingPeriod: number
+  remainingPeriod: number,
+  isNotifiable: boolean,
+  isMarketing: boolean
 }
-
 
 export interface UserInfoType {
   providerType: "kakao" | "naver" | "google" | "apple",
@@ -65,4 +66,17 @@ export interface UserInfoType {
   occupation?: string,
   representBadge: string,
   tags: UserInfoTagType
+}
+
+export interface postProfileType {
+  nickname: string,
+  headline: string,
+  profileImage: string | null,
+  isNotifiable?: boolean,
+  isMarketing?: boolean,
+  tags: {
+    foodStyle: Array<string>,
+    household: Array<string>,
+    occupation: Array<string>
+  }
 }

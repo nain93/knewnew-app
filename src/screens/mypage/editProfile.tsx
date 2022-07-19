@@ -24,6 +24,7 @@ import { hitslop } from '~/utils/constant';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import UserTagLayout from '~/components/layout/UserTagLayout';
 import SelectTag from '~/components/selectTag';
+import { postProfileType } from '~/types/user';
 
 interface ProfileEditType {
   nickname: string,
@@ -82,17 +83,6 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
     name: string | undefined,
     type: string
   }>();
-
-  interface postProfileType {
-    nickname: string,
-    headline: string,
-    profileImage: string | null,
-    tags: {
-      foodStyle: Array<string>,
-      household: Array<string>,
-      occupation: Array<string>
-    }
-  }
 
   const editProfileMutation = useMutation(["editprofile", token],
     (profileprop: postProfileType) => editUserProfile({ token, id: myId, profile: profileprop }), {
