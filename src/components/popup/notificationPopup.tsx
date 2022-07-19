@@ -9,11 +9,12 @@ import { FONT } from '~/styles/fonts';
 interface NotificationPopupProp {
   content: string,
   modalOpen: boolean,
-  setIsVisible: (view: boolean) => void
-  setModalOpen: (isOpen: boolean) => void
+  setIsVisible: (view: boolean) => void,
+  setModalOpen: (isOpen: boolean) => void,
+  onPress: () => void
 }
 
-const NotificationPopup = ({ content, modalOpen, setIsVisible, setModalOpen }: NotificationPopupProp) => {
+const NotificationPopup = ({ content, modalOpen, setIsVisible, setModalOpen, onPress }: NotificationPopupProp) => {
   const moveAnim = useRef(new Animated.Value(-80)).current;
 
   const moveUp = () => {
@@ -54,7 +55,10 @@ const NotificationPopup = ({ content, modalOpen, setIsVisible, setModalOpen }: N
       }]}>
       <Pressable
         style={styles.pressable}
-        onPress={() => console.log("noti")}>
+        onPress={() => {
+          onPress();
+          setModalOpen(false);
+        }}>
         <View style={{
           width: d2p(30), height: d2p(30), justifyContent: "center",
           alignItems: "center", marginRight: d2p(10)

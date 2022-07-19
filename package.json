@@ -60,6 +60,7 @@
     "react-native-share": "^7.5.0",
     "react-native-splash-screen": "^3.3.0",
     "react-native-tab-view": "^3.1.1",
+    "react-native-version-check": "^3.4.3",
     "react-navigation": "^4.4.4",
     "react-navigation-backhandler": "^2.0.1",
     "react-navigation-stack": "^2.10.4",

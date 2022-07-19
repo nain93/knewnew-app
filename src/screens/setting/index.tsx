@@ -1,4 +1,4 @@
-import { Image, Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Linking, Platform, PlatformOSType, Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
@@ -18,6 +18,9 @@ import { useMutation } from 'react-query';
 import { deleteUser } from '~/api/user';
 import ToggleButton from '~/components/button/toggleButton';
 import Loading from '~/components/loading';
+import { deleteNotification, registerNotification } from '~/api/setting';
+//@ts-ignore
+import VersionCheck from 'react-native-version-check';
 
 interface SettingProps {
   navigation: NavigationStackProp;
@@ -28,24 +31,76 @@ const Setting = ({ navigation }: SettingProps) => {
   const [token, setToken] = useRecoilState(tokenState);
   const myId = useRecoilValue(myIdState);
   const setModalOpen = useSetRecoilState(okPopupState);
-  const [isOn, setIsOn] = useState(false);
+  const [isOn, setIsOn] = useState(true);
+  const [isLatestVersion, setIsLatestVersion] = useState<boolean>(false);
 
   const deleteUserMutation = useMutation("deleteUser", () => deleteUser({ token, id: myId }), {
     onSuccess: async () => {
+      unregisterDevice();
       setToken("");
       AsyncStorage.removeItem("token");
     }
   });
 
+  const notificationMutation = useMutation("registerNotification", ({ FCMToken, type }: { FCMToken: string, type: PlatformOSType }) =>
+    registerNotification({ token, FCMToken, type }));
+
+  const deleteNotiMutation = useMutation("deleteNotification", (id: string) => deleteNotification({ token, id }));
+
+
+  // * 알람 디바이스 등록 
+  const registerDevice = () => {
+    messaging().getToken().then(FCMToken => {
+      notificationMutation.mutate({ FCMToken, type: Platform.OS });
+    });
+  };
+
+  // * 알람 디바이스 해제
+  const unregisterDevice = () => {
+    messaging().getToken().then(FCMToken => {
+      deleteNotiMutation.mutate(FCMToken);
+    });
+  };
+
   useEffect(() => {
     if (isOn) {
-      messaging().registerDeviceForRemoteMessages();
-      // AsyncStorage.setItem(AsyncStorageKeys.setAllNotification, (1).toString());
+      registerDevice();
+      // messaging().registerDeviceForRemoteMessages();
     } else {
-      messaging().unregisterDeviceForRemoteMessages();
-      // AsyncStorage.setItem(AsyncStorageKeys.setAllNotification, (0).toString());
+      unregisterDevice();
+      // messaging().unregisterDeviceForRemoteMessages();
     }
   }, [isOn]);
+
+  useEffect(() => {
+    // * 최신버전 체크
+    if (Platform.OS === "ios") {
+      VersionCheck.getLatestVersion({
+        provider: "appStore"
+      }).then((latestVersion: string) => {
+        if (latestVersion === versioningIOS) {
+          setIsLatestVersion(true);
+        }
+        else {
+          setIsLatestVersion(false);
+        }
+      });
+    }
+
+    if (Platform.OS === "android") {
+      VersionCheck.getLatestVersion({
+        provider: "playStore"
+      }).then((latestVersion: string) => {
+        if (latestVersion === versioningAOS) {
+          setIsLatestVersion(true);
+        }
+        else {
+          setIsLatestVersion(false);
+        }
+      });
+    }
+
+  }, []);
 
   if (deleteUserMutation.isLoading) {
     return <Loading />;
@@ -60,7 +115,7 @@ const Setting = ({ navigation }: SettingProps) => {
         <View style={styles.list}>
           <Text style={[FONT.Regular, styles.listText]}>버전 정보</Text>
           <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_443e49 }]}>
-            {(Platform.OS === "ios" ? `v.${versioningIOS}` : `v.${versioningAOS}`)} (최신 버전)
+            {(Platform.OS === "ios" ? `v.${versioningIOS}` : `v.${versioningAOS}`)} {isLatestVersion && "(최신 버전)"}
           </Text>
         </View>
         <View style={styles.list}>
@@ -90,6 +145,7 @@ const Setting = ({ navigation }: SettingProps) => {
               isOpen: true,
               content: "로그아웃 하시겠습니까?",
               okButton: () => {
+                unregisterDevice();
                 AsyncStorage.removeItem("token");
                 setToken("");
               }

@@ -1,4 +1,4 @@
-import { Dimensions, FlatList, Image, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { useCallback } from 'react';
 import Header from '~/components/header';
 import { NavigationStackProp } from 'react-navigation-stack';
@@ -25,6 +25,7 @@ interface NotificationListType {
   link: string,
   message: string,
   title: string,
+  created: string,
   type: "review_comment" | "review_comment_like" | "review_child_comment" | "review_bookmark" |
   "review_like" | "review_popular" | "review_recommend" | "review_view" | "follow" | "review_mention" |
   "comment_mention" | "admin_noti" | "general"
@@ -34,13 +35,16 @@ interface NotificationListType {
 const Notification = ({ navigation }: NotificationProps) => {
   const token = useRecoilValue(tokenState);
 
-  const notificationQuery = useInfiniteQuery<NotificationListType[], Error>("notiList", () => notificationList({ token }), {
+  const notificationQuery = useInfiniteQuery<NotificationListType[], Error>("notiList", ({ pageParam = 0 }) =>
+    notificationList({ token, offset: pageParam }), {
     getNextPageParam: (next, all) => all.flat().length,
   });
 
   const renderItem = useCallback(({ item }: { item: NotificationListType, index: number }) => {
     return (
-      <View style={{ flexDirection: "row" }}>
+      <Pressable
+        onPress={() => navigation.navigate("FeedDetail", { id: item.link.split("/")[1] })}
+        style={{ flexDirection: "row" }}>
         <View style={{
           marginRight: d2p(10),
           width: d2p(42), height: h2p(42),
@@ -51,7 +55,7 @@ const Notification = ({ navigation }: NotificationProps) => {
               case "review_popular": {
                 return (
                   <>
-                    <Image source={knewnewIcon} style={{ width: d2p(18), height: d2p(18) }} />
+                    <Image source={knewnewIcon} resizeMode="contain" style={{ width: d2p(18), height: d2p(18) }} />
                     <Text style={[FONT.Regular, styles.notiText]}>
                       활동
                     </Text>
@@ -61,17 +65,27 @@ const Notification = ({ navigation }: NotificationProps) => {
               case "review_comment": {
                 return (
                   <>
-                    <Image source={comment} style={{ width: d2p(18), height: d2p(18) }} />
+                    <Image source={comment} resizeMode="contain" style={{ width: d2p(18), height: d2p(18) }} />
                     <Text style={[FONT.Regular, styles.notiText]}>
                       댓글
                     </Text>
                   </>
                 );
               }
-              case "review_recommend": {
+              case "review_comment_like": {
                 return (
                   <>
-                    <Image source={reComment} style={{ width: d2p(18), height: d2p(18) }} />
+                    <Image source={likeComment} resizeMode="contain" style={{ width: d2p(18), height: d2p(18) }} />
+                    <Text style={[FONT.Regular, styles.notiText]}>
+                      좋아요
+                    </Text>
+                  </>
+                );
+              }
+              case "review_child_comment": {
+                return (
+                  <>
+                    <Image source={reComment} resizeMode="contain" style={{ width: d2p(18), height: d2p(18) }} />
                     <Text style={[FONT.Regular, styles.notiText]}>
                       답글
                     </Text>
@@ -81,7 +95,7 @@ const Notification = ({ navigation }: NotificationProps) => {
               case "comment_mention": {
                 return (
                   <>
-                    <Image source={mention} style={{ width: d2p(18), height: d2p(18) }} />
+                    <Image source={mention} resizeMode="contain" style={{ width: d2p(18), height: d2p(18) }} />
                     <Text style={[FONT.Regular, styles.notiText]}>
                       언급
                     </Text>
@@ -91,7 +105,7 @@ const Notification = ({ navigation }: NotificationProps) => {
               case "review_like": {
                 return (
                   <>
-                    <Image source={likeComment} style={{ width: d2p(18), height: d2p(18) }} />
+                    <Image source={likeComment} resizeMode="contain" style={{ width: d2p(18), height: d2p(18) }} />
                     <Text style={[FONT.Regular, styles.notiText]}>
                       좋아요
                     </Text>
@@ -101,7 +115,7 @@ const Notification = ({ navigation }: NotificationProps) => {
               case "review_bookmark": {
                 return (
                   <>
-                    <Image source={cart} style={{ width: d2p(18), height: d2p(18) }} />
+                    <Image source={cart} resizeMode="contain" style={{ width: d2p(18), height: d2p(18) }} />
                     <Text style={[FONT.Regular, styles.notiText]}>
                       담기
                     </Text>
@@ -117,20 +131,40 @@ const Notification = ({ navigation }: NotificationProps) => {
         <View style={{
           width: Dimensions.get("window").width - d2p(92),
           borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc,
-          paddingVertical: h2p(20)
+          paddingVertical: h2p(20),
         }}>
-          <Text style={[FONT.Regular, { lineHeight: 20 }]}>{item.message}</Text>
+          {item.message.includes(":") ?
+            <View style={{ flexDirection: "row", width: Dimensions.get("window").width - d2p(92), flexWrap: "wrap" }}>
+              <Text style={[FONT.Regular, { lineHeight: 20 }]}>
+                {item.message.split(":")[0]}
+              </Text>
+              <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4, lineHeight: 20 }]}>
+                {` : ${item.message.split(":")[1]}`}
+              </Text>
+            </View>
+            :
+            <Text style={[FONT.Regular, { lineHeight: 20 }]}>
+              {item.message}
+            </Text>
+          }
+
           <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4, marginTop: h2p(7) }]}>
-            {/* {simpleDate()} */}
-            2022.06.28
+            {simpleDate(item.created, "전")}
           </Text>
         </View>
-      </View>
+      </Pressable>
     );
   }, []);
 
   if (notificationQuery.isLoading) {
-    return <Loading />;
+    return (
+      <>
+        <Header
+          headerLeft={<LeftArrowIcon onBackClick={() => navigation.goBack()} />}
+          title="알림" />
+        <Loading />
+      </>
+    );
   }
 
   return (
@@ -143,7 +177,7 @@ const Notification = ({ navigation }: NotificationProps) => {
         showsVerticalScrollIndicator={false}
         onEndReachedThreshold={0.5}
         refreshing={notificationQuery.isLoading}
-        onRefresh={() => notificationQuery.refetch()}
+        onRefresh={notificationQuery.refetch}
         onEndReached={() => {
           if (notificationQuery.data &&
             notificationQuery.data.pages.flat().length > 19) {

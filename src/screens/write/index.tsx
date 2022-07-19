@@ -213,11 +213,7 @@ const Write = ({ navigation, route }: WriteProp) => {
       }
     });
 
-  const { mutateAsync } = useMutation("deleteImages", (id: number) => deleteReviewImage(token, id), {
-    onSuccess: (data) => {
-      console.log(data, 'data');
-    }
-  });
+  const { mutateAsync } = useMutation("deleteImages", (id: number) => deleteReviewImage(token, id));
 
   const handleAddWrite = async () => {
     if (writeData.satisfaction === "") {

@@ -22,8 +22,8 @@ export const registerNotification = async ({ token, FCMToken, type }: registerNo
   }
 };
 
-export const notificationList = async ({ token }: { token: string }) => {
-  const res = await axios.get(baseURL + "notification/", {
+export const deleteNotification = async ({ token, id }: { token: string, id: string }) => {
+  const res = await axios.delete(baseURL + `notification/device/${id}/`, {
     headers: {
       Authorization: `Bearer ${token}`,
     }
@@ -32,3 +32,18 @@ export const notificationList = async ({ token }: { token: string }) => {
     return res.data;
   }
 };
+
+export const notificationList = async ({ token, offset }: { token: string, offset: number }) => {
+  const res = await axios.get(baseURL + "notification/", {
+    params: {
+      offset
+    },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+  if (res) {
+    return res.data;
+  }
+};
+

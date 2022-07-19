@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, Animated, Linking, Platform, PlatformOSType, Text, TouchableOpacity } from 'react-native';
-import { createNavigationContainerRef, NavigationContainer, useFocusEffect } from '@react-navigation/native';
+import { Animated, Linking, Platform, PlatformOSType } from 'react-native';
+import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import SplashScreen from 'react-native-splash-screen';
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useRecoilState } from 'recoil';
@@ -33,44 +33,37 @@ const App = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   const notificationMutation = useMutation("registerNotification", ({ FCMToken, type }: { FCMToken: string, type: PlatformOSType }) =>
-    registerNotification({ token, FCMToken, type }),
-    {
-      onSuccess: (data) => {
-        console.log(data, "data");
-      },
-    });
+    registerNotification({ token, FCMToken, type }));
 
-  const sendLoggedFiles = useCallback(() => {
-    FileLogger.sendLogFilesByEmail({
-      to: 'rnrb555@gmail.com',
-      subject: 'App logs',
-      body: 'Attached logs',
-    })
-      .then(() => {
-        setTimeout(() => {
-          FileLogger.deleteLogFiles();
-        }, 5000);
-      })
-      .catch((err) => {
-        if ('message' in err) {
-          FileLogger.error(err.message);
-        } else {
-          FileLogger.error(JSON.stringify(err));
-        }
-      });
-  }, []);
+  // const sendLoggedFiles = useCallback(() => {
+  //   FileLogger.sendLogFilesByEmail({
+  //     to: 'rnrb555@gmail.com',
+  //     subject: 'App logs',
+  //     body: 'Attached logs',
+  //   })
+  //     .then(() => {
+  //       setTimeout(() => {
+  //         FileLogger.deleteLogFiles();
+  //       }, 5000);
+  //     })
+  //     .catch((err) => {
+  //       if ('message' in err) {
+  //         FileLogger.error(err.message);
+  //       } else {
+  //         FileLogger.error(JSON.stringify(err));
+  //       }
+  //     });
+  // }, []);
 
   // * 스플래시 로딩중 토큰 저장
   useEffect(() => {
     const getToken = async () => {
       // TODO refresh api
-      sendLoggedFiles();
       const storageToken = await AsyncStorage.getItem("token");
       if (storageToken) {
         setToken(storageToken);
-        // * 알람 기기등록 (등록안되어있을 경우)
+        // * 알람 기기등록 
         messaging().getToken().then(FCMToken => {
-          console.log(FCMToken, "FCMToken");
           notificationMutation.mutate({ FCMToken, type: Platform.OS });
         });
       }
@@ -79,6 +72,9 @@ const App = () => {
       }
     };
     getToken();
+    return messaging().onTokenRefresh(FCMToken => {
+      notificationMutation.mutate({ FCMToken, type: Platform.OS });
+    });
   }, []);
 
   const linking = {
@@ -123,9 +119,17 @@ const App = () => {
     }
     // * 알람 수신후 핸들링
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log(remoteMessage, 'remoteMessage');
       if (remoteMessage.notification?.body) {
-        setNotiOpen({ isOpen: true, content: remoteMessage.notification.body });
+        setNotiOpen({
+          isOpen: true, content: remoteMessage.notification.body,
+          onPress: () => {
+            if (navigationRef.isReady()) {
+              // todo 알람팝업 클릭시 화면 navigate
+              //@ts-ignore
+              navigationRef.navigate("FeedDetail", { id: remoteMessage.data.link.split("/")[1] });
+            }
+          }
+        });
       }
       if (navigationRef.isReady()) {
         // todo 알람팝업 클릭시 화면 navigate
@@ -210,6 +214,7 @@ const App = () => {
       {/* 위에서 내려오는 알림 팝업 */}
       {isVisible &&
         <NotificationPopup
+          onPress={notiOpen.onPress}
           setIsVisible={(view: boolean) => setIsVisible(view)}
           content={notiOpen.content}
           modalOpen={notiOpen.isOpen}

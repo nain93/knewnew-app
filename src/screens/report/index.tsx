@@ -78,7 +78,6 @@ const Report = ({ navigation, route }: ReportProps) => {
             maxLength={501}
             onChangeText={(e) => {
               if (e.length > 500) {
-                console.log(report.length, 'report.length');
                 setReport(e.slice(0, e.length - 1));
               }
               else {

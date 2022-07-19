@@ -1,10 +1,10 @@
-import { Dimensions, Image, Pressable, StyleSheet, Text, TouchableOpacity, View, Platform } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View, Platform } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import Header from '~/components/header';
 import theme from '~/styles/theme';
 import { d2p, h2p } from '~/utils';
-import { knewnewIcon, plusIcon } from '~/assets/icons';
+import { plusIcon } from '~/assets/icons';
 import { TextInput } from 'react-native-gesture-handler';
 import BasicButton from '~/components/button/basicButton';
 import { NavigationStackProp } from 'react-navigation-stack';
@@ -73,7 +73,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
 
   const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
   const [bonusBadge, setBonusBadge] = useState<BonusBadgeType[]>(bonusTagData);
-  const [token] = useRecoilValue(tokenState);
+  const token = useRecoilValue(tokenState);
   const myId = useRecoilValue(myIdState);
   const queryClient = useQueryClient();
   const [profile, setProfile] = useState(route.params?.profile.profileImage || "");
@@ -116,16 +116,9 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
           nickname: profileInfo.nickname,
           headline: profileInfo.headline,
           tags: {
-            foodStyle: userBadge.foodStyle.map(v => v.title),
-            household: userBadge.household.map(v => v.title),
-            occupation: userBadge.occupation.map(v => {
-              if (v.content) {
-                return v.content;
-              }
-              else {
-                return v.title;
-              }
-            })
+            foodStyle: [userBadge.foodStyle.filter(v => v.isClick)[0].title],
+            household: [userBadge.household.filter(v => v.isClick)[0].title],
+            occupation: [userBadge.occupation.filter(v => v.content || v.isClick)[0].title]
           }
         });
       }
@@ -305,7 +298,8 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
               userBadge={userBadge} setUserBadge={(badge: BadgeType) => setUserBadge(badge)} />
           </View>
         </View>
-        <View style={{ marginTop: h2p(40) }}>
+        {/* 보너스 입맛 기능 추가후 주석해제 */}
+        {/* <View style={{ marginTop: h2p(40) }}>
           <View style={{ marginHorizontal: d2p(20), marginBottom: h2p(10), flexDirection: "row", alignItems: "center" }}>
             <Image source={knewnewIcon} style={{ width: d2p(20), height: d2p(20), marginRight: d2p(5) }} />
             <Text style={[FONT.Bold, styles.inputTitle]}>보너스 입맛 태그</Text>
@@ -348,7 +342,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
               </View>
             </View>
           </View>
-        </View>
+        </View> */}
         <BasicButton viewStyle={{ alignSelf: "center", marginTop: h2p(40) }}
           onPress={() => {
             if (!profileInfo.profileImage && !profile) {
@@ -357,16 +351,9 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
                 nickname: profileInfo.nickname,
                 headline: profileInfo.headline,
                 tags: {
-                  foodStyle: userBadge.foodStyle.map(v => v.title),
-                  household: userBadge.household.map(v => v.title),
-                  occupation: userBadge.occupation.map(v => {
-                    if (v.content) {
-                      return v.content;
-                    }
-                    else {
-                      return v.title;
-                    }
-                  })
+                  foodStyle: [userBadge.foodStyle.filter(v => v.isClick)[0].title],
+                  household: [userBadge.household.filter(v => v.isClick)[0].title],
+                  occupation: [userBadge.occupation.filter(v => v.content || v.isClick)[0].title]
                 }
               });
             }

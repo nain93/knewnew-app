@@ -49,10 +49,11 @@ export const okPopupState = atom<okPopupStateProps>({
   }
 });
 
-export const notificationPopup = atom<popupStateProps>({
+export const notificationPopup = atom<popupStateProps & { onPress: () => void }>({
   key: "notificationState",
   default: {
     isOpen: false,
-    content: ""
+    content: "",
+    onPress: () => null
   }
 });

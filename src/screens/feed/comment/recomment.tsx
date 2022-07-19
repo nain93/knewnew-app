@@ -23,7 +23,7 @@ interface RecommentProps {
   setModifyingIdx: (mdIdx: number) => void;
   commentIsEdit: boolean
   modifyingIdx: number
-  reviewId: number
+  reviewId: number | undefined
 }
 
 const Recomment = ({ child, authorName,

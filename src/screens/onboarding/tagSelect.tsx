@@ -36,9 +36,6 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
   const signupMutation = useMutation("signup", (signupData: UserInfoType) => userSignup(signupData), {
     onSuccess: async (data) => {
       if (data) {
-        setToken(data.accessToken);
-        await AsyncStorage.setItem("token", data.accessToken);
-        await AsyncStorage.setItem("refreshToken", data.refreshToken);
         navigation.navigate("Welcome", {
           userBadge: {
             foodLife: userBadge.foodStyle.filter(v => v.isClick)[0].title,
@@ -46,6 +43,9 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
             household: userBadge.household.filter(v => v.isClick)[0].title
           }, userInfo
         });
+        setToken(data.accessToken);
+        await AsyncStorage.setItem("token", data.accessToken);
+        await AsyncStorage.setItem("refreshToken", data.refreshToken);
       }
     }
   });

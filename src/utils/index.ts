@@ -44,7 +44,6 @@ export function dateCommentFormat(date: string) {
 export async function hasAndroidPermission() {
   const permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
   const hasPermission = await PermissionsAndroid.check(permission);
-  console.log(hasPermission);
   if (hasPermission) {
     return true;
   }

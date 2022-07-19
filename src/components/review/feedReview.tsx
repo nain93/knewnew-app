@@ -309,8 +309,8 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           </Pressable>
           <TouchableOpacity
             onPress={() => {
-              setApiBlock(true);
               if (!apiBlock) {
+                setApiBlock(true);
                 if (isLike) {
                   setIsLike(false);
                   setLikeCount(prev => prev - 1);
