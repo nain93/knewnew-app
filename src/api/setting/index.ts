@@ -47,3 +47,13 @@ export const notificationList = async ({ token, offset }: { token: string, offse
   }
 };
 
+export const isNotification = async ({ token }: { token: string }) => {
+  const res = await axios.get(baseURL + "notification/device/", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+  if (res) {
+    return res.data;
+  }
+};

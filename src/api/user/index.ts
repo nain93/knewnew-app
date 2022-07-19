@@ -28,6 +28,8 @@ export const getUserProfile = async (token: string, id: number) => {
 interface EditPrfoileType {
   token: string,
   id: number,
+  isNotifiable?: boolean,
+  isMarketing?: boolean,
   profile: {
     nickname: string,
     profileImage: string | null,
