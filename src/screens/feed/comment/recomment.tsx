@@ -130,10 +130,9 @@ const Recomment = ({ child, authorName,
                 </View>
               </View>
               <View style={styles.commentContent}>
-                <Text style={[FONT.Regular, { fontSize: 15, color: theme.color.main }]}>@{authorName} </Text>
-                <Text style={[{
-                  color: theme.color.grayscale.C_443e49, fontSize: 15
-                }, FONT.Regular]}>{item.content}</Text>
+                <Text style={[FONT.Regular, { fontSize: 15, color: theme.color.main }]}>@{authorName}
+                  <Text style={{ color: theme.color.grayscale.C_443e49 }}> {item.content}</Text>
+                </Text>
               </View>
               <TouchableOpacity
                 style={{ marginLeft: d2p(49), marginTop: h2p(10) }}
@@ -209,9 +208,7 @@ const styles = StyleSheet.create({
   },
   commentContent: {
     marginLeft: d2p(49),
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginTop: h2p(5)
+    marginTop: h2p(5),
   },
   clickBox: {
     width: d2p(70),

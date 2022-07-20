@@ -84,7 +84,6 @@ const ReKnew = ({ review, filterBadge, type }: FeedReviewProps) => {
         }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text style={[styles.title, FONT.Medium]}>{review.author.nickname}</Text>
-            <Badge type="feed" text={review.author.representBadge} />
             <Text style={[styles.household, FONT.Regular]}>{review.author.household}</Text>
           </View>
           {type === "detail" &&
@@ -96,20 +95,25 @@ const ReKnew = ({ review, filterBadge, type }: FeedReviewProps) => {
 
       <View style={{ marginLeft: type === "detail" ? d2p(25) : d2p(75) }}>
         <ReviewIcon viewStyle={{ marginBottom: h2p(10), marginTop: type === "detail" ? h2p(35) : h2p(15) }} review={review.satisfaction} />
-        <Text style={[{ color: theme.color.black }, FONT.Regular]}>{review.content}</Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: h2p(10), flexWrap: "wrap" }}>
+        <Text style={[{ lineHeight: 21, color: theme.color.black }, FONT.Regular]}>{review.content}</Text>
+        <View style={{
+          flexDirection: 'row', alignItems: 'center',
+          width: Dimensions.get("window").width - d2p(90),
+          marginTop: h2p(10), flexWrap: "wrap"
+        }}>
           <Image source={tag} style={{ width: d2p(10), height: d2p(10), marginRight: d2p(5) }} />
-          <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
-            {React.Children.toArray(tags.map((v) => {
-              if (v === filterBadge) {
-                return;
-              }
-              return <Text>#{v} </Text>;
-            }))}
-            {filterBadge &&
-              <Text style={{ color: theme.color.main, fontSize: 12 }}>#{filterBadge}</Text>
+          {React.Children.toArray(tags.map((v) => {
+            if (v === filterBadge) {
+              return;
             }
-          </Text>
+            return <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>#{v} </Text>;
+          }))}
+          {
+            filterBadge ?
+              <Text style={[FONT.Regular, { color: theme.color.main, fontSize: 12 }]}>#{filterBadge}</Text>
+              :
+              null
+          }
         </View>
         {review.market &&
           <View style={styles.sign}>
@@ -206,7 +210,6 @@ const styles = StyleSheet.create({
   },
   household: {
     fontSize: 12,
-    marginLeft: d2p(5),
     color: theme.color.grayscale.a09ca4
   },
   sign: {
