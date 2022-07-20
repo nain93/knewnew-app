@@ -188,24 +188,34 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           style={[FONT.Regular, { marginBottom: h2p(10), marginLeft: d2p(50) }]}
         />
         :
-        <Text style={[{ color: theme.color.black, marginBottom: h2p(10), marginLeft: d2p(50) }, FONT.Regular]}>
+        <Text style={[{
+          color: theme.color.black,
+          lineHeight: 21,
+          marginBottom: h2p(10), marginLeft: d2p(50)
+        }, FONT.Regular]}>
           {review.content}
         </Text>
       }
       {!review.parent &&
-        <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: d2p(10), marginLeft: d2p(50) }}>
+        <View style={{
+          flexDirection: 'row', alignItems: 'center',
+          width: Dimensions.get("window").width - d2p(90),
+          flexWrap: "wrap",
+          paddingRight: d2p(10), marginLeft: d2p(50)
+        }}>
           <Image source={tag} style={{ width: d2p(10), height: d2p(10), marginRight: d2p(5) }} />
-          <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
-            {React.Children.toArray(tags.map((v) => {
-              if (v === filterBadge) {
-                return;
-              }
-              return <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_79737e }]}>#{v} </Text>;
-            }))}
-            {filterBadge &&
-              <Text style={[FONT.Regular, { color: theme.color.main, fontSize: 12 }]}>#{filterBadge}</Text>
+          {React.Children.toArray(tags.map((v) => {
+            if (v === filterBadge) {
+              return;
             }
-          </Text>
+            return <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_79737e }]}>#{v} </Text>;
+          }))}
+          {
+            filterBadge ?
+              <Text style={[FONT.Regular, { color: theme.color.main, fontSize: 12 }]}>#{filterBadge}</Text>
+              :
+              null
+          }
         </View>}
       {review.market &&
         <View style={styles.sign}>

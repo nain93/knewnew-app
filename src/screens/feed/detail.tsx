@@ -114,7 +114,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
         }
       }
     },
-    onSettled: () => SplashScreen.hide()
   });
 
   const likeReviewMutation = useMutation('likeReview',
@@ -403,7 +402,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
               paddingLeft: d2p(10)
             }}>
               <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap" }}>
-                <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: route.params?.authorId })}>
+                <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: reviewDetailQuery.data?.author.id })}>
                   <Text style={[styles.writer, FONT.Medium]}>{reviewDetailQuery.data?.author.nickname}</Text>
                 </TouchableOpacity>
                 {reviewDetailQuery.data?.author.representBadge &&
@@ -427,23 +426,30 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           <View style={{ paddingTop: h2p(20), paddingHorizontal: d2p(20) }}>
             {reviewDetailQuery.data &&
               <ReviewIcon review={reviewDetailQuery.data?.satisfaction} />}
-            <Text style={[styles.content, FONT.Regular]}>{reviewDetailQuery.data?.content}</Text>
+            <Text style={[styles.content, { lineHeight: 21 }, FONT.Regular]}>{reviewDetailQuery.data?.content}</Text>
           </View>
           {!reviewDetailQuery.data?.parent &&
             <>
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: d2p(20) }}>
+              <View style={{
+                flexDirection: 'row', alignItems: 'center',
+                width: Dimensions.get("window").width - d2p(90),
+                flexWrap: "wrap",
+                marginHorizontal: d2p(20)
+              }}>
                 <Image source={tag} style={{ width: d2p(10), height: d2p(10), marginRight: d2p(5) }} />
-                <Text style={[{ fontSize: 12, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
-                  {React.Children.toArray(tags.map((v) => {
-                    if (v === route.params?.badge) {
-                      return;
-                    }
-                    return <Text>#{v} </Text>;
-                  }))}
-                  {route.params?.badge &&
-                    <Text style={{ color: theme.color.main, fontSize: 12 }}>#{route.params?.badge}</Text>
+                {React.Children.toArray(tags.map((v) => {
+                  if (v === route.params?.badge) {
+                    return;
                   }
-                </Text>
+                  return <Text style={[FONT.Regular, { color: theme.color.grayscale.C_79737e, fontSize: 12 }]}>
+                    #{v} </Text>;
+                }))}
+                {
+                  route.params?.badge ?
+                    <Text style={[FONT.Regular, { color: theme.color.main, fontSize: 12 }]}>#{route.params?.badge}</Text>
+                    :
+                    null
+                }
               </View>
               <View style={styles.sign}>
                 <Text style={[styles.store, FONT.Regular]}>{reviewDetailQuery.data?.market}</Text>
@@ -586,7 +592,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                                 }
                               </View>
                             </View>
-                            {/* {console.log(item, 'item')} */}
                             <Text style={[styles.commentContent, FONT.Regular]}>{item.content}</Text>
                             {/* 대댓글 */}
                             <View style={{ flexDirection: "row", alignItems: "center", marginLeft: d2p(40), marginTop: h2p(10) }}>
