@@ -1,5 +1,5 @@
 import { Animated } from 'react-native';
-import React, { RefObject, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface FadeInOutProp {
   isPopupOpen: {
@@ -14,7 +14,7 @@ interface FadeInOutProp {
       }) => void
 }
 
-const FadeInOut = ({ isPopupOpen, setIsPopupOpen }: FadeInOutProp) => {
+const useFadeInOut = ({ isPopupOpen, setIsPopupOpen }: FadeInOutProp) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const fadeIn = () => {
@@ -51,4 +51,4 @@ const FadeInOut = ({ isPopupOpen, setIsPopupOpen }: FadeInOutProp) => {
   };
 };
 
-export default FadeInOut;
+export default useFadeInOut;

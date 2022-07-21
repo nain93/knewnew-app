@@ -1,4 +1,4 @@
-import { Dimensions, Image, StyleSheet, Text, View, Animated, Easing, Pressable } from 'react-native';
+import { Dimensions, Image, StyleSheet, Text, View, Animated, Easing, Pressable, Platform } from 'react-native';
 import React, { useEffect, useRef } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
       width: 0,
       height: 3
     },
-    elevation: 24,
+    elevation: Platform.OS === "android" ? 24 : 0,
     shadowRadius: 6,
     shadowOpacity: 1
   },

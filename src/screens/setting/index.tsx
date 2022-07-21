@@ -54,12 +54,16 @@ const Setting = ({ navigation }: SettingProps) => {
   // * 알람 디바이스 해제
   const unregisterDevice = async () => {
     messaging().unregisterDeviceForRemoteMessages();
+    AsyncStorage.removeItem("isNotification");
   };
 
   useEffect(() => {
-    if (getMyProfileQuery.data) {
-      setIsOn(getMyProfileQuery.data?.isNotifiable);
-    }
+    AsyncStorage.getItem("isNotification").then((notification) => {
+      if (notification) {
+        const isNotiOn = JSON.parse(notification);
+        setIsOn(isNotiOn);
+      }
+    });
   }, [getMyProfileQuery.data]);
 
 

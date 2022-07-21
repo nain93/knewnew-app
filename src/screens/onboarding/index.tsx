@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, Platform, Dimensions } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import {
   kakaoImg,
@@ -23,6 +23,7 @@ import { FONT } from '~/styles/fonts';
 import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import theme from '~/styles/theme';
 import { emailicon } from '~/assets/icons';
+import useNotification from '~/hooks/useNotification';
 
 const iosKeys = {
   kConsumerKey: Config.NAVER_KEY,
@@ -40,6 +41,7 @@ const aosKeys = {
 const Onboarding = ({ navigation }: NavigationType) => {
   const setToken = useSetRecoilState(tokenState);
   const [apiBlock, setApiBlock] = useState(false);
+  const usePermission = useNotification();
 
   const goToBadgeSelect = (userData: {
     email: string,
@@ -76,6 +78,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
       AsyncStorage.setItem("refreshToken", data.refreshToken);
       //@ts-ignore
       navigation.reset({ index: 0, routes: [{ name: "TabNav" }] });
+      usePermission.notificationPermission();
     }
     else {
       // * 새 유저
@@ -97,6 +100,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
             AsyncStorage.setItem("refreshToken", data.refreshToken);
             //@ts-ignore
             navigation.reset({ routes: [{ name: "TabNav" }] });
+            usePermission.notificationPermission();
           }
           else {
             goToBadgeSelect(data);
@@ -132,6 +136,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
         AsyncStorage.setItem("refreshToken", data.refreshToken);
         //@ts-ignore
         navigation.reset({ routes: [{ name: "TabNav" }] });
+        usePermission.notificationPermission();
       }
       else {
         goToBadgeSelect(data);
@@ -157,6 +162,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
           AsyncStorage.setItem("refreshToken", data.refreshToken);
           //@ts-ignore
           navigation.reset({ routes: [{ name: "TabNav" }] });
+          usePermission.notificationPermission();
         }
         else {
           goToBadgeSelect(data);
@@ -199,7 +205,8 @@ const Onboarding = ({ navigation }: NavigationType) => {
               <Image source={appleImg} style={styles.snsImg} />
             </TouchableOpacity>}
         </View>
-        <TouchableOpacity
+        {/* 이메일 가입 기능 추가후 주석해제 */}
+        {/* <TouchableOpacity
           onPress={() => navigation.navigate("emailLogin")}
           style={{
             marginTop: h2p(23),
@@ -216,7 +223,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
             textAlign: "center",
             color: theme.color.grayscale.a09ca4
           }]}>이메일로 시작하기</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       <View style={{
         width: Dimensions.get("window").width - d2p(40),

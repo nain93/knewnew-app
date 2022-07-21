@@ -24,7 +24,7 @@ import { FONT } from '~/styles/fonts';
 import { interestTagData } from '~/utils/data';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
-import FadeInOut from '~/hooks/fadeInOut';
+import FadeInOut from '~/hooks/useFadeInOut';
 import SplashScreen from 'react-native-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { loading } from '~/assets/gif';
@@ -309,7 +309,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
             borderBottomRightRadius: 30,
             paddingHorizontal: d2p(20),
             paddingBottom: h2p(20),
-            paddingTop: isIphoneX() ? getStatusBarHeight() + d2p(15) : d2p(15),
+            paddingTop: Platform.OS === "ios" ? getStatusBarHeight() + d2p(15) : d2p(15),
           }, draggableIcon: {
             display: "none"
           }
@@ -320,7 +320,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "center",
-            marginBottom: h2p(20)
+            marginBottom: h2p(20),
           }}>
           <Text style={[{ color: theme.color.grayscale.C_79737e }, FONT.Medium]}>
             보고싶은 태그를 하나만 선택해주세요
@@ -371,7 +371,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
           style={{
             paddingHorizontal: d2p(15),
             paddingVertical: h2p(5),
-            maxWidth: d2p(140),
+            maxWidth: d2p(150),
             borderRadius: 20,
             backgroundColor: theme.color.white,
             borderWidth: 1,
