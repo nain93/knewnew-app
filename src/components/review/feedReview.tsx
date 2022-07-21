@@ -3,7 +3,6 @@ import Text from '~/components/style/CustomText';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import theme from '~/styles/theme';
 import { d2p, h2p, simpleDate } from '~/utils';
-import Badge from '../badge';
 import ReviewIcon from '../icon/reviewIcon';
 import { cart, colorCart, colorLike, comment, like, more, reKnew, tag } from '~/assets/icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -91,14 +90,17 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
     }, []));
 
   useEffect(() => {
-    const copy: { [index: string]: Array<string> }
-      = { ...review.tags };
-    setTags(
-      Object.keys(copy).reduce<Array<string>>((acc, cur) => {
-        acc = acc.concat(copy[cur]);
-        return acc;
-      }, [])
-    );
+    if (review.tags.interest) {
+      setTags(review.tags.interest);
+    }
+    // const copy: { [index: string]: Array<string> }
+    //   = { ...review.tags };
+    // setTags(
+    //   Object.keys(copy).reduce<Array<string>>((acc, cur) => {
+    //     acc = acc.concat(copy[cur]);
+    //     return acc;
+    //   }, [])
+    // );
   }, [review]);
 
   useEffect(() => {
@@ -151,7 +153,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           </View>
           <View style={{ marginTop: h2p(5), flexDirection: "row", justifyContent: "space-between" }}>
             <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
-              {review.author.tags.foodStyle} {review.author.tags.household} {review.author.tags.occupation}
+              {review.author.tags?.foodStyle} {review.author.tags?.household} {review.author.tags?.occupation}
             </Text>
             {type === "normal" &&
               <Text style={[FONT.Regular, { fontSize: 10, color: theme.color.grayscale.a09ca4 }]}>
@@ -371,7 +373,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
         </View>
       }
       {review.parent &&
-        <ReKnew review={{ ...review.parent, tags: review.tags }} filterBadge={filterBadge ? filterBadge : ""} />
+        <ReKnew review={{ ...review.parent }} filterBadge={filterBadge ? filterBadge : ""} />
       }
       {
         type === "normal" &&

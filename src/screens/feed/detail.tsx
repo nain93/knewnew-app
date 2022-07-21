@@ -292,15 +292,18 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   }, [commentIsEdit]);
 
   useEffect(() => {
-    const copy: { [index: string]: Array<string> }
-      = { ...reviewDetailQuery.data?.tags };
-    setTags(
-      Object.keys(copy).reduce<Array<string>>((acc, cur) => {
-        acc = acc.concat(copy[cur]);
-        return acc;
-      }, [])
-    );
-  }, [reviewDetailQuery.data?.tags]);
+    // const copy: { [index: string]: Array<string> }
+    //   = { ...reviewDetailQuery.data?.tags };
+    // setTags(
+    //   Object.keys(copy).reduce<Array<string>>((acc, cur) => {
+    //     acc = acc.concat(copy[cur]);
+    //     return acc;
+    //   }, [])
+    // );
+    if (reviewDetailQuery.data?.tags.interest) {
+      setTags(reviewDetailQuery?.data.tags.interest);
+    }
+  }, [reviewDetailQuery.data]);
 
   // * 댓글위치로 스크롤
   useEffect(() => {
@@ -498,8 +501,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                 <ReKnew
                   type="detail"
                   review={{
-                    ...reviewDetailQuery.data.parent,
-                    tags: reviewDetailQuery.data.tags
+                    ...reviewDetailQuery.data.parent
                   }}
                 />
               </View>
