@@ -8,6 +8,7 @@ import { useRecoilValue } from 'recoil';
 import { myIdState, tokenState } from '~/recoil/atoms';
 import { postProfileType } from '~/types/user';
 import { editUserProfile } from '~/api/user';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface ToggleButtonProps {
   isOn: boolean
@@ -46,6 +47,7 @@ const ToggleButton = ({ isOn, setIsOn }: ToggleButtonProps) => {
   // * 알람 디바이스 등록 
   const registerDevice = async () => {
     messaging().registerDeviceForRemoteMessages();
+    AsyncStorage.setItem("isNotification", JSON.stringify(true));
     const profileData: (postProfileType | undefined) = await queryClient.getQueryData("myProfile");
     if (profileData) {
       editProfileMutation.mutate({
@@ -58,6 +60,7 @@ const ToggleButton = ({ isOn, setIsOn }: ToggleButtonProps) => {
   // * 알람 디바이스 해제
   const unregisterDevice = async () => {
     messaging().unregisterDeviceForRemoteMessages();
+    AsyncStorage.setItem("isNotification", JSON.stringify(false));
     const profileData: (postProfileType | undefined) = await queryClient.getQueryData("myProfile");
     if (profileData) {
       editProfileMutation.mutate({
@@ -78,7 +81,7 @@ const ToggleButton = ({ isOn, setIsOn }: ToggleButtonProps) => {
 
   return (
     <Pressable
-      onPress={() => {
+      onPress={async () => {
         if (isOn) {
           unregisterDevice();
         }

@@ -134,7 +134,8 @@ const Write = ({ navigation, route }: WriteProp) => {
     },
     onSettled: () => setBlockSubmit(false)
   });
-
+  console.log(route.params?.type, 'route.params?.type');
+  console.log(route.params?.review?.tags, 'route.params.review');
   const editReviewMutation = useMutation(["editReview", token],
     ({ writeProps, id }: { writeProps: WriteReviewType, id: number }) =>
       editReview({ token, id, ...writeProps }), {
@@ -261,14 +262,17 @@ const Write = ({ navigation, route }: WriteProp) => {
     if (route.params?.review && route.params.type !== "reKnewWrite") {
       setImages(route.params.review.images);
       setImageList(route.params.review.images.map(v => v.image));
-      setInterestTag({
-        interest: interestTag.interest.map(v => {
-          if (route.params?.review?.tags.interest.includes(v.title)) {
-            return { isClick: true, title: v.title };
-          }
-          return { isClick: false, title: v.title };
-        })
-      });
+
+      if (Object.keys(route.params?.review?.tags).length !== 0) {
+        setInterestTag({
+          interest: interestTag.interest.map(v => {
+            if (route.params?.review?.tags.interest.includes(v.title)) {
+              return { isClick: true, title: v.title };
+            }
+            return { isClick: false, title: v.title };
+          })
+        });
+      }
       setWriteData({
         ...writeData,
         images: route.params.review.images.map(v => ({ ...v, image: "review" + v.image?.split("review")[1] })),

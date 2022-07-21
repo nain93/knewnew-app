@@ -267,9 +267,11 @@ PODS:
   - nanopb/encode (2.30908.0)
   - naveridlogin-sdk-ios (4.1.3)
   - OpenSSL-Universal (1.1.1100)
-  - Permission-PhotoLibrary (3.3.1):
+  - Permission-Notifications (3.6.0):
     - RNPermissions
-  - Permission-PhotoLibraryAddOnly (3.3.1):
+  - Permission-PhotoLibrary (3.6.0):
+    - RNPermissions
+  - Permission-PhotoLibraryAddOnly (3.6.0):
     - RNPermissions
   - PromisesObjC (2.1.1)
   - RCT-Folly (2021.06.28.00-v2):
@@ -601,7 +603,7 @@ PODS:
   - RNNaverLogin (2.3.0):
     - naveridlogin-sdk-ios (~> 4.1)
     - React
-  - RNPermissions (3.3.1):
+  - RNPermissions (3.6.0):
     - React-Core
   - RNReanimated (2.9.1):
     - DoubleConversion
@@ -691,6 +693,7 @@ DEPENDENCIES:
   - GoogleSignIn (~> 6.1.0)
   - "kakao-login (from `../node_modules/@react-native-seoul/kakao-login`)"
   - OpenSSL-Universal (= 1.1.1100)
+  - Permission-Notifications (from `../node_modules/react-native-permissions/ios/Notifications`)
   - Permission-PhotoLibrary (from `../node_modules/react-native-permissions/ios/PhotoLibrary`)
   - Permission-PhotoLibraryAddOnly (from `../node_modules/react-native-permissions/ios/PhotoLibraryAddOnly`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
@@ -822,6 +825,8 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
   kakao-login:
     :path: "../node_modules/@react-native-seoul/kakao-login"
+  Permission-Notifications:
+    :path: "../node_modules/react-native-permissions/ios/Notifications"
   Permission-PhotoLibrary:
     :path: "../node_modules/react-native-permissions/ios/PhotoLibrary"
   Permission-PhotoLibraryAddOnly:
@@ -978,8 +983,9 @@ SPEC CHECKSUMS:
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
   naveridlogin-sdk-ios: b9d7c20677981177ed994ecb1c8c2b49f223277d
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
-  Permission-PhotoLibrary: ddb5a158725b29cb12e9e477e8a5f5151c66cc3c
-  Permission-PhotoLibraryAddOnly: 104e42dbe894b0fccb370be26dd1b4a3c23578eb
+  Permission-Notifications: 7f2a467ab97a130a847519705340830d52cfc5f0
+  Permission-PhotoLibrary: fda0fda455bebaa2602f3dfdf8296b28247c1484
+  Permission-PhotoLibraryAddOnly: e5ae346a7ad3effb3f4da07220cf487ff6a2bcba
   PromisesObjC: ab77feca74fa2823e7af4249b8326368e61014cb
   RCT-Folly: 4d8508a426467c48885f1151029bc15fa5d7b3b8
   RCTRequired: 00581111c53531e39e3c6346ef0d2c0cf52a5a37
@@ -1023,7 +1029,7 @@ SPEC CHECKSUMS:
   RNGoogleSignin: d7f8368b82d94f1dec964785d496387ca7f19092
   RNImageCropPicker: 44e2807bc410741f35d4c45b6586aedfe3da39d2
   RNNaverLogin: d4a1a99535542ef0e5da6082264033dd8dcee611
-  RNPermissions: 34d678157c800b25b22a488e4d8babb57456e796
+  RNPermissions: de7b7c3fe1680d974ac7a85e3e97aa539c0e68ea
   RNReanimated: 5c8c17e26787fd8984cd5accdc70fef2ca70aafd
   RNScreens: 4830eb40e0793b38849965cd27f4f3a7d7bc65c1
   RNSentry: d27112c8fcb77c52a42c3fffb796193c333ee562
@@ -1039,6 +1045,6 @@ SPEC CHECKSUMS:
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
   ZIPFoundation: b1f0de4eed33e74a676f76e12559ab6b75990197
 
-PODFILE CHECKSUM: de0c254738cb01d4df2613acc7cdda2f84f3e45c
+PODFILE CHECKSUM: 328528e61e94cf0c97c1f6665e74e08a65ee65bb
 
 COCOAPODS: 1.11.3

@@ -74,9 +74,5 @@ export interface postProfileType {
   profileImage: string | null,
   isNotifiable?: boolean,
   isMarketing?: boolean,
-  tags: {
-    foodStyle: Array<string>,
-    household: Array<string>,
-    occupation: Array<string>
-  }
+  tags: UserInfoTagType
 }

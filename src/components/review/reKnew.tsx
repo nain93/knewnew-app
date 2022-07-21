@@ -2,7 +2,6 @@ import { View, Text, StyleSheet, Dimensions, Image, TouchableOpacity } from 'rea
 import React, { useEffect, useState } from 'react';
 import theme from '~/styles/theme';
 import { d2p, h2p, simpleDate } from '~/utils';
-import Badge from '../badge';
 import ReviewIcon from '../icon/reviewIcon';
 import { more, retweetfrom, tag } from '~/assets/icons';
 import { FONT } from '~/styles/fonts';
@@ -22,14 +21,17 @@ const ReKnew = ({ review, filterBadge, type }: FeedReviewProps) => {
   const [tags, setTags] = useState<Array<string>>([]);
 
   useEffect(() => {
-    const copy: { [index: string]: Array<string> }
-      = { ...review.tags };
-    setTags(
-      Object.keys(copy).reduce<Array<string>>((acc, cur) => {
-        acc = acc.concat(copy[cur]);
-        return acc;
-      }, [])
-    );
+    // const copy: { [index: string]: Array<string> }
+    //   = { ...review.tags };
+    // setTags(
+    //   Object.keys(copy).reduce<Array<string>>((acc, cur) => {
+    //     acc = acc.concat(copy[cur]);
+    //     return acc;
+    //   }, [])
+    // );
+    if (review.tags.interest) {
+      setTags(review.tags.interest);
+    }
   }, []);
 
   if (!review.isActive) {
@@ -84,7 +86,6 @@ const ReKnew = ({ review, filterBadge, type }: FeedReviewProps) => {
         }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text style={[styles.title, FONT.Medium]}>{review.author.nickname}</Text>
-            <Text style={[styles.household, FONT.Regular]}>{review.author.household}</Text>
           </View>
           {type === "detail" &&
             <Text style={[FONT.Regular, { position: "absolute", top: h2p(25), left: d2p(10), fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
@@ -102,6 +103,7 @@ const ReKnew = ({ review, filterBadge, type }: FeedReviewProps) => {
           marginTop: h2p(10), flexWrap: "wrap"
         }}>
           <Image source={tag} style={{ width: d2p(10), height: d2p(10), marginRight: d2p(5) }} />
+
           {React.Children.toArray(tags.map((v) => {
             if (v === filterBadge) {
               return;

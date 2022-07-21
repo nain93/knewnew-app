@@ -45,7 +45,7 @@
    if ([FIRApp defaultApp] == nil) {
     [FIRApp configure];
   }
-  [[NaverThirdPartyLoginConnection getSharedInstance] setIsNaverAppOauthEnable:YES];
+  [[NaverThirdPartyLoginConnection getSharedInstance] setIsNaverAppOauthEnable:NO];
   RCTAppSetupPrepareApp(application);
 
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
