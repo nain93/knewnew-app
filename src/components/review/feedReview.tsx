@@ -119,16 +119,18 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
 
   return (
     <>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: h2p(20) }}>
+      <View style={{
+        flexDirection: 'row', justifyContent: 'space-between',
+        alignItems: "center"
+      }}>
         <TouchableOpacity
           onPress={() => navigation.navigate("Mypage", { id: review.author.id })}
           style={{
-            position: "absolute",
-            left: 0,
             borderRadius: 40,
-            borderColor: theme.color.grayscale.e9e7ec,
-            borderWidth: 1,
-            overflow: "hidden"
+            height: d2p(40),
+            width: d2p(40),
+            overflow: "hidden",
+            borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
           }}>
           <Image source={review.author.profileImage ? { uri: review.author.profileImage } : noProfile}
             style={{
@@ -136,49 +138,59 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
               borderRadius: 40
             }} />
         </TouchableOpacity>
+
         <View style={{
-          flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap',
-          marginLeft: d2p(50),
-          width: Dimensions.get('window').width - d2p(120)
+          width: Dimensions.get('window').width - d2p(80),
+          paddingLeft: d2p(10)
         }}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("Mypage", { id: review.author.id })}>
-            <Text style={[styles.title, FONT.Medium]}>{review.author.nickname}</Text>
-          </TouchableOpacity>
-          {/* 뱃지 기능 추가후 작업  */}
-          {/* <Badge type="feed" text={review.author.representBadge} /> */}
-          {/* <Text style={[{ fontSize: 12, color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>{review.author.household}</Text> */}
+          <View style={{ alignItems: "center", flexWrap: "wrap" }}>
+            <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: review.author.id })}>
+              <Text style={[styles.title, FONT.Medium]}>{review.author.nickname}</Text>
+            </TouchableOpacity>
+            {/* todo 뱃지 추가 */}
+          </View>
+          <View style={{ marginTop: h2p(5), flexDirection: "row", justifyContent: "space-between" }}>
+            <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
+              {review.author.tags.foodStyle} {review.author.tags.household} {review.author.tags.occupation}
+            </Text>
+            {type === "normal" &&
+              <Text style={[FONT.Regular, { fontSize: 10, color: theme.color.grayscale.a09ca4 }]}>
+                {simpleDate(review.created, ' 전')}
+              </Text>
+            }
+          </View>
           {review.isEdit &&
             <Text style={[FONT.Regular,
-            { fontSize: 12, color: theme.color.grayscale.d3d0d5, marginLeft: d2p(5) }]}>
+            { fontSize: 12, color: theme.color.grayscale.d3d0d5, marginTop: h2p(5) }]}>
               수정됨</Text>
           }
         </View>
-        {type === "normal" &&
-          <TouchableOpacity onPress={() => {
-            if (setSelectedIndex)
-              if (selectedIndex === idx) {
-                setSelectedIndex(-1);
-              }
-              else {
-                setSelectedIndex(idx);
-              }
-          }}>
+
+        {
+          type === "normal" &&
+          <TouchableOpacity
+            style={{ position: "absolute", right: 0, top: 0 }}
+            onPress={() => {
+              if (setSelectedIndex)
+                if (selectedIndex === idx) {
+                  setSelectedIndex(-1);
+                }
+                else {
+                  setSelectedIndex(idx);
+                }
+            }}>
             <Image
               source={more}
               resizeMode="contain"
               style={{ width: d2p(26), height: d2p(16) }}
             />
-          </TouchableOpacity>}
+          </TouchableOpacity>
+        }
       </View>
-      <Text style={[FONT.Regular, { fontSize: 12, marginTop: h2p(5), color: theme.color.grayscale.a09ca4, marginLeft: d2p(50) }]}>
-        {getMyProfileQuery.data?.tags.foodStyle} {getMyProfileQuery.data?.tags.household} {getMyProfileQuery.data?.tags.occupation}
-      </Text>
+
+
       <View style={styles.titleContainer}>
         <ReviewIcon viewStyle={{ marginTop: h2p(15), marginBottom: h2p(10) }} review={review.satisfaction} />
-        {type === "normal" &&
-          <Text style={[FONT.Regular, { fontSize: 10, color: theme.color.grayscale.a09ca4 }]}>{simpleDate(review.created, ' 전')}</Text>
-        }
       </View>
       {keyword ?
         <Highlighter
@@ -305,7 +317,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
                 { loading: false, isEdit: false, type: "reKnewWrite", review, nickname: getMyProfileQuery.data?.nickname, filterBadge })}
               style={styles.reviewIcon}>
               <Image source={reKnew} style={styles.reviewImg} />
-              <Text style={styles.reviewCount}>{review.childCount}</Text>
+              <Text style={[FONT.Regular, styles.reviewCount]}>{review.childCount}</Text>
             </TouchableOpacity>
           }
           <Pressable
@@ -316,7 +328,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             })}
             style={styles.reviewIcon}>
             <Image source={comment} style={styles.reviewImg} />
-            <Text style={styles.reviewCount}>{review.commentCount}</Text>
+            <Text style={[FONT.Regular, styles.reviewCount]}>{review.commentCount}</Text>
           </Pressable>
           <TouchableOpacity
             onPress={() => {
@@ -335,7 +347,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             }}
             style={styles.reviewIcon}>
             <Image source={isLike ? colorLike : like} style={styles.reviewImg} />
-            <Text style={styles.reviewCount}>{likeCount}</Text>
+            <Text style={[FONT.Regular, styles.reviewCount]}>{likeCount}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -354,7 +366,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             }}
             style={styles.reviewIcon}>
             <Image source={isBookmarkState ? colorCart : cart} style={styles.reviewImg} />
-            <Text style={styles.reviewCount}>{bookmarkCount}</Text>
+            <Text style={[FONT.Regular, styles.reviewCount]}>{bookmarkCount}</Text>
           </TouchableOpacity>
         </View>
       }

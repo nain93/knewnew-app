@@ -379,7 +379,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             />
           }
           <View style={{
-            paddingHorizontal: d2p(20), flexDirection: 'row', justifyContent: 'space-between'
+            paddingHorizontal: d2p(20), flexDirection: 'row', justifyContent: 'space-between',
+            alignItems: "center"
           }}>
             <TouchableOpacity
               onPress={() => navigation.navigate("Mypage", { id: reviewDetailQuery.data?.author.id })}
@@ -387,41 +388,46 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                 borderRadius: 40,
                 height: d2p(40),
                 width: d2p(40),
-                overflow: "hidden"
+                overflow: "hidden",
+                borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
               }}>
               <Image source={reviewDetailQuery.data?.author.profileImage ?
                 { uri: reviewDetailQuery.data?.author.profileImage } : noProfile}
                 style={{
-                  width: d2p(40), height: d2p(40), borderRadius: 40,
-                  borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec
+                  width: d2p(40), height: d2p(40), borderRadius: 40
                 }}
               />
             </TouchableOpacity>
+
             <View style={{
               width: Dimensions.get('window').width - d2p(105),
               paddingLeft: d2p(10)
             }}>
-              <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap" }}>
+              <View style={{ alignItems: "center", flexWrap: "wrap" }}>
                 <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: reviewDetailQuery.data?.author.id })}>
                   <Text style={[styles.writer, FONT.Medium]}>{reviewDetailQuery.data?.author.nickname}</Text>
                 </TouchableOpacity>
-                {reviewDetailQuery.data?.author.representBadge &&
-                  <Badge type="feed" text={reviewDetailQuery.data?.author.representBadge} />}
-                <Text style={{ fontSize: 12, marginLeft: d2p(5), color: theme.color.grayscale.a09ca4 }}>{reviewDetailQuery.data?.author.household}</Text>
               </View>
-              <View style={{ marginTop: h2p(5) }}>
-                <Text style={[{ fontSize: 12, color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>
-                  {(reviewDetailQuery.data) && simpleDate(reviewDetailQuery.data?.created, ' 전')}</Text>
-              </View>
+              <Text style={[FONT.Regular, { marginTop: h2p(5), fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
+                {reviewDetailQuery.data?.author.tags.foodStyle} {reviewDetailQuery.data?.author.tags.household} {reviewDetailQuery.data?.author.tags.occupation}
+              </Text>
             </View>
 
-            <TouchableOpacity onPress={() => setIsMoreClick(!isMoreClick)}>
-              <Image
-                source={more}
-                resizeMode="contain"
-                style={{ width: d2p(26), height: d2p(16) }}
-              />
-            </TouchableOpacity>
+            <View style={{ alignItems: "center" }}>
+              <TouchableOpacity onPress={() => setIsMoreClick(!isMoreClick)}>
+                <Image
+                  source={more}
+                  resizeMode="contain"
+                  style={{ width: d2p(26), height: d2p(16) }}
+                />
+              </TouchableOpacity>
+              <Text style={[{
+                marginTop: h2p(10),
+                fontSize: 10, color: theme.color.grayscale.a09ca4
+              }, FONT.Regular]}>
+                {(reviewDetailQuery.data) && simpleDate(reviewDetailQuery.data?.created, ' 전')}</Text>
+            </View>
+
           </View>
           <View style={{ paddingTop: h2p(20), paddingHorizontal: d2p(20) }}>
             {reviewDetailQuery.data &&
@@ -522,7 +528,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             <ReactionIcon name="like" count={reviewDetailQuery.data?.likeCount} state={like}
               isState={(isState: boolean) => setLike(isState)} mutation={likeReviewMutation} id={route.params?.id} />
           </View>
-          <Text style={[styles.commentMeta, FONT.Bold]}>작성된 댓글 {commentListQuery.data?.length}개</Text>
+          <Text style={[styles.commentMeta, FONT.Bold]}>작성된 댓글 {reviewDetailQuery.data?.commentCount}개</Text>
           {commentListQuery.isLoading ?
             <Loading viewStyle={{ top: h2p(0), position: "relative" }} />
             :

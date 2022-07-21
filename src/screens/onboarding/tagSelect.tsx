@@ -18,6 +18,7 @@ import { useMutation } from 'react-query';
 import { userSignup } from '~/api/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import UserTagLayout from '~/components/layout/UserTagLayout';
+import useNotification from '~/hooks/useNotification';
 
 interface BadgeSelectProps {
   navigation: NavigationStackProp
@@ -29,6 +30,7 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
   const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
   const scrollRef = useRef<KeyboardAwareScrollView>(null);
   const [buttonEnabled, setButtonEnabled] = useState(false);
+  const usePermission = useNotification();
 
   const setToken = useSetRecoilState(tokenState);
   const setIspopupOpen = useSetRecoilState(popupState);
@@ -46,6 +48,7 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
         setToken(data.accessToken);
         await AsyncStorage.setItem("token", data.accessToken);
         await AsyncStorage.setItem("refreshToken", data.refreshToken);
+        usePermission.notificationPermission();
       }
     }
   });
