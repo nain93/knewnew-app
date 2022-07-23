@@ -16,7 +16,6 @@ const useNotification = () => {
     // * 아이폰 알림 권한 핸들링
     if (Platform.OS === "ios") {
       messaging().requestPermission().then(isPermission => {
-        console.log(isPermission, 'isPermission');
         if (isPermission === 1) {
           messaging().getToken().then(FCMToken => {
             AsyncStorage.setItem("isNotification", JSON.stringify(true));

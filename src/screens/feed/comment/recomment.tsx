@@ -67,7 +67,6 @@ const Recomment = ({ child, authorName,
       setReModifyingIdx(-1);
     }
   }, [setModifyingIdx]);
-  // console.log(child, 'child');
   return (
     <>
       {

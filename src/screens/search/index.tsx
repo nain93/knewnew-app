@@ -37,7 +37,7 @@ const Search = ({ navigation }: SearchProps) => {
   const token = useRecoilValue(tokenState);
 
   const searchListQuery = useInfiniteQuery<ReviewListType[], Error>(["searchList", token, textForRefresh], async ({ pageParam = 0 }) => {
-    const queryData: { result: ReviewListType[], totalLength: number } = await getSearchList({ token, keyword, offset: pageParam });
+    const queryData: { result: ReviewListType[], totalLength: number } = await getSearchList({ token, keyword, offset: pageParam, limit: 5 });
     setReviewCount(queryData.totalLength);
     return queryData.result;
   }, {
@@ -146,7 +146,7 @@ const Search = ({ navigation }: SearchProps) => {
         <SearchTabView
           reviewNext={() => {
             if (searchListQuery.data &&
-              searchListQuery.data.pages.flat().length > 19) {
+              searchListQuery.data.pages.flat().length > 4) {
               searchListQuery.fetchNextPage();
             }
           }}

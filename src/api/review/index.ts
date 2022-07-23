@@ -2,10 +2,18 @@ import axios from "axios";
 import { baseURL } from "~/api";
 import { WriteReviewType } from "~/types/review";
 
-export const getReviewList = async ({ token, tag, offset }: { token: string, tag?: string, offset: number }) => {
+interface GetReviewListType {
+  token: string,
+  tag?: string,
+  offset: number,
+  limit?: number
+}
+
+export const getReviewList = async ({ token, tag, offset, limit }: GetReviewListType) => {
   const res = await axios.get(baseURL + "review/", {
     params: {
       offset,
+      limit,
       tag
     },
     headers: {

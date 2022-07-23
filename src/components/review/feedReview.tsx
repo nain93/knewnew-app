@@ -134,7 +134,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             overflow: "hidden",
             borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
           }}>
-          <Image source={review.author.profileImage ? { uri: review.author.profileImage } : noProfile}
+          <FastImage source={review.author.profileImage ? { uri: review.author.profileImage } : noProfile}
             style={{
               width: d2p(40), height: d2p(40),
               borderRadius: 40
