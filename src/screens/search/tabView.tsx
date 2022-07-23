@@ -101,7 +101,7 @@ const SearchTabView = ({ reviewCount, userCount, searchList, userList, keyword, 
                 <Text style={[styles.searchResult, { marginBottom: h2p(30) }, FONT.Regular]}>검색결과 · {userCount}건</Text>
                 <FlatList
                   onEndReached={userNext}
-                  onEndReachedThreshold={0.8}
+                  onEndReachedThreshold={0.5}
                   style={{ marginBottom: h2p(80) }}
                   contentContainerStyle={{ paddingBottom: d2p(40), paddingHorizontal: d2p(20) }}
                   keyExtractor={(review) => String(review.id)}

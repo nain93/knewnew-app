@@ -146,6 +146,11 @@ const Feed = ({ navigation, route }: FeedProps) => {
       reviewListQuery.data.pages.flat().length > 4) {
       reviewListQuery.fetchNextPage();
     }
+  }, [reviewListQuery]);
+
+  const reviewOnScroll = useCallback((event) => {
+    const currentScrollOffset = event.nativeEvent.contentOffset.y;
+    setScrollOffset(currentScrollOffset);
   }, []);
 
   const reviewRenderItem = useCallback(({ item, index }) =>
@@ -282,10 +287,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
           ListFooterComponent={reviewListQuery.isFetchingNextPage ? footerLoading : reviewFooter}
           style={{ marginTop: 0, marginBottom: h2p(80), backgroundColor: theme.color.grayscale.f7f7fc }}
           keyExtractor={reviewKey}
-          onScroll={(event) => {
-            const currentScrollOffset = event.nativeEvent.contentOffset.y;
-            setScrollOffset(currentScrollOffset);
-          }}
+          onScroll={reviewOnScroll}
         />
       </View>
       <RBSheet

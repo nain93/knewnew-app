@@ -133,6 +133,18 @@ const Recomment = ({ child, authorName,
                   <Text style={{ color: theme.color.grayscale.C_443e49 }}> {item.content}</Text>
                 </Text>
               </View>
+
+              {/* 댓글에 답글달기 백엔드 작업후 주석해제 */}
+              {/* <View style={{ flexDirection: "row", alignItems: "center", marginLeft: d2p(49), marginTop: h2p(10) }}>
+                <TouchableOpacity onPress={() => {
+                  setCommentParentId(item.id);
+                  setRecommentName(item.author.nickname);
+                  setRecommentMode(true);
+                }}>
+                <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_79737e }]}>답글달기</Text>
+              </TouchableOpacity>
+              </View> */}
+
               <TouchableOpacity
                 style={{ marginLeft: d2p(49), marginTop: h2p(10) }}
                 onPress={() => {
@@ -141,7 +153,7 @@ const Recomment = ({ child, authorName,
                     commentLikeMutation.mutate({ commentId: item.id, isLike: !item.isLike });
                   }
                 }}>
-                <Text style={[FONT.Bold, {
+                <Text style={[(item.isLike ? FONT.Bold : FONT.Regular), {
                   fontSize: 12, color: item.isLike ? theme.color.grayscale.C_443e49 : theme.color.grayscale.C_79737e,
                 }]}>좋아요 {item.likeCount > 0 && item.likeCount}</Text>
               </TouchableOpacity>
