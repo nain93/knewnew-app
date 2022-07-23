@@ -134,8 +134,7 @@ const Write = ({ navigation, route }: WriteProp) => {
     },
     onSettled: () => setBlockSubmit(false)
   });
-  console.log(route.params?.type, 'route.params?.type');
-  console.log(route.params?.review?.tags, 'route.params.review');
+
   const editReviewMutation = useMutation(["editReview", token],
     ({ writeProps, id }: { writeProps: WriteReviewType, id: number }) =>
       editReview({ token, id, ...writeProps }), {

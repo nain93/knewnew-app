@@ -1,10 +1,18 @@
 import axios from "axios";
 import { baseURL } from "~/api";
 
-export const getSearchList = async ({ token, keyword, offset }: { token: string, keyword: string, offset: number }) => {
+interface GetSearchListType {
+  token: string,
+  keyword: string,
+  offset: number,
+  limit: number
+}
+
+export const getSearchList = async ({ token, keyword, offset, limit }: GetSearchListType) => {
   const res = await axios.get(baseURL + "search/review/", {
     params: {
       offset,
+      limit,
       keyword
     },
     headers: {

@@ -1,5 +1,5 @@
 import { Dimensions, FlatList, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { TabBar, TabView } from 'react-native-tab-view';
 //@ts-ignore
 import Highlighter from 'react-native-highlight-words';
@@ -35,6 +35,33 @@ const SearchTabView = ({ reviewCount, userCount, searchList, userList, keyword, 
   ]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
+  const menuKey = useCallback((review) => String(review.id), []);
+  const menuRenderItem = useCallback((review) => {
+    return (
+      <Pressable onPress={() => navigation.navigate("FeedDetail",
+        { id: review.item.id, isLike: review.item.isLike })}
+        style={{
+          marginHorizontal: d2p(20), marginTop: h2p(25),
+          paddingBottom: h2p(14.5),
+          borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc
+        }}
+      >
+        <FeedReview
+          keyword={keyword}
+          clickBoxStyle={{ right: d2p(26), top: h2p(-10) }}
+          idx={review.index}
+          selectedIndex={selectedIndex}
+          setSelectedIndex={(selectIdx: number) => setSelectedIndex(selectIdx)}
+          review={review.item} />
+      </Pressable>
+    );
+  }, [keyword, selectedIndex]);
+
+  const menuEmpty = useCallback(() =>
+    <Text style={[{ textAlign: "center", marginTop: h2p(115), color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
+      검색결과가 없습니다.
+    </Text>, []);
+
   if (!searchList) {
     return <Loading />;
   }
@@ -54,34 +81,16 @@ const SearchTabView = ({ reviewCount, userCount, searchList, userList, keyword, 
                 <Text style={[styles.searchResult, FONT.Regular]}>검색결과 · {reviewCount}건</Text>
                 <FlatList
                   onEndReached={reviewNext}
-                  onEndReachedThreshold={0.8}
+                  onEndReachedThreshold={0.5}
+                  maxToRenderPerBatch={5}
+                  windowSize={5}
+                  removeClippedSubviews={true}
                   style={{ marginBottom: h2p(80) }}
                   contentContainerStyle={{ paddingBottom: d2p(40) }}
-                  keyExtractor={(review) => String(review.id)}
+                  keyExtractor={menuKey}
                   data={searchList}
-                  ListEmptyComponent={() =>
-                    <Text style={[{ textAlign: "center", marginTop: h2p(115), color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
-                      검색결과가 없습니다.</Text>}
-                  renderItem={(review) => {
-                    return (
-                      <Pressable onPress={() => navigation.navigate("FeedDetail",
-                        { id: review.item.id, isLike: review.item.isLike })}
-                        style={{
-                          marginHorizontal: d2p(20), marginTop: h2p(25),
-                          paddingBottom: h2p(14.5),
-                          borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc
-                        }}
-                      >
-                        <FeedReview
-                          keyword={keyword}
-                          clickBoxStyle={{ right: d2p(26), top: h2p(-10) }}
-                          idx={review.index}
-                          selectedIndex={selectedIndex}
-                          setSelectedIndex={(selectIdx: number) => setSelectedIndex(selectIdx)}
-                          review={review.item} />
-                      </Pressable>
-                    );
-                  }}
+                  ListEmptyComponent={menuEmpty}
+                  renderItem={menuRenderItem}
                   showsVerticalScrollIndicator={false}
                 />
               </View>

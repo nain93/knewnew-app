@@ -54,7 +54,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
 
   const userReviewListQuery = useInfiniteQuery<ReviewListType[], Error>(["userReviewList", route.params?.id], async ({ pageParam = 0 }) => {
     if (route.params?.id) {
-      const queryData = await getUserReviewList({ token, id: route.params?.id, offset: pageParam });
+      const queryData = await getUserReviewList({ token, id: route.params?.id, offset: pageParam, limit: 5 });
       return queryData;
     }
   }, {
@@ -64,7 +64,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
 
   const userBookmarkListQuery = useInfiniteQuery<ReviewListType[], Error>(["userBookmarkList", route.params?.id], async ({ pageParam = 0 }) => {
     if (route.params?.id) {
-      const queryData = await getUserBookmarkList({ token, id: route.params?.id, offset: pageParam });
+      const queryData = await getUserBookmarkList({ token, id: route.params?.id, offset: pageParam, limit: 5 });
       return queryData;
     }
   }, {
@@ -145,6 +145,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     </View>
   ), [getMyProfileQuery.data]);
 
+  // * 작성글
   const reviewKey = useCallback((v) => String(v.id), []);
   const reviewEmpty = useCallback(() => {
     if (!userReviewListQuery.isLoading) {
@@ -204,8 +205,20 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     }
     , [selectedIndex, userReviewListQuery.isLoading]);
 
+  const reviewEndReached = useCallback(() => {
+    if (userReviewListQuery.data &&
+      userReviewListQuery.data.pages.flat().length > 4) {
+      userReviewListQuery.fetchNextPage();
+    }
+  }, []);
+
+  const reviewRefresh = useCallback(() => {
+    userReviewListQuery.refetch();
+    getMyProfileQuery.refetch();
+  }, []);
   const reviewFooter = useCallback(() => <View style={{ height: h2p(100) }} />, []);
 
+  // * 담은글
   const bookmarkKey = useCallback((v) => (v.id).toString(), []);
   const bookmarkEmpty = useCallback(() => {
     if (!userBookmarkListQuery.isLoading) {
@@ -263,6 +276,18 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     );
   }, [userBookmarkListQuery.isLoading, selectedIndex]);
 
+  const bookmarkEndReached = useCallback(() => {
+    if (userBookmarkListQuery.data &&
+      userBookmarkListQuery.data?.pages.flat().length > 4) {
+      userBookmarkListQuery.fetchNextPage();
+    }
+  }, []);
+
+  const bookmarkRefresh = useCallback(() => {
+    userBookmarkListQuery.refetch();
+    getMyProfileQuery.refetch();
+  }, []);
+
   const bookmarkFooter = useCallback(() => <View style={{ height: h2p(100) }} />, []);
 
   useEffect(() => {
@@ -309,18 +334,13 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             ref={reviewRef}
             ListHeaderComponent={Platform.OS === "android" ? reviewHeader : null}
             ListEmptyComponent={reviewEmpty}
-            onEndReached={() => {
-              if (userReviewListQuery.data &&
-                userReviewListQuery.data.pages.flat().length > 19) {
-                userReviewListQuery.fetchNextPage();
-              }
-            }}
+            onEndReached={reviewEndReached}
             onEndReachedThreshold={0.5}
+            maxToRenderPerBatch={5}
+            windowSize={5}
+            removeClippedSubviews={true}
             refreshing={userReviewListQuery.isLoading}
-            onRefresh={() => {
-              userReviewListQuery.refetch();
-              getMyProfileQuery.refetch();
-            }}
+            onRefresh={reviewRefresh}
             showsVerticalScrollIndicator={false}
             ListFooterComponent={reviewFooter}
             data={userReviewListQuery.data?.pages.flat()}
@@ -334,18 +354,13 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             ref={bookmarkRef}
             ListHeaderComponent={Platform.OS === "android" ? bookmarkHeader : null}
             ListEmptyComponent={bookmarkEmpty}
-            onEndReached={() => {
-              if (userBookmarkListQuery.data &&
-                userBookmarkListQuery.data?.pages.flat().length > 19) {
-                userBookmarkListQuery.fetchNextPage();
-              }
-            }}
-            onEndReachedThreshold={0.8}
+            onEndReached={bookmarkEndReached}
+            onEndReachedThreshold={0.5}
+            maxToRenderPerBatch={5}
+            windowSize={5}
+            removeClippedSubviews={true}
             refreshing={userBookmarkListQuery.isLoading}
-            onRefresh={() => {
-              userBookmarkListQuery.refetch();
-              getMyProfileQuery.refetch();
-            }}
+            onRefresh={bookmarkRefresh}
             showsVerticalScrollIndicator={false}
             ListFooterComponent={bookmarkFooter}
             data={userBookmarkListQuery.data?.pages.flat()}
