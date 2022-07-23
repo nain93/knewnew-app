@@ -1,5 +1,5 @@
 import { Dimensions, Image, StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import CloseIcon from '~/components/icon/closeIcon';
@@ -107,6 +107,13 @@ const Search = ({ navigation }: SearchProps) => {
     getRecentKeyWords();
   }, []);
 
+  const reviewNext = useCallback(() => {
+    if (searchListQuery.data &&
+      searchListQuery.data.pages.flat().length > 4) {
+      searchListQuery.fetchNextPage();
+    }
+  }, [searchListQuery]);
+
   return (
     <>
       <Header
@@ -144,12 +151,7 @@ const Search = ({ navigation }: SearchProps) => {
       />
       {isSearchMode ?
         <SearchTabView
-          reviewNext={() => {
-            if (searchListQuery.data &&
-              searchListQuery.data.pages.flat().length > 4) {
-              searchListQuery.fetchNextPage();
-            }
-          }}
+          reviewNext={reviewNext}
           userNext={() => {
             if (userListQuery.data &&
               userListQuery.data.pages.flat().length > 19) {

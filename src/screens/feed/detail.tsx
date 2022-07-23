@@ -601,14 +601,13 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                               </View>
                             </View>
                             <Text style={[styles.commentContent, FONT.Regular]}>{item.content}</Text>
-                            {/* 대댓글 */}
                             <View style={{ flexDirection: "row", alignItems: "center", marginLeft: d2p(40), marginTop: h2p(10) }}>
                               <TouchableOpacity onPress={() => {
                                 setCommentParentId(item.id);
                                 setRecommentName(item.author.nickname);
                                 setRecommentMode(true);
                               }}>
-                                <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_79737e }]}>답글 달기</Text>
+                                <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_79737e }]}>답글달기</Text>
                               </TouchableOpacity>
                               <TouchableOpacity onPress={() => {
                                 setApiBlock(true);
@@ -616,7 +615,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                                   commentLikeMutation.mutate({ commentId: item.id, isLike: !item.isLike });
                                 }
                               }}>
-                                <Text style={[FONT.Bold, {
+                                {console.log(item.isLike, 'item.isLike')}
+                                <Text style={[(item.isLike ? FONT.Bold : FONT.Regular), {
                                   marginLeft: d2p(10),
                                   fontSize: 12, color: item.isLike ? theme.color.grayscale.C_443e49 : theme.color.grayscale.C_79737e
                                 }]}>좋아요 {item.likeCount > 0 && item.likeCount}</Text>

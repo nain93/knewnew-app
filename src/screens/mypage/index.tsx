@@ -210,7 +210,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
       userReviewListQuery.data.pages.flat().length > 4) {
       userReviewListQuery.fetchNextPage();
     }
-  }, []);
+  }, [userReviewListQuery]);
 
   const reviewRefresh = useCallback(() => {
     userReviewListQuery.refetch();
@@ -281,7 +281,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
       userBookmarkListQuery.data?.pages.flat().length > 4) {
       userBookmarkListQuery.fetchNextPage();
     }
-  }, []);
+  }, [userBookmarkListQuery]);
 
   const bookmarkRefresh = useCallback(() => {
     userBookmarkListQuery.refetch();
