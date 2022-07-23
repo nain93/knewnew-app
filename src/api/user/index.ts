@@ -149,10 +149,18 @@ export const deleteUser = async ({ token, id }: { token: string, id: number }) =
   }
 };
 
-export const getUserReviewList = async ({ token, id, offset }: { token: string, id: number, offset: number }) => {
+interface GetUserReviewListType {
+  token: string,
+  id: number,
+  offset: number,
+  limit: number
+}
+
+export const getUserReviewList = async ({ token, id, offset, limit }: GetUserReviewListType) => {
   const res = await axios.get(baseURL + `user/${id}/reviews/`, {
     params: {
-      offset
+      offset,
+      limit
     },
     headers: {
       Authorization: `Bearer ${token}`,
@@ -163,10 +171,18 @@ export const getUserReviewList = async ({ token, id, offset }: { token: string, 
   }
 };
 
-export const getUserBookmarkList = async ({ token, id, offset }: { token: string, id: number, offset: number }) => {
+interface GetUserBookmarkListType {
+  token: string,
+  id: number,
+  offset: number,
+  limit: number
+}
+
+export const getUserBookmarkList = async ({ token, id, offset, limit }: GetUserBookmarkListType) => {
   const res = await axios.get(baseURL + `user/${id}/bookmarks/`, {
     params: {
-      offset
+      offset,
+      limit
     },
     headers: {
       Authorization: `Bearer ${token}`,

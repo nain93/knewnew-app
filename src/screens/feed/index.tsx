@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, Animated, Pressable, ActivityIndicator } from 'react-native';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, Animated, Pressable } from 'react-native';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import Header from '~/components/header';
@@ -62,6 +62,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const [allClick, setAllClick] = useState(false);
   const flatListRef = useRef<FlatList>(null);
 
+
   const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", token, filterBadge], () => getMyProfile(token), {
     enabled: !!token,
     onSuccess: (data) => {
@@ -87,11 +88,11 @@ const Feed = ({ navigation, route }: FeedProps) => {
 
   const reviewListQuery = useInfiniteQuery<ReviewListType[], Error>(["reviewList", token, filterBadge], async ({ pageParam = 0 }) => {
     if (allClick) {
-      const queryData = await getReviewList({ token, tag: "", offset: pageParam });
+      const queryData = await getReviewList({ token, tag: "", offset: pageParam, limit: 5 });
       return queryData;
     }
     else {
-      const queryData = await getReviewList({ token, tag: filterBadge, offset: pageParam });
+      const queryData = await getReviewList({ token, tag: filterBadge, offset: pageParam, limit: 5 });
       return queryData;
     }
   }, {
@@ -139,6 +140,13 @@ const Feed = ({ navigation, route }: FeedProps) => {
     <View style={{ height: h2p(117) }}>
       <Image source={loading} style={{ alignSelf: "center", width: d2p(70), height: d2p(70) }} />
     </View>, []);
+
+  const reviewEndReached = useCallback(() => {
+    if (reviewListQuery.data &&
+      reviewListQuery.data.pages.flat().length > 4) {
+      reviewListQuery.fetchNextPage();
+    }
+  }, []);
 
   const reviewRenderItem = useCallback(({ item, index }) =>
     <Pressable onPress={() =>
@@ -260,19 +268,17 @@ const Feed = ({ navigation, route }: FeedProps) => {
       <View>
         <FlatList
           ref={flatListRef}
-          onEndReached={() => {
-            if (reviewListQuery.data &&
-              reviewListQuery.data.pages.flat().length > 19) {
-              reviewListQuery.fetchNextPage();
-            }
-          }}
-          onEndReachedThreshold={0.5}
+          onEndReached={reviewEndReached}
           refreshing={reviewListQuery.isLoading}
           onRefresh={reviewListQuery.refetch}
           data={reviewListQuery.data?.pages.flat()}
           ListHeaderComponent={reviewHeader}
           showsVerticalScrollIndicator={false}
           renderItem={reviewRenderItem}
+          onEndReachedThreshold={0.5}
+          maxToRenderPerBatch={5}
+          windowSize={5}
+          removeClippedSubviews={true}
           ListFooterComponent={reviewListQuery.isFetchingNextPage ? footerLoading : reviewFooter}
           style={{ marginTop: 0, marginBottom: h2p(80), backgroundColor: theme.color.grayscale.f7f7fc }}
           keyExtractor={reviewKey}
@@ -411,7 +417,7 @@ const styles = StyleSheet.create({
     paddingTop: h2p(35),
     paddingBottom: h2p(18),
     paddingHorizontal: 20,
-    width: '100%',
+    width: '100%'
   },
   mainText: {
     fontSize: 20
