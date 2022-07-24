@@ -1,12 +1,11 @@
-import { View, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView, Keyboard, FlatList } from 'react-native';
+import { View, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, Keyboard, FlatList } from 'react-native';
 import Text from '~/components/style/CustomText';
-import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import theme from '~/styles/theme';
 import { d2p, dateCommentFormat, h2p, simpleDate } from '~/utils';
 import ReviewIcon from '~/components/icon/reviewIcon';
-import Badge from '~/components/badge';
 import ReactionIcon from '~/components/icon/reactionIcon';
 import { commentMore, more, tag } from '~/assets/icons';
 import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
@@ -684,7 +683,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                 <Loading viewStyle={{ top: h2p(0), position: "relative" }} />
               );
             }
-            return <View>zz</View>;
+            return null;
           }}
           renderItem={detailRenderItem}
           onEndReachedThreshold={0.5}
