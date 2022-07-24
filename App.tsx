@@ -131,48 +131,48 @@ const App = () => {
   };
 
   const installUpdateIfAvailable = () => {
-    const TimeoutMS = 10000;
-    const checkAndUpdatePromise = new Promise(async (resolve: Function) => {
-      const updateAvailable = await checkForUpdate();
-      // console.log(updateAvailable, "updateAvailable");
-      if (updateAvailable) {
-        const syncStatus = (status: codePush.SyncStatus) => {
-          console.log("SyncStatus = ", status);
-          switch (status) {
-            case codePush.SyncStatus.UP_TO_DATE:
-            case codePush.SyncStatus.UPDATE_IGNORED:
-              console.log("App is up to date...");
-              resolve();
-              break;
-            case codePush.SyncStatus.UPDATE_INSTALLED:
-              console.log("Update installed successfully!");
-              // DO NOT RESOLVE AS THE APP WILL REBOOT ITSELF HERE
-              break;
-            case codePush.SyncStatus.UNKNOWN_ERROR:
-              console.log("Update received an unknown error...");
-              resolve();
-              break;
-            default:
-              break;
-          }
-        };
+    // const TimeoutMS = 10000;
+    // const checkAndUpdatePromise = new Promise(async (resolve: Function) => {
+    //   const updateAvailable = await checkForUpdate();
+    //   // console.log(updateAvailable, "updateAvailable");
+    //   if (updateAvailable) {
+    //     const syncStatus = (status: codePush.SyncStatus) => {
+    //       console.log("SyncStatus = ", status);
+    //       switch (status) {
+    //         case codePush.SyncStatus.UP_TO_DATE:
+    //         case codePush.SyncStatus.UPDATE_IGNORED:
+    //           console.log("App is up to date...");
+    //           resolve();
+    //           break;
+    //         case codePush.SyncStatus.UPDATE_INSTALLED:
+    //           console.log("Update installed successfully!");
+    //           // DO NOT RESOLVE AS THE APP WILL REBOOT ITSELF HERE
+    //           break;
+    //         case codePush.SyncStatus.UNKNOWN_ERROR:
+    //           console.log("Update received an unknown error...");
+    //           resolve();
+    //           break;
+    //         default:
+    //           break;
+    //       }
+    //     };
 
-        // Install the update
-        codePush.sync(
-          {
-            installMode: codePush.InstallMode.IMMEDIATE,
-            mandatoryInstallMode: codePush.InstallMode.IMMEDIATE
-          },
-          syncStatus
-        );
-      } else {
-        resolve();
-      }
-      setTimeout(() => {
-        resolve();
-      }, TimeoutMS);
-    });
-    return Promise.race([checkAndUpdatePromise]);
+    //     // Install the update
+    //     codePush.sync(
+    //       {
+    //         installMode: codePush.InstallMode.IMMEDIATE,
+    //         mandatoryInstallMode: codePush.InstallMode.IMMEDIATE
+    //       },
+    //       syncStatus
+    //     );
+    //   } else {
+    //     resolve();
+    //   }
+    //   setTimeout(() => {
+    //     resolve();
+    //   }, TimeoutMS);
+    // });
+    // return Promise.race([checkAndUpdatePromise]);
   };
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { View, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView, Keyboard, FlatList } from 'react-native';
+import { View, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, Keyboard, FlatList } from 'react-native';
 import Text from '~/components/style/CustomText';
 import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
@@ -6,13 +6,12 @@ import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import theme from '~/styles/theme';
 import { d2p, dateCommentFormat, h2p, simpleDate } from '~/utils';
 import ReviewIcon from '~/components/icon/reviewIcon';
-import Badge from '~/components/badge';
 import ReactionIcon from '~/components/icon/reactionIcon';
 import { commentMore, more, tag } from '~/assets/icons';
 import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { myIdState, okPopupState, popupState, refreshState, tokenState } from '~/recoil/atoms';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from 'react-query';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import { bookmarkReview, getReviewDetail, likeReview } from '~/api/review';
@@ -36,6 +35,8 @@ import axios from 'axios';
 import Recomment from '~/screens/feed/comment/recomment';
 import { CommentListType } from '~/types/comment';
 import SplashScreen from 'react-native-splash-screen';
+import ImageFlatlist from '~/screens/feed/ImageFlatlist';
+
 interface FeedDetailProps {
   navigation: NavigationStackProp
   route: NavigationRoute<{
@@ -60,7 +61,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [inputHeight, setInputHeight] = useState(getBottomSpace());
   const token = useRecoilValue(tokenState);
   const inputRef = useRef<TextInput>(null);
-  const [scrollIdx, setScrollIdx] = React.useState(0);
   const [isMoreClick, setIsMoreClick] = useState<boolean>();
   const myId = useRecoilValue(myIdState);
   const queryClient = useQueryClient();
@@ -79,12 +79,14 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [recommentName, setRecommentName] = useState("");
   const [commentParentId, setCommentParentId] = useState<number | null>(null);
   const [apiBlock, setApiBlock] = useState(false);
+  const [commentLayoutHeight, setCommentLayoutHeight] = useState(0);
+  const [commentLoading, setCommentLoading] = useState(false);
 
   const setRefresh = useSetRecoilState(refreshState);
   const setModalOpen = useSetRecoilState(okPopupState);
   const setIspopupOpen = useSetRecoilState(popupState);
 
-  const detailScrollRef = useRef<ScrollView>(null);
+  const detailScrollRef = useRef<FlatList>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [initialIndex, setInitialIndex] = useState(0);
   const openGallery = (idx: number) => {
@@ -101,8 +103,10 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     }, {
     enabled: !!route.params?.id,
     onSuccess: (data) => {
-      setLike(data.isLike);
-      setCart(data.isBookmark);
+      if (data) {
+        setLike(data.isLike);
+        setCart(data.isBookmark);
+      }
     },
     onSettled: () => SplashScreen.hide(),
     onError: (error) => {
@@ -133,12 +137,13 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   });
 
 
-  const commentListQuery = useQuery<CommentListType[], Error>(['getCommentList', token, route.params?.id], async () => {
+  const commentListQuery = useInfiniteQuery<CommentListType[], Error>(['getCommentList', token, route.params?.id], async ({ pageParam = 0 }) => {
     if (route.params) {
-      const comments = await getReviewComment(token, route.params?.id);
+      const comments = await getReviewComment({ token, reviewId: route.params?.id, offset: pageParam, limit: 10 });
       return comments;
     }
   }, {
+    getNextPageParam: (next, all) => all.flat().length ?? undefined,
     enabled: !!route.params?.id
   });
 
@@ -160,8 +165,14 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
       }
       queryClient.invalidateQueries('getCommentList');
       queryClient.invalidateQueries("reviewList");
+      queryClient.setQueryData<ReviewListType | undefined>(["reviewDetail", token, route.params?.id], (postData) => {
+        if (postData) {
+          return { ...postData, commentCount: postData.commentCount + 1 };
+        }
+      });
       Keyboard.dismiss();
-    }
+    },
+    onSettled: () => setCommentLoading(false)
   });
 
   const editCommentMutation = useMutation('editComment', async ({ reviewId, commentId, comment }: { reviewId: number, commentId: number, comment: string }) =>
@@ -170,7 +181,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
       setCommentIsEdit(false);
       queryClient.invalidateQueries('getCommentList');
       Keyboard.dismiss();
-    }
+    },
+    onSettled: () => setCommentLoading(false)
   });
 
   const deleteCommentMutation = useMutation('deleteComment', (id: number) =>
@@ -178,7 +190,13 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries('getCommentList');
       queryClient.invalidateQueries("reviewList");
-    }
+      queryClient.setQueryData<ReviewListType | undefined>(["reviewDetail", token, route.params?.id], (postData) => {
+        if (postData) {
+          return { ...postData, commentCount: postData.commentCount - 1 };
+        }
+      });
+    },
+    onSettled: () => setCommentLoading(false)
   });
 
   const commentLikeMutation = useMutation("likeCount", ({ commentId, isLike }: { commentId: number, isLike: boolean }) =>
@@ -190,6 +208,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   });
 
   const handleWriteComment = () => {
+    setCommentLoading(true);
     if (route.params) {
       if (commentIsEdit) {
         editCommentMutation.mutate({ reviewId: route.params?.id, commentId: editCommentId, comment: content });
@@ -204,8 +223,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     }
     setContent("");
   };
-
-  const imageKey = useCallback((v) => String(v.id), []);
 
   const renderCustomImage = (image: ImageObject, currentIndex: number) => {
     return (
@@ -251,28 +268,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     );
   };
 
-  const imageRenderItem = useCallback((image) =>
-    <Pressable
-      onPress={() => openGallery(image.index)}
-      style={{
-        aspectRatio: 1.7,
-        height: h2p(180),
-        borderRadius: 18,
-        marginHorizontal: d2p(15),
-        borderWidth: 1,
-        borderColor: theme.color.grayscale.e9e7ec,
-        width: Dimensions.get('window').width - d2p(30),
-      }}
-    >
-      <FastImage
-        style={{
-          width: Dimensions.get('window').width - d2p(30),
-          height: "100%",
-          borderRadius: 18
-        }}
-        source={{ uri: image.item.image }} />
-    </Pressable>
-    , []);
 
   // * 키보드 높이 컨트롤
   useEffect(() => {
@@ -308,9 +303,306 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   // * 댓글위치로 스크롤
   useEffect(() => {
     if (route.params?.toComment) {
-      detailScrollRef.current?.scrollToEnd();
+      detailScrollRef.current?.scrollToOffset({ offset: commentLayoutHeight, animated: true });
     }
-  }, [route.params, reviewDetailQuery.isFetching]);
+  }, [route.params, commentLayoutHeight]);
+
+  function detailHeader() {
+    return (
+      <View onLayout={(event) => {
+        const layout = event.nativeEvent.layout;
+        setCommentLayoutHeight(layout.height - 20);
+      }}>
+        {reviewDetailQuery.data &&
+          <More
+            review={reviewDetailQuery.data}
+            userId={reviewDetailQuery.data?.author.id}
+            isMoreClick={isMoreClick}
+            type="review"
+            isGobacK={() => navigation.goBack()}
+            handleCloseMore={() => setIsMoreClick(false)}
+          />
+        }
+        <View
+          style={{
+            paddingHorizontal: d2p(20), flexDirection: 'row', justifyContent: 'space-between',
+            alignItems: "center"
+          }}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Mypage", { id: reviewDetailQuery.data?.author.id })}
+            style={{
+              borderRadius: 40,
+              height: d2p(40),
+              width: d2p(40),
+              overflow: "hidden",
+              borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
+            }}>
+            <Image source={reviewDetailQuery.data?.author.profileImage ?
+              { uri: reviewDetailQuery.data?.author.profileImage } : noProfile}
+              style={{
+                width: d2p(40), height: d2p(40), borderRadius: 40
+              }}
+            />
+          </TouchableOpacity>
+
+          <View style={{
+            width: Dimensions.get('window').width - d2p(105),
+            paddingLeft: d2p(10)
+          }}>
+            <View style={{ alignItems: "center", flexWrap: "wrap" }}>
+              <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: reviewDetailQuery.data?.author.id })}>
+                <Text style={[styles.writer, FONT.Medium]}>{reviewDetailQuery.data?.author.nickname}</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={[FONT.Regular, { marginTop: h2p(5), fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
+              {reviewDetailQuery.data?.author.tags.foodStyle} {reviewDetailQuery.data?.author.tags.household} {reviewDetailQuery.data?.author.tags.occupation}
+            </Text>
+          </View>
+
+          <View style={{ alignItems: "center" }}>
+            <TouchableOpacity onPress={() => setIsMoreClick((isClick) => !isClick)}>
+              <Image
+                source={more}
+                resizeMode="contain"
+                style={{ width: d2p(26), height: d2p(16) }}
+              />
+            </TouchableOpacity>
+            <Text style={[{
+              marginTop: h2p(10),
+              fontSize: 10, color: theme.color.grayscale.a09ca4
+            }, FONT.Regular]}>
+              {(reviewDetailQuery.data) && simpleDate(reviewDetailQuery.data?.created, ' 전')}</Text>
+          </View>
+        </View>
+        <View style={{ paddingTop: h2p(20), paddingHorizontal: d2p(20) }}>
+          {reviewDetailQuery.data &&
+            <ReviewIcon review={reviewDetailQuery.data?.satisfaction} />}
+          <Text style={[styles.content, { lineHeight: 21 }, FONT.Regular]}>{reviewDetailQuery.data?.content}</Text>
+        </View>
+        {!reviewDetailQuery.data?.parent &&
+          <>
+            <View style={{
+              flexDirection: 'row', alignItems: 'center',
+              width: Dimensions.get("window").width - d2p(90),
+              flexWrap: "wrap",
+              marginHorizontal: d2p(20)
+            }}>
+              <Image source={tag} style={{ width: d2p(10), height: d2p(10), marginRight: d2p(5) }} />
+              {React.Children.toArray(tags.map((v) => {
+                if (v === route.params?.badge) {
+                  return;
+                }
+                return <Text style={[FONT.Regular, { color: theme.color.grayscale.C_79737e, fontSize: 12 }]}>
+                  #{v} </Text>;
+              }))}
+              {
+                route.params?.badge ?
+                  <Text style={[FONT.Regular, { color: theme.color.main, fontSize: 12 }]}>#{route.params?.badge}</Text>
+                  :
+                  null
+              }
+            </View>
+            <View style={styles.sign}>
+              <Text style={[styles.store, FONT.Regular]}>{reviewDetailQuery.data?.market}</Text>
+            </View>
+          </>
+        }
+
+        {/* 이미지 스크롤 ui */}
+        {reviewDetailQuery.data?.images &&
+          <ImageFlatlist
+            onPress={(openIdx: number) => openGallery(openIdx)}
+            data={reviewDetailQuery.data?.images}
+          />
+        }
+
+        {reviewDetailQuery.data?.parent &&
+          <>
+            <View style={{
+              marginHorizontal: d2p(20)
+            }}>
+              <ReKnew
+                type="detail"
+                review={{
+                  ...reviewDetailQuery.data.parent
+                }}
+              />
+            </View>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("FeedDetail",
+                { id: reviewDetailQuery.data.parent?.id })}
+              style={{
+                marginTop: h2p(15),
+                marginBottom: h2p(10),
+                marginLeft: d2p(45),
+                width: d2p(155), height: h2p(40),
+                borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
+                justifyContent: "center", alignItems: "center", borderRadius: 5
+              }}>
+              <Text style={[FONT.Medium, { fontSize: 12, color: theme.color.grayscale.C_443e49 }]}>
+                원문으로</Text>
+            </TouchableOpacity>
+          </>
+        }
+        <View style={[styles.reactionContainer, { paddingTop: reviewDetailQuery.data?.parent ? 0 : h2p(10) }]}>
+          <ReactionIcon name="cart" state={cart} count={reviewDetailQuery.data?.bookmarkCount}
+            mutation={boomarkMutation}
+            id={route.params?.id}
+            isState={(isState: boolean) => setCart(isState)} />
+          <View style={{ borderLeftWidth: 1, borderLeftColor: theme.color.grayscale.eae7ec, height: h2p(26) }} />
+          <ReactionIcon name="like" count={reviewDetailQuery.data?.likeCount} state={like}
+            isState={(isState: boolean) => setLike(isState)} mutation={likeReviewMutation} id={route.params?.id} />
+        </View>
+        <Text style={[styles.commentMeta, FONT.Bold]}>작성된 댓글 {reviewDetailQuery.data?.commentCount}개</Text>
+      </View>
+    );
+  }
+
+  const detailRenderItem = useCallback(({ item, index }) => {
+    return (
+      <Pressable
+        onPress={() => setCommentSelectedIdx(-1)}>
+        <>
+          <View
+            style={{
+              paddingHorizontal: d2p(20),
+              paddingTop: h2p(10),
+              paddingBottom: h2p(14.5),
+              backgroundColor: (index === modifyingIdx) && commentIsEdit ? theme.color.grayscale.f7f7fc : theme.color.white
+            }}>
+            {item.isActive ?
+              <>
+                <View style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}>
+                  <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: item.author.id })}
+                    style={styles.commentProfileLine}>
+                    <FastImage source={item.author.profileImage ? { uri: item.author.profileImage } : noProfile}
+                      style={styles.commentImg} />
+                  </TouchableOpacity>
+                  <View style={{
+                    flexDirection: "row", justifyContent: "space-between",
+                    width: Dimensions.get("window").width - d2p(70),
+                  }}>
+                    <View style={{ marginLeft: d2p(10) }}>
+                      <View style={{ flexDirection: "row", alignItems: "center" }}>
+                        <TouchableOpacity
+                          style={{ flexDirection: "row" }}
+                          onPress={() => navigation.navigate("Mypage", { id: item.author.id })}>
+                          <Text style={[FONT.Medium, { fontSize: 14 }]}>{item.author.nickname}</Text>
+                          {item.author.id === reviewDetailQuery.data?.author.id &&
+                            <View style={{
+                              width: d2p(38),
+                              justifyContent: "center", alignItems: "center",
+                              marginLeft: d2p(5),
+                              backgroundColor: theme.color.white,
+                              borderRadius: 4, borderWidth: 1, borderColor: theme.color.grayscale.d2d0d5
+                            }}>
+                              <Text style={[FONT.Medium, { fontSize: 10, color: theme.color.grayscale.C_79737e }]}>
+                                작성자</Text>
+                            </View>
+                          }
+                        </TouchableOpacity>
+                        <Text style={[styles.commentDate, FONT.Regular]}>{dateCommentFormat(item.created)}</Text>
+                      </View>
+                    </View>
+                    {myId === item.author.id &&
+                      <TouchableOpacity onPress={() => {
+                        if (commentSelectedIdx === index) {
+                          setCommentSelectedIdx(-1);
+                        } else {
+                          setCommentSelectedIdx(index);
+                        }
+                      }}>
+                        <Image
+                          source={commentMore}
+                          resizeMode="contain"
+                          style={{ width: d2p(12), height: d2p(16) }}
+                        />
+                      </TouchableOpacity>
+                    }
+                  </View>
+                </View>
+                <Text style={[styles.commentContent, FONT.Regular]}>{item.content}</Text>
+                <View style={{ flexDirection: "row", alignItems: "center", marginLeft: d2p(40), marginTop: h2p(10) }}>
+                  <TouchableOpacity onPress={() => {
+                    setCommentParentId(item.id);
+                    setRecommentName(item.author.nickname);
+                    setRecommentMode(true);
+                  }}>
+                    <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_79737e }]}>답글달기</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => {
+                    setApiBlock(true);
+                    if (!apiBlock) {
+                      commentLikeMutation.mutate({ commentId: item.id, isLike: !item.isLike });
+                    }
+                  }}>
+                    <Text style={[(item.isLike ? FONT.Bold : FONT.Regular), {
+                      marginLeft: d2p(10),
+                      fontSize: 12, color: item.isLike ? theme.color.grayscale.C_443e49 : theme.color.grayscale.C_79737e
+                    }]}>좋아요 {item.likeCount > 0 && item.likeCount}</Text>
+                  </TouchableOpacity>
+                </View>
+              </> :
+              <Text style={[FONT.Regular, { fontSize: 15, color: theme.color.grayscale.C_79737e }]}>
+                삭제된 댓글입니다.
+              </Text>
+            }
+            {commentSelectedIdx === index &&
+              <View style={[styles.clickBox, { right: d2p(32) }]}>
+                <Pressable
+                  style={{
+                    justifyContent: "center", alignItems: "center", width: d2p(70), height: d2p(35)
+                  }}
+                  onPress={() => {
+                    setContent(item.content);
+                    setCommentIsEdit(true);
+                    setModifyingIdx(commentSelectedIdx);
+                    setEditCommentId(item.id);
+                    setCommentSelectedIdx(-1);
+                  }}>
+                  <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
+                </Pressable>
+                <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
+                <Pressable
+                  style={{ justifyContent: "center", alignItems: "center", width: d2p(70), height: d2p(35) }}
+                  onPress={() => {
+                    setModalOpen({
+                      isOpen: true,
+                      content: "댓글을 삭제할까요?",
+                      okButton: () => {
+                        setCommentLoading(true);
+                        deleteCommentMutation.mutate(item.id);
+                      }
+                    });
+                    setCommentSelectedIdx(-1);
+                  }}>
+                  <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
+                </Pressable>
+              </View>
+            }
+          </View>
+          {/* 대댓글 ui */}
+          {item.child ?
+            <Recomment
+              reviewId={reviewDetailQuery.data?.author.id}
+              modifyingIdx={modifyingIdx}
+              commentIsEdit={commentIsEdit}
+              setModifyingIdx={(mdIdx: number) => setModifyingIdx(mdIdx)}
+              setContent={(reContent: string) => setContent(reContent)}
+              setCommentIsEdit={(isEdit: boolean) => setCommentIsEdit(isEdit)}
+              setEditCommentId={(editId: number) => setEditCommentId(editId)}
+              setCommentSelectedIdx={(selectIdx: number) => setCommentSelectedIdx(selectIdx)}
+              child={item.child} authorName={item.author.nickname} />
+            :
+            <View style={styles.commentLine} />
+          }
+        </>
+      </Pressable>
+    );
+  }, [navigation, commentSelectedIdx, commentIsEdit]);
 
   if (reviewDetailQuery.isLoading || reviewDetailQuery.isFetching) {
     return (
@@ -365,321 +657,43 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={{ flex: 1 }}
       >
-        <ScrollView
+        {commentLoading &&
+          <View style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            zIndex: 10,
+            backgroundColor: "rgba(0,0,0,0.2)"
+          }}>
+            <Loading />
+          </View>
+        }
+        <FlatList
           ref={detailScrollRef}
           contentContainerStyle={{ paddingBottom: h2p(30) }}
           showsVerticalScrollIndicator={false}
           style={{ paddingTop: h2p(20), flex: 1 }}
-        >
-          {reviewDetailQuery.data &&
-            <More
-              review={reviewDetailQuery.data}
-              userId={reviewDetailQuery.data?.author.id}
-              isMoreClick={isMoreClick}
-              type="review"
-              isGobacK={() => navigation.goBack()}
-              handleCloseMore={() => setIsMoreClick(false)}
-            />
-          }
-          <View style={{
-            paddingHorizontal: d2p(20), flexDirection: 'row', justifyContent: 'space-between',
-            alignItems: "center"
-          }}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("Mypage", { id: reviewDetailQuery.data?.author.id })}
-              style={{
-                borderRadius: 40,
-                height: d2p(40),
-                width: d2p(40),
-                overflow: "hidden",
-                borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
-              }}>
-              <Image source={reviewDetailQuery.data?.author.profileImage ?
-                { uri: reviewDetailQuery.data?.author.profileImage } : noProfile}
-                style={{
-                  width: d2p(40), height: d2p(40), borderRadius: 40
-                }}
-              />
-            </TouchableOpacity>
-
-            <View style={{
-              width: Dimensions.get('window').width - d2p(105),
-              paddingLeft: d2p(10)
-            }}>
-              <View style={{ alignItems: "center", flexWrap: "wrap" }}>
-                <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: reviewDetailQuery.data?.author.id })}>
-                  <Text style={[styles.writer, FONT.Medium]}>{reviewDetailQuery.data?.author.nickname}</Text>
-                </TouchableOpacity>
-              </View>
-              <Text style={[FONT.Regular, { marginTop: h2p(5), fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
-                {reviewDetailQuery.data?.author.tags.foodStyle} {reviewDetailQuery.data?.author.tags.household} {reviewDetailQuery.data?.author.tags.occupation}
-              </Text>
-            </View>
-
-            <View style={{ alignItems: "center" }}>
-              <TouchableOpacity onPress={() => setIsMoreClick(!isMoreClick)}>
-                <Image
-                  source={more}
-                  resizeMode="contain"
-                  style={{ width: d2p(26), height: d2p(16) }}
-                />
-              </TouchableOpacity>
-              <Text style={[{
-                marginTop: h2p(10),
-                fontSize: 10, color: theme.color.grayscale.a09ca4
-              }, FONT.Regular]}>
-                {(reviewDetailQuery.data) && simpleDate(reviewDetailQuery.data?.created, ' 전')}</Text>
-            </View>
-
-          </View>
-          <View style={{ paddingTop: h2p(20), paddingHorizontal: d2p(20) }}>
-            {reviewDetailQuery.data &&
-              <ReviewIcon review={reviewDetailQuery.data?.satisfaction} />}
-            <Text style={[styles.content, { lineHeight: 21 }, FONT.Regular]}>{reviewDetailQuery.data?.content}</Text>
-          </View>
-          {!reviewDetailQuery.data?.parent &&
-            <>
-              <View style={{
-                flexDirection: 'row', alignItems: 'center',
-                width: Dimensions.get("window").width - d2p(90),
-                flexWrap: "wrap",
-                marginHorizontal: d2p(20)
-              }}>
-                <Image source={tag} style={{ width: d2p(10), height: d2p(10), marginRight: d2p(5) }} />
-                {React.Children.toArray(tags.map((v) => {
-                  if (v === route.params?.badge) {
-                    return;
-                  }
-                  return <Text style={[FONT.Regular, { color: theme.color.grayscale.C_79737e, fontSize: 12 }]}>
-                    #{v} </Text>;
-                }))}
-                {
-                  route.params?.badge ?
-                    <Text style={[FONT.Regular, { color: theme.color.main, fontSize: 12 }]}>#{route.params?.badge}</Text>
-                    :
-                    null
-                }
-              </View>
-              <View style={styles.sign}>
-                <Text style={[styles.store, FONT.Regular]}>{reviewDetailQuery.data?.market}</Text>
-              </View>
-            </>
-          }
-          <View>
-            <FlatList
-              data={reviewDetailQuery.data?.images}
-              horizontal
-              pagingEnabled
-              onScroll={e =>
-                setScrollIdx(Math.min(
-                  reviewDetailQuery.data?.images.length ?? 0,
-                  Math.max(0, Math.round(e.nativeEvent.contentOffset.x / (Dimensions.get("window").width - d2p(30))))))}
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={imageKey}
-              renderItem={imageRenderItem}
-            />
-            {(reviewDetailQuery.data?.images.length || 0) > 1 &&
-              <View style={{
-                marginHorizontal: d2p(15),
-                position: "absolute", backgroundColor: theme.color.white.concat("bb"),
-                borderRadius: 5,
-                paddingHorizontal: d2p(5),
-                paddingVertical: h2p(2),
-                right: d2p(10), bottom: d2p(10),
-                borderWidth: 1,
-                borderColor: theme.color.grayscale.e9e7ec
-              }}>
-                <Text>{scrollIdx + 1} / {reviewDetailQuery.data?.images.length}</Text>
-              </View>
+          data={commentListQuery.data?.pages.flat()}
+          ListHeaderComponent={detailHeader()}
+          ListEmptyComponent={() => {
+            if (commentListQuery.isLoading) {
+              return (
+                <Loading viewStyle={{ top: h2p(0), position: "relative" }} />
+              );
             }
-          </View>
-          {reviewDetailQuery.data?.parent &&
-            <>
-              <View style={{
-                marginHorizontal: d2p(20)
-              }}>
-                <ReKnew
-                  type="detail"
-                  review={{
-                    ...reviewDetailQuery.data.parent
-                  }}
-                />
-              </View>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("FeedDetail",
-                  { id: reviewDetailQuery.data.parent?.id })}
-                style={{
-                  marginTop: h2p(15),
-                  marginBottom: h2p(10),
-                  marginLeft: d2p(45),
-                  width: d2p(155), height: h2p(40),
-                  borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
-                  justifyContent: "center", alignItems: "center", borderRadius: 5
-                }}>
-                <Text style={[FONT.Medium, { fontSize: 12, color: theme.color.grayscale.C_443e49 }]}>
-                  원문으로</Text>
-              </TouchableOpacity>
-            </>
-          }
-          <View style={[styles.reactionContainer, { paddingTop: reviewDetailQuery.data?.parent ? 0 : h2p(10) }]}>
-            <ReactionIcon name="cart" state={cart} count={reviewDetailQuery.data?.bookmarkCount}
-              mutation={boomarkMutation}
-              id={route.params?.id}
-              isState={(isState: boolean) => setCart(isState)} />
-            <View style={{ borderLeftWidth: 1, borderLeftColor: theme.color.grayscale.eae7ec, height: h2p(26) }} />
-            <ReactionIcon name="like" count={reviewDetailQuery.data?.likeCount} state={like}
-              isState={(isState: boolean) => setLike(isState)} mutation={likeReviewMutation} id={route.params?.id} />
-          </View>
-          <Text style={[styles.commentMeta, FONT.Bold]}>작성된 댓글 {reviewDetailQuery.data?.commentCount}개</Text>
-          {commentListQuery.isLoading ?
-            <Loading viewStyle={{ top: h2p(0), position: "relative" }} />
-            :
-            <>
-              <Pressable onPress={() => setCommentSelectedIdx(-1)}>
-                {React.Children.toArray(commentListQuery.data?.map((item, index) => {
-                  return (
-                    <>
-                      <View
-                        style={{
-                          paddingHorizontal: d2p(20),
-                          paddingTop: h2p(10),
-                          paddingBottom: h2p(14.5),
-                          backgroundColor: (index === modifyingIdx) && commentIsEdit ? theme.color.grayscale.f7f7fc : theme.color.white
-                        }}>
-                        {item.isActive ?
-                          <>
-                            <View style={{
-                              flexDirection: "row",
-                              alignItems: "center",
-                            }}>
-                              <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: item.author.id })}
-                                style={styles.commentProfileLine}>
-                                <FastImage source={item.author.profileImage ? { uri: item.author.profileImage } : noProfile}
-                                  style={styles.commentImg} />
-                              </TouchableOpacity>
-                              <View style={{
-                                flexDirection: "row", justifyContent: "space-between",
-                                width: Dimensions.get("window").width - d2p(70),
-                              }}>
-                                <View style={{ marginLeft: d2p(10) }}>
-                                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                    <TouchableOpacity
-                                      style={{ flexDirection: "row" }}
-                                      onPress={() => navigation.navigate("Mypage", { id: item.author.id })}>
-                                      <Text style={[FONT.Medium, { fontSize: 14 }]}>{item.author.nickname}</Text>
-                                      {item.author.id === reviewDetailQuery.data?.author.id &&
-                                        <View style={{
-                                          width: d2p(38),
-                                          justifyContent: "center", alignItems: "center",
-                                          marginLeft: d2p(5),
-                                          backgroundColor: theme.color.white,
-                                          borderRadius: 4, borderWidth: 1, borderColor: theme.color.grayscale.d2d0d5
-                                        }}>
-                                          <Text style={[FONT.Medium, { fontSize: 10, color: theme.color.grayscale.C_79737e }]}>
-                                            작성자</Text>
-                                        </View>
-                                      }
-                                    </TouchableOpacity>
-                                    <Text style={[styles.commentDate, FONT.Regular]}>{dateCommentFormat(item.created)}</Text>
-                                  </View>
-                                </View>
-                                {myId === item.author.id &&
-                                  <TouchableOpacity onPress={() => {
-                                    if (commentSelectedIdx === index) {
-                                      setCommentSelectedIdx(-1);
-                                    } else {
-                                      setCommentSelectedIdx(index);
-                                    }
-                                  }}>
-                                    <Image
-                                      source={commentMore}
-                                      resizeMode="contain"
-                                      style={{ width: d2p(12), height: d2p(16) }}
-                                    />
-                                  </TouchableOpacity>
-                                }
-                              </View>
-                            </View>
-                            <Text style={[styles.commentContent, FONT.Regular]}>{item.content}</Text>
-                            <View style={{ flexDirection: "row", alignItems: "center", marginLeft: d2p(40), marginTop: h2p(10) }}>
-                              <TouchableOpacity onPress={() => {
-                                setCommentParentId(item.id);
-                                setRecommentName(item.author.nickname);
-                                setRecommentMode(true);
-                              }}>
-                                <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_79737e }]}>답글달기</Text>
-                              </TouchableOpacity>
-                              <TouchableOpacity onPress={() => {
-                                setApiBlock(true);
-                                if (!apiBlock) {
-                                  commentLikeMutation.mutate({ commentId: item.id, isLike: !item.isLike });
-                                }
-                              }}>
-                                {console.log(item.isLike, 'item.isLike')}
-                                <Text style={[(item.isLike ? FONT.Bold : FONT.Regular), {
-                                  marginLeft: d2p(10),
-                                  fontSize: 12, color: item.isLike ? theme.color.grayscale.C_443e49 : theme.color.grayscale.C_79737e
-                                }]}>좋아요 {item.likeCount > 0 && item.likeCount}</Text>
-                              </TouchableOpacity>
-                            </View>
-                          </> :
-                          <Text style={[FONT.Regular, { fontSize: 15, color: theme.color.grayscale.C_79737e }]}>
-                            삭제된 댓글입니다.
-                          </Text>
-                        }
-                        {commentSelectedIdx === index &&
-                          <View style={[styles.clickBox, { right: d2p(32) }]}>
-                            <Pressable
-                              style={{
-                                justifyContent: "center", alignItems: "center", width: d2p(70), height: d2p(35)
-                              }}
-                              onPress={() => {
-                                setContent(item.content);
-                                setCommentIsEdit(true);
-                                setModifyingIdx(commentSelectedIdx);
-                                setEditCommentId(item.id);
-                                setCommentSelectedIdx(-1);
-                              }}>
-                              <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
-                            </Pressable>
-                            <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-                            <Pressable
-                              style={{ justifyContent: "center", alignItems: "center", width: d2p(70), height: d2p(35) }}
-                              onPress={() => {
-                                setModalOpen({
-                                  isOpen: true,
-                                  content: "댓글을 삭제할까요?",
-                                  okButton: () => deleteCommentMutation.mutate(item.id)
-                                });
-                                setCommentSelectedIdx(-1);
-                              }}>
-                              <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
-                            </Pressable>
-                          </View>
-                        }
-                      </View>
-                      {/* 대댓글 ui */}
-                      {item.child ?
-                        <Recomment
-                          reviewId={reviewDetailQuery.data?.author.id}
-                          modifyingIdx={modifyingIdx}
-                          commentIsEdit={commentIsEdit}
-                          setModifyingIdx={(mdIdx: number) => setModifyingIdx(mdIdx)}
-                          setContent={(reContent: string) => setContent(reContent)}
-                          setCommentIsEdit={(isEdit: boolean) => setCommentIsEdit(isEdit)}
-                          setEditCommentId={(editId: number) => setEditCommentId(editId)}
-                          setCommentSelectedIdx={(selectIdx: number) => setCommentSelectedIdx(selectIdx)}
-                          child={item.child} authorName={item.author.nickname} />
-                        :
-                        <View style={styles.commentLine} />
-                      }
-                    </>
-                  );
-                }))}
-              </Pressable>
-            </>
-          }
-        </ScrollView>
+            return null;
+          }}
+          renderItem={detailRenderItem}
+          onEndReachedThreshold={0.5}
+          onEndReached={() => {
+            if (commentListQuery.data &&
+              commentListQuery.data.pages.flat().length > 9) {
+              commentListQuery.fetchNextPage();
+            }
+          }}
+        />
         {recommentMode &&
           <View style={{
             backgroundColor: theme.color.grayscale.f7f7fc,
