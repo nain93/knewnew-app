@@ -1,9 +1,18 @@
 import axios from "axios";
 import { baseURL } from "~/api";
 
-export const getReviewComment = async (token: string, reviewId: number) => {
+interface GetReviewCommentType {
+  token: string,
+  reviewId: number,
+  offset: number,
+  limit?: number
+}
+
+export const getReviewComment = async ({ token, reviewId, offset, limit }: GetReviewCommentType) => {
   const res = await axios.get(baseURL + "comment/review/", {
     params: {
+      offset,
+      limit,
       rid: reviewId
     },
     headers: {
