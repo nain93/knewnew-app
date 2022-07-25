@@ -47,6 +47,25 @@ export const notificationList = async ({ token, offset }: { token: string, offse
   }
 };
 
+interface EditNotificationType {
+  token: string,
+  id: number,
+  isRead: boolean
+}
+
+export const editNotification = async ({ token, id, isRead }: EditNotificationType) => {
+  const res = await axios.post(baseURL + `notification/${id}/`, {
+    isRead
+  }, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+  if (res) {
+    return res.data;
+  }
+};
+
 export const isNotification = async ({ token }: { token: string }) => {
   const res = await axios.get(baseURL + "notification/device/", {
     headers: {

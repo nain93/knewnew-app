@@ -14,8 +14,8 @@ import { InterestTagType } from '~/types';
 import AlertPopup from '~/components/popup/alertPopup';
 import { useInfiniteQuery, useQuery } from 'react-query';
 import { getReviewList } from '~/api/review';
-import { useRecoilState, useSetRecoilState } from 'recoil';
-import { myIdState, tokenState } from '~/recoil/atoms';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { isNotiReadState, myIdState, tokenState } from '~/recoil/atoms';
 import Loading from '~/components/loading';
 import { getMyProfile } from '~/api/user';
 import { MyProfileType } from '~/types/user';
@@ -57,6 +57,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const [interestTag, setInterestTag] = useState<InterestTagType>(interestTagData);
   const [token, setToken] = useRecoilState(tokenState);
   const setMyId = useSetRecoilState(myIdState);
+  const isNotiRead = useRecoilValue(isNotiReadState);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [filterBadge, setFilterBadge] = useState("");
   const [allClick, setAllClick] = useState(false);
@@ -73,16 +74,12 @@ const Feed = ({ navigation, route }: FeedProps) => {
         }
         setMyId(data.id);
       }
-      else {
-        SplashScreen.hide();
-      }
     },
     onError: () => {
       setToken("");
       AsyncStorage.removeItem("token");
       //@ts-ignore
       navigation.reset({ index: 0, routes: [{ name: "OnBoarding" }] });
-      SplashScreen.hide();
     }
   });
 
@@ -228,13 +225,21 @@ const Feed = ({ navigation, route }: FeedProps) => {
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <TouchableOpacity
                   onPress={() => tagRefRBSheet.current?.open()}
-                  style={[styles.filter, { marginRight: 0, marginBottom: 0 }]}>
+                  style={[styles.filter, { marginRight: d2p(10), marginBottom: 0 }]}>
                   <Image source={tagfilter} style={{ width: d2p(11), height: d2p(10), marginRight: d2p(10) }} />
                   <Text style={[FONT.Medium, { fontSize: 12 }]}>태그 변경</Text>
                 </TouchableOpacity>
                 <Pressable
-                  style={{ marginLeft: d2p(10) }}
                   hitSlop={hitslop} onPress={() => navigation.navigate("notification")} >
+                  {!isNotiRead &&
+                    <View style={{
+                      position: "absolute",
+                      top: 0,
+                      right: 0,
+                      borderRadius: 4,
+                      width: d2p(4), height: d2p(4), backgroundColor: theme.color.main
+                    }} />
+                  }
                   <Image source={noticeIcon} style={{ width: d2p(24), height: d2p(24) }} />
                 </Pressable>
               </View>
@@ -264,6 +269,15 @@ const Feed = ({ navigation, route }: FeedProps) => {
           }}>
             <Image source={mainLogo} resizeMode="contain" style={{ width: d2p(96), height: d2p(20) }} />
             <Pressable hitSlop={hitslop} onPress={() => navigation.navigate("notification")} >
+              {!isNotiRead &&
+                <View style={{
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  borderRadius: 4,
+                  width: d2p(4), height: d2p(4), backgroundColor: theme.color.main
+                }} />
+              }
               <Image source={noticeIcon} style={{ width: d2p(24), height: d2p(24) }} />
             </Pressable>
           </View>

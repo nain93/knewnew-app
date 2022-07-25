@@ -17,13 +17,18 @@ export const refreshState = atom<boolean>({
   default: false
 });
 
-interface popupStateProps {
+export const isNotiReadState = atom<boolean>({
+  key: "isNotiReadState",
+  default: true
+});
+
+interface popupStateType {
   isOpen: boolean;
   content: string;
   popupStyle?: ViewStyle
 }
 
-export const popupState = atom<popupStateProps>({
+export const popupState = atom<popupStateType>({
   key: "popupState",
   default: {
     isOpen: false,
@@ -32,14 +37,14 @@ export const popupState = atom<popupStateProps>({
   }
 });
 
-interface okPopupStateProps {
+interface okPopupStateType {
   isOpen: boolean;
   content: string;
   popupStyle?: ViewStyle;
   okButton: () => void
 }
 
-export const okPopupState = atom<okPopupStateProps>({
+export const okPopupState = atom<okPopupStateType>({
   key: "okPopupState",
   default: {
     isOpen: false,
@@ -49,7 +54,11 @@ export const okPopupState = atom<okPopupStateProps>({
   }
 });
 
-export const notificationPopup = atom<popupStateProps & { onPress: () => void }>({
+interface notificationPopupType extends popupStateType {
+  onPress: () => void
+}
+
+export const notificationPopup = atom<notificationPopupType>({
   key: "notificationState",
   default: {
     isOpen: false,

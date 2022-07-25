@@ -3,7 +3,7 @@ import { Animated, Linking } from 'react-native';
 import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import SplashScreen from 'react-native-splash-screen';
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 import codePush from "react-native-code-push";
@@ -11,7 +11,7 @@ import { FileLogger } from "react-native-file-logger";
 
 import GlobalNav from './src/navigators/globalNav';
 import AlertPopup from '~/components/popup/alertPopup';
-import { notificationPopup, okPopupState, popupState, tokenState } from '~/recoil/atoms';
+import { isNotiReadState, notificationPopup, okPopupState, popupState, tokenState } from '~/recoil/atoms';
 import OkPopup from '~/components/popup/okPopup';
 import Loading from '~/components/loading';
 import FadeInOut from '~/hooks/useFadeInOut';
@@ -29,6 +29,7 @@ const App = () => {
   const { fadeAnim } = FadeInOut({ isPopupOpen, setIsPopupOpen });
   const [token, setToken] = useRecoilState(tokenState);
   const [isVisible, setIsVisible] = useState(false);
+  const setIsNotiReadState = useSetRecoilState(isNotiReadState);
 
   // const sendLoggedFiles = useCallback(() => {
   //   FileLogger.sendLogFilesByEmail({
@@ -56,6 +57,7 @@ const App = () => {
       // TODO refresh api
       const storageToken = await AsyncStorage.getItem("token");
       if (storageToken) {
+        console.log(storageToken, 'storageToken');
         setToken(storageToken);
       }
       else {
@@ -95,7 +97,7 @@ const App = () => {
   // * FCM
   useEffect(() => {
     // * 코드푸시 업데이트 체크
-    installUpdateIfAvailable();
+    // installUpdateIfAvailable();
     // * 알람 수신후 핸들링
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       if (remoteMessage.notification?.body) {
@@ -131,53 +133,55 @@ const App = () => {
   };
 
   const installUpdateIfAvailable = () => {
-    // const TimeoutMS = 10000;
-    // const checkAndUpdatePromise = new Promise(async (resolve: Function) => {
-    //   const updateAvailable = await checkForUpdate();
-    //   // console.log(updateAvailable, "updateAvailable");
-    //   if (updateAvailable) {
-    //     const syncStatus = (status: codePush.SyncStatus) => {
-    //       console.log("SyncStatus = ", status);
-    //       switch (status) {
-    //         case codePush.SyncStatus.UP_TO_DATE:
-    //         case codePush.SyncStatus.UPDATE_IGNORED:
-    //           console.log("App is up to date...");
-    //           resolve();
-    //           break;
-    //         case codePush.SyncStatus.UPDATE_INSTALLED:
-    //           console.log("Update installed successfully!");
-    //           // DO NOT RESOLVE AS THE APP WILL REBOOT ITSELF HERE
-    //           break;
-    //         case codePush.SyncStatus.UNKNOWN_ERROR:
-    //           console.log("Update received an unknown error...");
-    //           resolve();
-    //           break;
-    //         default:
-    //           break;
-    //       }
-    //     };
+    const TimeoutMS = 10000;
+    const checkAndUpdatePromise = new Promise(async (resolve: Function) => {
+      const updateAvailable = await checkForUpdate();
+      // console.log(updateAvailable, "updateAvailable");
+      if (updateAvailable) {
+        const syncStatus = (status: codePush.SyncStatus) => {
+          console.log("SyncStatus = ", status);
+          switch (status) {
+            case codePush.SyncStatus.UP_TO_DATE:
+            case codePush.SyncStatus.UPDATE_IGNORED:
+              console.log("App is up to date...");
+              resolve();
+              break;
+            case codePush.SyncStatus.UPDATE_INSTALLED:
+              console.log("Update installed successfully!");
+              // DO NOT RESOLVE AS THE APP WILL REBOOT ITSELF HERE
+              break;
+            case codePush.SyncStatus.UNKNOWN_ERROR:
+              console.log("Update received an unknown error...");
+              resolve();
+              break;
+            default:
+              break;
+          }
+        };
 
-    //     // Install the update
-    //     codePush.sync(
-    //       {
-    //         installMode: codePush.InstallMode.IMMEDIATE,
-    //         mandatoryInstallMode: codePush.InstallMode.IMMEDIATE
-    //       },
-    //       syncStatus
-    //     );
-    //   } else {
-    //     resolve();
-    //   }
-    //   setTimeout(() => {
-    //     resolve();
-    //   }, TimeoutMS);
-    // });
-    // return Promise.race([checkAndUpdatePromise]);
+        // Install the update
+        codePush.sync(
+          {
+            installMode: codePush.InstallMode.IMMEDIATE,
+            mandatoryInstallMode: codePush.InstallMode.IMMEDIATE
+          },
+          syncStatus
+        );
+      } else {
+        resolve();
+      }
+      setTimeout(() => {
+        resolve();
+      }, TimeoutMS);
+    });
+    return Promise.race([checkAndUpdatePromise]);
   };
 
   useEffect(() => {
+    // * 알람오면 알람팝업 띄우고 안 읽음처리
     if (notiOpen.isOpen) {
       setIsVisible(true);
+      setIsNotiReadState(false);
     }
   }, [notiOpen.isOpen]);
 
