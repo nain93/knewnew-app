@@ -73,16 +73,12 @@ const Feed = ({ navigation, route }: FeedProps) => {
         }
         setMyId(data.id);
       }
-      else {
-        SplashScreen.hide();
-      }
     },
     onError: () => {
       setToken("");
       AsyncStorage.removeItem("token");
       //@ts-ignore
       navigation.reset({ index: 0, routes: [{ name: "OnBoarding" }] });
-      SplashScreen.hide();
     }
   });
 

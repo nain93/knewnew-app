@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, Image, Pressable, TextInput } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import BasicButton from '~/components/button/basicButton';
@@ -8,11 +8,9 @@ import { NavigationRoute } from "react-navigation";
 import { BadgeType } from '~/types';
 import { popupState, tokenState } from '~/recoil/atoms';
 import { useSetRecoilState } from 'recoil';
-import { UserInfoTagType, UserInfoType } from '~/types/user';
+import { UserInfoType } from '~/types/user';
 import { FONT } from '~/styles/fonts';
 import { initialBadgeData } from '~/utils/data';
-import SelectTag from '~/components/selectTag';
-import { checkIcon } from '~/assets/icons';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useMutation } from 'react-query';
 import { userSignup } from '~/api/user';
@@ -48,7 +46,7 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
         setToken(data.accessToken);
         await AsyncStorage.setItem("token", data.accessToken);
         await AsyncStorage.setItem("refreshToken", data.refreshToken);
-        usePermission.notificationPermission();
+        usePermission.notificationPermission({ token: data.accessToken });
       }
     }
   });

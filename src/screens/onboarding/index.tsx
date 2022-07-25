@@ -78,7 +78,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
       AsyncStorage.setItem("refreshToken", data.refreshToken);
       //@ts-ignore
       navigation.reset({ index: 0, routes: [{ name: "TabNav" }] });
-      usePermission.notificationPermission();
+      usePermission.notificationPermission({ token: data.accessToken });
     }
     else {
       // * 새 유저
@@ -100,7 +100,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
             AsyncStorage.setItem("refreshToken", data.refreshToken);
             //@ts-ignore
             navigation.reset({ routes: [{ name: "TabNav" }] });
-            usePermission.notificationPermission();
+            usePermission.notificationPermission({ token: data.accessToken });
           }
           else {
             goToBadgeSelect(data);
@@ -136,7 +136,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
         AsyncStorage.setItem("refreshToken", data.refreshToken);
         //@ts-ignore
         navigation.reset({ routes: [{ name: "TabNav" }] });
-        usePermission.notificationPermission();
+        usePermission.notificationPermission({ token: data.accessToken });
       }
       else {
         goToBadgeSelect(data);
@@ -162,7 +162,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
           AsyncStorage.setItem("refreshToken", data.refreshToken);
           //@ts-ignore
           navigation.reset({ routes: [{ name: "TabNav" }] });
-          usePermission.notificationPermission();
+          usePermission.notificationPermission({ token: data.accessToken });
         }
         else {
           goToBadgeSelect(data);
