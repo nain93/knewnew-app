@@ -3,23 +3,22 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 import { useMutation } from 'react-query';
 import { registerNotification } from '~/api/setting';
-import { useRecoilValue } from 'recoil';
-import { tokenState } from '~/recoil/atoms';
 
 const useNotification = () => {
-  const token = useRecoilValue(tokenState);
 
-  const notificationMutation = useMutation("registerNotification", ({ FCMToken, type }: { FCMToken: string, type: PlatformOSType }) =>
+  const notificationMutation = useMutation("registerNotification", ({ token, FCMToken, type }: { token: string, FCMToken: string, type: PlatformOSType }) =>
     registerNotification({ token, FCMToken, type }));
 
-  const notificationPermission = () => {
+  const notificationPermission = async ({ token }: { token: string }) => {
+    await messaging().registerDeviceForRemoteMessages();
+
     // * 아이폰 알림 권한 핸들링
     if (Platform.OS === "ios") {
       messaging().requestPermission().then(isPermission => {
         if (isPermission === 1) {
           messaging().getToken().then(FCMToken => {
             AsyncStorage.setItem("isNotification", JSON.stringify(true));
-            notificationMutation.mutate({ FCMToken, type: Platform.OS });
+            notificationMutation.mutate({ token, FCMToken, type: Platform.OS });
           });
         }
         else {
@@ -27,11 +26,11 @@ const useNotification = () => {
         }
       });
     }
+    // * 안드로이드 알림 디바이스 등록
     else {
-      // * 알림 디바이스 등록
       messaging().getToken().then(FCMToken => {
         AsyncStorage.setItem("isNotification", JSON.stringify(true));
-        notificationMutation.mutate({ FCMToken, type: Platform.OS });
+        notificationMutation.mutate({ token, FCMToken, type: Platform.OS });
       });
     }
   };

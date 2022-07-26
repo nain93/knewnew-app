@@ -21,6 +21,7 @@ import messaging from '@react-native-firebase/messaging';
 //@ts-ignore
 import VersionCheck from 'react-native-version-check';
 import { MyProfileType } from '~/types/user';
+import { loading } from '~/assets/gif';
 
 interface SettingProps {
   navigation: NavigationStackProp;
@@ -31,7 +32,7 @@ const Setting = ({ navigation }: SettingProps) => {
   const [token, setToken] = useRecoilState(tokenState);
   const myId = useRecoilValue(myIdState);
   const setModalOpen = useSetRecoilState(okPopupState);
-  const [isLatestVersion, setIsLatestVersion] = useState<boolean>(false);
+  const [isLatestVersion, setIsLatestVersion] = useState("");
   const queryClient = useQueryClient();
   const [isOn, setIsOn] = useState(true);
 
@@ -46,8 +47,8 @@ const Setting = ({ navigation }: SettingProps) => {
   const deleteUserMutation = useMutation("deleteUser", () => deleteUser({ token, id: myId }), {
     onSuccess: async () => {
       unregisterDevice();
-      setToken("");
       AsyncStorage.removeItem("token");
+      setToken("");
     }
   });
 
@@ -57,6 +58,7 @@ const Setting = ({ navigation }: SettingProps) => {
     AsyncStorage.removeItem("isNotification");
   };
 
+  // * 알람 켜짐 여부 로컬에서 가져옴
   useEffect(() => {
     AsyncStorage.getItem("isNotification").then((notification) => {
       if (notification) {
@@ -74,12 +76,7 @@ const Setting = ({ navigation }: SettingProps) => {
         VersionCheck.getLatestVersion({
           provider: "appStore"
         }).then((latestVersion: string) => {
-          if (latestVersion === versioningIOS) {
-            setIsLatestVersion(true);
-          }
-          else {
-            setIsLatestVersion(false);
-          }
+          setIsLatestVersion(latestVersion);
         });
       }
 
@@ -87,16 +84,10 @@ const Setting = ({ navigation }: SettingProps) => {
         VersionCheck.getLatestVersion({
           provider: "playStore"
         }).then((latestVersion: string) => {
-          if (latestVersion === versioningAOS) {
-            setIsLatestVersion(true);
-          }
-          else {
-            setIsLatestVersion(false);
-          }
+          setIsLatestVersion(latestVersion);
         });
       }
     }
-
   }, []);
 
   if (deleteUserMutation.isLoading) {
@@ -111,9 +102,30 @@ const Setting = ({ navigation }: SettingProps) => {
       <View style={styles.container}>
         <View style={styles.list}>
           <Text style={[FONT.Regular, styles.listText]}>버전 정보</Text>
-          <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_443e49 }]}>
-            {(Platform.OS === "ios" ? `v.${versioningIOS}` : `v.${versioningAOS}`)} {isLatestVersion && "(최신 버전)"}
-          </Text>
+          <View>
+            {isLatestVersion ?
+              <>
+                <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.main }]}>
+                  최신 버전: {isLatestVersion}
+                </Text>
+                <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_443e49 }]}>
+                  현재 버전: {(Platform.OS === "ios" ? `v.${versioningIOS}` : `v.${versioningAOS}`)}
+                </Text>
+              </>
+              :
+              <View style={{
+                position: "absolute",
+                right: 0,
+                top: -15,
+                flexDirection: "row",
+                justifyContent: 'center', alignItems: "center"
+              }}>
+                <Image source={loading} style={{
+                  width: d2p(30), height: d2p(30)
+                }} />
+              </View>
+            }
+          </View>
         </View>
         <View style={styles.list}>
           <Text style={[FONT.Regular, styles.listText]}>알림 설정</Text>
@@ -141,7 +153,7 @@ const Setting = ({ navigation }: SettingProps) => {
             setModalOpen({
               isOpen: true,
               content: "로그아웃 하시겠습니까?",
-              okButton: () => {
+              okButton: async () => {
                 unregisterDevice();
                 AsyncStorage.removeItem("token");
                 setToken("");

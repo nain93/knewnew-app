@@ -190,16 +190,15 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
         }
       </View>
 
-
       <View style={styles.titleContainer}>
         <ReviewIcon viewStyle={{ marginTop: h2p(15), marginBottom: h2p(10) }} review={review.satisfaction} />
       </View>
       {keyword ?
         <Highlighter
-          highlightStyle={[FONT.Bold, { color: theme.color.main }]}
+          highlightStyle={[FONT.Bold, { fontSize: 15, color: theme.color.main }]}
           searchWords={[keyword]}
           textToHighlight={review.content}
-          style={[FONT.Regular, { marginBottom: h2p(10), marginLeft: d2p(50) }]}
+          style={[FONT.Regular, { fontSize: 15, marginBottom: h2p(10), marginLeft: d2p(50) }]}
         />
         :
         <Text style={[{
@@ -245,7 +244,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             // * 사진 1개
             case 1: {
               return (
-                <FastImage source={{ uri: review.images[0]?.image }}
+                <FastImage source={{ uri: review.images[0]?.image, priority: FastImage.priority.high }}
                   style={[styles.imageWrap, {
                     width: type === "reKnewWrite" ?
                       Dimensions.get("window").width - d2p(120)
@@ -259,7 +258,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
               return (
                 <View style={[styles.imageWrap, { borderWidth: 0, flexDirection: "row" }]}>
                   {React.Children.toArray(review.images.map((v, i) => (
-                    <FastImage source={{ uri: v.image }} style={{
+                    <FastImage source={{ uri: v.image, priority: FastImage.priority.high }} style={{
                       marginRight: i === 0 ? d2p(10) : 0,
                       borderRadius: 10,
                       borderWidth: 1,
@@ -280,7 +279,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
                 <View style={[styles.imageWrap, { borderWidth: 0, flexDirection: "row" }]}>
                   {React.Children.toArray(review.images.slice(0, 3).map((v, i) => (
                     <View>
-                      <FastImage source={{ uri: v.image }} style={{
+                      <FastImage source={{ uri: v.image, priority: FastImage.priority.high }} style={{
                         marginRight: i !== 2 ? d2p(5) : 0,
                         borderRadius: 10,
                         borderWidth: 1,

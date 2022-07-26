@@ -208,6 +208,9 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   });
 
   const handleWriteComment = () => {
+    if (content === "") {
+      return;
+    }
     setCommentLoading(true);
     if (route.params) {
       if (commentIsEdit) {
@@ -526,21 +529,32 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                 </View>
                 <Text style={[styles.commentContent, FONT.Regular]}>{item.content}</Text>
                 <View style={{ flexDirection: "row", alignItems: "center", marginLeft: d2p(40), marginTop: h2p(10) }}>
-                  <TouchableOpacity onPress={() => {
-                    setCommentParentId(item.id);
-                    setRecommentName(item.author.nickname);
-                    setRecommentMode(true);
-                  }}>
+                  <TouchableOpacity
+                    hitSlop={hitslop}
+                    onPress={() => {
+                      inputRef.current?.focus();
+                      setCommentParentId(item.id);
+                      setRecommentName(item.author.nickname);
+                      setRecommentMode(true);
+                      // * 답글달기 클릭하면 해당 아이템 인덱스로 스크롤
+                      if (Platform.OS === "ios") {
+                        setTimeout(() => {
+                          detailScrollRef.current?.scrollToIndex({ animated: true, index, viewPosition: 0, viewOffset: -15 });
+                        }, 200);
+                      }
+                    }}>
                     <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_79737e }]}>답글달기</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => {
-                    setApiBlock(true);
-                    if (!apiBlock) {
-                      commentLikeMutation.mutate({ commentId: item.id, isLike: !item.isLike });
-                    }
-                  }}>
+                  <TouchableOpacity
+                    style={{ marginLeft: d2p(20) }}
+                    hitSlop={hitslop}
+                    onPress={() => {
+                      setApiBlock(true);
+                      if (!apiBlock) {
+                        commentLikeMutation.mutate({ commentId: item.id, isLike: !item.isLike });
+                      }
+                    }}>
                     <Text style={[(item.isLike ? FONT.Bold : FONT.Regular), {
-                      marginLeft: d2p(10),
                       fontSize: 12, color: item.isLike ? theme.color.grayscale.C_443e49 : theme.color.grayscale.C_79737e
                     }]}>좋아요 {item.likeCount > 0 && item.likeCount}</Text>
                   </TouchableOpacity>
@@ -602,7 +616,9 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
         </>
       </Pressable>
     );
-  }, [navigation, commentSelectedIdx, commentIsEdit]);
+  }, [navigation, commentSelectedIdx,
+    reviewDetailQuery.data?.author.id,
+    commentIsEdit, commentLikeMutation]);
 
   if (reviewDetailQuery.isLoading || reviewDetailQuery.isFetching) {
     return (
@@ -654,7 +670,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
         title="게시글 상세"
       />
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : -285}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
         {commentLoading &&
