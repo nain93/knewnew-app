@@ -7,13 +7,14 @@ import { d2p, h2p, simpleDate } from '~/utils';
 import { FONT } from '~/styles/fonts';
 import theme from '~/styles/theme';
 import { cart, comment, likeComment, mention, reComment } from '~/assets/icons/notificationIcon';
-import { useInfiniteQuery, useMutation } from 'react-query';
-import { editNotification, notificationList } from '~/api/setting';
+import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
+import { allReadNotification, notificationList } from '~/api/setting';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { isNotiReadState, tokenState } from '~/recoil/atoms';
 import { knewnewIcon } from '~/assets/icons';
 import Loading from '~/components/loading';
 import { NotificationListType } from '~/types/setting';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
@@ -50,22 +51,27 @@ interface NotificationProps {
 
 const Notification = ({ navigation }: NotificationProps) => {
   const token = useRecoilValue(tokenState);
-  const setIsNotiRead = useSetRecoilState(isNotiReadState);
-
+  const setIsNotiReadState = useSetRecoilState(isNotiReadState);
+  const queryClient = useQueryClient();
 
   const notificationQuery = useInfiniteQuery<NotificationListType[], Error>("notiList", ({ pageParam = 0 }) =>
     notificationList({ token, offset: pageParam }), {
     getNextPageParam: (next, all) => all.flat().length,
   });
 
-  const isReadNotification = useMutation("isReadNotification", ({ id, isRead }: { id: number, isRead: boolean }) =>
-    editNotification({ token, id, isRead }));
+  const isReadNotification = useMutation("isReadNotification", () => allReadNotification({ token }));
 
-  // * 화면 나갈때 알람 전부 읽음처리
   useEffect(() => {
+    setIsNotiReadState(true);
+    AsyncStorage.setItem("isNotiReadState", JSON.stringify(true));
     return () => {
-      // todo 전체읽음 api 필요
-      setIsNotiRead(true);
+      // * 읽음처리 캐시 컨트롤
+      isReadNotification.mutate();
+      queryClient.setQueryData<{ pageParams: Array<any>, pages: Array<NotificationListType> } | undefined>("notiList", postData => {
+        if (postData) {
+          return { ...postData, pages: postData.pages.flat().map(v => ({ ...v, isRead: true })) };
+        }
+      });
     };
   }, []);
 

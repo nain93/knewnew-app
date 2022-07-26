@@ -54,9 +54,20 @@ interface EditNotificationType {
 }
 
 export const editNotification = async ({ token, id, isRead }: EditNotificationType) => {
-  const res = await axios.post(baseURL + `notification/${id}/`, {
+  const res = await axios.patch(baseURL + `notification/${id}/`, {
     isRead
   }, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+  if (res) {
+    return res.data;
+  }
+};
+
+export const allReadNotification = async ({ token }: { token: string }) => {
+  const res = await axios.patch(baseURL + `notification/`, {}, {
     headers: {
       Authorization: `Bearer ${token}`,
     }

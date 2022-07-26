@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, Animated, Pressable } from 'react-native';
-import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, Animated, Pressable, AppState } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import Header from '~/components/header';
@@ -62,7 +62,6 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const [filterBadge, setFilterBadge] = useState("");
   const [allClick, setAllClick] = useState(false);
   const flatListRef = useRef<FlatList>(null);
-
 
   const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", token, filterBadge], () => getMyProfile(token), {
     enabled: !!token,

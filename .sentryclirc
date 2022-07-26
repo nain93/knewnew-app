@@ -1,0 +1,7 @@
+[defaults]
+url = https://sentry.io/
+org = knewnew
+project = application
+
+[auth]
+token = 7f5757c69f6f439f9468c26737add077d7fdb8a22494471ab81e4affe96638f4

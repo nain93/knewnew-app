@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Animated, Linking } from 'react-native';
+import { Animated, AppState, Linking } from 'react-native';
 import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import SplashScreen from 'react-native-splash-screen';
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -19,6 +19,7 @@ import FadeInOut from '~/hooks/useFadeInOut';
 import * as Sentry from "@sentry/react-native";
 import Config from 'react-native-config';
 import NotificationPopup from '~/components/popup/notificationPopup';
+
 
 export const navigationRef = createNavigationContainerRef();
 
@@ -51,13 +52,13 @@ const App = () => {
   //     });
   // }, []);
 
-  // * 스플래시 로딩중 토큰 저장
   useEffect(() => {
+    // *스플래시 로딩중
     const getToken = async () => {
       // TODO refresh api
+      // * 토큰 저장
       const storageToken = await AsyncStorage.getItem("token");
       if (storageToken) {
-        console.log(storageToken, 'storageToken');
         setToken(storageToken);
       }
       else {
@@ -94,14 +95,37 @@ const App = () => {
     },
   };
 
+  useEffect(() => {
+    const state = AppState.addEventListener('change', (nextAppState) => {
+      if (nextAppState === "active") {
+        // * 백그라운드 알람 클릭시
+        messaging().getInitialNotification().then(remoteMessage => {
+          if (remoteMessage) {
+            //@ts-ignore
+            navigationRef.navigate("FeedDetail", { id: remoteMessage.data.link.split("/")[1] });
+          }
+        });
+        // * 알림 읽은정보 저장
+        AsyncStorage.getItem("isNotiReadState").then(isReadNoti => {
+          if (isReadNoti) {
+            setIsNotiReadState(JSON.parse(isReadNoti));
+          }
+        });
+      }
+    });
+    return () => state.remove();
+  }, []);
+
   // * FCM
   useEffect(() => {
     // * 코드푸시 업데이트 체크
     // installUpdateIfAvailable();
-    // * 알람 수신후 핸들링
+
+    // * 포어그라운드 알람 클릭시
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       if (remoteMessage.notification?.body) {
         setNotiOpen({
+          id: Number(remoteMessage.data?.id),
           isOpen: true, content: remoteMessage.notification.body,
           onPress: () => {
             if (navigationRef.isReady()) {
@@ -182,6 +206,7 @@ const App = () => {
     if (notiOpen.isOpen) {
       setIsVisible(true);
       setIsNotiReadState(false);
+      AsyncStorage.setItem("isNotiReadState", JSON.stringify(false));
     }
   }, [notiOpen.isOpen]);
 
@@ -194,6 +219,7 @@ const App = () => {
       {/* 위에서 내려오는 알림 팝업 */}
       {isVisible &&
         <NotificationPopup
+          id={notiOpen.id}
           onPress={notiOpen.onPress}
           setIsVisible={(view: boolean) => setIsVisible(view)}
           content={notiOpen.content}

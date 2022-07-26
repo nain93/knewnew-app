@@ -5,8 +5,13 @@ import theme from '~/styles/theme';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { knewnewIcon } from '~/assets/icons';
 import { FONT } from '~/styles/fonts';
+import { tokenState } from '~/recoil/atoms';
+import { useRecoilValue } from 'recoil';
+import { useMutation } from 'react-query';
+import { editNotification } from '~/api/setting';
 
 interface NotificationPopupProp {
+  id: number,
   content: string,
   modalOpen: boolean,
   setIsVisible: (view: boolean) => void,
@@ -14,8 +19,10 @@ interface NotificationPopupProp {
   onPress: () => void
 }
 
-const NotificationPopup = ({ content, modalOpen, setIsVisible, setModalOpen, onPress }: NotificationPopupProp) => {
+const NotificationPopup = ({ id, content, modalOpen, setIsVisible, setModalOpen, onPress }: NotificationPopupProp) => {
   const moveAnim = useRef(new Animated.Value(-80)).current;
+  const token = useRecoilValue(tokenState);
+  const editNoti = useMutation("editNoti", ({ notiId, isRead }: { notiId: number, isRead: boolean }) => editNotification({ token, id: notiId, isRead }));
 
   const moveUp = () => {
     Animated.timing(moveAnim, {
@@ -57,6 +64,7 @@ const NotificationPopup = ({ content, modalOpen, setIsVisible, setModalOpen, onP
         style={styles.pressable}
         onPress={() => {
           onPress();
+          // editNoti.mutate({ notiId: id, isRead: true });
           setModalOpen(false);
         }}>
         <View style={{

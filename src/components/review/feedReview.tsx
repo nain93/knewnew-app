@@ -190,16 +190,15 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
         }
       </View>
 
-
       <View style={styles.titleContainer}>
         <ReviewIcon viewStyle={{ marginTop: h2p(15), marginBottom: h2p(10) }} review={review.satisfaction} />
       </View>
       {keyword ?
         <Highlighter
-          highlightStyle={[FONT.Bold, { color: theme.color.main }]}
+          highlightStyle={[FONT.Bold, { fontSize: 15, color: theme.color.main }]}
           searchWords={[keyword]}
           textToHighlight={review.content}
-          style={[FONT.Regular, { marginBottom: h2p(10), marginLeft: d2p(50) }]}
+          style={[FONT.Regular, { fontSize: 15, marginBottom: h2p(10), marginLeft: d2p(50) }]}
         />
         :
         <Text style={[{

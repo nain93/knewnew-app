@@ -55,12 +55,14 @@ export const okPopupState = atom<okPopupStateType>({
 });
 
 interface notificationPopupType extends popupStateType {
-  onPress: () => void
+  onPress: () => void,
+  id: number
 }
 
 export const notificationPopup = atom<notificationPopupType>({
   key: "notificationState",
   default: {
+    id: -1,
     isOpen: false,
     content: "",
     onPress: () => null
