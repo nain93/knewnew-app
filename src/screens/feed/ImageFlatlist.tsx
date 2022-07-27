@@ -65,7 +65,7 @@ const ImageFlatlist = ({ data, onPress }: ImageRenderItemProps) => {
   );
 };
 
-
 export default memo(ImageFlatlist);
+
 
 const styles = StyleSheet.create({});

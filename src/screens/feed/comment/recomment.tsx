@@ -147,6 +147,7 @@ const Recomment = ({ child, authorName,
                 <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_79737e }]}>답글달기</Text>
               </TouchableOpacity>
               </View> */}
+              
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <TouchableOpacity
                   hitSlop={hitslop}

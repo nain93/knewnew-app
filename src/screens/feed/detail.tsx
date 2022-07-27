@@ -211,6 +211,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     if (content === "") {
       return;
     }
+
     setCommentLoading(true);
     if (route.params) {
       if (commentIsEdit) {
@@ -621,6 +622,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   }, [navigation, commentSelectedIdx,
     reviewDetailQuery.data?.author.id,
     commentIsEdit, commentLikeMutation]);
+
 
   if (reviewDetailQuery.isLoading || reviewDetailQuery.isFetching) {
     return (
