@@ -9,6 +9,7 @@ import { ReviewParentType } from '~/types/review';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 import { useNavigation } from '@react-navigation/native';
 import { noProfile } from '~/assets/images';
+import FastImage from 'react-native-fast-image';
 
 interface FeedReviewProps {
   review: ReviewParentType,
@@ -70,12 +71,14 @@ const ReKnew = ({ review, filterBadge, type }: FeedReviewProps) => {
               left: d2p(25),
               borderRadius: 40,
               borderColor: theme.color.grayscale.e9e7ec,
-              borderWidth: 1
+              borderWidth: 1,
+              overflow: "hidden"
             }}>
-            <Image source={review.author.profileImage ? { uri: review.author.profileImage } : noProfile}
+            <FastImage
+              resizeMode="cover"
+              source={review.author.profileImage ? { uri: review.author.profileImage } : noProfile}
               style={{
-                width: d2p(40), height: d2p(40),
-                borderRadius: 40
+                width: d2p(40), height: d2p(40)
               }} />
           </TouchableOpacity>
         </View>

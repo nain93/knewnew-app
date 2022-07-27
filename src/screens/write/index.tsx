@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import theme from '~/styles/theme';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
-import { BadgeType, InterestTagType } from '~/types';
+import { InterestTagType } from '~/types';
 import { blackclose, cart, circle, graycircle, grayclose, grayheart, heart, maincart, maintag, tag } from '~/assets/icons';
 import { photo, photoClose } from '~/assets/images';
 import { d2p, h2p } from '~/utils';
@@ -27,7 +27,7 @@ import { preSiginedImages, uploadImage } from '~/api';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { getMyProfile } from '~/api/user';
 import { MyProfileType } from '~/types/user';
-import { marketList } from '~/utils/constant';
+import { marketList, S3_URL } from '~/utils/constant';
 import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
 
 interface WriteProp {
@@ -121,9 +121,9 @@ const Write = ({ navigation, route }: WriteProp) => {
                 created: new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString(),
                 id: data.id,
                 images: presignImg.length > 0 ?
-                  presignImg.map(img => ({ ...img, image: "https://knewnnew-s3.s3.amazonaws.com/" + img.image }))
+                  presignImg.map(img => ({ ...img, image: S3_URL + img.image }))
                   :
-                  writeData.images?.map(img => ({ ...img, image: "https://knewnnew-s3.s3.amazonaws.com/" + img.image }))
+                  writeData.images?.map(img => ({ ...img, image: S3_URL + img.image }))
               }, ...reviewQuery.pages.flat()]]
             };
           }
@@ -169,9 +169,9 @@ const Write = ({ navigation, route }: WriteProp) => {
                         null,
                     market: (writeData.market === "판매처 선택" || writeData.market === "선택 안함") ? undefined : writeData.market,
                     images: presignImg.length > 0 ?
-                      presignImg.map(img => ({ ...img, image: "https://knewnnew-s3.s3.amazonaws.com/" + img.image }))
+                      presignImg.map(img => ({ ...img, image: S3_URL + img.image }))
                       :
-                      writeData.images?.map(img => ({ ...img, image: "https://knewnnew-s3.s3.amazonaws.com/" + img.image }))
+                      writeData.images?.map(img => ({ ...img, image: S3_URL + img.image }))
                   };
                 }
                 return v;
@@ -190,9 +190,15 @@ const Write = ({ navigation, route }: WriteProp) => {
     (fileName: Array<string>) => preSiginedImages({ token, fileName, route: "review" }),
     {
       onSuccess: (data) => {
-        uploadBody.map(async (v, i) => {
+        const uploadedImages = uploadBody.map(async (v, i) => {
           await uploadImage(v, data[i]);
         });
+
+        // * 업로드 실패시 경고메세지
+        if (uploadedImages.length === 0 || (uploadBody.length !== uploadedImages.length)) {
+          setIspopupOpen({ isOpen: true, content: "사진 업로드중 문제가 생겼습니다 다시 시도해주세요." });
+          return;
+        }
         //@ts-ignore
         const reducedImages = data.reduce<Array<{ priority: number, image: string }>>((acc, cur, idx) => {
           acc = acc.concat({ priority: idx, image: cur.fields.key });
