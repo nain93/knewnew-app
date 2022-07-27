@@ -205,8 +205,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
               <Image source={appleImg} style={styles.snsImg} />
             </TouchableOpacity>}
         </View>
-        {/* 이메일 가입 기능 추가후 주석해제 */}
-        {/* <TouchableOpacity
+        <TouchableOpacity
           onPress={() => navigation.navigate("emailLogin")}
           style={{
             marginTop: h2p(23),
@@ -223,7 +222,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
             textAlign: "center",
             color: theme.color.grayscale.a09ca4
           }]}>이메일로 시작하기</Text>
-        </TouchableOpacity> */}
+        </TouchableOpacity>
       </View>
       <View style={{
         width: Dimensions.get("window").width - d2p(40),

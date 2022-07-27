@@ -47,8 +47,8 @@ const Setting = ({ navigation }: SettingProps) => {
   const deleteUserMutation = useMutation("deleteUser", () => deleteUser({ token, id: myId }), {
     onSuccess: async () => {
       unregisterDevice();
-      setToken("");
       AsyncStorage.removeItem("token");
+      setToken("");
     }
   });
 
@@ -58,6 +58,7 @@ const Setting = ({ navigation }: SettingProps) => {
     AsyncStorage.removeItem("isNotification");
   };
 
+  // * 알람 켜짐 여부 로컬에서 가져옴
   useEffect(() => {
     AsyncStorage.getItem("isNotification").then((notification) => {
       if (notification) {
@@ -152,7 +153,7 @@ const Setting = ({ navigation }: SettingProps) => {
             setModalOpen({
               isOpen: true,
               content: "로그아웃 하시겠습니까?",
-              okButton: () => {
+              okButton: async () => {
                 unregisterDevice();
                 AsyncStorage.removeItem("token");
                 setToken("");

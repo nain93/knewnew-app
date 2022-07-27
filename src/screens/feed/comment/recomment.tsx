@@ -13,6 +13,7 @@ import { noProfile } from '~/assets/images';
 import { RecommentType } from '~/types/comment';
 import { useMutation, useQueryClient } from 'react-query';
 import { deleteReviewComment, likeComment } from '~/api/comment';
+import { hitslop } from '~/utils/constant';
 
 interface RecommentProps {
   authorName: string
@@ -102,13 +103,15 @@ const Recomment = ({ child, authorName,
                           borderRadius: 4, borderWidth: 1, borderColor: theme.color.grayscale.d2d0d5
                         }}>
                           <Text style={[FONT.Medium, { fontSize: 10, color: theme.color.grayscale.C_79737e }]}>
-                            작성자</Text>
+                            작성자
+                          </Text>
                         </View>
                       }
                     </TouchableOpacity>
                     <Text style={[
                       { marginLeft: item.author.id === myId ? d2p(5) : d2p(10) },
-                      styles.commentDate, FONT.Regular]}>{dateCommentFormat(item.created)}</Text>
+                      styles.commentDate, FONT.Regular]}>{dateCommentFormat(item.created)}
+                    </Text>
                   </View>
                   {myId === item.author.id &&
                     <TouchableOpacity onPress={() => {
@@ -144,19 +147,23 @@ const Recomment = ({ child, authorName,
                 <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_79737e }]}>답글달기</Text>
               </TouchableOpacity>
               </View> */}
-
-              <TouchableOpacity
-                style={{ marginLeft: d2p(49), marginTop: h2p(10) }}
-                onPress={() => {
-                  setApiBlock(true);
-                  if (!apiBlock) {
-                    commentLikeMutation.mutate({ commentId: item.id, isLike: !item.isLike });
-                  }
-                }}>
-                <Text style={[(item.isLike ? FONT.Bold : FONT.Regular), {
-                  fontSize: 12, color: item.isLike ? theme.color.grayscale.C_443e49 : theme.color.grayscale.C_79737e,
-                }]}>좋아요 {item.likeCount > 0 && item.likeCount}</Text>
-              </TouchableOpacity>
+              
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <TouchableOpacity
+                  hitSlop={hitslop}
+                  style={{ marginLeft: d2p(49), marginTop: h2p(10) }}
+                  onPress={() => {
+                    setApiBlock(true);
+                    if (!apiBlock) {
+                      commentLikeMutation.mutate({ commentId: item.id, isLike: !item.isLike });
+                    }
+                  }}>
+                  <Text style={[(item.isLike ? FONT.Bold : FONT.Regular), {
+                    fontSize: 12, color: item.isLike ? theme.color.grayscale.C_443e49 : theme.color.grayscale.C_79737e,
+                  }]}>좋아요 {item.likeCount > 0 && item.likeCount}
+                  </Text>
+                </TouchableOpacity>
+              </View>
               {recommentSelectedIdx === index &&
                 <View style={styles.clickBox}>
                   <Pressable

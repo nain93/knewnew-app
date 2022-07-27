@@ -9,7 +9,9 @@ const useNotification = () => {
   const notificationMutation = useMutation("registerNotification", ({ token, FCMToken, type }: { token: string, FCMToken: string, type: PlatformOSType }) =>
     registerNotification({ token, FCMToken, type }));
 
-  const notificationPermission = ({ token }: { token: string }) => {
+  const notificationPermission = async ({ token }: { token: string }) => {
+    await messaging().registerDeviceForRemoteMessages();
+
     // * 아이폰 알림 권한 핸들링
     if (Platform.OS === "ios") {
       messaging().requestPermission().then(isPermission => {
@@ -24,8 +26,8 @@ const useNotification = () => {
         }
       });
     }
+    // * 안드로이드 알림 디바이스 등록
     else {
-      // * 알림 디바이스 등록
       messaging().getToken().then(FCMToken => {
         AsyncStorage.setItem("isNotification", JSON.stringify(true));
         notificationMutation.mutate({ token, FCMToken, type: Platform.OS });

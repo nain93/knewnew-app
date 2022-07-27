@@ -1,5 +1,5 @@
 import { Dimensions, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import React, { useState } from 'react';
+import React, { memo, useState } from 'react';
 import FastImage from 'react-native-fast-image';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
@@ -43,7 +43,7 @@ const ImageFlatlist = ({ data, onPress }: ImageRenderItemProps) => {
               height: "100%",
               borderRadius: 18
             }}
-            source={{ uri: item.image }} />
+            source={{ uri: item.image, priority: "high" }} />
         </Pressable>}
       />
 
@@ -63,10 +63,9 @@ const ImageFlatlist = ({ data, onPress }: ImageRenderItemProps) => {
       }
     </View>
   );
-
 };
 
+export default memo(ImageFlatlist);
 
-export default ImageFlatlist;
 
 const styles = StyleSheet.create({});

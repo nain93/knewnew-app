@@ -1,5 +1,5 @@
-import { Dimensions, FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import React, { useCallback } from 'react';
+import { Dimensions, FlatList, Image, ImageSourcePropType, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useEffect } from 'react';
 import Header from '~/components/header';
 import { NavigationStackProp } from 'react-navigation-stack';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
@@ -7,38 +7,73 @@ import { d2p, h2p, simpleDate } from '~/utils';
 import { FONT } from '~/styles/fonts';
 import theme from '~/styles/theme';
 import { cart, comment, likeComment, mention, reComment } from '~/assets/icons/notificationIcon';
-import { useInfiniteQuery } from 'react-query';
-import { notificationList } from '~/api/setting';
-import { useRecoilValue } from 'recoil';
-import { tokenState } from '~/recoil/atoms';
+import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
+import { allReadNotification, notificationList } from '~/api/setting';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { isNotiReadState, tokenState } from '~/recoil/atoms';
 import { knewnewIcon } from '~/assets/icons';
 import Loading from '~/components/loading';
+import { NotificationListType } from '~/types/setting';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+
+interface NotiContainerProp {
+  source: ImageSourcePropType,
+  title: string,
+  isRead: boolean
+}
+
+const NotiContainer = ({ source, title, isRead }: NotiContainerProp) => {
+  return (
+    <>
+      <Image source={source} resizeMode="contain" style={{ width: d2p(18), height: d2p(18) }} />
+      <View>
+        {!isRead &&
+          <View style={{
+            position: "absolute",
+            top: 3,
+            right: -5,
+            width: d2p(4), height: d2p(4), backgroundColor: theme.color.main, borderRadius: 4
+          }} />
+        }
+        <Text style={[FONT.Regular, styles.notiText]}>
+          {title}
+        </Text>
+      </View>
+    </>
+  );
+};
 
 interface NotificationProps {
   navigation: NavigationStackProp;
 }
 
-interface NotificationListType {
-  id: number,
-  image: string | null,
-  isRead: boolean,
-  link: string,
-  message: string,
-  title: string,
-  created: string,
-  type: "review_comment" | "review_comment_like" | "review_child_comment" | "review_bookmark" |
-  "review_like" | "review_popular" | "review_recommend" | "review_view" | "follow" | "review_mention" |
-  "comment_mention" | "admin_noti" | "general"
-}
-
-
 const Notification = ({ navigation }: NotificationProps) => {
   const token = useRecoilValue(tokenState);
+  const setIsNotiReadState = useSetRecoilState(isNotiReadState);
+  const queryClient = useQueryClient();
 
   const notificationQuery = useInfiniteQuery<NotificationListType[], Error>("notiList", ({ pageParam = 0 }) =>
     notificationList({ token, offset: pageParam }), {
     getNextPageParam: (next, all) => all.flat().length,
   });
+
+  const isReadNotification = useMutation("isReadNotification", () => allReadNotification({ token }));
+
+  useEffect(() => {
+    setIsNotiReadState(true);
+    AsyncStorage.setItem("isNotiReadState", JSON.stringify(true));
+    return () => {
+      // * 읽음처리 캐시 컨트롤
+      isReadNotification.mutate();
+      queryClient.setQueryData<{ pageParams: Array<any>, pages: Array<NotificationListType> } | undefined>("notiList", postData => {
+        if (postData) {
+          return { ...postData, pages: postData.pages.flat().map(v => ({ ...v, isRead: true })) };
+        }
+      });
+    };
+  }, []);
 
   const renderItem = useCallback(({ item }: { item: NotificationListType, index: number }) => {
     return (
@@ -54,72 +89,37 @@ const Notification = ({ navigation }: NotificationProps) => {
             switch (item.type) {
               case "review_popular": {
                 return (
-                  <>
-                    <Image source={knewnewIcon} resizeMode="contain" style={{ width: d2p(18), height: d2p(18) }} />
-                    <Text style={[FONT.Regular, styles.notiText]}>
-                      활동
-                    </Text>
-                  </>
+                  <NotiContainer source={knewnewIcon} isRead={item.isRead} title="활동" />
                 );
               }
               case "review_comment": {
                 return (
-                  <>
-                    <Image source={comment} resizeMode="contain" style={{ width: d2p(18), height: d2p(18) }} />
-                    <Text style={[FONT.Regular, styles.notiText]}>
-                      댓글
-                    </Text>
-                  </>
+                  <NotiContainer source={comment} isRead={item.isRead} title="댓글" />
                 );
               }
               case "review_comment_like": {
                 return (
-                  <>
-                    <Image source={likeComment} resizeMode="contain" style={{ width: d2p(18), height: d2p(18) }} />
-                    <Text style={[FONT.Regular, styles.notiText]}>
-                      좋아요
-                    </Text>
-                  </>
+                  <NotiContainer source={likeComment} isRead={item.isRead} title="좋아요" />
                 );
               }
               case "review_child_comment": {
                 return (
-                  <>
-                    <Image source={reComment} resizeMode="contain" style={{ width: d2p(18), height: d2p(18) }} />
-                    <Text style={[FONT.Regular, styles.notiText]}>
-                      답글
-                    </Text>
-                  </>
+                  <NotiContainer source={reComment} isRead={item.isRead} title="답글" />
                 );
               }
               case "comment_mention": {
                 return (
-                  <>
-                    <Image source={mention} resizeMode="contain" style={{ width: d2p(18), height: d2p(18) }} />
-                    <Text style={[FONT.Regular, styles.notiText]}>
-                      언급
-                    </Text>
-                  </>
+                  <NotiContainer source={mention} isRead={item.isRead} title="언급" />
                 );
               }
               case "review_like": {
                 return (
-                  <>
-                    <Image source={likeComment} resizeMode="contain" style={{ width: d2p(18), height: d2p(18) }} />
-                    <Text style={[FONT.Regular, styles.notiText]}>
-                      좋아요
-                    </Text>
-                  </>
+                  <NotiContainer source={likeComment} isRead={item.isRead} title="좋아요" />
                 );
               }
               case "review_bookmark": {
                 return (
-                  <>
-                    <Image source={cart} resizeMode="contain" style={{ width: d2p(18), height: d2p(18) }} />
-                    <Text style={[FONT.Regular, styles.notiText]}>
-                      담기
-                    </Text>
-                  </>
+                  <NotiContainer source={cart} isRead={item.isRead} title="담기" />
                 );
               }
               default: {

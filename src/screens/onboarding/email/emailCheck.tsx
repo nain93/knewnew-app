@@ -50,7 +50,7 @@ const EmailCheck = ({ navigation }: EmailCheckProps) => {
           placeholderTextColor={theme.color.grayscale.d3d0d5}
           value={email}
           onChangeText={(e) => setEmail(e)}
-          autoCapitalize="none" style={styles.textInput} placeholder="이메일 주소를 입력하세요" keyboardType="email-address" />
+          autoCapitalize="none" style={[FONT.Regular, styles.textInput]} placeholder="이메일 주소를 입력하세요" keyboardType="email-address" />
         <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.main, marginTop: h2p(5) }]}>{error}</Text>
         <TouchableOpacity
           onPress={handleEmailCheck}
