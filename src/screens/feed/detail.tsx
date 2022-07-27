@@ -338,12 +338,14 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
               height: d2p(40),
               width: d2p(40),
               overflow: "hidden",
-              borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
+              borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec
             }}>
-            <Image source={reviewDetailQuery.data?.author.profileImage ?
-              { uri: reviewDetailQuery.data?.author.profileImage } : noProfile}
+            <FastImage
+              resizeMode="cover"
+              source={reviewDetailQuery.data?.author.profileImage ?
+                { uri: reviewDetailQuery.data?.author.profileImage } : noProfile}
               style={{
-                width: d2p(40), height: d2p(40), borderRadius: 40
+                width: d2p(40), height: d2p(40)
               }}
             />
           </TouchableOpacity>

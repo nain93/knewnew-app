@@ -134,11 +134,8 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             overflow: "hidden",
             borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
           }}>
-          <FastImage source={review.author.profileImage ? { uri: review.author.profileImage } : noProfile}
-            style={{
-              width: d2p(40), height: d2p(40),
-              borderRadius: 40
-            }} />
+          <FastImage resizeMode="cover" source={review.author.profileImage ? { uri: review.author.profileImage } : noProfile}
+            style={{ width: d2p(40), height: d2p(40) }} />
         </TouchableOpacity>
 
         <View style={{
@@ -244,7 +241,8 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             // * 사진 1개
             case 1: {
               return (
-                <FastImage source={{ uri: review.images[0]?.image, priority: FastImage.priority.high }}
+                <FastImage
+                  source={{ uri: review.images[0]?.image, priority: FastImage.priority.high }}
                   style={[styles.imageWrap, {
                     width: type === "reKnewWrite" ?
                       Dimensions.get("window").width - d2p(120)
@@ -279,17 +277,18 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
                 <View style={[styles.imageWrap, { borderWidth: 0, flexDirection: "row" }]}>
                   {React.Children.toArray(review.images.slice(0, 3).map((v, i) => (
                     <View>
-                      <FastImage source={{ uri: v.image, priority: FastImage.priority.high }} style={{
-                        marginRight: i !== 2 ? d2p(5) : 0,
-                        borderRadius: 10,
-                        borderWidth: 1,
-                        borderColor: theme.color.grayscale.d3d0d5,
-                        width:
-                          type === "reKnewWrite" ?
-                            Dimensions.get("window").width - d2p(283.5)
-                            :
-                            Dimensions.get("window").width - d2p(276), aspectRatio: 3 / 2,
-                      }} />
+                      <FastImage
+                        source={{ uri: v.image, priority: FastImage.priority.high }} style={{
+                          marginRight: i !== 2 ? d2p(5) : 0,
+                          borderRadius: 10,
+                          borderWidth: 1,
+                          borderColor: theme.color.grayscale.d3d0d5,
+                          width:
+                            type === "reKnewWrite" ?
+                              Dimensions.get("window").width - d2p(283.5)
+                              :
+                              Dimensions.get("window").width - d2p(276), aspectRatio: 3 / 2,
+                        }} />
                       {i === 2 &&
                         <View style={{
                           position: "absolute",

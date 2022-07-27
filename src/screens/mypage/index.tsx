@@ -17,6 +17,7 @@ import { NavigationRoute } from 'react-navigation';
 import BasicButton from '~/components/button/basicButton';
 import { ReviewListType } from '~/types/review';
 import { graywrite } from '~/assets/icons';
+import FastImage from 'react-native-fast-image';
 
 interface MypageProps {
   navigation: NavigationStackProp;
@@ -101,7 +102,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             {`${getMyProfileQuery.data?.tags.foodStyle} ${getMyProfileQuery.data?.tags.household} ${getMyProfileQuery.data?.tags.occupation}`}
           </Text>
         </View>
-        <Image style={{
+        <FastImage style={{
           width: d2p(70), height: d2p(70), borderRadius: 70,
           borderWidth: 1,
           borderColor: theme.color.grayscale.eae7ec

@@ -43,11 +43,20 @@ export async function uploadImage(file: { uri: string, type: string, name: strin
 
   data.append("file", file);
 
-  return (await axios.post(preSigned.url, data, {
-    headers: {
-      'Content-Type': 'multipart/form-data'
+  try {
+    const res = await axios.post(preSigned.url, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    if (res) {
+      return res.data;
     }
-  })).data;
+  }
+  catch (e) {
+    console.log(e);
+  }
+
 }
 
 
