@@ -167,12 +167,13 @@ const UserTagLayout = ({ viewStyle, scrollRef, userBadge, setUserBadge }: UserTa
                           })
                         });
                       }}
-                      style={{
+                      style={[FONT.Regular, {
                         marginTop: h2p(5),
+                        color: theme.color.black,
                         width: Dimensions.get("window").width - d2p(140),
                         paddingVertical: h2p(6),
                         borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec
-                      }}
+                      }]}
                     />
                   }
                 </>

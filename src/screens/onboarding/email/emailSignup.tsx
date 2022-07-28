@@ -77,7 +77,7 @@ const EmailSignup = ({ navigation, route }: EmailSignupProps) => {
           placeholderTextColor={theme.color.grayscale.d3d0d5}
           value={userInput.email}
           onChangeText={(e) => setUserInput({ ...userInput, email: e })}
-          autoCapitalize="none" style={styles.textInput} placeholder="이메일 주소를 입력하세요" keyboardType="email-address" />
+          autoCapitalize="none" style={[FONT.Regular, styles.textInput]} placeholder="이메일 주소를 입력하세요" keyboardType="email-address" />
 
         <View style={[styles.textInput, {
           flexDirection: "row",

@@ -66,13 +66,13 @@ const EmailLogin = ({ navigation, route }: EmailLoginProps) => {
           placeholderTextColor={theme.color.grayscale.d3d0d5}
           value={userInput.email}
           onChangeText={(e) => setUserInput({ ...userInput, email: e })}
-          autoCapitalize="none" style={styles.textInput} placeholder="이메일 주소를 입력하세요" keyboardType="email-address" />
+          autoCapitalize="none" style={[FONT.Regular, styles.textInput]} placeholder="이메일 주소를 입력하세요" keyboardType="email-address" />
         <TextInput
           placeholderTextColor={theme.color.grayscale.d3d0d5}
           value={userInput.password}
           onChangeText={(e) => setUserInput({ ...userInput, password: e })}
           autoCapitalize="none"
-          style={styles.textInput} placeholder="비밀번호를 입력하세요" secureTextEntry={true} />
+          style={[FONT.Regular, styles.textInput]} placeholder="비밀번호를 입력하세요" secureTextEntry={true} />
         <Text style={[FONT.Bold, { color: theme.color.main }]}>{error}</Text>
         <Text style={{
           marginTop: "auto",
