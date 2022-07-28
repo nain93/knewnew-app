@@ -150,8 +150,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode project.env.get("AOS_BUILD_VERSION").toInteger()
-        versionName project.env.get("AOS_APP_VERSION")
-        // versionName 1.0.13
+        // versionName project.env.get("AOS_APP_VERSION")
+        versionName 1.0.14
         resValue 'string', "CODE_PUSH_APK_BUILD_TIME", String.format("\"%d\"", System.currentTimeMillis())
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
         vectorDrawables.useSupportLibrary = true

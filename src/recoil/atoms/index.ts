@@ -22,6 +22,11 @@ export const isNotiReadState = atom<boolean>({
   default: true
 });
 
+export const latestVerionsState = atom<string>({
+  key: "latestVerionsState",
+  default: ""
+});
+
 interface popupStateType {
   isOpen: boolean;
   content: string;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Animated, AppState, Linking } from 'react-native';
+import { Animated, AppState, Linking, Platform } from 'react-native';
 import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import SplashScreen from 'react-native-splash-screen';
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -11,12 +11,14 @@ import { FileLogger } from "react-native-file-logger";
 
 import GlobalNav from './src/navigators/globalNav';
 import AlertPopup from '~/components/popup/alertPopup';
-import { isNotiReadState, notificationPopup, okPopupState, popupState, tokenState } from '~/recoil/atoms';
+import { isNotiReadState, latestVerionsState, notificationPopup, okPopupState, popupState, tokenState } from '~/recoil/atoms';
 import OkPopup from '~/components/popup/okPopup';
 import Loading from '~/components/loading';
 import FadeInOut from '~/hooks/useFadeInOut';
 
 import * as Sentry from "@sentry/react-native";
+//@ts-ignore
+import VersionCheck from 'react-native-version-check';
 import Config from 'react-native-config';
 import NotificationPopup from '~/components/popup/notificationPopup';
 
@@ -31,6 +33,7 @@ const App = () => {
   const [token, setToken] = useRecoilState(tokenState);
   const [isVisible, setIsVisible] = useState(false);
   const setIsNotiReadState = useSetRecoilState(isNotiReadState);
+  const setLatestVerions = useSetRecoilState(latestVerionsState);
 
   // const sendLoggedFiles = useCallback(() => {
   //   FileLogger.sendLogFilesByEmail({
@@ -52,20 +55,41 @@ const App = () => {
   //     });
   // }, []);
 
+  // * 최신버전 체크
+  const versionCheck = () => {
+    if (Platform.OS === "ios") {
+      VersionCheck.getLatestVersion({
+        provider: "appStore"
+      }).then((latestVersion: string) => {
+        setLatestVerions(latestVersion);
+      });
+    }
+
+    if (Platform.OS === "android") {
+      VersionCheck.getLatestVersion({
+        provider: "playStore"
+      }).then((latestVersion: string) => {
+        setLatestVerions(latestVersion);
+      });
+    }
+  };
+
+  const getToken = async () => {
+    // TODO refresh api
+    // * 토큰 저장
+    const storageToken = await AsyncStorage.getItem("token");
+    if (storageToken) {
+      setToken(storageToken);
+    }
+    else {
+      SplashScreen.hide();
+    }
+  };
+
   useEffect(() => {
     // *스플래시 로딩중
-    const getToken = async () => {
-      // TODO refresh api
-      // * 토큰 저장
-      const storageToken = await AsyncStorage.getItem("token");
-      if (storageToken) {
-        setToken(storageToken);
-      }
-      else {
-        SplashScreen.hide();
-      }
-    };
     getToken();
+    versionCheck();
   }, []);
 
   const linking = {

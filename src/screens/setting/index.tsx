@@ -12,7 +12,7 @@ import { versioningAOS, versioningIOS } from '~/utils/constant';
 import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { myIdState, okPopupState, tokenState } from '~/recoil/atoms';
+import { latestVerionsState, myIdState, okPopupState, tokenState } from '~/recoil/atoms';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { deleteUser, getMyProfile } from '~/api/user';
 import ToggleButton from '~/components/button/toggleButton';
@@ -32,7 +32,7 @@ const Setting = ({ navigation }: SettingProps) => {
   const [token, setToken] = useRecoilState(tokenState);
   const myId = useRecoilValue(myIdState);
   const setModalOpen = useSetRecoilState(okPopupState);
-  const [isLatestVersion, setIsLatestVersion] = useState("");
+  const isLatestVersion = useRecoilValue(latestVerionsState);
   const queryClient = useQueryClient();
   const [isOn, setIsOn] = useState(true);
 
@@ -68,28 +68,6 @@ const Setting = ({ navigation }: SettingProps) => {
     });
   }, [getMyProfileQuery.data]);
 
-
-  useEffect(() => {
-    // * 최신버전 체크
-    if (!__DEV__) {
-      if (Platform.OS === "ios") {
-        VersionCheck.getLatestVersion({
-          provider: "appStore"
-        }).then((latestVersion: string) => {
-          setIsLatestVersion(latestVersion);
-        });
-      }
-
-      if (Platform.OS === "android") {
-        VersionCheck.getLatestVersion({
-          provider: "playStore"
-        }).then((latestVersion: string) => {
-          setIsLatestVersion(latestVersion);
-        });
-      }
-    }
-  }, []);
-
   if (deleteUserMutation.isLoading) {
     return <Loading />;
   }
@@ -109,7 +87,7 @@ const Setting = ({ navigation }: SettingProps) => {
                   최신 버전: {isLatestVersion}
                 </Text>
                 <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_443e49 }]}>
-                  현재 버전: {(Platform.OS === "ios" ? `v.${versioningIOS}` : `v.${versioningAOS}`)}
+                  현재 버전: {(Platform.OS === "ios" ? versioningIOS : versioningAOS)}
                 </Text>
               </>
               :
