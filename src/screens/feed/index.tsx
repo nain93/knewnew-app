@@ -5,7 +5,7 @@ import theme from '~/styles/theme';
 import Header from '~/components/header';
 import mainLogo from '~/assets/logo';
 import FeedReview from '~/components/review/feedReview';
-import { colorCheck, noticeIcon, tagfilter } from '~/assets/icons';
+import { colorCheck, grayCheckIcon, heart, leftArrow, noticeIcon, tagfilter } from '~/assets/icons';
 
 import RBSheet from "react-native-raw-bottom-sheet";
 import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
@@ -29,6 +29,7 @@ import SplashScreen from 'react-native-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { loading } from '~/assets/gif';
 import { hitslop } from '~/utils/constant';
+import CloseIcon from '~/components/icon/closeIcon';
 
 
 function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
@@ -54,6 +55,8 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const fadeHook = FadeInOut({ isPopupOpen, setIsPopupOpen });
   const [scrollOffset, setScrollOffset] = useState(0);
   const tagRefRBSheet = useRef<RBSheet>(null);
+  const reactRefRBSheet = useRef<RBSheet>(null);
+  const marketRefRBSheet = useRef<RBSheet>(null);
   const [interestTag, setInterestTag] = useState<InterestTagType>(interestTagData);
   const [token, setToken] = useRecoilState(tokenState);
   const setMyId = useSetRecoilState(myIdState);
@@ -102,19 +105,19 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const reviewHeader = useCallback(() =>
     <>
       <View style={styles.main}>
-        <Text style={[styles.mainText, FONT.Bold]}>뉴뉴는 지금</Text>
+        <Text style={[styles.mainText, FONT.Bold]}>지금 실시간</Text>
         <View style={{ flexDirection: 'row' }}>
           {filterBadge ?
             <>
-              <Text style={[styles.mainText, { color: theme.color.main, marginTop: Platform.OS === "ios" ? h2p(2) : 0 }, FONT.Bold]}>
+              <Text style={[styles.mainText, { color: theme.color.main }, FONT.Bold]}>
                 {filterBadge ? `#${filterBadge}` : `#${getMyProfileQuery.data?.representBadge}`} </Text>
-              <Text style={[styles.mainText, FONT.Bold]}>관련 메뉴 추천 중 👀</Text>
+              <Text style={[styles.mainText, FONT.Bold]}>구경 중이에요!</Text>
             </>
             :
             <>
-              <Text style={[styles.mainText, { color: theme.color.main, marginTop: Platform.OS === "ios" ? h2p(2) : 0 }, FONT.Bold]}>
+              <Text style={[styles.mainText, { color: theme.color.main }, FONT.Bold]}>
                 모든 메뉴 </Text>
-              <Text style={[styles.mainText, FONT.Bold]}>추천 중 👀</Text>
+              <Text style={[styles.mainText, FONT.Bold]}>구경 중이에요!</Text>
             </>
           }
         </View>
@@ -124,8 +127,43 @@ const Feed = ({ navigation, route }: FeedProps) => {
           onPress={() => tagRefRBSheet.current?.open()}
           style={styles.filter}>
           <Image source={tagfilter} style={{ width: d2p(11), height: d2p(10), marginRight: d2p(10) }} />
-          <Text style={[FONT.Medium, { fontSize: 12 }]}>태그 변경</Text>
+          <Text style={[FONT.Medium, { fontSize: 12, color: theme.color.grayscale.C_443e49 }]}>다른 태그 보기</Text>
         </TouchableOpacity>
+      </View>
+
+      <View style={{ paddingHorizontal: d2p(10) }}>
+        {/* 팔로잉 기능 추가후 주석해제 */}
+        <View style={{ flexDirection: "row", alignItems: "center", marginLeft: d2p(10) }}>
+          <Image source={grayCheckIcon} style={{ width: d2p(10), height: d2p(8), marginRight: d2p(10) }} />
+          <Text style={[FONT.Medium, { color: theme.color.grayscale.a09ca4, fontSize: 12 }]}>
+            팔로잉한 유저만 보기
+          </Text>
+        </View>
+        <View style={{
+          flexDirection: "row", marginTop: h2p(10), alignItems: "center",
+          justifyContent: "space-between",
+        }}>
+          <View style={{ flexDirection: "row", marginBottom: h2p(5) }}>
+            <TouchableOpacity
+              onPress={() => reactRefRBSheet.current?.open()}
+              style={styles.filterTag}>
+              <Text style={[FONT.Regular, { marginRight: d2p(5), fontSize: 12, color: theme.color.grayscale.C_443e49 }]}>
+                반응별</Text>
+              <Image source={leftArrow} style={{ width: d2p(7), height: d2p(15), transform: [{ rotate: "270deg" }] }} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => marketRefRBSheet.current?.open()}
+              style={styles.filterTag}>
+              <Text style={[FONT.Regular, { marginRight: d2p(5), fontSize: 12, color: theme.color.grayscale.C_443e49 }]}>
+                구매처별</Text>
+              <Image source={leftArrow} style={{ width: d2p(7), height: d2p(15), transform: [{ rotate: "270deg" }] }} />
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={[FONT.Regular, { fontSize: 12, marginRight: d2p(5) }]}>최신순</Text>
+            <Image source={leftArrow} style={{ width: d2p(7), height: d2p(15), transform: [{ rotate: "270deg" }] }} />
+          </TouchableOpacity>
+        </View>
       </View>
     </>
     , [filterBadge, getMyProfileQuery.data?.representBadge]);
@@ -303,6 +341,8 @@ const Feed = ({ navigation, route }: FeedProps) => {
           onScroll={reviewOnScroll}
         />
       </View>
+
+      {/* 다른 태그 보기 sheet */}
       <RBSheet
         ref={tagRefRBSheet}
         onOpen={() =>
@@ -414,6 +454,57 @@ const Feed = ({ navigation, route }: FeedProps) => {
           </Animated.View>
         }
       </RBSheet>
+
+      {/* 반응별 sheet */}
+      <RBSheet ref={reactRefRBSheet}
+        closeOnDragDown
+        dragFromTopOnly
+        animationType="fade"
+        height={Dimensions.get("window").height - h2p(480)}
+        customStyles={{
+          container: {
+            borderRadius: 30,
+            padding: d2p(20)
+          },
+          draggableIcon: {
+            display: "none"
+          }
+        }}
+        openDuration={250}
+      >
+        <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: d2p(10), marginBottom: h2p(34) }}>
+          <CloseIcon onPress={() => reactRefRBSheet.current?.close()}
+            imageStyle={{ width: d2p(15), height: h2p(15) }} />
+          <Text style={[{ fontSize: 16, marginRight: d2p(15) }, FONT.Bold]}>반응별로 보기</Text>
+          <View />
+        </View>
+        <View style={{
+          borderWidth: 1, borderRadius: 10,
+          borderColor: theme.color.grayscale.eae7ec,
+          width: d2p(70), height: h2p(70),
+          justifyContent: "center", alignItems: "center"
+        }}>
+          <Image source={heart} style={{ width: d2p(20), height: d2p(20) }} />
+          <Text>최고예요</Text>
+        </View>
+      </RBSheet>
+      {/* 구매처별 sheet */}
+      <RBSheet ref={marketRefRBSheet}
+        closeOnDragDown
+        dragFromTopOnly
+        animationType="fade"
+        height={Dimensions.get("window").height - h2p(456)}
+        customStyles={{
+          container: {
+            borderRadius: 30,
+            padding: d2p(20)
+          },
+          draggableIcon: {
+            display: "none"
+          }
+        }}
+        openDuration={250}
+      />
     </>
   );
 };
@@ -431,7 +522,7 @@ const styles = StyleSheet.create({
   main: {
     paddingTop: h2p(35),
     paddingBottom: h2p(18),
-    paddingHorizontal: 20,
+    paddingHorizontal: d2p(20),
     width: '100%'
   },
   mainText: {
@@ -442,13 +533,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
+    borderColor: "#9f9ca3",
     borderRadius: 5,
     paddingVertical: h2p(7),
-    paddingHorizontal: d2p(17),
+    paddingHorizontal: d2p(15),
     backgroundColor: theme.color.white,
-    width: d2p(100),
     marginRight: d2p(20),
     marginBottom: h2p(20)
+  },
+  filterTag: {
+    borderColor: theme.color.grayscale.e9e7ec,
+    borderWidth: 1,
+    backgroundColor: theme.color.white, width: d2p(70), height: h2p(25),
+    borderRadius: 12.5,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: d2p(5),
+    flexDirection: "row"
   },
   tagBtn: {
     color: theme.color.white,

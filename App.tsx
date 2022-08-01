@@ -143,7 +143,7 @@ const App = () => {
   // * FCM
   useEffect(() => {
     // * 코드푸시 업데이트 체크
-    installUpdateIfAvailable();
+    // installUpdateIfAvailable();
 
     // * 포어그라운드 알람 클릭시
     const unsubscribe = messaging().onMessage(async remoteMessage => {
