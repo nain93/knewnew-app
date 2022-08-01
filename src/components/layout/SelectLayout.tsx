@@ -1,12 +1,12 @@
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
-import Badge from '~/components/badge';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
-import { checkIcon, initialize } from '~/assets/icons';
-import { BadgeType, InterestTagType } from '~/types';
+import { checkIcon } from '~/assets/icons';
+import { InterestTagType } from '~/types';
 import { FONT } from '~/styles/fonts';
 import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
+import ResetButton from '~/components/button/resetButton';
 
 interface SelectLayoutProps {
   interestTag: InterestTagType;
@@ -76,15 +76,13 @@ const SelectLayout = ({ setIsPopupOpen, remainingPeriod, headerComponent, isInit
         </View>
       </ScrollView>
       {isInitial &&
-        <TouchableOpacity
-          onPress={resetIsClick}
-          style={{
-            position: "absolute", flexDirection: 'row', right: d2p(30),
+        <ResetButton
+          resetClick={resetIsClick}
+          viewStyle={{
+            position: "absolute", right: d2p(30),
             bottom: headerComponent ? h2p(100) : (isIphoneX() ? getBottomSpace() : h2p(20))
-          }}>
-          <Image source={initialize} resizeMode="contain" style={{ height: d2p(12), width: d2p(12), marginRight: d2p(5) }} />
-          <Text style={[{ color: theme.color.grayscale.a09ca4 }, FONT.Bold]}>초기화</Text>
-        </TouchableOpacity>
+          }}
+        />
       }
     </>
   );

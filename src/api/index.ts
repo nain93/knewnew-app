@@ -2,6 +2,7 @@ import axios from "axios";
 import Config from "react-native-config";
 
 export const baseURL = Config.BACKEND_URL;
+// export const baseURL = "http://1.227.95.139:8000/";
 
 export const getNewToken = async (refreshToken: string) => {
   const res = await axios.get(baseURL + "auth/refresh/", {

@@ -5,7 +5,7 @@ import theme from '~/styles/theme';
 import Header from '~/components/header';
 import mainLogo from '~/assets/logo';
 import FeedReview from '~/components/review/feedReview';
-import { colorCheck, grayCheckIcon, heart, leftArrow, noticeIcon, tagfilter } from '~/assets/icons';
+import { colorCheck, grayCheckIcon, leftArrow, noticeIcon, tagfilter } from '~/assets/icons';
 
 import RBSheet from "react-native-raw-bottom-sheet";
 import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
@@ -19,7 +19,7 @@ import { isNotiReadState, myIdState, tokenState } from '~/recoil/atoms';
 import Loading from '~/components/loading';
 import { getMyProfile } from '~/api/user';
 import { MyProfileType } from '~/types/user';
-import { ReviewListType } from '~/types/review';
+import { MarketType, ReactionType, ReviewListType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
 import { interestTagData } from '~/utils/data';
 import { NavigationStackProp } from 'react-navigation-stack';
@@ -30,6 +30,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { loading } from '~/assets/gif';
 import { hitslop } from '~/utils/constant';
 import CloseIcon from '~/components/icon/closeIcon';
+import ResetButton from '~/components/button/resetButton';
+import BasicButton from '~/components/button/basicButton';
+import MarketLayout from '~/components/layout/MarketLayout';
+import ReactionLayout from '~/components/layout/ReactionLayout';
 
 
 function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
@@ -65,6 +69,16 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const [filterBadge, setFilterBadge] = useState("");
   const [allClick, setAllClick] = useState(false);
   const flatListRef = useRef<FlatList>(null);
+
+  const [openFilterBox, setOpenFilterBox] = useState(false);
+  const [clickedMarket, setClickMarket] = useState<Array<{
+    title: MarketType,
+    isClick: boolean
+  }>>([]);
+  const [clickedReact, setClickReact] = useState<Array<{
+    title: ReactionType,
+    isClick: boolean
+  }>>([]);
 
   const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", token, filterBadge], () => getMyProfile(token), {
     enabled: !!token,
@@ -159,14 +173,17 @@ const Feed = ({ navigation, route }: FeedProps) => {
               <Image source={leftArrow} style={{ width: d2p(7), height: d2p(15), transform: [{ rotate: "270deg" }] }} />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={{ flexDirection: "row", alignItems: "center" }}>
+          <TouchableOpacity
+            hitSlop={hitslop}
+            onPress={() => setOpenFilterBox(!openFilterBox)}
+            style={{ flexDirection: "row", alignItems: "center" }}>
             <Text style={[FONT.Regular, { fontSize: 12, marginRight: d2p(5) }]}>최신순</Text>
             <Image source={leftArrow} style={{ width: d2p(7), height: d2p(15), transform: [{ rotate: "270deg" }] }} />
           </TouchableOpacity>
         </View>
       </View>
     </>
-    , [filterBadge, getMyProfileQuery.data?.representBadge]);
+    , [filterBadge, getMyProfileQuery.data?.representBadge, openFilterBox]);
 
   const reviewFooter = useCallback(() => <View style={{ height: h2p(117) }} />, []);
 
@@ -221,6 +238,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
   };
 
   useEffect(() => {
+    setOpenFilterBox(false);
     if (scrollOffset >= h2p(130)) {
       fadeIn();
     }
@@ -322,6 +340,44 @@ const Feed = ({ navigation, route }: FeedProps) => {
         isBorder={scrollOffset >= h2p(130) ? true : false} bgColor={scrollOffset >= h2p(130) ? theme.color.white : theme.color.grayscale.f7f7fc}
       />
       <View>
+        {/* 최신순 필터 박스 */}
+        {openFilterBox &&
+          <View style={{
+            right: d2p(10),
+            zIndex: 10,
+            top: h2p(200),
+            position: "absolute",
+            borderRadius: 5,
+            shadowColor: "rgba(211, 208, 213, 0.45)",
+            backgroundColor: theme.color.white,
+            shadowOffset: {
+              width: 0,
+              height: 0
+            },
+            shadowRadius: 5,
+            shadowOpacity: 1,
+
+          }}>
+            <View style={{
+              justifyContent: "center",
+              alignItems: "center",
+              marginHorizontal: d2p(11.5),
+              minWidth: d2p(47), height: d2p(35),
+              borderBottomWidth: 1,
+              borderBottomColor: theme.color.grayscale.eae7ec
+            }}>
+              <Text>최신순</Text>
+            </View>
+            <View style={{
+              justifyContent: "center",
+              alignItems: "center",
+              marginHorizontal: d2p(11.5),
+              minWidth: d2p(47), height: d2p(35)
+            }}>
+              <Text>인기순</Text>
+            </View>
+          </View>
+        }
         <FlatList
           ref={flatListRef}
           onEndReached={reviewEndReached}
@@ -472,22 +528,33 @@ const Feed = ({ navigation, route }: FeedProps) => {
         }}
         openDuration={250}
       >
-        <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: d2p(10), marginBottom: h2p(34) }}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: d2p(10), marginBottom: h2p(30) }}>
           <CloseIcon onPress={() => reactRefRBSheet.current?.close()}
             imageStyle={{ width: d2p(15), height: h2p(15) }} />
           <Text style={[{ fontSize: 16, marginRight: d2p(15) }, FONT.Bold]}>반응별로 보기</Text>
           <View />
         </View>
-        <View style={{
-          borderWidth: 1, borderRadius: 10,
-          borderColor: theme.color.grayscale.eae7ec,
-          width: d2p(70), height: h2p(70),
-          justifyContent: "center", alignItems: "center"
-        }}>
-          <Image source={heart} style={{ width: d2p(20), height: d2p(20) }} />
-          <Text>최고예요</Text>
-        </View>
+        <ReactionLayout
+          clickedReact={clickedReact}
+          setClickReact={(react: {
+            title: ReactionType,
+            isClick: boolean
+          }[]) => setClickReact(react)}
+        />
+        <ResetButton resetClick={() => setClickReact(clickedReact.map(v => ({
+          title: v.title, isClick: false
+        })))}
+          viewStyle={{ marginTop: h2p(40), marginBottom: "auto" }} />
+        <BasicButton text="필터 저장하기"
+          onPress={() => {
+            console.log("save");
+            reactRefRBSheet.current?.close();
+          }}
+          bgColor={theme.color.main}
+          textColor={theme.color.white}
+        />
       </RBSheet>
+
       {/* 구매처별 sheet */}
       <RBSheet ref={marketRefRBSheet}
         closeOnDragDown
@@ -504,7 +571,34 @@ const Feed = ({ navigation, route }: FeedProps) => {
           }
         }}
         openDuration={250}
-      />
+      >
+        <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: d2p(10), marginBottom: h2p(30) }}>
+          <CloseIcon onPress={() => marketRefRBSheet.current?.close()}
+            imageStyle={{ width: d2p(15), height: h2p(15) }} />
+          <Text style={[{ fontSize: 16, marginRight: d2p(15) }, FONT.Bold]}>구매처별로 보기</Text>
+          <View />
+        </View>
+        <MarketLayout
+          clickedMarket={clickedMarket}
+          setClickMarket={(market: {
+            title: MarketType,
+            isClick: boolean
+          }[]) => {
+            setClickMarket(market);
+          }}
+        />
+        <ResetButton resetClick={() => {
+          setClickMarket(clickedMarket.map(v => ({ title: v.title, isClick: false })));
+        }} viewStyle={{ marginTop: h2p(40), marginBottom: "auto" }} />
+        <BasicButton text="필터 저장하기"
+          onPress={() => {
+            console.log("save");
+            marketRefRBSheet.current?.close();
+          }}
+          bgColor={theme.color.main}
+          textColor={theme.color.white}
+        />
+      </RBSheet>
     </>
   );
 };

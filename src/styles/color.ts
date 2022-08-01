@@ -14,6 +14,7 @@ const grayscale = {
   eae7ec: '#eae7ec',
   d2d0d5: '#d2d0d5',
   ff5d5d: "#ff5d5d",
+  ffc646: "#ffc646",
   ec6863: "#ec6863"
 };
 

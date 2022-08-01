@@ -17,6 +17,13 @@ export enum MarketType {
   "판매처 선택" = "판매처 선택"
 }
 
+export enum ReactionType {
+  "최고예요" = "최고예요",
+  "괜찮아요" = "괜찮아요",
+  "별로예요" = "별로예요",
+  "궁금해요" = "궁금해요"
+}
+
 export interface WriteReviewType {
   images?: Array<WriteImagesType>,
   content: string,
