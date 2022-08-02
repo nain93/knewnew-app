@@ -1,8 +1,8 @@
-import { Image, ImageSourcePropType, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect } from 'react';
 import { FONT } from '~/styles/fonts';
 import { d2p, h2p } from '~/utils';
-import { circle, close, graycircle, grayclose, grayheart, grayquestion, heart, question, smallClose } from '~/assets/icons';
+import { circle, graycircle, grayclose, grayheart, grayquestion, heart, question, smallClose } from '~/assets/icons';
 import theme from '~/styles/theme';
 import { ReactionType } from '~/types/review';
 import { reactList } from '~/utils/constant';
@@ -15,16 +15,10 @@ interface ReactionLayoutProps {
   setClickReact: (reactList: {
     title: ReactionType,
     isClick: boolean
-  }[]) => void
+  }[]) => void,
 }
 
 const ReactionLayout = ({ clickedReact, setClickReact }: ReactionLayoutProps) => {
-
-  useEffect(() => {
-    setClickReact(reactList.map(v => {
-      return { title: v, isClick: false };
-    }));
-  }, []);
 
   return (
     <View style={{ flexDirection: "row" }}>

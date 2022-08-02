@@ -5,7 +5,7 @@ import theme from '~/styles/theme';
 import Header from '~/components/header';
 import mainLogo from '~/assets/logo';
 import FeedReview from '~/components/review/feedReview';
-import { colorCheck, grayCheckIcon, leftArrow, noticeIcon, tagfilter } from '~/assets/icons';
+import { colorCheck, grayclose, leftArrow, noticeIcon, tagfilter, whiteClose } from '~/assets/icons';
 
 import RBSheet from "react-native-raw-bottom-sheet";
 import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
@@ -28,12 +28,13 @@ import FadeInOut from '~/hooks/useFadeInOut';
 import SplashScreen from 'react-native-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { loading } from '~/assets/gif';
-import { hitslop } from '~/utils/constant';
+import { hitslop, marketList, reactList } from '~/utils/constant';
 import CloseIcon from '~/components/icon/closeIcon';
 import ResetButton from '~/components/button/resetButton';
 import BasicButton from '~/components/button/basicButton';
 import MarketLayout from '~/components/layout/MarketLayout';
 import ReactionLayout from '~/components/layout/ReactionLayout';
+import CustomBottomSheet from '~/components/popup/CustomBottomSheet';
 
 
 function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
@@ -60,6 +61,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const [scrollOffset, setScrollOffset] = useState(0);
   const tagRefRBSheet = useRef<RBSheet>(null);
   const reactRefRBSheet = useRef<RBSheet>(null);
+  const sortRefSheet = useRef<RBSheet>(null);
   const marketRefRBSheet = useRef<RBSheet>(null);
   const [interestTag, setInterestTag] = useState<InterestTagType>(interestTagData);
   const [token, setToken] = useRecoilState(tokenState);
@@ -70,15 +72,21 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const [allClick, setAllClick] = useState(false);
   const flatListRef = useRef<FlatList>(null);
 
-  const [openFilterBox, setOpenFilterBox] = useState(false);
+  const [sort, setSort] = useState<"0" | "1">("0");
+  const [sortMarket, setSortMarket] = useState<string[]>();
+  const [sortReact, setSortReact] = useState<string[]>();
   const [clickedMarket, setClickMarket] = useState<Array<{
     title: MarketType,
     isClick: boolean
-  }>>([]);
+  }>>(marketList.map(v => {
+    return { title: v, isClick: false };
+  }));
   const [clickedReact, setClickReact] = useState<Array<{
     title: ReactionType,
     isClick: boolean
-  }>>([]);
+  }>>(reactList.map(v => {
+    return { title: v, isClick: false };
+  }));
 
   const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", token, filterBadge], () => getMyProfile(token), {
     enabled: !!token,
@@ -99,13 +107,59 @@ const Feed = ({ navigation, route }: FeedProps) => {
     }
   });
 
-  const reviewListQuery = useInfiniteQuery<ReviewListType[], Error>(["reviewList", token, filterBadge], async ({ pageParam = 0 }) => {
+  const reviewListQuery = useInfiniteQuery<ReviewListType[], Error>(["reviewList", sort, sortReact, sortMarket, filterBadge], async ({ pageParam = 0 }) => {
     if (allClick) {
-      const queryData = await getReviewList({ token, tag: "", offset: pageParam, limit: 5 });
+      const queryData = await getReviewList({
+        token, tag: "",
+        market: (clickedMarket.filter(v => v.isClick)).map(v => v.title).toString(),
+        satisfaction: (clickedReact.filter(v => v.isClick)).map(v => {
+          switch (v.title) {
+            case "최고예요": {
+              return "best";
+            }
+            case "괜찮아요": {
+              return "good";
+            }
+            case "별로예요": {
+              return "bad";
+            }
+            case "궁금해요": {
+              return "question";
+            }
+            default: {
+              return null;
+            }
+          }
+        }).toString(),
+        offset: pageParam, limit: 5, sort
+      });
       return queryData;
     }
     else {
-      const queryData = await getReviewList({ token, tag: filterBadge, offset: pageParam, limit: 5 });
+      const queryData = await getReviewList({
+        token, tag: filterBadge,
+        market: (clickedMarket.filter(v => v.isClick)).map(v => v.title).toString(),
+        satisfaction: (clickedReact.filter(v => v.isClick)).map(v => {
+          switch (v.title) {
+            case "최고예요": {
+              return "best";
+            }
+            case "괜찮아요": {
+              return "good";
+            }
+            case "별로예요": {
+              return "bad";
+            }
+            case "궁금해요": {
+              return "question";
+            }
+            default: {
+              return null;
+            }
+          }
+        }).toString(),
+        offset: pageParam, limit: 5, sort
+      });
       return queryData;
     }
   }, {
@@ -147,43 +201,81 @@ const Feed = ({ navigation, route }: FeedProps) => {
 
       <View style={{ paddingHorizontal: d2p(10) }}>
         {/* 팔로잉 기능 추가후 주석해제 */}
-        <View style={{ flexDirection: "row", alignItems: "center", marginLeft: d2p(10) }}>
+        {/* <View style={{ flexDirection: "row", alignItems: "center", marginLeft: d2p(10) }}>
           <Image source={grayCheckIcon} style={{ width: d2p(10), height: d2p(8), marginRight: d2p(10) }} />
           <Text style={[FONT.Medium, { color: theme.color.grayscale.a09ca4, fontSize: 12 }]}>
             팔로잉한 유저만 보기
           </Text>
-        </View>
+        </View> */}
         <View style={{
           flexDirection: "row", marginTop: h2p(10), alignItems: "center",
           justifyContent: "space-between",
+          marginBottom: h2p(5)
         }}>
-          <View style={{ flexDirection: "row", marginBottom: h2p(5) }}>
+          <View style={{ flexDirection: "row" }}>
             <TouchableOpacity
-              onPress={() => reactRefRBSheet.current?.open()}
-              style={styles.filterTag}>
-              <Text style={[FONT.Regular, { marginRight: d2p(5), fontSize: 12, color: theme.color.grayscale.C_443e49 }]}>
+              onPress={() => {
+                if (sortReact && sortReact.length > 0) {
+                  setClickReact(clickedReact.map(v => ({ ...v, isClick: false })));
+                  setSortReact([]);
+                }
+                else {
+                  reactRefRBSheet.current?.open();
+                }
+              }}
+              style={[styles.filterTag, {
+                backgroundColor: (sortReact && sortReact.length > 0) ? theme.color.grayscale.C_443e49 : theme.color.white,
+              }]}>
+              <Text style={[FONT.Regular, {
+                marginRight: d2p(5), fontSize: 12,
+                color: (sortReact && sortReact.length > 0) ? theme.color.white : theme.color.grayscale.C_443e49
+              }]}>
                 반응별</Text>
-              <Image source={leftArrow} style={{ width: d2p(7), height: d2p(15), transform: [{ rotate: "270deg" }] }} />
+              {(sortReact && sortReact.length > 0) ?
+                <Image source={whiteClose} style={{ width: d2p(7), height: d2p(7) }} />
+                :
+                <Image source={leftArrow} style={{ width: d2p(7), height: d2p(15), transform: [{ rotate: "270deg" }] }} />
+              }
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => marketRefRBSheet.current?.open()}
-              style={styles.filterTag}>
-              <Text style={[FONT.Regular, { marginRight: d2p(5), fontSize: 12, color: theme.color.grayscale.C_443e49 }]}>
+              onPress={() => {
+                if (sortMarket && sortMarket.length > 0) {
+                  setClickMarket(clickedMarket.map(v => ({ ...v, isClick: false })));
+                  setSortMarket([]);
+                }
+                else {
+                  marketRefRBSheet.current?.open();
+                }
+              }
+              }
+              style={[styles.filterTag, {
+                backgroundColor: (sortMarket && sortMarket.length > 0) ? theme.color.grayscale.C_443e49 : theme.color.white,
+              }]}>
+              <Text style={[FONT.Regular, {
+                marginRight: d2p(5), fontSize: 12,
+                color: (sortMarket && sortMarket.length > 0) ? theme.color.white : theme.color.grayscale.C_443e49
+              }]}>
                 구매처별</Text>
-              <Image source={leftArrow} style={{ width: d2p(7), height: d2p(15), transform: [{ rotate: "270deg" }] }} />
+              {(sortMarket && sortMarket.length > 0) ?
+                <Image source={whiteClose} style={{ width: d2p(7), height: d2p(7) }} />
+                :
+                <Image source={leftArrow} style={{ width: d2p(7), height: d2p(15), transform: [{ rotate: "270deg" }] }} />
+              }
             </TouchableOpacity>
           </View>
           <TouchableOpacity
             hitSlop={hitslop}
-            onPress={() => setOpenFilterBox(!openFilterBox)}
+            onPress={() => sortRefSheet.current?.open()}
             style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text style={[FONT.Regular, { fontSize: 12, marginRight: d2p(5) }]}>최신순</Text>
+            <Text style={[FONT.Regular, { fontSize: 12, marginRight: d2p(5) }]}>
+              {sort === "0" ? "최신순" : "인기순"}
+            </Text>
             <Image source={leftArrow} style={{ width: d2p(7), height: d2p(15), transform: [{ rotate: "270deg" }] }} />
           </TouchableOpacity>
         </View>
       </View>
     </>
-    , [filterBadge, getMyProfileQuery.data?.representBadge, openFilterBox]);
+    , [filterBadge, getMyProfileQuery.data?.representBadge, sort, sortReact, sortMarket]);
 
   const reviewFooter = useCallback(() => <View style={{ height: h2p(117) }} />, []);
 
@@ -238,7 +330,6 @@ const Feed = ({ navigation, route }: FeedProps) => {
   };
 
   useEffect(() => {
-    setOpenFilterBox(false);
     if (scrollOffset >= h2p(130)) {
       fadeIn();
     }
@@ -282,7 +373,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
                   onPress={() => tagRefRBSheet.current?.open()}
                   style={[styles.filter, { marginRight: d2p(10), marginBottom: 0 }]}>
                   <Image source={tagfilter} style={{ width: d2p(11), height: d2p(10), marginRight: d2p(10) }} />
-                  <Text style={[FONT.Medium, { fontSize: 12 }]}>태그 변경</Text>
+                  <Text style={[FONT.Medium, { fontSize: 12 }]}>다른 태그 보기</Text>
                 </TouchableOpacity>
                 <Pressable
                   hitSlop={hitslop} onPress={() => navigation.navigate("notification")} >
@@ -340,44 +431,6 @@ const Feed = ({ navigation, route }: FeedProps) => {
         isBorder={scrollOffset >= h2p(130) ? true : false} bgColor={scrollOffset >= h2p(130) ? theme.color.white : theme.color.grayscale.f7f7fc}
       />
       <View>
-        {/* 최신순 필터 박스 */}
-        {openFilterBox &&
-          <View style={{
-            right: d2p(10),
-            zIndex: 10,
-            top: h2p(200),
-            position: "absolute",
-            borderRadius: 5,
-            shadowColor: "rgba(211, 208, 213, 0.45)",
-            backgroundColor: theme.color.white,
-            shadowOffset: {
-              width: 0,
-              height: 0
-            },
-            shadowRadius: 5,
-            shadowOpacity: 1,
-
-          }}>
-            <View style={{
-              justifyContent: "center",
-              alignItems: "center",
-              marginHorizontal: d2p(11.5),
-              minWidth: d2p(47), height: d2p(35),
-              borderBottomWidth: 1,
-              borderBottomColor: theme.color.grayscale.eae7ec
-            }}>
-              <Text>최신순</Text>
-            </View>
-            <View style={{
-              justifyContent: "center",
-              alignItems: "center",
-              marginHorizontal: d2p(11.5),
-              minWidth: d2p(47), height: d2p(35)
-            }}>
-              <Text>인기순</Text>
-            </View>
-          </View>
-        }
         <FlatList
           ref={flatListRef}
           onEndReached={reviewEndReached}
@@ -399,8 +452,8 @@ const Feed = ({ navigation, route }: FeedProps) => {
       </View>
 
       {/* 다른 태그 보기 sheet */}
-      <RBSheet
-        ref={tagRefRBSheet}
+      <CustomBottomSheet
+        sheetRef={tagRefRBSheet}
         onOpen={() =>
           setInterestTag({
             interest: interestTag.interest.map(v => {
@@ -411,11 +464,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
             })
           })
         }
-        closeOnDragDown
-        dragFromTopOnly
-        animationType="fade"
         height={Dimensions.get("window").height * (481 / 760)}
-        openDuration={250}
         customStyles={{
           wrapper: {
             transform: [{ rotate: '180deg' }],
@@ -432,173 +481,208 @@ const Feed = ({ navigation, route }: FeedProps) => {
           }
         }}
       >
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: h2p(20),
-          }}>
-          <Text style={[{ color: theme.color.grayscale.C_79737e }, FONT.Medium]}>
-            보고싶은 태그를 하나만 선택해주세요
-          </Text>
+        <>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: h2p(20),
+            }}>
+            <Text style={[{ color: theme.color.grayscale.C_79737e }, FONT.Medium]}>
+              보고싶은 태그를 하나만 선택해주세요
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                // * 태그 선택 안했을경우
+                if (
+                  interestTag.interest.every(v => !v.isClick) &&
+                  !allClick
+                ) {
+                  setIsPopupOpen({ isOpen: true, content: "태그를 선택해주세요" });
+                  return;
+                }
+                if (allClick) {
+                  setFilterBadge("");
+                  tagRefRBSheet.current?.close();
+                  return;
+                }
+                // * 태그 선택후 대표 뱃지 적용
+                const copy: { [index: string]: Array<{ isClick: boolean, title: string }> } = { ...interestTag };
+                const badge = Object.keys(interestTag).reduce((acc, cur) => {
+                  if (!copy[cur].every(v => !v.isClick)) {
+                    acc = copy[cur].filter(v => v.isClick)[0].title;
+                  }
+                  return acc;
+                }, "");
+                setFilterBadge(badge);
+
+                tagRefRBSheet.current?.close();
+                // * 필터후 스크롤 offset초기화
+                flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
+              }}
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: 5,
+                width: d2p(100), height: h2p(30), backgroundColor: theme.color.main
+              }}>
+              <Text style={[styles.tagBtn, FONT.Medium]}>태그 적용</Text>
+            </TouchableOpacity>
+          </View>
           <TouchableOpacity
             onPress={() => {
-              // * 태그 선택 안했을경우
-              if (
-                interestTag.interest.every(v => !v.isClick) &&
-                !allClick
-              ) {
-                setIsPopupOpen({ isOpen: true, content: "태그를 선택해주세요" });
-                return;
-              }
-              if (allClick) {
-                setFilterBadge("");
-                tagRefRBSheet.current?.close();
-                return;
-              }
-              // * 태그 선택후 대표 뱃지 적용
-              const copy: { [index: string]: Array<{ isClick: boolean, title: string }> } = { ...interestTag };
-              const badge = Object.keys(interestTag).reduce((acc, cur) => {
-                if (!copy[cur].every(v => !v.isClick)) {
-                  acc = copy[cur].filter(v => v.isClick)[0].title;
-                }
-                return acc;
-              }, "");
-              setFilterBadge(badge);
-
-              tagRefRBSheet.current?.close();
-              // * 필터후 스크롤 offset초기화
-              flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
+              setAllClick(!allClick);
+              setInterestTag(interestTagData);
             }}
             style={{
-              justifyContent: "center",
-              alignItems: "center",
-              borderRadius: 5,
-              width: d2p(100), height: h2p(30), backgroundColor: theme.color.main
+              paddingHorizontal: d2p(15),
+              paddingVertical: h2p(5),
+              maxWidth: d2p(150),
+              borderRadius: 20,
+              backgroundColor: theme.color.white,
+              borderWidth: 1,
+              borderColor: allClick ? theme.color.main : theme.color.grayscale.d2d0d5,
+              flexDirection: "row",
+              alignItems: "center", justifyContent: "center",
+              marginBottom: h2p(20)
             }}>
-            <Text style={[styles.tagBtn, FONT.Medium]}>태그 적용</Text>
+            {allClick && <Image source={colorCheck} resizeMode="contain" style={{ width: d2p(10), height: d2p(8), marginRight: d2p(5) }} />}
+            <Text style={[FONT.Medium, {
+              color: allClick ? theme.color.main : theme.color.black,
+              includeFontPadding: false
+            }]}>모든 메뉴 보기 👀</Text>
           </TouchableOpacity>
-        </View>
-        <TouchableOpacity
-          onPress={() => {
-            setAllClick(!allClick);
-            setInterestTag(interestTagData);
-          }}
-          style={{
-            paddingHorizontal: d2p(15),
-            paddingVertical: h2p(5),
-            maxWidth: d2p(150),
-            borderRadius: 20,
-            backgroundColor: theme.color.white,
-            borderWidth: 1,
-            borderColor: allClick ? theme.color.main : theme.color.grayscale.d2d0d5,
-            flexDirection: "row",
-            alignItems: "center", justifyContent: "center",
-            marginBottom: h2p(20)
-          }}>
-          {allClick && <Image source={colorCheck} resizeMode="contain" style={{ width: d2p(10), height: d2p(8), marginRight: d2p(5) }} />}
-          <Text style={[FONT.Medium, {
-            color: allClick ? theme.color.main : theme.color.black,
-            includeFontPadding: false
-          }]}>모든 메뉴 보기 👀</Text>
-        </TouchableOpacity>
-        <SelectLayout type="filter" interestTag={interestTag} setInterestTag={setInterestTag} />
-        {isPopupOpen.isOpen &&
-          <Animated.View style={{ opacity: fadeHook.fadeAnim ? fadeHook.fadeAnim : 1, zIndex: fadeHook.fadeAnim ? fadeHook.fadeAnim : -1 }}>
-            <AlertPopup text={isPopupOpen.content} popupStyle={{ bottom: h2p(20) }} />
-          </Animated.View>
-        }
-      </RBSheet>
+          <SelectLayout type="filter" interestTag={interestTag} setInterestTag={setInterestTag} />
+          {isPopupOpen.isOpen &&
+            <Animated.View style={{ opacity: fadeHook.fadeAnim ? fadeHook.fadeAnim : 1, zIndex: fadeHook.fadeAnim ? fadeHook.fadeAnim : -1 }}>
+              <AlertPopup text={isPopupOpen.content} popupStyle={{ bottom: h2p(20) }} />
+            </Animated.View>
+          }
+        </>
+      </CustomBottomSheet>
+
+      {/* 최신순 sheet */}
+      <CustomBottomSheet
+        sheetRef={sortRefSheet}
+        height={Dimensions.get("window").height - h2p(600)}
+      >
+        <>
+          <TouchableOpacity
+            onPress={() => {
+              setSort("0");
+              sortRefSheet.current?.close();
+            }}
+            style={{
+              paddingVertical: h2p(12.5), paddingHorizontal: d2p(10),
+              borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc
+            }}>
+            <Text style={[FONT.Regular, {
+              color: sort === "0" ? theme.color.black : theme.color.grayscale.a09ca4
+            }]}>최신순</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setSort("1");
+              sortRefSheet.current?.close();
+            }}
+            style={{
+              paddingVertical: h2p(12.5), paddingHorizontal: d2p(10),
+              borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc
+            }}>
+            <Text style={[FONT.Regular, {
+              color: sort === "1" ? theme.color.black : theme.color.grayscale.a09ca4
+            }]}>인기순</Text>
+          </TouchableOpacity>
+        </>
+      </CustomBottomSheet>
 
       {/* 반응별 sheet */}
-      <RBSheet ref={reactRefRBSheet}
-        closeOnDragDown
-        dragFromTopOnly
-        animationType="fade"
+      <CustomBottomSheet
         height={Dimensions.get("window").height - h2p(480)}
-        customStyles={{
-          container: {
-            borderRadius: 30,
-            padding: d2p(20)
-          },
-          draggableIcon: {
-            display: "none"
-          }
-        }}
-        openDuration={250}
+        sheetRef={reactRefRBSheet}
+        onOpen={() =>
+          setClickReact(clickedReact.map(v => {
+            if (sortReact?.includes(v.title)) {
+              return { ...v, isClick: true };
+            }
+            return { ...v, isClick: false };
+          }))
+        }
       >
-        <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: d2p(10), marginBottom: h2p(30) }}>
-          <CloseIcon onPress={() => reactRefRBSheet.current?.close()}
-            imageStyle={{ width: d2p(15), height: h2p(15) }} />
-          <Text style={[{ fontSize: 16, marginRight: d2p(15) }, FONT.Bold]}>반응별로 보기</Text>
-          <View />
-        </View>
-        <ReactionLayout
-          clickedReact={clickedReact}
-          setClickReact={(react: {
-            title: ReactionType,
-            isClick: boolean
-          }[]) => setClickReact(react)}
-        />
-        <ResetButton resetClick={() => setClickReact(clickedReact.map(v => ({
-          title: v.title, isClick: false
-        })))}
-          viewStyle={{ marginTop: h2p(40), marginBottom: "auto" }} />
-        <BasicButton text="필터 저장하기"
-          onPress={() => {
-            console.log("save");
-            reactRefRBSheet.current?.close();
-          }}
-          bgColor={theme.color.main}
-          textColor={theme.color.white}
-        />
-      </RBSheet>
+        <>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: d2p(10), marginBottom: h2p(30) }}>
+            <CloseIcon onPress={() => reactRefRBSheet.current?.close()}
+              imageStyle={{ width: d2p(15), height: h2p(15) }} />
+            <Text style={[{ fontSize: 16, marginRight: d2p(15) }, FONT.Bold]}>반응별로 보기</Text>
+            <View />
+          </View>
+          <ReactionLayout
+            clickedReact={clickedReact}
+            setClickReact={(react: {
+              title: ReactionType,
+              isClick: boolean
+            }[]) => setClickReact(react)}
+          />
+          <ResetButton resetClick={() => setClickReact(clickedReact.map(v => ({
+            title: v.title, isClick: false
+          })))}
+            viewStyle={{ marginTop: h2p(40), marginBottom: "auto" }} />
+          <BasicButton text="필터 저장하기"
+            onPress={() => {
+              setSortReact(clickedReact.filter(v => v.isClick).map(v => v.title));
+              reviewListQuery.refetch();
+              reactRefRBSheet.current?.close();
+            }}
+            bgColor={theme.color.main}
+            textColor={theme.color.white}
+          />
+        </>
+      </CustomBottomSheet>
 
       {/* 구매처별 sheet */}
-      <RBSheet ref={marketRefRBSheet}
-        closeOnDragDown
-        dragFromTopOnly
-        animationType="fade"
+      <CustomBottomSheet
+        sheetRef={marketRefRBSheet}
         height={Dimensions.get("window").height - h2p(456)}
-        customStyles={{
-          container: {
-            borderRadius: 30,
-            padding: d2p(20)
-          },
-          draggableIcon: {
-            display: "none"
-          }
-        }}
-        openDuration={250}
+        onOpen={() =>
+          setClickMarket(clickedMarket.map(v => {
+            if (sortMarket?.includes(v.title)) {
+              return { ...v, isClick: true };
+            }
+            return { ...v, isClick: false };
+          }))
+        }
       >
-        <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: d2p(10), marginBottom: h2p(30) }}>
-          <CloseIcon onPress={() => marketRefRBSheet.current?.close()}
-            imageStyle={{ width: d2p(15), height: h2p(15) }} />
-          <Text style={[{ fontSize: 16, marginRight: d2p(15) }, FONT.Bold]}>구매처별로 보기</Text>
-          <View />
-        </View>
-        <MarketLayout
-          clickedMarket={clickedMarket}
-          setClickMarket={(market: {
-            title: MarketType,
-            isClick: boolean
-          }[]) => {
-            setClickMarket(market);
-          }}
-        />
-        <ResetButton resetClick={() => {
-          setClickMarket(clickedMarket.map(v => ({ title: v.title, isClick: false })));
-        }} viewStyle={{ marginTop: h2p(40), marginBottom: "auto" }} />
-        <BasicButton text="필터 저장하기"
-          onPress={() => {
-            console.log("save");
-            marketRefRBSheet.current?.close();
-          }}
-          bgColor={theme.color.main}
-          textColor={theme.color.white}
-        />
-      </RBSheet>
+        <>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: d2p(10), marginBottom: h2p(30) }}>
+            <CloseIcon onPress={() => marketRefRBSheet.current?.close()}
+              imageStyle={{ width: d2p(15), height: h2p(15) }} />
+            <Text style={[{ fontSize: 16, marginRight: d2p(15) }, FONT.Bold]}>구매처별로 보기</Text>
+            <View />
+          </View>
+          <MarketLayout
+            clickedMarket={clickedMarket}
+            setClickMarket={(market: {
+              title: MarketType,
+              isClick: boolean
+            }[]) => {
+              setClickMarket(market);
+            }}
+          />
+          <ResetButton resetClick={() => {
+            setClickMarket(clickedMarket.map(v => ({ title: v.title, isClick: false })));
+          }} viewStyle={{ marginTop: h2p(40), marginBottom: "auto" }} />
+          <BasicButton text="필터 저장하기"
+            onPress={() => {
+              setSortMarket(clickedMarket.filter(v => v.isClick).map(v => v.title));
+              reviewListQuery.refetch();
+              marketRefRBSheet.current?.close();
+            }}
+            bgColor={theme.color.main}
+            textColor={theme.color.white}
+          />
+        </>
+      </CustomBottomSheet>
     </>
   );
 };
@@ -638,7 +722,7 @@ const styles = StyleSheet.create({
   filterTag: {
     borderColor: theme.color.grayscale.e9e7ec,
     borderWidth: 1,
-    backgroundColor: theme.color.white, width: d2p(70), height: h2p(25),
+    width: d2p(70), height: h2p(25),
     borderRadius: 12.5,
     justifyContent: "center",
     alignItems: "center",

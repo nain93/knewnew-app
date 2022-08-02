@@ -18,12 +18,6 @@ interface MarketLayoutProps {
 
 const MarketLayout = ({ clickedMarket, setClickMarket }: MarketLayoutProps) => {
 
-  useEffect(() => {
-    setClickMarket(marketList.map(v => {
-      return { title: v, isClick: false };
-    }));
-  }, []);
-
   return (
     <View style={styles.container}>
       {React.Children.toArray(clickedMarket.map((market, marketIdx) => {

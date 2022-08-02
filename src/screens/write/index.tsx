@@ -99,35 +99,36 @@ const Write = ({ navigation, route }: WriteProp) => {
             ...profileQuery, reviewCount: profileQuery?.reviewCount + 1
           };
         });
-        queryClient.setQueriesData("reviewList", (reviewQuery: any) => {
-          if (reviewQuery && getMyProfileQuery.data) {
-            return {
-              ...reviewQuery, pages: [[{
-                author: {
-                  id: getMyProfileQuery.data.id,
-                  profileImage: getMyProfileQuery.data.profileImage,
-                  representBadge: getMyProfileQuery.data.representBadge,
-                  nickname: getMyProfileQuery.data.nickname,
-                  household: getMyProfileQuery.data.household
-                },
-                ...writeData,
-                tags: route.params?.type === "reKnewWrite" ? route.params.review?.tags : writeData.tags,
-                parent: route.params?.type === "reKnewWrite" ? { ...route.params?.review, isActive: true } : null,
-                market: (writeData.market === "판매처 선택" || writeData.market === "선택 안함") ? undefined : writeData.market,
-                bookmarkCount: 0,
-                likeCount: 0,
-                childCount: 0,
-                commentCount: 0,
-                created: new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString(),
-                id: data.id,
-                images: presignImg.length > 0 ?
-                  presignImg.map(img => ({ ...img, image: S3_URL + img.image }))
-                  :
-                  writeData.images?.map(img => ({ ...img, image: S3_URL + img.image }))
-              }, ...reviewQuery.pages.flat()]]
-            };
-          }
-        });
+        queryClient.invalidateQueries("reviewList");
+        // queryClient.setQueriesData("reviewList", (reviewQuery: any) => {
+        //   if (reviewQuery && getMyProfileQuery.data) {
+        //     return {
+        //       ...reviewQuery, pages: [[{
+        //         author: {
+        //           id: getMyProfileQuery.data.id,
+        //           profileImage: getMyProfileQuery.data.profileImage,
+        //           representBadge: getMyProfileQuery.data.representBadge,
+        //           nickname: getMyProfileQuery.data.nickname,
+        //           household: getMyProfileQuery.data.household
+        //         },
+        //         ...writeData,
+        //         tags: route.params?.type === "reKnewWrite" ? route.params.review?.tags : writeData.tags,
+        //         parent: route.params?.type === "reKnewWrite" ? { ...route.params?.review, isActive: true } : null,
+        //         market: (writeData.market === "판매처 선택" || writeData.market === "선택 안함") ? undefined : writeData.market,
+        //         bookmarkCount: 0,
+        //         likeCount: 0,
+        //         childCount: 0,
+        //         commentCount: 0,
+        //         created: new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString(),
+        //         id: data.id,
+        //         images: presignImg.length > 0 ?
+        //           presignImg.map(img => ({ ...img, image: S3_URL + img.image }))
+        //           :
+        //           writeData.images?.map(img => ({ ...img, image: S3_URL + img.image }))
+        //       }, ...reviewQuery.pages.flat()]]
+        //     };
+        //   }
+        // });
         navigation.goBack();
         navigation.navigate("FeedDetail", { id: data.id, authorId: myId });
       }
@@ -142,43 +143,44 @@ const Write = ({ navigation, route }: WriteProp) => {
       // * 이미지 삭제 api
       await Promise.all(imageIds.map(v => mutateAsync(v)));
       if (data) {
-        queryClient.setQueriesData("reviewList", (reviewQuery: any) => {
-          if (reviewQuery && getMyProfileQuery.data) {
-            return {
-              //@ts-ignore
-              ...reviewQuery, pages: [reviewQuery.pages.flat().map(v => {
-                if (!route.params?.type && route.params?.review &&
-                  (v.parent?.id === route.params?.review.id)) {
-                  return { ...v, parent: { ...v.parent, content: writeData.content, satisfaction: writeData.satisfaction } };
-                }
-                if (v.id === route.params?.review?.id) {
-                  return {
-                    author: route.params?.review?.author,
-                    created: route.params?.review?.created,
-                    bookmarkCount: route.params?.review?.bookmarkCount,
-                    likeCount: route.params?.review?.likeCount,
-                    childCount: route.params?.review?.childCount,
-                    commentCount: route.params?.review?.commentCount,
-                    ...writeData, id: v.id,
-                    parent:
-                      route.params?.review?.parent ?
-                        (route.params?.review?.parent?.isActive ? { ...route.params?.review?.parent, isActive: true }
-                          :
-                          { ...route.params?.review?.parent, isActive: false })
-                        :
-                        null,
-                    market: (writeData.market === "판매처 선택" || writeData.market === "선택 안함") ? undefined : writeData.market,
-                    images: presignImg.length > 0 ?
-                      presignImg.map(img => ({ ...img, image: S3_URL + img.image }))
-                      :
-                      writeData.images?.map(img => ({ ...img, image: S3_URL + img.image }))
-                  };
-                }
-                return v;
-              })]
-            };
-          }
-        });
+        queryClient.invalidateQueries("reviewList");
+        // queryClient.setQueriesData("reviewList", (reviewQuery: any) => {
+        //   if (reviewQuery && getMyProfileQuery.data) {
+        //     return {
+        //       //@ts-ignore
+        //       ...reviewQuery, pages: [reviewQuery.pages.flat().map(v => {
+        //         if (!route.params?.type && route.params?.review &&
+        //           (v.parent?.id === route.params?.review.id)) {
+        //           return { ...v, parent: { ...v.parent, content: writeData.content, satisfaction: writeData.satisfaction } };
+        //         }
+        //         if (v.id === route.params?.review?.id) {
+        //           return {
+        //             author: route.params?.review?.author,
+        //             created: route.params?.review?.created,
+        //             bookmarkCount: route.params?.review?.bookmarkCount,
+        //             likeCount: route.params?.review?.likeCount,
+        //             childCount: route.params?.review?.childCount,
+        //             commentCount: route.params?.review?.commentCount,
+        //             ...writeData, id: v.id,
+        //             parent:
+        //               route.params?.review?.parent ?
+        //                 (route.params?.review?.parent?.isActive ? { ...route.params?.review?.parent, isActive: true }
+        //                   :
+        //                   { ...route.params?.review?.parent, isActive: false })
+        //                 :
+        //                 null,
+        //             market: (writeData.market === "판매처 선택" || writeData.market === "선택 안함") ? undefined : writeData.market,
+        //             images: presignImg.length > 0 ?
+        //               presignImg.map(img => ({ ...img, image: S3_URL + img.image }))
+        //               :
+        //               writeData.images?.map(img => ({ ...img, image: S3_URL + img.image }))
+        //           };
+        //         }
+        //         return v;
+        //       })]
+        //     };
+        //   }
+        // });
         navigation.goBack();
         navigation.navigate("FeedDetail", { id: data.id, authorId: myId });
       }

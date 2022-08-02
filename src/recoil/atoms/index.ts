@@ -1,4 +1,4 @@
-import { ViewStyle } from "react-native";
+import { StyleProp, ViewStyle } from "react-native";
 import { atom } from "recoil";
 
 // * 토큰여부에 따라서 로그인 여부 확인
@@ -72,4 +72,21 @@ export const notificationPopup = atom<notificationPopupType>({
     content: "",
     onPress: () => null
   }
+});
+
+interface BottomSheetProps {
+  onOpen?: () => void
+  isOpen: boolean,
+  height: number,
+  children: JSX.Element,
+  customStyles: {
+    wrapper?: StyleProp<ViewStyle>;
+    container?: StyleProp<ViewStyle>;
+    draggableIcon?: StyleProp<ViewStyle>;
+  }
+}
+
+export const bottomSheetState = atom<BottomSheetProps | null>({
+  key: "bottomSheetState",
+  default: null
 });
