@@ -14,6 +14,7 @@ import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { getFocusedRouteNameFromRoute, useRoute } from '@react-navigation/native';
+import BeforeWrite from '~/screens/write/beforeWrite';
 
 const Tabs = createBottomTabNavigator();
 
@@ -87,14 +88,8 @@ const TabNavigator = () => {
         }}
       />
       <Tabs.Screen
-        name="Write"
-        component={Write}
-        listeners={({ navigation }) => ({
-          tabPress: e => {
-            e.preventDefault();
-            navigation.navigate('Write', { loading: false, isEdit: false });
-          },
-        })}
+        name="BeforeWrite"
+        component={BeforeWrite}
         options={{
           tabBarLabel: "글쓰기",
           headerShown: false,

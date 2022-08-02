@@ -27,8 +27,9 @@ import { preSiginedImages, uploadImage } from '~/api';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { getMyProfile } from '~/api/user';
 import { MyProfileType } from '~/types/user';
-import { marketList, S3_URL } from '~/utils/constant';
+import { marketList, reactList, S3_URL } from '~/utils/constant';
 import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
+import ReactionLayout from '~/components/layout/ReactionLayout';
 
 interface WriteProp {
   navigation: NavigationStackProp;
@@ -37,8 +38,8 @@ interface WriteProp {
     type?: "reknew" | "reKnewWrite",
     filterBadge?: string,
     nickname?: string,
-    loading?: boolean,
-    isEdit: boolean
+    loading?: boolean
+    isEdit: boolean,
   }>;
 }
 
@@ -395,16 +396,19 @@ const Write = ({ navigation, route }: WriteProp) => {
           }
         }}
           imageStyle={{ width: d2p(11), height: h2p(25) }} />}
-        title="작성하기"
+        title="글쓰기"
         headerRightPress={() => {
-          if (blockSubmit) {
-            return;
-          }
-          else {
-            handleAddWrite();
-          }
+          // todo 임시저장
+          // if (blockSubmit) {
+          //   return;
+          // }
+          // else {
+          //   handleAddWrite();
+          // }
         }}
-        headerRight={<Text style={[{ color: theme.color.main }, FONT.Regular]}>완료</Text>} />
+        headerRight={<Text style={[{ color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>
+          임시저장
+        </Text>} />
       <KeyboardAwareScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.container}
@@ -683,7 +687,7 @@ export default Write;
 
 const styles = StyleSheet.create({
   container: {
-    minHeight: Dimensions.get("window").height - h2p(104),
+    minHeight: Dimensions.get("window").height - h2p(104)
   },
   textInput: {
     paddingHorizontal: d2p(20),
@@ -695,8 +699,8 @@ const styles = StyleSheet.create({
   },
   reviewIconWrap: {
     marginTop: h2p(20),
-    paddingHorizontal: d2p(20),
-    flexDirection: "row"
+    flexDirection: "row",
+    paddingHorizontal: d2p(20)
   },
   reviewIcon: {
     flexDirection: "row",

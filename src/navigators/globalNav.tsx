@@ -20,6 +20,7 @@ import Privacy from '~/screens/setting/term/privacy';
 import Term from '~/screens/setting/term/term';
 import TermScreen from '~/screens/setting/term';
 import OpenSource from '~/screens/setting/openSource';
+import Write from '~/screens/write';
 
 const Stack = createStackNavigator();
 
@@ -64,6 +65,13 @@ const GlobalNav = ({ token }: { token: string }) => {
             headerShown: false
           }}
         />
+        <Stack.Screen
+          name="Write"
+          options={{
+            title: "",
+            headerShown: false,
+          }}
+          component={Write} />
         <Stack.Screen
           name="FeedDetail"
           options={{

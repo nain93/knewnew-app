@@ -27,14 +27,9 @@ const SelectLayout = ({ setIsPopupOpen, remainingPeriod, headerComponent, isInit
 
   return (
     <>
-      <ScrollView
-        bounces={false}
-        style={{ flex: 1, position: "relative" }}
-        showsVerticalScrollIndicator={false}>
+      <View
+        style={{ position: "relative" }}>
         {headerComponent}
-        <View style={{ flexDirection: 'row' }}>
-          <Text style={[styles.menu, { marginTop: 0 }, FONT.Regular]}>관심사 </Text>
-        </View>
         <View
           style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
           {React.Children.toArray(interestTag.interest.map((item, idx) => {
@@ -74,7 +69,7 @@ const SelectLayout = ({ setIsPopupOpen, remainingPeriod, headerComponent, isInit
             );
           }))}
         </View>
-      </ScrollView>
+      </View>
       {isInitial &&
         <ResetButton
           resetClick={resetIsClick}
@@ -91,10 +86,6 @@ const SelectLayout = ({ setIsPopupOpen, remainingPeriod, headerComponent, isInit
 export default SelectLayout;
 
 const styles = StyleSheet.create({
-  menu: {
-    marginTop: h2p(40),
-    marginBottom: h2p(5)
-  },
   guide: {
     marginLeft: d2p(15),
     fontSize: 12,
@@ -104,7 +95,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center',
     borderWidth: 1,
     borderRadius: 16,
-    marginTop: d2p(15), marginRight: d2p(5),
+    marginTop: d2p(10),
+    marginRight: d2p(5),
     paddingVertical: d2p(5),
     paddingHorizontal: d2p(15),
   },

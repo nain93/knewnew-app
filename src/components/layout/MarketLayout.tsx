@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, ViewStyle } from 'react-native';
 import React, { useEffect } from 'react';
 import BadgeButton from '~/components/button/badgeButton';
 import { d2p } from '~/utils';
@@ -13,13 +13,14 @@ interface MarketLayoutProps {
   setClickMarket: (marketList: {
     title: MarketType,
     isClick: boolean
-  }[]) => void
+  }[]) => void,
+  viewStyle?: ViewStyle
 }
 
-const MarketLayout = ({ clickedMarket, setClickMarket }: MarketLayoutProps) => {
+const MarketLayout = ({ clickedMarket, setClickMarket, viewStyle }: MarketLayoutProps) => {
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, viewStyle]}>
       {React.Children.toArray(clickedMarket.map((market, marketIdx) => {
         if (market.title === "선택 안함") {
           return null;
