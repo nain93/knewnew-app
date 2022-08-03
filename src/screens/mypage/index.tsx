@@ -1,11 +1,11 @@
-import { Dimensions, FlatList, Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, FlatList, Image, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import { myIdState, tokenState } from '~/recoil/atoms';
-import { getMyProfile, getUserBookmarkList, getUserProfile, getUserReviewList } from '~/api/user';
+import { getMyProfile, getUserBookmarkList, getUserProfile, getUserReviewList, userFollow } from '~/api/user';
 import { useRecoilValue } from 'recoil';
-import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from 'react-query';
 import { MyProfileType } from '~/types/user';
 import { noProfile } from '~/assets/images';
 import Loading from '~/components/loading';
@@ -18,6 +18,10 @@ import BasicButton from '~/components/button/basicButton';
 import { ReviewListType } from '~/types/review';
 import { graywrite } from '~/assets/icons';
 import FastImage from 'react-native-fast-image';
+import RBSheet from 'react-native-raw-bottom-sheet';
+import CustomBottomSheet from '~/components/popup/CustomBottomSheet';
+import FollowBottomTab from '~/screens/mypage/followBottomTab';
+import CloseIcon from '~/components/icon/closeIcon';
 
 interface MypageProps {
   navigation: NavigationStackProp;
@@ -32,9 +36,12 @@ const Mypage = ({ navigation, route }: MypageProps) => {
   const myId = useRecoilValue(myIdState);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [index, setIndex] = useState(0);
+  const [followIndex, setFollowIndex] = useState(0);
   const reviewRef = useRef<FlatList>(null);
   const bookmarkRef = useRef<FlatList>(null);
   const queryClient = useQueryClient();
+
+  const followRef = useRef<RBSheet>(null);
 
   const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", route.params?.id], async () => {
     if (route.params?.id && (route.params.id !== myId)) {
@@ -73,19 +80,27 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     getNextPageParam: (next, all) => all.flat().length
   });
 
+  const followMutation = useMutation("userFollow", ({ userId, isFollow }: { userId: number, isFollow: boolean }) =>
+    userFollow({ token, userId, isFollow }), {
+    onSuccess: () => {
+      queryClient.invalidateQueries("myProfile");
+    }
+  });
+
   const tabHeader = useCallback(() => (
-    <View pointerEvents="box-none" style={{ paddingHorizontal: d2p(20) }} >
-      <View style={styles.profileImage} >
-        <View>
-          {/* <Text style={[FONT.Bold, { color: theme.color.main, marginBottom: h2p(5) }]}>
+    <>
+      <View pointerEvents="box-none" style={{ paddingHorizontal: d2p(20) }} >
+        <View style={styles.profileImage} >
+          <View>
+            {/* <Text style={[FONT.Bold, { color: theme.color.main, marginBottom: h2p(5) }]}>
             느끼만렙 맵찔이
           </Text> */}
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text style={[FONT.Bold, { fontSize: 20 }]}>
-              {getMyProfileQuery.data?.nickname}
-            </Text>
-            {/* 뱃지 기능 추가후 주석해제 */}
-            {/* <View style={{
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Text style={[FONT.Bold, { fontSize: 20 }]}>
+                {getMyProfileQuery.data?.nickname}
+              </Text>
+              {/* 뱃지 기능 추가후 주석해제 */}
+              {/* <View style={{
               marginLeft: d2p(10),
               borderWidth: 1,
               borderRadius: 10, height: d2p(20),
@@ -97,54 +112,161 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             }}>
               <Text style={[FONT.Medium, { fontSize: 10, color: "rgb(255,107,41)" }]}>{`다이어터 >`}</Text>
             </View> */}
+            </View>
+            <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4, marginTop: h2p(10) }]}>
+              {`${getMyProfileQuery.data?.tags.foodStyle} ${getMyProfileQuery.data?.tags.household} ${getMyProfileQuery.data?.tags.occupation}`}
+            </Text>
           </View>
-          <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4, marginTop: h2p(10) }]}>
-            {`${getMyProfileQuery.data?.tags.foodStyle} ${getMyProfileQuery.data?.tags.household} ${getMyProfileQuery.data?.tags.occupation}`}
-          </Text>
-        </View>
-        <FastImage style={{
-          width: d2p(70), height: d2p(70), borderRadius: 70,
-          borderWidth: 1,
-          borderColor: theme.color.grayscale.eae7ec
-        }}
-          source={getMyProfileQuery.data?.profileImage ? { uri: getMyProfileQuery.data?.profileImage } : noProfile} />
-      </View>
-      <View style={styles.profileInfo}>
-        <Pressable
-          onPress={() => {
-            if (route.params?.id === myId) {
-              navigation.navigate("editProfile",
-                {
-                  profile:
-                  {
-                    nickname: getMyProfileQuery?.data?.nickname,
-                    headline: getMyProfileQuery?.data?.headline,
-                    profileImage: getMyProfileQuery?.data?.profileImage,
-                    tags: {
-                      foodStyle: getMyProfileQuery?.data?.tags.foodStyle.map(v => ({ title: v, isClick: true })),
-                      household: getMyProfileQuery?.data?.tags.household.map(v => ({ title: v, isClick: true })),
-                      occupation: getMyProfileQuery?.data?.tags.occupation.map(v => ({ title: v, isClick: true })),
-                    },
-                    representBadge: getMyProfileQuery?.data?.representBadge,
-                    remainingPeriod: getMyProfileQuery?.data?.remainingPeriod
-                  }
-                });
-            }
+          <FastImage style={{
+            width: d2p(70), height: d2p(70), borderRadius: 70,
+            borderWidth: 1,
+            borderColor: theme.color.grayscale.eae7ec
           }}
-          style={styles.headline}>
-          <Text style={[FONT.Medium, {
-            color: getMyProfileQuery.data?.headline ? theme.color.black : theme.color.grayscale.a09ca4
-          }]}>
-            {getMyProfileQuery.data?.headline ? getMyProfileQuery.data?.headline : "자기소개를 입력해주세요."}
-          </Text>
-          <Image
-            style={{ width: d2p(10.5), height: d2p(10.5) }}
-            source={graywrite}
-          />
-        </Pressable>
+            source={getMyProfileQuery.data?.profileImage ? { uri: getMyProfileQuery.data?.profileImage } : noProfile} />
+        </View>
+        <View style={styles.profileInfo}>
+          <Pressable
+            onPress={() => {
+              if (route.params?.id === myId) {
+                navigation.navigate("editProfile",
+                  {
+                    profile:
+                    {
+                      nickname: getMyProfileQuery?.data?.nickname,
+                      headline: getMyProfileQuery?.data?.headline,
+                      profileImage: getMyProfileQuery?.data?.profileImage,
+                      tags: {
+                        foodStyle: getMyProfileQuery?.data?.tags.foodStyle.map(v => ({ title: v, isClick: true })),
+                        household: getMyProfileQuery?.data?.tags.household.map(v => ({ title: v, isClick: true })),
+                        occupation: getMyProfileQuery?.data?.tags.occupation.map(v => ({ title: v, isClick: true })),
+                      },
+                      representBadge: getMyProfileQuery?.data?.representBadge,
+                      remainingPeriod: getMyProfileQuery?.data?.remainingPeriod
+                    }
+                  });
+              }
+            }}
+            style={styles.headline}>
+            <Text style={[FONT.Medium, {
+              color: getMyProfileQuery.data?.headline ? theme.color.black : theme.color.grayscale.a09ca4
+            }]}>
+              {getMyProfileQuery.data?.headline ? getMyProfileQuery.data?.headline : "자기소개를 입력해주세요."}
+            </Text>
+            <Image
+              style={{ width: d2p(10.5), height: d2p(10.5) }}
+              source={graywrite}
+            />
+          </Pressable>
+          <View style={{
+            borderBottomWidth: 4, borderBottomColor: theme.color.grayscale.f7f7fc,
+            borderTopWidth: 4, borderTopColor: theme.color.grayscale.f7f7fc,
+            width: Dimensions.get("window").width,
+            // flexDirection: "row",
+          }}>
+            <View style={{ flexDirection: "row" }}>
+              <TouchableOpacity
+                onPress={() => {
+                  setFollowIndex(0);
+                  followRef.current?.open();
+                }}
+                style={{
+                  width: "50%",
+                  paddingLeft: d2p(10), paddingVertical: h2p(10)
+                }}>
+                <View style={{ alignItems: "center", marginVertical: h2p(10) }}>
+                  <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
+                    팔로잉
+                  </Text>
+                  <Text style={[FONT.SemiBold, { marginTop: h2p(5) }]}>192</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setFollowIndex(1);
+                  followRef.current?.open();
+                }}
+                style={{
+                  width: "50%",
+                  paddingRight: d2p(10), paddingVertical: h2p(10)
+                }}>
+                <View style={{
+                  alignItems: "center", marginVertical: h2p(10),
+                  borderLeftWidth: 1,
+                  borderLeftColor: theme.color.grayscale.f7f7fc
+                }}>
+                  <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
+                    팔로워
+                  </Text>
+                  <Text style={[FONT.SemiBold, { marginTop: h2p(5) }]}>60</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+            {route.params?.id !== myId &&
+              <View style={{
+                marginHorizontal: d2p(20), marginBottom: h2p(20),
+                flexDirection: "row", alignItems: "center"
+              }}>
+                <BasicButton
+                  onPress={() => {
+                    // todo isFollow true면 false 반대면 true
+                    if (getMyProfileQuery.data) {
+                      followMutation.mutate({
+                        userId: getMyProfileQuery.data?.id,
+                        isFollow: true
+                      });
+                    }
+                  }}
+                  viewStyle={{ width: Dimensions.get("window").width - d2p(110), height: h2p(35) }}
+                  text="팔로우" bgColor={theme.color.main} textColor={theme.color.white} />
+                <TouchableOpacity style={{
+                  borderWidth: 1,
+                  borderColor: theme.color.grayscale.a09ca4,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: 5,
+                  width: d2p(60), height: h2p(35),
+                  marginLeft: d2p(10)
+                }}>
+                  <Text style={[FONT.Medium, { color: theme.color.grayscale.C_443e49 }]}>
+                    차단
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            }
+          </View>
+        </View>
       </View>
-    </View>
-  ), [getMyProfileQuery.data]);
+      <CustomBottomSheet
+        customStyles={{
+          container: {
+            padding: 0,
+            paddingTop: h2p(20),
+            borderRadius: 30,
+          }
+        }}
+        sheetRef={followRef}
+        height={Dimensions.get("window").height - h2p(60)}
+      >
+        <>
+          <View style={{
+            flexDirection: "row", justifyContent: "space-between",
+            paddingHorizontal: d2p(30), marginBottom: h2p(20)
+          }}>
+            <CloseIcon onPress={() => followRef.current?.close()}
+              imageStyle={{ width: d2p(15), height: h2p(15) }} />
+            <Text style={[{ fontSize: 16, marginRight: d2p(15) }, FONT.Bold]}>{getMyProfileQuery.data?.nickname}</Text>
+            <View />
+          </View>
+          {/* 팔로우 바텀 시트 */}
+          {route.params?.id &&
+            <FollowBottomTab
+              followIndex={followIndex}
+              id={route.params.id} />
+          }
+        </>
+      </CustomBottomSheet>
+    </>
+  ), [getMyProfileQuery.data, followIndex]);
 
   // * 작성글
   const reviewKey = useCallback((v) => String(v.id), []);

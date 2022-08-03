@@ -399,16 +399,22 @@ const Write = ({ navigation, route }: WriteProp) => {
         title="글쓰기"
         headerRightPress={() => {
           // todo 임시저장
-          // if (blockSubmit) {
-          //   return;
-          // }
-          // else {
-          //   handleAddWrite();
-          // }
+          if (blockSubmit) {
+            return;
+          }
+          else {
+            handleAddWrite();
+          }
         }}
-        headerRight={<Text style={[{ color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>
-          임시저장
-        </Text>} />
+        headerRight={<Text style={[{ color: theme.color.main }, FONT.Regular]}>
+          완료
+        </Text>}
+
+      // headerRight={<Text style={[{ color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>
+      //   임시저장
+      // </Text>} 
+
+      />
       <KeyboardAwareScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.container}

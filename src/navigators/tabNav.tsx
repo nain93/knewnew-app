@@ -87,9 +87,31 @@ const TabNavigator = () => {
           )
         }}
       />
-      <Tabs.Screen
+      {/* 작성 리뉴얼후 주석해제 */}
+      {/* <Tabs.Screen
         name="BeforeWrite"
         component={BeforeWrite}
+        options={{
+          tabBarLabel: "글쓰기",
+          headerShown: false,
+          tabBarStyle: { display: "none" },
+          tabBarIcon: () => (
+            <Image
+              style={{ width: d2p(20), height: d2p(20) }}
+              source={graywrite}
+            />
+          )
+        }}
+      /> */}
+      <Tabs.Screen
+        name="Write"
+        component={Write}
+        listeners={({ navigation }) => ({
+          tabPress: e => {
+            e.preventDefault();
+            navigation.navigate('Write', { loading: false, isEdit: false });
+          },
+        })}
         options={{
           tabBarLabel: "글쓰기",
           headerShown: false,
@@ -132,7 +154,7 @@ const TabNavigator = () => {
               <StatusBarPlaceHolder />
               <Header
                 //@ts-ignore
-                title={params?.id === myId ? "마이페이지" : "회원 프로필"}
+                title={params?.id === myId ? "마이뉴뉴" : "회원 프로필"}
                 bgColor={theme.color.white}
                 viewStyle={{
                 }}

@@ -4,7 +4,7 @@ import React, { memo, useCallback, useEffect, useState } from 'react';
 import theme from '~/styles/theme';
 import { d2p, h2p, simpleDate } from '~/utils';
 import ReviewIcon from '../icon/reviewIcon';
-import { cart, colorCart, colorLike, comment, like, more, reKnew, tag } from '~/assets/icons';
+import { cart, colorCart, colorLike, comment, grayEyeIcon, like, more, reKnew, tag } from '~/assets/icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 //@ts-ignore
@@ -129,8 +129,6 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           onPress={() => navigation.navigate("Mypage", { id: review.author.id })}
           style={{
             borderRadius: 40,
-            height: d2p(40),
-            width: d2p(40),
             overflow: "hidden",
             borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
           }}>
@@ -311,7 +309,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
       {type === "normal" &&
         <View style={styles.reactionContainer}>
           {/* 인용글에서는 리트윗 아이콘 삭제 */}
-          {!review.parent &&
+          {/* {!review.parent &&
             <TouchableOpacity
               onPress={() => navigation.navigate("Write",
                 { loading: false, isEdit: false, type: "reKnewWrite", review, nickname: getMyProfileQuery.data?.nickname, filterBadge })}
@@ -319,7 +317,15 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
               <Image source={reKnew} style={styles.reviewImg} />
               <Text style={[FONT.Regular, styles.reviewCount]}>{review.childCount}</Text>
             </TouchableOpacity>
-          }
+          } */}
+          {/* {
+            console.log(review, 'review')
+          } */}
+          <View
+            style={styles.reviewIcon}>
+            <Image source={grayEyeIcon} style={styles.reviewImg} />
+            <Text style={[FONT.Regular, styles.reviewCount]}>{review.childCount}</Text>
+          </View>
           <Pressable
             onPress={() => navigation.navigate("FeedDetail", {
               authorId: review.author.id,

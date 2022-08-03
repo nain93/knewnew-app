@@ -1,5 +1,5 @@
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FONT } from '~/styles/fonts';
 import theme from '~/styles/theme';
 import ReactionLayout from '~/components/layout/ReactionLayout';
@@ -19,13 +19,14 @@ import { colorCart, rightArrow } from '~/assets/icons';
 import CustomBottomSheet from '~/components/popup/CustomBottomSheet';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import CloseIcon from '~/components/icon/closeIcon';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface BeforeWriteProp {
   navigation: NavigationStackProp;
   route: NavigationRoute;
 }
 
-const BeforeWrite = ({ navigation }: BeforeWriteProp) => {
+const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
   const marketRefRBSheet = useRef<RBSheet>(null);
   const [clickedReact, setClickReact] = useState<Array<{
     title: ReactionType,
@@ -64,7 +65,7 @@ const BeforeWrite = ({ navigation }: BeforeWriteProp) => {
       <View style={styles.container}>
         <Text style={[FONT.Regular, { fontSize: 16 }]}>오늘의 푸드로그는</Text>
         <Text style={[FONT.Bold, { fontSize: 20 }]}>한마디로,
-          <Text style={[FONT.Regular, { color: theme.color.main, fontSize: 12 }]}>(필수)</Text>
+          <Text style={[FONT.Regular, { color: theme.color.main, fontSize: 12 }]}> (필수)</Text>
         </Text>
         <View style={styles.reactionWrap}>
           <ReactionLayout
@@ -77,7 +78,7 @@ const BeforeWrite = ({ navigation }: BeforeWriteProp) => {
         </View>
         <Text style={[FONT.Regular, { fontSize: 16 }]}>오늘의 푸드로그</Text>
         <Text style={[FONT.Bold, { fontSize: 20, marginBottom: h2p(10) }]}>푸드 태그는,
-          <Text style={[FONT.Regular, { color: theme.color.main, fontSize: 12 }]}>(필수)</Text>
+          <Text style={[FONT.Regular, { color: theme.color.main, fontSize: 12 }]}> (필수)</Text>
         </Text>
         <SelectLayout type="filter" interestTag={interestTag} setInterestTag={setInterestTag} />
         <View style={{ marginTop: h2p(60), marginBottom: h2p(20) }}>
@@ -102,6 +103,7 @@ const BeforeWrite = ({ navigation }: BeforeWriteProp) => {
           <Image source={rightArrow} style={{ marginLeft: "auto", width: d2p(12), height: d2p(25) }} />
         </TouchableOpacity>
         <BasicButton
+          disabled={interestTag.interest.every(v => !v.isClick) || clickedReact.every(v => !v.isClick)}
           text="다음으로" bgColor={theme.color.white} textColor={theme.color.main}
           onPress={() => navigation.navigate("Write", { loading: false, isEdit: false })}
         />

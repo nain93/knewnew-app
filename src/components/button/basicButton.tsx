@@ -19,8 +19,9 @@ const BasicButton = ({ disabled, text, bgColor, textColor, borderColor, viewStyl
     <TouchableOpacity
       disabled={disabled}
       onPress={onPress}>
-      <View style={[styles.container, viewStyle, { backgroundColor: bgColor }, { borderColor: borderColor ? borderColor : textColor }]}>
-        <Text style={[styles.text, { color: textColor }, FONT.Bold]}>{text}</Text>
+      <View style={[styles.container, viewStyle, { backgroundColor: disabled ? theme.color.grayscale.f7f7fc : bgColor },
+      { borderColor: disabled ? theme.color.grayscale.e9e7ec : (borderColor ? borderColor : textColor) }]}>
+        <Text style={[styles.text, { color: disabled ? theme.color.grayscale.d3d0d5 : textColor }, FONT.Bold]}>{text}</Text>
       </View>
     </TouchableOpacity>
   );
