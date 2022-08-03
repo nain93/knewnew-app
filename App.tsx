@@ -125,8 +125,14 @@ const App = () => {
         // * 백그라운드 알람 클릭시
         messaging().getInitialNotification().then(remoteMessage => {
           if (remoteMessage) {
-            //@ts-ignore
-            navigationRef.navigate("FeedDetail", { id: remoteMessage.data.link.split("/")[1] });
+            if (Platform.OS === "ios") {
+              //@ts-ignore
+              navigationRef.navigate("FeedDetail", { id: remoteMessage.data.custom_data.link.split("/")[1] });
+            }
+            else {
+              //@ts-ignore
+              navigationRef.navigate("FeedDetail", { id: remoteMessage.data.link.split("/")[1] });
+            }
           }
         });
         // * 알림 읽은정보 저장
@@ -154,8 +160,14 @@ const App = () => {
           onPress: () => {
             if (navigationRef.isReady()) {
               // * 알람팝업 클릭시 화면 navigate
-              //@ts-ignore
-              navigationRef.navigate("FeedDetail", { id: remoteMessage.data.link.split("/")[1] });
+              if (Platform.OS === "ios") {
+                //@ts-ignore
+                navigationRef.navigate("FeedDetail", { id: remoteMessage.data.custom_data.link.split("/")[1] });
+              }
+              else {
+                //@ts-ignore
+                navigationRef.navigate("FeedDetail", { id: remoteMessage.data.link.split("/")[1] });
+              }
             }
           }
         });
