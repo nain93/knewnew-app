@@ -7,7 +7,7 @@ import theme from '~/styles/theme';
 import { d2p, dateCommentFormat, h2p, simpleDate } from '~/utils';
 import ReviewIcon from '~/components/icon/reviewIcon';
 import ReactionIcon from '~/components/icon/reactionIcon';
-import { commentMore, more, tag } from '~/assets/icons';
+import { commentMore, more, reKnew, tag } from '~/assets/icons';
 import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { myIdState, okPopupState, popupState, refreshState, tokenState } from '~/recoil/atoms';
@@ -36,6 +36,8 @@ import Recomment from '~/screens/feed/comment/recomment';
 import { CommentListType } from '~/types/comment';
 import SplashScreen from 'react-native-splash-screen';
 import ImageFlatlist from '~/screens/feed/ImageFlatlist';
+import { MyProfileType } from '~/types/user';
+import { getMyProfile } from '~/api/user';
 
 interface FeedDetailProps {
   navigation: NavigationStackProp
@@ -94,6 +96,10 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     setInitialIndex(idx);
   };
   const closeGallery = () => setIsOpen(false);
+  const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", token], () => getMyProfile(token), {
+    enabled: !!token,
+  });
+
   const reviewDetailQuery = useQuery<ReviewListType, Error>(["reviewDetail", token, route.params?.id],
     async () => {
       if (route.params) {
@@ -451,13 +457,35 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           </>
         }
         <View style={[styles.reactionContainer, { paddingTop: reviewDetailQuery.data?.parent ? 0 : h2p(10) }]}>
+          {/* 인용글에서는 리트윗 아이콘 삭제 */}
+          {!reviewDetailQuery.data?.parent &&
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Write",
+                {
+                  loading: false, isEdit: false, type: "reKnewWrite", review: reviewDetailQuery.data,
+                  nickname: getMyProfileQuery.data?.nickname
+                })}
+              style={{
+                flexDirection: "row",
+                alignItems: "center"
+              }}>
+              <Image source={reKnew} style={{
+                width: d2p(24),
+                height: d2p(24),
+                marginRight: d2p(10)
+              }} />
+              <Text style={[FONT.Regular, {
+                fontSize: 12,
+                color: theme.color.grayscale.C_79737e
+              }]}>{reviewDetailQuery.data?.childCount}</Text>
+            </TouchableOpacity>
+          }
+          <ReactionIcon name="like" count={reviewDetailQuery.data?.likeCount} state={like}
+            isState={(isState: boolean) => setLike(isState)} mutation={likeReviewMutation} id={route.params?.id} />
           <ReactionIcon name="cart" state={cart} count={reviewDetailQuery.data?.bookmarkCount}
             mutation={boomarkMutation}
             id={route.params?.id}
             isState={(isState: boolean) => setCart(isState)} />
-          <View style={{ borderLeftWidth: 1, borderLeftColor: theme.color.grayscale.eae7ec, height: h2p(26) }} />
-          <ReactionIcon name="like" count={reviewDetailQuery.data?.likeCount} state={like}
-            isState={(isState: boolean) => setLike(isState)} mutation={likeReviewMutation} id={route.params?.id} />
         </View>
         <Text style={[styles.commentMeta, FONT.Bold]}>작성된 댓글 {reviewDetailQuery.data?.commentCount}개</Text>
       </View>
@@ -635,7 +663,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
               navigation.reset({ index: 0, routes: [{ name: "TabNav" }] });
             }
             else {
-              navigation.goBack();
+              navigation.navigate("Feed");
             }
           }}
             imageStyle={{ width: d2p(11), height: d2p(25) }} />}
@@ -667,7 +695,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             navigation.reset({ index: 0, routes: [{ name: "TabNav" }] });
           }
           else {
-            navigation.goBack();
+            navigation.navigate("Feed");
           }
         }}
           imageStyle={{ width: d2p(11), height: d2p(25) }} />}

@@ -4,17 +4,13 @@ import Header from '~/components/header';
 import theme from '~/styles/theme';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import { InterestTagType } from '~/types';
-import { blackclose, cart, circle, graycircle, grayclose, grayheart, heart, maincart, maintag, tag } from '~/assets/icons';
 import { photo, photoClose } from '~/assets/images';
 import { d2p, h2p } from '~/utils';
 
-import RBSheet from "react-native-raw-bottom-sheet";
-import SelectLayout from '~/components/layout/SelectLayout';
-import CloseIcon from '~/components/icon/closeIcon';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { myIdState, okPopupState, popupState, tokenState } from '~/recoil/atoms';
-import { MarketType, ReviewListType, WriteImagesType, WriteReviewType } from '~/types/review';
+import { ReviewListType, WriteImagesType, WriteReviewType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
@@ -25,10 +21,10 @@ import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 import Loading from '~/components/loading';
 import { preSiginedImages, uploadImage } from '~/api';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { getMyProfile } from '~/api/user';
-import { MyProfileType } from '~/types/user';
-import { marketList, S3_URL } from '~/utils/constant';
 import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
+import BasicButton from '~/components/button/basicButton';
+import { blackclose, circle, graycircle, grayclose, grayheart, heart, reKnew } from '~/assets/icons';
+import FastImage from 'react-native-fast-image';
 
 interface WriteProp {
   navigation: NavigationStackProp;
@@ -37,12 +33,10 @@ interface WriteProp {
     type?: "reknew" | "reKnewWrite",
     filterBadge?: string,
     nickname?: string,
-    loading?: boolean,
-    isEdit: boolean
+    loading?: boolean
+    isEdit: boolean,
   }>;
 }
-
-const today = new Date();
 
 const Write = ({ navigation, route }: WriteProp) => {
   let parentId: number | undefined;
@@ -56,7 +50,7 @@ const Write = ({ navigation, route }: WriteProp) => {
     images: [],
     content: "",
     satisfaction: "",
-    market: MarketType["판매처 선택"],
+    market: undefined,
     parent: parentId,
     tags: {
       interest: []
@@ -65,8 +59,6 @@ const Write = ({ navigation, route }: WriteProp) => {
 
   const [interestTag, setInterestTag] = useState<InterestTagType>(interestTagData);
   const inputRef = useRef<TextInput>(null);
-  const tagRefRBSheet = useRef<RBSheet>(null);
-  const marketRefRBSheet = useRef<RBSheet>(null);
   const [keyboardHeight, setKeyBoardHeight] = useState(0);
   const queryClient = useQueryClient();
   const token = useRecoilValue(tokenState);
@@ -85,10 +77,6 @@ const Write = ({ navigation, route }: WriteProp) => {
   const [images, setImages] = useState<any[]>([]);
   const [imageIds, setImageIds] = useState<number[]>([]);
 
-  const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", token], () => getMyProfile(token), {
-    enabled: !!token
-  });
-
   const addReviewMutation = useMutation(["addReview", token],
     (writeProps: WriteReviewType) => writeReview({ token, ...writeProps }), {
     onSuccess: (data) => {
@@ -99,35 +87,8 @@ const Write = ({ navigation, route }: WriteProp) => {
             ...profileQuery, reviewCount: profileQuery?.reviewCount + 1
           };
         });
-        queryClient.setQueriesData("reviewList", (reviewQuery: any) => {
-          if (reviewQuery && getMyProfileQuery.data) {
-            return {
-              ...reviewQuery, pages: [[{
-                author: {
-                  id: getMyProfileQuery.data.id,
-                  profileImage: getMyProfileQuery.data.profileImage,
-                  representBadge: getMyProfileQuery.data.representBadge,
-                  nickname: getMyProfileQuery.data.nickname,
-                  household: getMyProfileQuery.data.household
-                },
-                ...writeData,
-                tags: route.params?.type === "reKnewWrite" ? route.params.review?.tags : writeData.tags,
-                parent: route.params?.type === "reKnewWrite" ? { ...route.params?.review, isActive: true } : null,
-                market: (writeData.market === "판매처 선택" || writeData.market === "선택 안함") ? undefined : writeData.market,
-                bookmarkCount: 0,
-                likeCount: 0,
-                childCount: 0,
-                commentCount: 0,
-                created: new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString(),
-                id: data.id,
-                images: presignImg.length > 0 ?
-                  presignImg.map(img => ({ ...img, image: S3_URL + img.image }))
-                  :
-                  writeData.images?.map(img => ({ ...img, image: S3_URL + img.image }))
-              }, ...reviewQuery.pages.flat()]]
-            };
-          }
-        });
+        queryClient.invalidateQueries("reviewList");
+        navigation.goBack();
         navigation.goBack();
         navigation.navigate("FeedDetail", { id: data.id, authorId: myId });
       }
@@ -142,43 +103,7 @@ const Write = ({ navigation, route }: WriteProp) => {
       // * 이미지 삭제 api
       await Promise.all(imageIds.map(v => mutateAsync(v)));
       if (data) {
-        queryClient.setQueriesData("reviewList", (reviewQuery: any) => {
-          if (reviewQuery && getMyProfileQuery.data) {
-            return {
-              //@ts-ignore
-              ...reviewQuery, pages: [reviewQuery.pages.flat().map(v => {
-                if (!route.params?.type && route.params?.review &&
-                  (v.parent?.id === route.params?.review.id)) {
-                  return { ...v, parent: { ...v.parent, content: writeData.content, satisfaction: writeData.satisfaction } };
-                }
-                if (v.id === route.params?.review?.id) {
-                  return {
-                    author: route.params?.review?.author,
-                    created: route.params?.review?.created,
-                    bookmarkCount: route.params?.review?.bookmarkCount,
-                    likeCount: route.params?.review?.likeCount,
-                    childCount: route.params?.review?.childCount,
-                    commentCount: route.params?.review?.commentCount,
-                    ...writeData, id: v.id,
-                    parent:
-                      route.params?.review?.parent ?
-                        (route.params?.review?.parent?.isActive ? { ...route.params?.review?.parent, isActive: true }
-                          :
-                          { ...route.params?.review?.parent, isActive: false })
-                        :
-                        null,
-                    market: (writeData.market === "판매처 선택" || writeData.market === "선택 안함") ? undefined : writeData.market,
-                    images: presignImg.length > 0 ?
-                      presignImg.map(img => ({ ...img, image: S3_URL + img.image }))
-                      :
-                      writeData.images?.map(img => ({ ...img, image: S3_URL + img.image }))
-                  };
-                }
-                return v;
-              })]
-            };
-          }
-        });
+        queryClient.invalidateQueries("reviewList");
         navigation.goBack();
         navigation.navigate("FeedDetail", { id: data.id, authorId: myId });
       }
@@ -222,19 +147,13 @@ const Write = ({ navigation, route }: WriteProp) => {
   const { mutateAsync } = useMutation("deleteImages", (id: number) => deleteReviewImage(token, id));
 
   const handleAddWrite = async () => {
-    if (writeData.satisfaction === "") {
-      setIspopupOpen({ isOpen: true, content: "선호도를 표시해주세요", popupStyle: { bottom: keyboardHeight + h2p(20) } });
+    if (route.params?.type === "reKnewWrite" && writeData.satisfaction === "") {
+      setIspopupOpen({ isOpen: true, content: "선호도를 입력해주세요", popupStyle: { bottom: keyboardHeight + h2p(20) } });
       return;
     }
     if (writeData.content === "") {
       setIspopupOpen({ isOpen: true, content: "내용을 입력해주세요", popupStyle: { bottom: keyboardHeight + h2p(20) } });
       return;
-    }
-    if (route.params && route.params.type !== "reknew" && route.params?.type !== "reKnewWrite") {
-      if (writeData.tags.interest.length === 0) {
-        setIspopupOpen({ isOpen: true, content: "태그를 선택해주세요", popupStyle: { bottom: keyboardHeight + h2p(20) } });
-        return;
-      }
     }
     setBlockSubmit(true);
     // * 이미지 업로드할때
@@ -283,7 +202,7 @@ const Write = ({ navigation, route }: WriteProp) => {
         images: route.params.review.images.map(v => ({ ...v, image: "review" + v.image?.split("review")[1] })),
         content: route.params.review.content,
         satisfaction: route.params.review.satisfaction,
-        market: route.params.review.market ? route.params.review.market : MarketType['선택 안함'],
+        market: route.params.review.market ? route.params.review.market : undefined,
         tags: {
           ...route.params.review.tags
         },
@@ -297,7 +216,7 @@ const Write = ({ navigation, route }: WriteProp) => {
         images: [],
         content: "",
         satisfaction: "",
-        market: MarketType['판매처 선택'],
+        market: undefined,
         parent: parentId,
         tags: {
           interest: []
@@ -365,129 +284,218 @@ const Write = ({ navigation, route }: WriteProp) => {
       <Header
         isBorder={true}
         headerLeft={<LeftArrowIcon onBackClick={() => {
-          if (writeData.content
-            || writeData.satisfaction
-            || writeData.images && writeData.images.length > 0
-            || writeData.market && (writeData.market !== "판매처 선택")
-            || writeData.tags.interest.length > 0) {
-            setModalOpen({
-              isOpen: true,
-              content: "앗! 지금까지 작성하신 내용이 사라져요",
-              okButton: () => {
-                navigation.goBack();
-                setWriteData({
-                  images: [],
-                  content: "",
-                  satisfaction: "",
-                  market: MarketType['판매처 선택'],
-                  parent: parentId,
-                  tags: {
-                    interest: []
-                  }
-                });
-              }
-            });
+          if (route.params?.isEdit) {
+            if (writeData.content
+              || writeData.satisfaction
+              || writeData.images && writeData.images.length > 0
+              || writeData.market
+              || writeData.tags.interest.length > 0) {
+              setModalOpen({
+                isOpen: true,
+                content: "앗! 지금까지 작성하신 내용이 사라져요",
+                okButton: () => {
+                  navigation.goBack();
+                  setWriteData({
+                    images: [],
+                    content: "",
+                    satisfaction: "",
+                    market: undefined,
+                    parent: parentId,
+                    tags: {
+                      interest: []
+                    }
+                  });
+                }
+              });
+            }
           }
           else {
             navigation.goBack();
           }
         }}
           imageStyle={{ width: d2p(11), height: h2p(25) }} />}
-        title="작성하기"
+        title="글쓰기"
         headerRightPress={() => {
-          if (blockSubmit) {
-            return;
-          }
-          else {
-            handleAddWrite();
-          }
+          // todo 임시저장
+
         }}
-        headerRight={<Text style={[{ color: theme.color.main }, FONT.Regular]}>완료</Text>} />
+      // headerRight={<Text style={[{ color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>
+      //   임시저장
+      // </Text>} 
+      />
       <KeyboardAwareScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.container}
       >
-        <View style={styles.reviewIconWrap}>
-          <TouchableOpacity
-            onPress={() => setWriteData({ ...writeData, satisfaction: "best" })}
-            style={styles.reviewIcon}>
-            <Image source={(writeData.satisfaction === "best") ? heart : grayheart} style={{ width: d2p(20), height: h2p(20) }} />
-            <Text style={[{ color: (writeData.satisfaction === "best") ? theme.color.main : theme.color.grayscale.a09ca4, marginLeft: d2p(5) },
-            (writeData.satisfaction === "best") ? FONT.Bold : FONT.Regular]}>최고예요</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setWriteData({ ...writeData, satisfaction: "good" })}
-            style={styles.reviewIcon}>
-            <Image source={(writeData.satisfaction === "good") ? circle : graycircle} style={{ width: d2p(20), height: h2p(20) }} />
-            <Text style={[{ color: (writeData.satisfaction === "good") ? theme.color.yellow : theme.color.grayscale.a09ca4, marginLeft: d2p(5) },
-            (writeData.satisfaction === "good") ? FONT.Bold : FONT.Regular]}>괜찮아요</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setWriteData({ ...writeData, satisfaction: "bad" })}
-            style={styles.reviewIcon}>
-            <Image source={(writeData.satisfaction === "bad") ? blackclose : grayclose} style={{ width: d2p(20), height: h2p(20) }} />
-            <Text style={[{ color: (writeData.satisfaction === "bad") ? theme.color.black : theme.color.grayscale.a09ca4, marginLeft: d2p(5) },
-            (writeData.satisfaction === "bad") ? FONT.Bold : FONT.Regular]}>별로예요</Text>
-          </TouchableOpacity>
-        </View>
+        {/* 인용할떄 ui */}
         {(route.params?.type === "reknew" || route.params?.type === "reKnewWrite") ?
           <View
-            style={{ marginTop: h2p(30), paddingHorizontal: d2p(20), marginBottom: "auto" }}>
-            <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>이 글을 인용하고 있어요.</Text>
-            <View style={{
-              borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
-              paddingHorizontal: d2p(15),
-              paddingTop: h2p(15),
-              paddingBottom: h2p(10),
-              marginVertical: h2p(15),
-              borderRadius: 5
-            }}>
-              {route.params.review &&
-                (
-                  (route.params.review.parent?.isActive || !route.params.review.parent) ?
-                    <FeedReview
-                      filterBadge={route.params.filterBadge}
-                      type="reKnewWrite"
-                      //@ts-ignore
-                      review={route.params?.review.parent ? route.params?.review.parent : route.params?.review} />
-                    :
-                    <Text style={[FONT.Regular, { color: theme.color.grayscale.C_79737e }]}>
-                      원문 글이 삭제되었습니다.
-                    </Text>
-                )
-              }
+            style={{ marginTop: h2p(20), marginBottom: "auto" }}>
+            <View style={{ paddingHorizontal: d2p(20) }}>
+              <View style={styles.reviewIconWrap}>
+                <TouchableOpacity
+                  onPress={() => setWriteData({ ...writeData, satisfaction: "best" })}
+                  style={styles.reviewIcon}>
+                  <Image source={(writeData.satisfaction === "best") ? heart : grayheart} style={{ width: d2p(20), height: h2p(20) }} />
+                  <Text style={[{ color: (writeData.satisfaction === "best") ? theme.color.main : theme.color.grayscale.a09ca4, marginLeft: d2p(5) },
+                  (writeData.satisfaction === "best") ? FONT.Bold : FONT.Regular]}>최고예요</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setWriteData({ ...writeData, satisfaction: "good" })}
+                  style={styles.reviewIcon}>
+                  <Image source={(writeData.satisfaction === "good") ? circle : graycircle} style={{ width: d2p(20), height: h2p(20) }} />
+                  <Text style={[{ color: (writeData.satisfaction === "good") ? theme.color.yellow : theme.color.grayscale.a09ca4, marginLeft: d2p(5) },
+                  (writeData.satisfaction === "good") ? FONT.Bold : FONT.Regular]}>괜찮아요</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setWriteData({ ...writeData, satisfaction: "bad" })}
+                  style={styles.reviewIcon}>
+                  <Image source={(writeData.satisfaction === "bad") ? blackclose : grayclose} style={{ width: d2p(20), height: h2p(20) }} />
+                  <Text style={[{ color: (writeData.satisfaction === "bad") ? theme.color.black : theme.color.grayscale.a09ca4, marginLeft: d2p(5) },
+                  (writeData.satisfaction === "bad") ? FONT.Bold : FONT.Regular]}>별로예요</Text>
+                </TouchableOpacity>
+              </View>
+              <Text style={[FONT.Bold, { marginBottom: h2p(10) }]}>오늘의 푸드로그
+                <Text style={[FONT.Regular, {
+                  fontSize: 12,
+                  color: writeData.content.length === 300 ? theme.color.main : theme.color.grayscale.a09ca4
+                }]}>  ({writeData.content.length}/300)</Text>
+              </Text>
             </View>
             <Pressable onPress={() => inputRef.current?.focus()}
               style={{
-                height: h2p(290)
+                height: h2p(555),
+                borderTopColor: theme.color.grayscale.eae7ec,
+                borderTopWidth: 1,
+                borderBottomColor: theme.color.grayscale.e9e7ec,
+                borderBottomWidth: 1,
+                paddingHorizontal: d2p(20),
               }}
             >
-              <TextInput
-                value={writeData.content}
-                maxLength={301}
-                onChangeText={(e) => {
-                  if (e.length > 300) {
-                    setWriteData({ ...writeData, content: e.slice(0, e.length - 1) });
+              <View style={{ flexDirection: "row", marginTop: h2p(20) }}>
+                <Image source={reKnew} style={{ width: d2p(26), height: d2p(26) }} />
+                <View style={{
+                  borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
+                  paddingTop: h2p(15),
+                  paddingBottom: h2p(10),
+                  // marginVertical: h2p(15),
+                  marginLeft: d2p(14),
+                  borderRadius: 5,
+                  paddingHorizontal: d2p(10),
+                  width: Dimensions.get("window").width - d2p(80)
+                }}>
+                  {route.params.review &&
+                    (
+                      (route.params.review.parent?.isActive || !route.params.review.parent) ?
+                        <FeedReview
+                          filterBadge={route.params.filterBadge}
+                          type="reKnewWrite"
+                          //@ts-ignore
+                          review={route.params?.review.parent ? route.params?.review.parent : route.params?.review} />
+                        :
+                        <Text style={[FONT.Regular, { color: theme.color.grayscale.C_79737e }]}>
+                          원문 글이 삭제되었습니다.
+                        </Text>
+                    )
                   }
-                  else {
-                    setWriteData({ ...writeData, content: e });
-                  }
-                }}
-                autoCapitalize="none"
-                ref={inputRef}
-                multiline
-                // onContentSizeChange={e => setNumberLine(Math.round(e.nativeEvent.contentSize.height / 20))}
-                placeholder={`${route.params?.nickname}님은 어떻게 생각하세요?`}
-                placeholderTextColor={theme.color.grayscale.a09ca4}
-                style={[{
-                  paddingTop: 0, padding: 0, fontSize: 16, color: theme.color.black,
-                }, FONT.Regular]} />
+                </View>
+              </View>
+
+              <View>
+                {!writeData.content &&
+                  <View style={{
+                    position: "absolute", top: h2p(32), left: 0,
+                    width: Dimensions.get("window").width - d2p(40),
+                  }}>
+                    <Text style={[FONT.Regular, {
+                      marginBottom: h2p(20),
+                      lineHeight: 23,
+                      fontSize: 16, color: theme.color.grayscale.a09ca4
+                    }]}>
+                      {`${route.params?.nickname}님은 어떻게 생각하세요?`}
+                      <Text style={[FONT.Regular, { color: theme.color.main, fontSize: 12, lineHeight: 23 }]}> (필수)</Text>
+                    </Text>
+                    <Text style={[FONT.Regular, { lineHeight: 23, color: theme.color.grayscale.a09ca4 }]}>
+                      Tip. 내 평소 입맛, 나만의 특별한 조리법 등 다른 분들에게 도움이 되는 꿀팁을 함께 나눠주시면 더욱 좋아요!
+                    </Text>
+                  </View>
+                }
+
+                <TextInput
+                  value={writeData.content}
+                  maxLength={301}
+                  onChangeText={(e) => {
+                    if (e.length > 300) {
+                      setWriteData({ ...writeData, content: e.slice(0, e.length - 1) });
+                    }
+                    else {
+                      setWriteData({ ...writeData, content: e });
+                    }
+                  }}
+                  autoCapitalize="none"
+                  ref={inputRef}
+                  multiline
+                  // onContentSizeChange={e => setNumberLine(Math.round(e.nativeEvent.contentSize.height / 20))}
+                  style={[{
+                    paddingTop: h2p(34), padding: 0, fontSize: 16, color: theme.color.black,
+                  }, FONT.Regular]} />
+              </View>
+
             </Pressable>
           </View>
           :
           <>
+            <View style={{
+              paddingHorizontal: d2p(10), marginTop: h2p(20), marginBottom: h2p(10),
+              flexDirection: "row", justifyContent: "space-between", alignItems: "center"
+            }}>
+              <Text style={FONT.Bold}>오늘의 푸드로그
+                <Text style={[FONT.Regular, {
+                  fontSize: 12,
+                  color: writeData.content.length === 300 ? theme.color.main : theme.color.grayscale.a09ca4
+                }]}>  ({writeData.content.length}/300)</Text>
+              </Text>
+              {route.params?.isEdit &&
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: theme.color.white,
+                    borderWidth: 1,
+                    borderColor: theme.color.grayscale.a09ca4,
+                    paddingHorizontal: d2p(5),
+                    paddingVertical: h2p(5),
+                    borderRadius: 5,
+                  }}
+                  onPress={() => navigation.navigate("EditBeforeWrite", { review: { ...route.params?.review, content: writeData.content } })}>
+                  <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49, }]}>{`< 기본정보 수정하기`}</Text>
+                </TouchableOpacity>
+              }
+            </View>
             <Pressable onPress={() => inputRef.current?.focus()}
-              style={{ height: h2p(446) }}>
+              style={{
+                height: h2p(360),
+                borderTopColor: theme.color.grayscale.eae7ec,
+                borderTopWidth: 1,
+                borderBottomColor: theme.color.grayscale.e9e7ec,
+                borderBottomWidth: 1
+              }}>
+              {!writeData.content &&
+                <View style={{
+                  position: "absolute", top: h2p(20), left: d2p(20),
+                  width: Dimensions.get("window").width - d2p(40),
+                }}>
+                  <Text style={[FONT.Regular, {
+                    marginBottom: h2p(20),
+                    lineHeight: 23,
+                    fontSize: 16, color: theme.color.grayscale.a09ca4
+                  }]}>
+                    푸드로그를 자유롭게 작성하세요.
+                    <Text style={[FONT.Regular, { color: theme.color.main, fontSize: 12, lineHeight: 23 }]}> (필수)</Text>
+                  </Text>
+                  <Text style={[FONT.Regular, { lineHeight: 23, color: theme.color.grayscale.a09ca4 }]}>
+                    Tip. 내 평소 입맛, 나만의 특별한 조리법 등 다른 분들에게 도움이 되는 꿀팁을 함께 나눠주시면 더욱 좋아요!
+                  </Text>
+                </View>
+              }
               <TextInput
                 ref={inputRef}
                 value={writeData.content}
@@ -504,175 +512,102 @@ const Write = ({ navigation, route }: WriteProp) => {
                   }
                 }}
                 style={[styles.textInput, FONT.Regular]}
-                placeholder="내용을 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
+              // placeholder="푸드로그를 자유롭게 작성하세요." placeholderTextColor={theme.color.grayscale.a09ca4} 
+              />
             </Pressable>
-            <View style={styles.selectWrap}>
-              <TouchableOpacity
-                onPress={() => tagRefRBSheet.current?.open()}
-                style={[styles.select, { marginRight: d2p(10) }]}>
-                <View style={{ position: "relative" }}>
-                  <Image source={
-                    writeData.tags.interest.length > 0 ? maintag : tag} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
-                  {(writeData.tags.interest.length) !== 0 &&
-                    <Text style={{ fontSize: 8, color: theme.color.white, top: h2p(3), left: "22%", position: "absolute" }}>
-                      {(writeData.tags.interest.length)}</Text>}
-                </View>
-                <Text style={FONT.Medium}>태그 선택</Text>
-                <Text style={[{ fontSize: 12, color: theme.color.main }, FONT.Medium]}> *</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => marketRefRBSheet.current?.open()}
-                style={styles.select}>
-                <Image source={(writeData.market !== "선택 안함" && writeData.market !== "판매처 선택") ? maincart : cart} style={{ width: d2p(14), height: h2p(14), marginRight: d2p(5) }} />
-                <Text style={FONT.Medium}>{writeData.market}</Text>
-              </TouchableOpacity>
-            </View>
           </>
         }
-      </KeyboardAwareScrollView>
-      <View style={{
-        position: "absolute", flexDirection: "row", alignItems: "center",
-        bottom: 0,
-        paddingBottom: isIphoneX() ? getBottomSpace() : h2p(30),
-        paddingTop: h2p(20),
-        backgroundColor: theme.color.white
-      }}>
-        {
-          (!route.params?.isEdit || !route.params.review?.id) &&
-          <Pressable onPress={openPicker} style={[styles.images, { marginLeft: d2p(20), marginRight: d2p(15) }]}>
-            <View style={{ alignItems: "center" }}>
+
+        {/* 상품명 추가 기능후 주석해제 */}
+        {/* <View style={{
+          flexDirection: "row", justifyContent: "space-between", alignItems: "center",
+          paddingHorizontal: d2p(20), marginBottom: h2p(10), marginTop: h2p(40)
+        }}>
+          <Text style={FONT.Bold}>상품명을 알고 있나요?</Text>
+          <Image source={circleQuestion} style={{ width: d2p(16), height: d2p(16) }} />
+        </View>
+        <TextInput style={[FONT.Regular, {
+          borderTopColor: theme.color.grayscale.eae7ec,
+          borderTopWidth: 1,
+          borderBottomColor: theme.color.grayscale.e9e7ec,
+          borderBottomWidth: 1,
+          paddingHorizontal: d2p(20),
+          paddingVertical: h2p(15),
+          fontSize: 16
+        }]} placeholder="상품명을 입력해주세요. 비워둬도 괜찮아요!" placeholderTextColor={theme.color.grayscale.a09ca4} /> */}
+
+        {(!route.params?.isEdit || !route.params.review?.id) &&
+          <Text style={[FONT.Bold, {
+            marginTop: h2p(40),
+            marginBottom: h2p(10),
+            marginHorizontal: d2p(20),
+          }]}>사진이 있다면, 더 좋아요!</Text>
+        }
+        <View style={{
+          flexDirection: "row", alignItems: "center",
+          paddingBottom: isIphoneX() ? getBottomSpace() : h2p(30),
+        }}>
+          {
+            (!route.params?.isEdit || !route.params.review?.id) &&
+            <Pressable onPress={openPicker} style={[styles.images, {
+              justifyContent: "center",
+              alignItems: "center", marginLeft: d2p(20), marginRight: d2p(15)
+            }]}>
               <Image source={photo} style={{ width: d2p(20), height: h2p(20), marginTop: h2p(12) }} />
               <Text style={[{ fontSize: 12, color: theme.color.grayscale.d3d0d5, marginVertical: h2p(8) }, FONT.Regular]}>{images.length}/5</Text>
-            </View>
-          </Pressable>
-        }
-        <ScrollView
-          style={{ paddingLeft: (!route.params?.isEdit || !route.params.review?.id) ? 0 : d2p(20) }}
-          horizontal showsHorizontalScrollIndicator={false}>
-          {React.Children.toArray(images.map((image, idx) => {
-            return (
-              <View style={[styles.images, { marginRight: (idx === imageList.length - 1) ? d2p(20) : d2p(5) }]}>
-                <View style={{ alignItems: "center" }}>
-                  <Image source={
-                    route.params?.review?.images ?
-                      { uri: images[idx].image }
-                      :
-                      {
-                        uri: Platform.OS === "ios" ? 'file://' + image.path : 'file://' + image.realPath,
-                      }
-                  } style={{ width: d2p(96), height: h2p(64), borderRadius: 4 }} />
-                  <Pressable onPress={() => {
-                    setImageIds(imageIds.concat(image.id));
-                    setImages(images.filter((_, filterIdx) => idx !== filterIdx));
-                    setWriteData({ ...writeData, images: writeData.images?.filter((_, filterIdx) => idx !== filterIdx) });
-                    setImageList(imageList.filter((_, filterIdx) => idx !== filterIdx));
-                    setUploadBody(uploadBody.filter((_, filterIdx) => idx !== filterIdx));
-                  }}
-                    style={{ position: "absolute", right: 0, top: 0 }}>
-                    <Image source={photoClose} style={{ width: d2p(16), height: h2p(16) }} />
-                  </Pressable>
+            </Pressable>
+          }
+          <ScrollView
+            style={{
+              marginTop: route.params?.isEdit ? h2p(20) : 0,
+              paddingLeft: (!route.params?.isEdit || !route.params.review?.id) ? 0 : d2p(20)
+            }}
+            horizontal showsHorizontalScrollIndicator={false}>
+            {React.Children.toArray(images.map((image, idx) => {
+              return (
+                <View style={[styles.images, { marginRight: (idx === imageList.length - 1) ? d2p(20) : d2p(5) }]}>
+                  <View style={{ alignItems: "center" }}>
+                    <FastImage source={
+                      route.params?.isEdit ?
+                        { uri: images[idx].image }
+                        :
+                        {
+                          uri: Platform.OS === "ios" ? 'file://' + image.path : 'file://' + image.realPath,
+                        }
+                    } style={{ width: d2p(100), height: h2p(100), borderRadius: 10 }} />
+                    <Pressable onPress={() => {
+                      setImageIds(imageIds.concat(image.id));
+                      setImages(images.filter((_, filterIdx) => idx !== filterIdx));
+                      setWriteData({ ...writeData, images: writeData.images?.filter((_, filterIdx) => idx !== filterIdx) });
+                      setImageList(imageList.filter((_, filterIdx) => idx !== filterIdx));
+                      setUploadBody(uploadBody.filter((_, filterIdx) => idx !== filterIdx));
+                    }}
+                      style={{ position: "absolute", right: 0, top: 0 }}>
+                      <Image source={photoClose} style={{ width: d2p(16), height: h2p(16) }} />
+                    </Pressable>
+                  </View >
                 </View >
-              </View >
-            );
-          }))}
-        </ScrollView >
-      </View >
-      <View style={{
-        position: "absolute", right: d2p(10),
-        bottom: keyboardHeight > 100 ? keyboardHeight + h2p(20) :
-          ((route.params?.type === "reKnewWrite" || route.params?.type === "reknew") ? h2p(94) : h2p(184)),
-        backgroundColor: "rgba(0,0,0,0.1)",
-        padding: d2p(5),
-        borderRadius: 5
-      }}>
-        <Text style={[FONT.Regular, {
-          color: writeData.content.length === 300 ? theme.color.main : theme.color.grayscale.a09ca4
-        }]}>{writeData.content.length}/300</Text>
-      </View>
-
-      {/* 태그 선택 바텀시트 */}
-      <RBSheet
-        animationType="fade"
-        ref={tagRefRBSheet}
-        closeOnDragDown
-        dragFromTopOnly
-        height={(!isIphoneX() && Platform.OS !== "android") ?
-          Dimensions.get("window").height - h2p(204) : Dimensions.get("window").height - h2p(264)}
-        openDuration={250}
-        customStyles={{
-          container: {
-            borderTopLeftRadius: 30,
-            borderTopRightRadius: 30,
-            paddingHorizontal: d2p(20),
-            paddingVertical: h2p(20)
-          }, draggableIcon: {
-            display: "none"
-          }
-        }}
-      >
-        <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: d2p(10), marginBottom: h2p(34) }}>
-          <CloseIcon onPress={() => tagRefRBSheet.current?.close()}
-            imageStyle={{ width: d2p(15), height: h2p(15) }} />
-          <Text style={[{ fontSize: 16 }, FONT.Bold]}>태그 선택</Text>
-          <TouchableOpacity onPress={() => {
-            setWriteData({
-              ...writeData, tags: {
-                interest: interestTag.interest.filter(v => v.isClick).map(v => v.title)
-              }
-            });
-            tagRefRBSheet.current?.close();
-          }}>
-            <Text style={[{ color: theme.color.grayscale.ff5d5d }, FONT.Regular]}>완료</Text>
-          </TouchableOpacity>
-        </View>
-        <SelectLayout isInitial={true} type={"write"} interestTag={interestTag} setInterestTag={setInterestTag} />
-      </RBSheet>
-
-      {/* 판매처 선택 바텀시트 */}
-      <RBSheet
-        animationType="fade"
-        ref={marketRefRBSheet}
-        closeOnDragDown
-        dragFromTopOnly
-        height={Dimensions.get("window").height - h2p(380)}
-        openDuration={250}
-        customStyles={{
-          container: {
-            borderTopLeftRadius: 30,
-            borderTopRightRadius: 30,
-            overflow: "visible"
-          }, draggableIcon: {
-            display: "none"
-          }
-        }}
-      >
-        <View style={{
-          flexDirection: "row", justifyContent: "space-between",
-          paddingHorizontal: d2p(30), paddingVertical: h2p(20)
-        }}>
-          <CloseIcon onPress={() => marketRefRBSheet.current?.close()}
-            imageStyle={{ width: d2p(15), height: h2p(15) }} />
-          <Text style={[{ fontSize: 16 }, FONT.Bold]}>구매처별 보기</Text>
-          <View />
-        </View>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          style={{ paddingHorizontal: d2p(20) }}>
-          {React.Children.toArray(marketList.map((market) =>
-            <TouchableOpacity
-              onPress={() => {
-                setWriteData({ ...writeData, market });
-                marketRefRBSheet.current?.close();
-              }}
-              style={{
-                paddingVertical: h2p(12.5), paddingHorizontal: d2p(10),
-                borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc
-              }}>
-              <Text style={FONT.Medium}>{market}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </RBSheet>
+              );
+            }))}
+          </ScrollView >
+        </View >
+        <BasicButton
+          disabled={Boolean(!writeData.content)}
+          onPress={() => {
+            if (blockSubmit) {
+              return;
+            }
+            else {
+              handleAddWrite();
+            }
+          }}
+          viewStyle={{
+            marginHorizontal: d2p(20), marginBottom: h2p(40)
+          }} text="글쓰기 완료"
+          bgColor={theme.color.main}
+          textColor={theme.color.white}
+        />
+      </KeyboardAwareScrollView>
     </>
   );
 };
@@ -681,20 +616,20 @@ export default Write;
 
 const styles = StyleSheet.create({
   container: {
-    minHeight: Dimensions.get("window").height - h2p(104),
+    // minHeight: Dimensions.get("window").height - h2p(104),
+    // backgroundColor: "green"
   },
   textInput: {
     paddingHorizontal: d2p(20),
-    marginTop: h2p(30),
+    marginTop: h2p(20),
     paddingTop: 0,
     includeFontPadding: false,
     fontSize: 16,
     color: theme.color.black,
   },
   reviewIconWrap: {
-    marginTop: h2p(20),
-    paddingHorizontal: d2p(20),
-    flexDirection: "row"
+    flexDirection: "row",
+    marginBottom: h2p(20)
   },
   reviewIcon: {
     flexDirection: "row",
@@ -717,10 +652,10 @@ const styles = StyleSheet.create({
     borderColor: theme.color.grayscale.e9e7ec
   },
   images: {
-    width: d2p(96),
-    height: h2p(64),
+    width: d2p(100),
+    height: h2p(100),
     borderWidth: 1,
     borderColor: theme.color.grayscale.eae7ec,
-    borderRadius: 4
+    borderRadius: 10
   }
 });

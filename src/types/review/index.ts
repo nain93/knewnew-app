@@ -7,25 +7,31 @@ export interface WriteImagesType {
 }
 
 export enum MarketType {
-  "선택 안함" = "선택 안함",
+  "네이버스토어" = "네이버스토어",
   "마켓컬리" = "마켓컬리",
   "쿠팡프레시" = "쿠팡프레시",
   "SSG" = "SSG",
   "B마트" = "B마트",
   "윙잇" = "윙잇",
-  "쿠캣마켓" = "쿠캣마켓",
-  "판매처 선택" = "판매처 선택"
+  // "기타 (직접 입력)" = "기타 (직접 입력)",
+}
+
+export enum ReactionType {
+  "best" = "best",
+  "good" = "good",
+  "bad" = "bad",
+  "question" = "question"
 }
 
 export interface WriteReviewType {
   images?: Array<WriteImagesType>,
   content: string,
-  satisfaction: | "best" | "good" | "bad" | "",
+  satisfaction: "best" | "good" | "bad" | "question" | "",
   product?: number,
   parent?: number,
   parentReview?: ReviewParentType,
   cart?: number,
-  market: MarketType,
+  market?: MarketType,
   tags: {
     interest: Array<string>
   }
@@ -44,7 +50,7 @@ export interface ReviewParentType {
   images: Array<WriteImagesType>,
   market: MarketType,
   product: string | null,
-  satisfaction: "best" | "good" | "bad",
+  satisfaction: "best" | "good" | "bad" | "question" | "",
   tags: {
     interest: Array<string>,
     household: Array<string>,
@@ -69,7 +75,7 @@ export interface ReviewListType {
   market: MarketType,
   parent?: ReviewParentType,
   product: string | null,
-  satisfaction: "best" | "good" | "bad",
+  satisfaction: "best" | "good" | "bad" | "question" | "",
   tags: {
     interest: Array<string>,
     household: Array<string>,
@@ -77,5 +83,6 @@ export interface ReviewListType {
   },
   isLike: boolean,
   isBookmark: boolean,
-  isEdit: boolean
+  isEdit: boolean,
+  viewCount: number
 }

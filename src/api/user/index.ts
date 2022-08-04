@@ -211,3 +211,57 @@ export const blockUser = async ({ token, id, isBlock }: BlockUserType) => {
     return res.data;
   }
 };
+
+export const userFollow = async ({ token, userId, isFollow }: { token: string, userId: number, isFollow: boolean }) => {
+  const res = await axios.post(baseURL + `user/${userId}/follow/`, {
+    isFollow
+  }, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+  if (res) {
+    return res.data;
+  }
+};
+
+export const deleteMyFollower = async ({ token, userId }: { token: string, userId: number }) => {
+  const res = await axios.delete(baseURL + `user/follower/${userId}/`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+  if (res) {
+    return res.data;
+  }
+};
+
+export const getFollowingList = async ({ token, id, offset, limit }: GetUserReviewListType) => {
+  const res = await axios.get(baseURL + `user/${id}/following/`, {
+    params: {
+      offset,
+      limit
+    },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+  if (res) {
+    return res.data;
+  }
+};
+
+export const getFollowerList = async ({ token, id, offset, limit }: GetUserReviewListType) => {
+  const res = await axios.get(baseURL + `user/${id}/follower/`, {
+    params: {
+      offset,
+      limit
+    },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+  if (res) {
+    return res.data;
+  }
+};
