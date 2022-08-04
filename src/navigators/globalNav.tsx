@@ -21,6 +21,7 @@ import Term from '~/screens/setting/term/term';
 import TermScreen from '~/screens/setting/term';
 import OpenSource from '~/screens/setting/openSource';
 import Write from '~/screens/write';
+import EditBeforeWrite from '~/screens/write/editBeforeWrite';
 
 const Stack = createStackNavigator();
 
@@ -82,6 +83,13 @@ const GlobalNav = ({ token }: { token: string }) => {
         <Stack.Screen
           name="editProfile"
           component={EditProfile}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="EditBeforeWrite"
+          component={EditBeforeWrite}
           options={{
             headerShown: false
           }}

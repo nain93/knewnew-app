@@ -243,7 +243,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
                   source={{ uri: review.images[0]?.image, priority: FastImage.priority.high }}
                   style={[styles.imageWrap, {
                     width: type === "reKnewWrite" ?
-                      Dimensions.get("window").width - d2p(120)
+                      Dimensions.get("window").width - d2p(150)
                       :
                       Dimensions.get("window").width - d2p(90), aspectRatio: 3 / 2
                   }]} />
@@ -261,7 +261,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
                       borderColor: theme.color.grayscale.d3d0d5,
                       width:
                         type === "reKnewWrite" ?
-                          Dimensions.get("window").width - d2p(245)
+                          Dimensions.get("window").width - d2p(260)
                           :
                           Dimensions.get("window").width - d2p(230), aspectRatio: 3 / 2,
                     }} />
@@ -283,7 +283,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
                           borderColor: theme.color.grayscale.d3d0d5,
                           width:
                             type === "reKnewWrite" ?
-                              Dimensions.get("window").width - d2p(283.5)
+                              Dimensions.get("window").width - d2p(293.5)
                               :
                               Dimensions.get("window").width - d2p(276), aspectRatio: 3 / 2,
                         }} />
@@ -318,13 +318,10 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
               <Text style={[FONT.Regular, styles.reviewCount]}>{review.childCount}</Text>
             </TouchableOpacity>
           } */}
-          {/* {
-            console.log(review, 'review')
-          } */}
           <View
             style={styles.reviewIcon}>
             <Image source={grayEyeIcon} style={styles.reviewImg} />
-            <Text style={[FONT.Regular, styles.reviewCount]}>{review.childCount}</Text>
+            <Text style={[FONT.Regular, styles.reviewCount]}>{review.viewCount}</Text>
           </View>
           <Pressable
             onPress={() => navigation.navigate("FeedDetail", {

@@ -3,10 +3,10 @@ import { d2p } from "~/utils";
 import Config from "react-native-config";
 
 export const marketList: Array<MarketType> =
-  [MarketType["선택 안함"], MarketType.마켓컬리, MarketType.쿠팡프레시, MarketType.SSG, MarketType.B마트, MarketType.윙잇, MarketType.쿠캣마켓];
+  [MarketType.네이버스토어, MarketType.마켓컬리, MarketType.쿠팡프레시, MarketType.SSG, MarketType.B마트, MarketType.윙잇];
 
 export const reactList: Array<ReactionType> =
-  [ReactionType.최고예요, ReactionType.괜찮아요, ReactionType.별로예요, ReactionType.궁금해요];
+  [ReactionType.best, ReactionType.good, ReactionType.bad, ReactionType.question];
 
 export const hitslop = { top: d2p(20), left: d2p(20), right: d2p(20), bottom: d2p(20) };
 

@@ -157,7 +157,9 @@ const Mypage = ({ navigation, route }: MypageProps) => {
               source={graywrite}
             />
           </Pressable>
-          <View style={{
+
+          {/* 팔로우 기능 추가후 주석해제 */}
+          {/* <View style={{
             borderBottomWidth: 4, borderBottomColor: theme.color.grayscale.f7f7fc,
             borderTopWidth: 4, borderTopColor: theme.color.grayscale.f7f7fc,
             width: Dimensions.get("window").width,
@@ -233,9 +235,11 @@ const Mypage = ({ navigation, route }: MypageProps) => {
                 </TouchableOpacity>
               </View>
             }
-          </View>
+          </View> */}
         </View>
       </View>
+
+      {/* 팔로우 바텀시트 */}
       <CustomBottomSheet
         customStyles={{
           container: {

@@ -87,29 +87,13 @@ const TabNavigator = () => {
           )
         }}
       />
-      {/* 작성 리뉴얼후 주석해제 */}
-      {/* <Tabs.Screen
+      <Tabs.Screen
         name="BeforeWrite"
         component={BeforeWrite}
-        options={{
-          tabBarLabel: "글쓰기",
-          headerShown: false,
-          tabBarStyle: { display: "none" },
-          tabBarIcon: () => (
-            <Image
-              style={{ width: d2p(20), height: d2p(20) }}
-              source={graywrite}
-            />
-          )
-        }}
-      /> */}
-      <Tabs.Screen
-        name="Write"
-        component={Write}
         listeners={({ navigation }) => ({
           tabPress: e => {
             e.preventDefault();
-            navigation.navigate('Write', { loading: false, isEdit: false });
+            navigation.navigate('BeforeWrite', { stateReset: true });
           },
         })}
         options={{

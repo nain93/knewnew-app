@@ -4,7 +4,7 @@ import { FONT } from '~/styles/fonts';
 import theme from '~/styles/theme';
 import ReactionLayout from '~/components/layout/ReactionLayout';
 import { marketList, reactList } from '~/utils/constant';
-import { ReactionType, WriteReviewType } from '~/types/review';
+import { ReactionType, ReviewListType, WriteReviewType } from '~/types/review';
 import { d2p, h2p } from '~/utils';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
@@ -18,15 +18,25 @@ import { colorCart, grayCart, rightArrow } from '~/assets/icons';
 import CustomBottomSheet from '~/components/popup/CustomBottomSheet';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import CloseIcon from '~/components/icon/closeIcon';
+import { useMutation, useQueryClient } from 'react-query';
+import { useRecoilValue } from 'recoil';
+import { myIdState, tokenState } from '~/recoil/atoms';
+import { deleteReviewImage, editReview } from '~/api/review';
 
 interface BeforeWriteProp {
   navigation: NavigationStackProp;
   route: NavigationRoute<{
-    stateReset: boolean
+    review: ReviewListType
+    stateReset: boolean,
+    images: any[],
+    imageIds: number[]
   }>;
 }
 
-const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
+const EditBeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
+  const token = useRecoilValue(tokenState);
+  const myId = useRecoilValue(myIdState);
+  const queryClient = useQueryClient();
   const marketRefRBSheet = useRef<RBSheet>(null);
   const [clickedReact, setClickReact] = useState<Array<{
     title: ReactionType,
@@ -45,18 +55,68 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
     }
   });
   const [interestTag, setInterestTag] = useState<InterestTagType>(interestTagData);
+  const [blockSubmit, setBlockSubmit] = useState(false);
+
+  const { mutateAsync } = useMutation("deleteImages", (id: number) => deleteReviewImage(token, id));
+
+  const editReviewMutation = useMutation(["editReview", token],
+    ({ writeProps, id }: { writeProps: WriteReviewType, id: number }) =>
+      editReview({ token, id, ...writeProps }), {
+    onSuccess: async (data) => {
+      if (route.params?.imageIds) {
+        // * 이미지 삭제 api
+        await Promise.all(route.params.imageIds.map(v => mutateAsync(v)));
+      }
+      if (data) {
+        queryClient.invalidateQueries("reviewList");
+        navigation.goBack();
+        navigation.navigate("FeedDetail", { id: data.id, authorId: myId });
+      }
+    },
+    onSettled: () => setBlockSubmit(false)
+  });
+
+  const handleAddWrite = () => {
+    if (route.params?.review?.id) {
+      editReviewMutation.mutate({
+        writeProps:
+        {
+          ...writeData,
+          satisfaction: clickedReact.filter(v => v.isClick).map(v => v.title)[0],
+          tags: {
+            interest: interestTag.interest.filter(v => v.isClick).map(v => v.title)
+          },
+          parent: route.params.review.parent?.isActive ? writeData.parent : undefined
+        },
+        id: route.params.review?.id
+      });
+    }
+  };
 
   useEffect(() => {
-    if (route.params?.stateReset) {
-      //* 최초 진입시 상태 초기화
-      setWriteData({
-        ...writeData,
-        market: undefined
-      });
-      setInterestTag(interestTagData);
-      setClickReact(reactList.map(v => {
-        return { title: v, isClick: false };
+    if (route.params?.review) {
+      setClickReact(clickedReact.map(v => {
+        if (v.title === route.params?.review.satisfaction) {
+          return { ...v, isClick: true };
+        }
+        return v;
       }));
+      setInterestTag({
+        interest: interestTag.interest.map(v => {
+          if (route.params?.review.tags.interest.includes(v.title)) {
+            return { ...v, isClick: true };
+          }
+          return v;
+        })
+      });
+      setWriteData({
+        images: route.params?.images,
+        content: route.params?.review.content,
+        satisfaction: route.params?.review.satisfaction,
+        market: route.params.review.market,
+        parent: route.params.review.parent ? route.params.review.parent.id : undefined,
+        tags: route.params.review.tags
+      });
     }
   }, [route.params]);
 
@@ -64,16 +124,17 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
     <>
       <Header
         headerLeft={<LeftArrowIcon
-          onBackClick={() => navigation.goBack()}
+          onBackClick={() => {
+            // * 뒤로갈때 상태 초기화
+            setInterestTag(interestTagData);
+            setClickReact(reactList.map(v => {
+              return { title: v, isClick: false };
+            }));
+            navigation.goBack();
+          }}
         />} title="글쓰기"
         headerRightPress={() => {
           // todo 임시저장
-          // if (blockSubmit) {
-          //   return;
-          // }
-          // else {
-          //   handleAddWrite();
-          // }
         }}
       // headerRight={<Text style={[{ color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>
       //   임시저장
@@ -123,17 +184,16 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
         </TouchableOpacity>
         <BasicButton
           disabled={interestTag.interest.every(v => !v.isClick) || clickedReact.every(v => !v.isClick)}
-          text="다음으로" bgColor={theme.color.white} textColor={theme.color.main}
-          onPress={() => navigation.navigate("Write", {
-            review: {
-              ...writeData,
-              satisfaction: clickedReact.filter(v => v.isClick).map(v => v.title)[0],
-              tags: {
-                interest: interestTag.interest.filter(v => v.isClick).map(v => v.title)
-              }
-            },
-            loading: false, isEdit: false
-          })}
+          text="글쓰기 완료" bgColor={theme.color.white} textColor={theme.color.main}
+          onPress={() => {
+            // todo 글작성후 성공하면 피드로
+            if (blockSubmit) {
+              return;
+            }
+            else {
+              handleAddWrite();
+            }
+          }}
         />
       </View>
       <CustomBottomSheet
@@ -172,7 +232,7 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
   );
 };
 
-export default BeforeWrite;
+export default EditBeforeWrite;
 
 const styles = StyleSheet.create({
   container: {

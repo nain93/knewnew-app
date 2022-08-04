@@ -16,19 +16,30 @@ interface ReactionLayoutProps {
     title: ReactionType,
     isClick: boolean
   }[]) => void,
+  multiSelect?: boolean
 }
 
-const ReactionLayout = ({ clickedReact, setClickReact }: ReactionLayoutProps) => {
+const ReactionLayout = ({ clickedReact, setClickReact, multiSelect = true }: ReactionLayoutProps) => {
+
+  const selectButton = (index: number) => setClickReact(clickedReact.map((v, i) => {
+    if (multiSelect) {
+      if (i === index) {
+        return { title: v.title, isClick: !v.isClick };
+      }
+      return v;
+    }
+    else {
+      if (i === index) {
+        return { title: v.title, isClick: !v.isClick };
+      }
+      return { title: v.title, isClick: false };
+    }
+  }));
 
   return (
     <View style={{ flexDirection: "row" }}>
       <TouchableOpacity
-        onPress={() => setClickReact(clickedReact.map((v, i) => {
-          if (i === 0) {
-            return { title: v.title, isClick: !v.isClick };
-          }
-          return v;
-        }))}
+        onPress={() => selectButton(0)}
         style={[styles.reactButton, {
           borderColor: clickedReact[0]?.isClick ? theme.color.main : theme.color.grayscale.eae7ec,
         }]}>
@@ -38,12 +49,7 @@ const ReactionLayout = ({ clickedReact, setClickReact }: ReactionLayoutProps) =>
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={() => setClickReact(clickedReact.map((v, i) => {
-          if (i === 1) {
-            return { title: v.title, isClick: !v.isClick };
-          }
-          return v;
-        }))}
+        onPress={() => selectButton(1)}
         style={[styles.reactButton, {
           borderColor: clickedReact[1]?.isClick ? theme.color.grayscale.ffc646 : theme.color.grayscale.eae7ec,
         }]}>
@@ -55,12 +61,7 @@ const ReactionLayout = ({ clickedReact, setClickReact }: ReactionLayoutProps) =>
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={() => setClickReact(clickedReact.map((v, i) => {
-          if (i === 2) {
-            return { title: v.title, isClick: !v.isClick };
-          }
-          return v;
-        }))}
+        onPress={() => selectButton(2)}
         style={[styles.reactButton, {
           borderColor: clickedReact[2]?.isClick ? theme.color.black : theme.color.grayscale.eae7ec,
         }]}>
@@ -70,12 +71,7 @@ const ReactionLayout = ({ clickedReact, setClickReact }: ReactionLayoutProps) =>
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={() => setClickReact(clickedReact.map((v, i) => {
-          if (i === 3) {
-            return { title: v.title, isClick: !v.isClick };
-          }
-          return v;
-        }))}
+        onPress={() => selectButton(3)}
         style={[styles.reactButton, {
           borderColor: clickedReact[3]?.isClick ? theme.color.grayscale.C_79737e : theme.color.grayscale.eae7ec,
         }]}>

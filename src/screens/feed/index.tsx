@@ -112,25 +112,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
       const queryData = await getReviewList({
         token, tag: "",
         market: (clickedMarket.filter(v => v.isClick)).map(v => v.title).toString(),
-        satisfaction: (clickedReact.filter(v => v.isClick)).map(v => {
-          switch (v.title) {
-            case "최고예요": {
-              return "best";
-            }
-            case "괜찮아요": {
-              return "good";
-            }
-            case "별로예요": {
-              return "bad";
-            }
-            case "궁금해요": {
-              return "question";
-            }
-            default: {
-              return null;
-            }
-          }
-        }).toString(),
+        satisfaction: (clickedReact.filter(v => v.isClick)).map(v => v.title).toString(),
         offset: pageParam, limit: 5, sort
       });
       return queryData;
@@ -139,25 +121,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
       const queryData = await getReviewList({
         token, tag: filterBadge,
         market: (clickedMarket.filter(v => v.isClick)).map(v => v.title).toString(),
-        satisfaction: (clickedReact.filter(v => v.isClick)).map(v => {
-          switch (v.title) {
-            case "최고예요": {
-              return "best";
-            }
-            case "괜찮아요": {
-              return "good";
-            }
-            case "별로예요": {
-              return "bad";
-            }
-            case "궁금해요": {
-              return "question";
-            }
-            default: {
-              return null;
-            }
-          }
-        }).toString(),
+        satisfaction: (clickedReact.filter(v => v.isClick)).map(v => v.title).toString(),
         offset: pageParam, limit: 5, sort
       });
       return queryData;
