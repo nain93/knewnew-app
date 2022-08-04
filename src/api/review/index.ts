@@ -5,16 +5,22 @@ import { WriteReviewType } from "~/types/review";
 interface GetReviewListType {
   token: string,
   tag?: string,
+  market?: string,
+  satisfaction?: string,
+  sort: "0" | "1",
   offset: number,
   limit?: number
 }
 
-export const getReviewList = async ({ token, tag, offset, limit }: GetReviewListType) => {
+export const getReviewList = async ({ token, tag, market, satisfaction, sort, offset, limit }: GetReviewListType) => {
   const res = await axios.get(baseURL + "review/", {
     params: {
       offset,
       limit,
-      tag
+      tag,
+      market,
+      satisfaction,
+      sort
     },
     headers: {
       Authorization: `Bearer ${token}`,
@@ -72,7 +78,7 @@ export const writeReview = async ({
     satisfaction,
     tags,
     parent,
-    market: market === "선택 안함" ? null : market
+    market
   }, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -93,7 +99,7 @@ export const editReview = async ({
     satisfaction,
     tags,
     parent,
-    market: market === "선택 안함" ? null : market
+    market
   }, {
     headers: {
       Authorization: `Bearer ${token}`,

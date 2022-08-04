@@ -1,12 +1,12 @@
 import React from "react";
 import { Image, ImageStyle, StyleSheet, Text, View, ViewStyle } from "react-native";
-import { heart, circle, bad } from "~/assets/icons";
+import { heart, circle, bad, question } from "~/assets/icons";
 import { FONT } from "~/styles/fonts";
 import theme from "~/styles/theme";
 import { d2p } from "~/utils";
 
 interface ReviewIconProp {
-  review: "best" | "good" | "bad";
+  review: "best" | "good" | "bad" | "question" | "";
   imageStyle?: ImageStyle;
   viewStyle?: ViewStyle
 }
@@ -28,11 +28,13 @@ const ReviewIcon = ({ review, imageStyle, viewStyle }: ReviewIconProp) => {
 const reviewItem = (review: string) => {
   switch (review) {
     case "best":
-      return { image: heart, text: '최고예요', };
+      return { image: heart, text: "최고예요", };
     case "good":
-      return { image: circle, text: '괜찮아요', };
+      return { image: circle, text: "괜찮아요", };
     case "bad":
-      return { image: bad, text: '별로예요', };
+      return { image: bad, text: "별로예요", };
+    case "question":
+      return { image: question, text: "궁금해요" };
   }
 };
 

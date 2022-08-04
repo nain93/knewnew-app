@@ -14,6 +14,7 @@ import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { getFocusedRouteNameFromRoute, useRoute } from '@react-navigation/native';
+import BeforeWrite from '~/screens/write/beforeWrite';
 
 const Tabs = createBottomTabNavigator();
 
@@ -87,12 +88,12 @@ const TabNavigator = () => {
         }}
       />
       <Tabs.Screen
-        name="Write"
-        component={Write}
+        name="BeforeWrite"
+        component={BeforeWrite}
         listeners={({ navigation }) => ({
           tabPress: e => {
             e.preventDefault();
-            navigation.navigate('Write', { loading: false, isEdit: false });
+            navigation.navigate('BeforeWrite', { stateReset: true });
           },
         })}
         options={{
@@ -137,7 +138,7 @@ const TabNavigator = () => {
               <StatusBarPlaceHolder />
               <Header
                 //@ts-ignore
-                title={params?.id === myId ? "마이페이지" : "회원 프로필"}
+                title={params?.id === myId ? "마이뉴뉴" : "회원 프로필"}
                 bgColor={theme.color.white}
                 viewStyle={{
                 }}
