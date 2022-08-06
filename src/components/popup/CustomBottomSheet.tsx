@@ -29,7 +29,8 @@ const CustomBottomSheet = ({ sheetRef, height, customStyles, children, onOpen }:
       customStyles={
         {
           container: {
-            borderRadius: 30,
+            borderTopRightRadius: 30,
+            borderTopLeftRadius: 30,
             padding: d2p(20)
           },
           draggableIcon: {

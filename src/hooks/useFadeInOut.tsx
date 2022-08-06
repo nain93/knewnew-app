@@ -2,19 +2,12 @@ import { Animated } from 'react-native';
 import { useEffect, useRef } from 'react';
 
 interface FadeInOutProp {
-  isPopupOpen: {
-    isOpen: boolean,
-    content: string
-  }
-  setIsPopupOpen: (
-    { isOpen, content }:
-      {
-        isOpen: boolean,
-        content: string
-      }) => void
+  isPopupOpen: boolean
+  setIsPopupOpen: (isOpen: boolean) => void,
+  openTime?: number
 }
 
-const useFadeInOut = ({ isPopupOpen, setIsPopupOpen }: FadeInOutProp) => {
+const useFadeInOut = ({ isPopupOpen, setIsPopupOpen, openTime = 1500 }: FadeInOutProp) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const fadeIn = () => {
@@ -35,14 +28,14 @@ const useFadeInOut = ({ isPopupOpen, setIsPopupOpen }: FadeInOutProp) => {
 
   // * 알림 팝업창 띄웠다 꺼지는 로직
   useEffect(() => {
-    if (isPopupOpen.isOpen) {
+    if (isPopupOpen) {
       fadeIn();
       setTimeout(() => {
         fadeOut();
         setTimeout(() => {
-          setIsPopupOpen({ ...isPopupOpen, isOpen: false });
+          setIsPopupOpen(false);
         }, 100);
-      }, 1500);
+      }, openTime);
     }
   }, [isPopupOpen, fadeAnim]);
 

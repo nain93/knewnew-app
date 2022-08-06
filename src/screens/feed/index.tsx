@@ -1,11 +1,11 @@
-import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, Animated, Pressable, AppState } from 'react-native';
+import { StyleSheet, Text, View, Image, FlatList, Platform, Dimensions, TouchableOpacity, Animated, Pressable, AppState, TouchableWithoutFeedback } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import Header from '~/components/header';
 import mainLogo from '~/assets/logo';
 import FeedReview from '~/components/review/feedReview';
-import { colorCheck, grayclose, leftArrow, noticeIcon, tagfilter, whiteClose } from '~/assets/icons';
+import { colorCheck, leftArrow, noticeIcon, tagfilter, whiteClose } from '~/assets/icons';
 
 import RBSheet from "react-native-raw-bottom-sheet";
 import { isIphoneX, getStatusBarHeight } from 'react-native-iphone-x-helper';
@@ -57,7 +57,7 @@ export interface FeedProps {
 const Feed = ({ navigation, route }: FeedProps) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [isPopupOpen, setIsPopupOpen] = useState({ isOpen: false, content: "" });
-  const fadeHook = FadeInOut({ isPopupOpen, setIsPopupOpen });
+  const fadeHook = FadeInOut({ isPopupOpen: isPopupOpen.isOpen, setIsPopupOpen: (isOpen: boolean) => setIsPopupOpen({ ...isPopupOpen, isOpen }) });
   const [scrollOffset, setScrollOffset] = useState(0);
   const tagRefRBSheet = useRef<RBSheet>(null);
   const reactRefRBSheet = useRef<RBSheet>(null);
@@ -261,12 +261,13 @@ const Feed = ({ navigation, route }: FeedProps) => {
   }, []);
 
   const reviewRenderItem = useCallback(({ item, index }) =>
-    <Pressable onPress={() =>
-      navigation.navigate("FeedDetail", {
-        authorId: item.author.id,
-        id: item.id, badge: filterBadge,
-        isLike: item.isLike, isBookmark: item.isBookmark
-      })}
+    <Pressable
+      onPress={() =>
+        navigation.navigate("FeedDetail", {
+          authorId: item.author.id,
+          id: item.id, badge: filterBadge,
+          isLike: item.isLike, isBookmark: item.isBookmark
+        })}
       style={styles.review}>
       <FeedReview
         idx={index}
@@ -275,7 +276,8 @@ const Feed = ({ navigation, route }: FeedProps) => {
         review={item}
         filterBadge={filterBadge}
       />
-    </Pressable>, [filterBadge, selectedIndex]);
+    </Pressable>
+    , [filterBadge, selectedIndex]);
 
   const fadeIn = () => {
     Animated.timing(fadeAnim, {
