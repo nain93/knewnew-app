@@ -27,14 +27,14 @@ export interface WriteReviewType {
   images?: Array<WriteImagesType>,
   content: string,
   satisfaction: "best" | "good" | "bad" | "question" | "",
-  product?: number,
+  product?: string,
   parent?: number,
   parentReview?: ReviewParentType,
   cart?: number,
   market?: MarketType,
   tags: {
     interest: Array<string>
-  }
+  },
 }
 
 export interface ReviewParentType {

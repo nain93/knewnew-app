@@ -7,7 +7,7 @@ import theme from '~/styles/theme';
 import { d2p, dateCommentFormat, h2p, simpleDate } from '~/utils';
 import ReviewIcon from '~/components/icon/reviewIcon';
 import ReactionIcon from '~/components/icon/reactionIcon';
-import { commentMore, more, reKnew, tag } from '~/assets/icons';
+import { commentMore, marketIcon, more, reKnew, tag } from '~/assets/icons';
 import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { myIdState, okPopupState, popupState, refreshState, tokenState } from '~/recoil/atoms';
@@ -358,20 +358,22 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           </TouchableOpacity>
 
           <View style={{
-            width: Dimensions.get('window').width - d2p(105),
+            width: Dimensions.get('window').width - d2p(115),
             paddingLeft: d2p(10)
           }}>
             <View style={{ alignItems: "center", flexWrap: "wrap" }}>
               <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: reviewDetailQuery.data?.author.id })}>
-                <Text style={[styles.writer, FONT.Medium]}>{reviewDetailQuery.data?.author.nickname}</Text>
+                <Text style={[styles.writer, FONT.Medium]}>
+                  {reviewDetailQuery.data?.author.nickname}
+                </Text>
               </TouchableOpacity>
             </View>
             <Text style={[FONT.Regular, { marginTop: h2p(5), fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
-              {reviewDetailQuery.data?.author.tags.foodStyle} {reviewDetailQuery.data?.author.tags.household} {reviewDetailQuery.data?.author.tags.occupation}
+              {reviewDetailQuery.data?.author.tags.foodStyle}
             </Text>
           </View>
 
-          <View style={{ alignItems: "center" }}>
+          <View style={{ alignItems: "flex-end", }}>
             <TouchableOpacity onPress={() => setIsMoreClick((isClick) => !isClick)}>
               <Image
                 source={more}
@@ -383,21 +385,67 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
               marginTop: h2p(10),
               fontSize: 10, color: theme.color.grayscale.a09ca4
             }, FONT.Regular]}>
-              {(reviewDetailQuery.data) && simpleDate(reviewDetailQuery.data?.created, ' 전')}</Text>
+              {(reviewDetailQuery.data) && simpleDate(reviewDetailQuery.data?.created, ' 전')}
+            </Text>
           </View>
         </View>
-        <View style={{ paddingTop: h2p(20), paddingHorizontal: d2p(20) }}>
+
+        <View style={{
+          paddingTop: h2p(20), paddingHorizontal: d2p(20),
+          flexDirection: "row", justifyContent: "space-between",
+          alignItems: "center"
+        }}>
           {reviewDetailQuery.data &&
             <ReviewIcon review={reviewDetailQuery.data?.satisfaction} />}
-          <Text style={[styles.content, { lineHeight: 21 }, FONT.Regular]}>{reviewDetailQuery.data?.content}</Text>
+          {reviewDetailQuery.data?.market &&
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Image source={marketIcon} style={{ width: d2p(16), height: d2p(16), marginRight: d2p(5) }} />
+              <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
+                {reviewDetailQuery.data?.market}
+              </Text>
+            </View>
+          }
         </View>
+        {reviewDetailQuery.data?.product &&
+          <View style={{
+            marginLeft: d2p(20),
+            marginTop: h2p(20),
+            flexDirection: 'row',
+          }}>
+            <TouchableOpacity
+              onPress={() => console.log("상품상세로 이동")}
+              style={{
+                backgroundColor: "rgba(234,231,236,0.4)",
+                paddingHorizontal: d2p(5),
+                paddingVertical: h2p(4),
+                borderRadius: 4
+              }}>
+              <Text style={[FONT.Medium, { color: theme.color.grayscale.C_79737e, }]}>
+                {`${reviewDetailQuery.data?.product} >`}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        }
+        <Text style={[styles.content,
+        { marginHorizontal: d2p(20), lineHeight: 21 }, FONT.Regular]}>
+          {reviewDetailQuery.data?.content}
+        </Text>
+
+        {/* 이미지 스크롤 ui */}
+        {reviewDetailQuery.data?.images &&
+          <ImageFlatlist
+            onPress={(openIdx: number) => openGallery(openIdx)}
+            data={reviewDetailQuery.data?.images}
+          />
+        }
         {!reviewDetailQuery.data?.parent &&
           <>
             <View style={{
               flexDirection: 'row', alignItems: 'center',
               width: Dimensions.get("window").width - d2p(90),
               flexWrap: "wrap",
-              marginHorizontal: d2p(20)
+              marginHorizontal: d2p(20),
+              marginTop: h2p(10)
             }}>
               <Image source={tag} style={{ width: d2p(10), height: d2p(10), marginRight: d2p(5) }} />
               {React.Children.toArray(tags.map((v) => {
@@ -414,30 +462,19 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                   null
               }
             </View>
-            <View style={styles.sign}>
-              <Text style={[styles.store, FONT.Regular]}>{reviewDetailQuery.data?.market}</Text>
-            </View>
           </>
-        }
-
-        {/* 이미지 스크롤 ui */}
-        {reviewDetailQuery.data?.images &&
-          <ImageFlatlist
-            onPress={(openIdx: number) => openGallery(openIdx)}
-            data={reviewDetailQuery.data?.images}
-          />
         }
 
         {reviewDetailQuery.data?.parent &&
           <>
             <View style={{
-              marginHorizontal: d2p(20)
+              marginTop: h2p(20),
+              marginLeft: d2p(40),
+              marginRight: d2p(20),
             }}>
               <ReKnew
                 type="detail"
-                review={{
-                  ...reviewDetailQuery.data.parent
-                }}
+                review={{ ...reviewDetailQuery.data.parent }}
               />
             </View>
             <TouchableOpacity
@@ -446,7 +483,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
               style={{
                 marginTop: h2p(15),
                 marginBottom: h2p(10),
-                marginLeft: d2p(45),
+                marginLeft: d2p(65),
                 width: d2p(155), height: h2p(40),
                 borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
                 justifyContent: "center", alignItems: "center", borderRadius: 5
@@ -837,8 +874,8 @@ const styles = StyleSheet.create({
     borderBottomColor: theme.color.grayscale.eae7ec
   },
   content: {
-    color: theme.color.black,
-    marginBottom: h2p(10), paddingTop: h2p(15)
+    color: theme.color.grayscale.C_79737e,
+    marginBottom: h2p(10), paddingTop: h2p(10)
   },
   commentLine: {
     borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc,
