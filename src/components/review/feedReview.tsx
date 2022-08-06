@@ -1,23 +1,21 @@
-import { View, Pressable, StyleSheet, Dimensions, Image, TouchableOpacity, ViewStyle } from 'react-native';
+import { View, Pressable, StyleSheet, Dimensions, Image, TouchableOpacity, ViewStyle, ScrollView, FlatList } from 'react-native';
 import Text from '~/components/style/CustomText';
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import theme from '~/styles/theme';
 import { d2p, h2p, simpleDate } from '~/utils';
 import ReviewIcon from '../icon/reviewIcon';
-import { cart, colorCart, colorLike, comment, grayEyeIcon, like, more, reKnew, tag } from '~/assets/icons';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { cart, colorCart, colorLike, comment, grayEyeIcon, like, more, tag } from '~/assets/icons';
+import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 //@ts-ignore
 import Highlighter from 'react-native-highlight-words';
 import { ReviewListType } from '~/types/review';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import { useRecoilValue } from 'recoil';
 import { tokenState } from '~/recoil/atoms';
 import { bookmarkReview, likeReview } from '~/api/review';
 import { FONT } from '~/styles/fonts';
 import { noProfile } from '~/assets/images';
-import { MyProfileType } from '~/types/user';
-import { getMyProfile } from '~/api/user';
 import ReKnew from '~/components/review/reKnew';
 import More from '~/components/more';
 import FastImage from 'react-native-fast-image';
@@ -79,30 +77,6 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
     onError: () => setApiBlock(false)
   });
 
-  const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", token], () => getMyProfile(token), {
-    enabled: !!token
-  });
-
-  useFocusEffect(
-    useCallback(() => {
-      if (setSelectedIndex)
-        return () => setSelectedIndex(-1);
-    }, []));
-
-  useEffect(() => {
-    if (review.tags.interest) {
-      setTags(review.tags.interest);
-    }
-    // const copy: { [index: string]: Array<string> }
-    //   = { ...review.tags };
-    // setTags(
-    //   Object.keys(copy).reduce<Array<string>>((acc, cur) => {
-    //     acc = acc.concat(copy[cur]);
-    //     return acc;
-    //   }, [])
-    // );
-  }, [review]);
-
   useEffect(() => {
     setLikeCount(review.likeCount);
   }, [review.likeCount]);
@@ -119,48 +93,38 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
     setIsBookmarkState(review.isBookmark);
   }, [review.isBookmark]);
 
+  useEffect(() => {
+    setTags(review.tags.interest);
+  }, [review.tags]);
+
   return (
     <>
       <View style={{
-        flexDirection: 'row', justifyContent: 'space-between',
+        flexDirection: 'row',
         alignItems: "center"
       }}>
         <TouchableOpacity
           onPress={() => navigation.navigate("Mypage", { id: review.author.id })}
           style={{
-            borderRadius: 40,
+            borderRadius: 20,
             overflow: "hidden",
             borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
+            marginRight: d2p(10)
           }}>
           <FastImage resizeMode="cover" source={review.author.profileImage ? { uri: review.author.profileImage } : noProfile}
-            style={{ width: d2p(40), height: d2p(40) }} />
+            style={{ width: d2p(20), height: d2p(20) }} />
         </TouchableOpacity>
 
-        <View style={{
-          width: Dimensions.get('window').width - d2p(80),
-          paddingLeft: d2p(10)
-        }}>
-          <View style={{ alignItems: "center", flexWrap: "wrap" }}>
+        <View style={{ width: Dimensions.get('window').width - d2p(80) }}>
+          <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap" }}>
             <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: review.author.id })}>
               <Text style={[styles.title, FONT.Medium]}>{review.author.nickname}</Text>
             </TouchableOpacity>
             {/* todo 뱃지 추가 */}
-          </View>
-          <View style={{ marginTop: h2p(5), flexDirection: "row", justifyContent: "space-between" }}>
-            <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
-              {review.author.tags?.foodStyle} {review.author.tags?.household} {review.author.tags?.occupation}
+            <Text style={[FONT.Regular, { fontSize: 13, color: theme.color.grayscale.a09ca4 }]}>
+              · {review.author.tags?.foodStyle}
             </Text>
-            {type === "normal" &&
-              <Text style={[FONT.Regular, { fontSize: 10, color: theme.color.grayscale.a09ca4 }]}>
-                {simpleDate(review.created, ' 전')}
-              </Text>
-            }
           </View>
-          {review.isEdit &&
-            <Text style={[FONT.Regular,
-            { fontSize: 12, color: theme.color.grayscale.d3d0d5, marginTop: h2p(5) }]}>
-              수정됨</Text>
-          }
         </View>
 
         {
@@ -183,52 +147,64 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             />
           </TouchableOpacity>
         }
+        <View style={{
+          right: 0, top: h2p(15),
+          position: "absolute",
+        }}>
+          {review.isEdit &&
+            <Text style={[FONT.Regular,
+            {
+              fontSize: 12, color: theme.color.grayscale.d3d0d5,
+              textAlign: "right",
+              marginTop: h2p(5)
+            }]}>
+              수정됨
+            </Text>
+          }
+        </View>
       </View>
 
       <View style={styles.titleContainer}>
-        <ReviewIcon viewStyle={{ marginTop: h2p(15), marginBottom: h2p(10) }} review={review.satisfaction} />
+        <ReviewIcon viewStyle={{ marginTop: h2p(15), marginBottom: h2p(15) }} review={review.satisfaction} />
       </View>
+      {review.product &&
+        <View style={{
+          marginLeft: d2p(30),
+          flexDirection: 'row',
+          marginBottom: h2p(10)
+        }}>
+          <TouchableOpacity
+            onPress={() => console.log("상품상세로 이동")}
+            style={{
+              backgroundColor: "rgba(234,231,236,0.4)",
+              paddingHorizontal: d2p(5),
+              paddingVertical: h2p(4),
+              borderRadius: 4
+            }}>
+            <Text style={[FONT.Medium, { color: theme.color.grayscale.C_79737e, }]}>
+              {`${review.product} >`}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      }
       {keyword ?
         <Highlighter
           highlightStyle={[FONT.Bold, { fontSize: 15, color: theme.color.main }]}
           searchWords={[keyword]}
           textToHighlight={review.content}
-          style={[FONT.Regular, { fontSize: 15, marginBottom: h2p(10), marginLeft: d2p(50) }]}
+          style={[FONT.Regular, { fontSize: 15, marginBottom: h2p(10), marginLeft: d2p(30) }]}
         />
         :
         <Text style={[{
-          color: theme.color.black,
+          color: theme.color.grayscale.C_79737e,
           lineHeight: 21,
-          marginBottom: h2p(10), marginLeft: d2p(50)
+          marginTop: 0,
+          marginLeft: d2p(30)
         }, FONT.Regular]}>
           {review.content}
         </Text>
       }
-      {!review.parent &&
-        <View style={{
-          flexDirection: 'row', alignItems: 'center',
-          width: Dimensions.get("window").width - d2p(90),
-          flexWrap: "wrap",
-          paddingRight: d2p(10), marginLeft: d2p(50)
-        }}>
-          <Image source={tag} style={{ width: d2p(10), height: d2p(10), marginRight: d2p(5) }} />
-          {React.Children.toArray(tags.map((v) => {
-            if (v === filterBadge) {
-              return;
-            }
-            return <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_79737e }]}>#{v} </Text>;
-          }))}
-          {
-            filterBadge ?
-              <Text style={[FONT.Regular, { color: theme.color.main, fontSize: 12 }]}>#{filterBadge}</Text>
-              :
-              null
-          }
-        </View>}
-      {review.market &&
-        <View style={styles.sign}>
-          <Text style={[styles.store, FONT.Regular]}>{review.market}</Text>
-        </View>}
+
       {
         (() => {
           switch (review.images.length) {
@@ -243,9 +219,9 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
                   source={{ uri: review.images[0]?.image, priority: FastImage.priority.high }}
                   style={[styles.imageWrap, {
                     width: type === "reKnewWrite" ?
-                      Dimensions.get("window").width - d2p(150)
+                      d2p(80)
                       :
-                      Dimensions.get("window").width - d2p(90), aspectRatio: 3 / 2
+                      d2p(90), aspectRatio: 1
                   }]} />
               );
             }
@@ -261,9 +237,10 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
                       borderColor: theme.color.grayscale.d3d0d5,
                       width:
                         type === "reKnewWrite" ?
-                          Dimensions.get("window").width - d2p(260)
+                          d2p(80)
                           :
-                          Dimensions.get("window").width - d2p(230), aspectRatio: 3 / 2,
+                          d2p(90),
+                      aspectRatio: 1,
                     }} />
                   )))}
                 </View>
@@ -272,7 +249,8 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             // * 사진 3개이상
             default:
               return (
-                <View style={[styles.imageWrap, { borderWidth: 0, flexDirection: "row" }]}>
+                <View
+                  style={[styles.imageWrap, { borderWidth: 0, flexDirection: "row" }]}>
                   {React.Children.toArray(review.images.slice(0, 3).map((v, i) => (
                     <View>
                       <FastImage
@@ -283,15 +261,16 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
                           borderColor: theme.color.grayscale.d3d0d5,
                           width:
                             type === "reKnewWrite" ?
-                              Dimensions.get("window").width - d2p(293.5)
+                              d2p(72.5)
                               :
-                              Dimensions.get("window").width - d2p(276), aspectRatio: 3 / 2,
+                              d2p(90),
+                          aspectRatio: 1,
                         }} />
                       {i === 2 &&
                         <View style={{
                           position: "absolute",
                           width: "100%",
-                          height: "100%",
+                          aspectRatio: 1,
                           borderRadius: 10,
                           backgroundColor: "rgba(0,0,0,0.6)",
                           justifyContent: "center",
@@ -305,6 +284,9 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
               );
           }
         })()
+      }
+      {review.parent &&
+        <ReKnew review={{ ...review.parent }} filterBadge={filterBadge ? filterBadge : ""} />
       }
       {type === "normal" &&
         <View style={styles.reactionContainer}>
@@ -373,9 +355,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           </TouchableOpacity>
         </View>
       }
-      {review.parent &&
-        <ReKnew review={{ ...review.parent }} filterBadge={filterBadge ? filterBadge : ""} />
-      }
+
       {
         type === "normal" &&
         <More
@@ -404,11 +384,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: "center",
-    marginLeft: d2p(50),
+    marginLeft: d2p(30)
   },
   title: {
-    fontSize: 16,
-    marginRight: d2p(10)
+    fontSize: 14,
+    marginRight: d2p(5)
   },
   sign: {
     flexDirection: 'row',
@@ -429,7 +409,7 @@ const styles = StyleSheet.create({
     borderStyle: 'dotted',
   },
   reactionContainer: {
-    marginLeft: d2p(50),
+    marginLeft: d2p(30),
     marginTop: h2p(10),
     marginRight: d2p(40),
     justifyContent: "space-between",
@@ -450,8 +430,8 @@ const styles = StyleSheet.create({
   },
   imageWrap: {
     borderWidth: 1,
-    marginLeft: d2p(50),
-    marginTop: h2p(10),
+    marginLeft: d2p(30),
+    marginTop: h2p(15),
     borderColor: theme.color.grayscale.d3d0d5,
     borderRadius: 10,
   }

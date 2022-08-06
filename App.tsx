@@ -29,7 +29,7 @@ const App = () => {
   const [isPopupOpen, setIsPopupOpen] = useRecoilState(popupState);
   const [modalOpen, setModalOpen] = useRecoilState(okPopupState);
   const [notiOpen, setNotiOpen] = useRecoilState(notificationPopup);
-  const { fadeAnim } = FadeInOut({ isPopupOpen, setIsPopupOpen });
+  const { fadeAnim } = FadeInOut({ isPopupOpen: isPopupOpen.isOpen, setIsPopupOpen: (isOpen: boolean) => setIsPopupOpen({ ...isPopupOpen, isOpen }) });
   const [token, setToken] = useRecoilState(tokenState);
   const [isVisible, setIsVisible] = useState(false);
   const setIsNotiReadState = useSetRecoilState(isNotiReadState);
@@ -79,7 +79,7 @@ const App = () => {
     // * 토큰 저장
     const storageToken = await AsyncStorage.getItem("token");
     if (storageToken) {
-      setToken(storageToken); 0;
+      setToken(storageToken);
     }
     else {
       SplashScreen.hide();
@@ -149,7 +149,7 @@ const App = () => {
   // * FCM
   useEffect(() => {
     // * 코드푸시 업데이트 체크
-    // installUpdateIfAvailable();
+    installUpdateIfAvailable();
 
     // * 포어그라운드 알람 클릭시
     const unsubscribe = messaging().onMessage(async remoteMessage => {
