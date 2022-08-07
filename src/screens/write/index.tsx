@@ -597,7 +597,8 @@ const Write = ({ navigation, route }: WriteProp) => {
               borderBottomWidth: 1,
               paddingHorizontal: d2p(20),
               paddingVertical: h2p(15),
-              fontSize: 16
+              fontSize: 16,
+              color: theme.color.black
             }]} placeholder="상품명을 입력해주세요. 비워둬도 괜찮아요!" placeholderTextColor={theme.color.grayscale.a09ca4} />
 
           {(!route.params?.isEdit || !route.params.review?.id) &&
