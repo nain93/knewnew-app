@@ -10,7 +10,7 @@ import { d2p, h2p } from '~/utils';
 import { useMutation, useQueryClient } from 'react-query';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { myIdState, okPopupState, popupState, tokenState } from '~/recoil/atoms';
-import { ReviewListType, WriteReviewType } from '~/types/review';
+import { ReviewListType, WriteImagesType, WriteReviewType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
@@ -63,6 +63,7 @@ const Write = ({ navigation, route }: WriteProp) => {
   const [keyboardHeight, setKeyBoardHeight] = useState(0);
   const queryClient = useQueryClient();
   const token = useRecoilValue(tokenState);
+  const [presignImg, setPresignImg] = useState<WriteImagesType[]>([]);
   const [blockSubmit, setBlockSubmit] = useState(false);
   const setModalOpen = useSetRecoilState(okPopupState);
   const setIspopupOpen = useSetRecoilState(popupState);
@@ -117,14 +118,10 @@ const Write = ({ navigation, route }: WriteProp) => {
   const presignMutation = useMutation("presignImages",
     (fileName: Array<string>) => preSiginedImages({ token, fileName, route: "review" }),
     {
-      onSuccess: async (data) => {
-        const uploadedImages: any = [];
-        await uploadBody.reduce(async (acc, cur, i) => {
-          await acc;
-          const uploadedImg = await uploadImage(cur, data[i]);
-          uploadedImages.push(uploadedImg);
-
-        }, Promise.resolve());
+      onSuccess: (data) => {
+        const uploadedImages = uploadBody.map(async (v, i) => {
+          await uploadImage(v, data[i]);
+        });
 
         // * 업로드 실패시 경고메세지
         if (uploadedImages.length === 0 || (uploadBody.length !== uploadedImages.length)) {
@@ -136,6 +133,7 @@ const Write = ({ navigation, route }: WriteProp) => {
           acc = acc.concat({ priority: idx, image: cur.fields.key });
           return acc;
         }, []);
+        setPresignImg(reducedImages);
 
         if (route.params?.isEdit && route.params.review?.id) {
           editReviewMutation.mutate({
@@ -169,6 +167,11 @@ const Write = ({ navigation, route }: WriteProp) => {
     else {
       // * 수정할때 (이미지 업로드x)
       if (route.params?.isEdit && route.params.review?.id) {
+        const reducedImages = images.reduce<Array<{ priority: number, image: string }>>((acc, cur, idx) => {
+          acc = acc.concat({ priority: idx, image: "review" + cur.image.split("review")[1] });
+          return acc;
+        }, []);
+        setPresignImg(reducedImages);
         editReviewMutation.mutate({
           writeProps:
             { ...writeData, parent: route.params.review.parent?.isActive ? writeData.parent : undefined },

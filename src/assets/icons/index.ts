@@ -60,8 +60,6 @@ import grayKnewnew from "./grayKnewnew.png";
 import grayCart from "./grayCart.png";
 import circleQuestion from "./circleQuestion.png";
 import marketIcon from "./marketIcon.png";
-import starIcon from "./starIcon.png";
-import goldStarIcon from "./goldStarIcon.png";
 
 export {
   close, leftArrow, more, heart, like, reKnew, comment, commentMore, circle, maincart, maintag,
@@ -70,6 +68,6 @@ export {
   graywrite, graylogo, graymypage, graysearch, mainmypage, mainlogoIcon, write, plusIcon, recommentIcon,
   handIcon, tagFood, tagHome, tagLife, emailicon, noticeIcon, alertIcon, eyeIcon, colorEyeIcon, checkIcon, tagIcon,
   selectTagIcon, knewnewIcon, settingIcon, rightArrow, settingKnewnew, grayCheckIcon, question, grayquestion, smallClose, whiteClose,
-  grayEyeIcon, grayKnewnew, grayCart, circleQuestion, marketIcon, goldStarIcon, starIcon
+  grayEyeIcon, grayKnewnew, grayCart, circleQuestion, marketIcon
 };
 
