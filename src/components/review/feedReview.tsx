@@ -174,7 +174,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           marginBottom: h2p(10)
         }}>
           <TouchableOpacity
-            onPress={() => console.log("상품상세로 이동")}
+            onPress={() => navigation.navigate("ProductDetail")}
             style={{
               backgroundColor: "rgba(234,231,236,0.4)",
               paddingHorizontal: d2p(5),
