@@ -51,13 +51,12 @@ export async function uploadImage(file: { uri: string, type: string, name: strin
       }
     });
     if (res) {
-      return res.data;
+      return res.config.data;
     }
   }
   catch (e) {
     console.log(e);
   }
-
 }
 
 
