@@ -194,8 +194,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
                 marginRight: d2p(5), fontSize: 12,
                 color: (sortReact && sortReact.length > 0) ? theme.color.white : theme.color.grayscale.C_443e49
               }]}>
-                반응별
-              </Text>
+                반응별</Text>
               {(sortReact && sortReact.length > 0) ?
                 <Image source={whiteClose} style={{ width: d2p(7), height: d2p(7) }} />
                 :
@@ -660,8 +659,8 @@ const styles = StyleSheet.create({
   review: {
     backgroundColor: theme.color.white,
     width: Dimensions.get('window').width - d2p(20),
-    borderRadius: 15,
-    marginHorizontal: d2p(10), marginTop: h2p(10),
+    borderRadius: 10,
+    marginHorizontal: d2p(10), marginTop: h2p(15),
     paddingHorizontal: d2p(10), paddingVertical: d2p(15)
   },
   main: {

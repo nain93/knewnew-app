@@ -22,8 +22,6 @@ import TermScreen from '~/screens/setting/term';
 import OpenSource from '~/screens/setting/openSource';
 import Write from '~/screens/write';
 import EditBeforeWrite from '~/screens/write/editBeforeWrite';
-import ProductDetail from '~/screens/feed/productDetail';
-import ProductList from '~/screens/feed/productList';
 
 const Stack = createStackNavigator();
 
@@ -82,20 +80,6 @@ const GlobalNav = ({ token }: { token: string }) => {
             headerShown: false,
           }}
           component={FeedDetail} />
-        <Stack.Screen
-          name="ProductDetail"
-          options={{
-            title: "",
-            headerShown: false,
-          }}
-          component={ProductDetail} />
-        <Stack.Screen
-          name="ProductList"
-          options={{
-            title: "",
-            headerShown: false,
-          }}
-          component={ProductList} />
         <Stack.Screen
           name="editProfile"
           component={EditProfile}
