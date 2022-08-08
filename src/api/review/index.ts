@@ -101,7 +101,7 @@ export const editReview = async ({
     tags,
     parent,
     market,
-    product
+    product: product ? product : null
   }, {
     headers: {
       Authorization: `Bearer ${token}`,

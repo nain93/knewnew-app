@@ -205,6 +205,7 @@ const Write = ({ navigation, route }: WriteProp) => {
         content: route.params.review.content,
         satisfaction: route.params.review.satisfaction,
         market: route.params.review.market ? route.params.review.market : undefined,
+        product: route.params.review.product ? route.params.review.product : undefined,
         tags: {
           ...route.params.review.tags
         },
@@ -576,6 +577,7 @@ const Write = ({ navigation, route }: WriteProp) => {
               </View>
             </Animated.View>
           }
+
           <View style={{
             flexDirection: "row", justifyContent: "space-between", alignItems: "center",
             paddingHorizontal: d2p(20), marginBottom: h2p(10), marginTop: h2p(40)
@@ -587,6 +589,7 @@ const Write = ({ navigation, route }: WriteProp) => {
           </View>
 
           <TextInput
+            value={writeData.product}
             onChangeText={(e) => setWriteData({ ...writeData, product: e })}
             autoCapitalize={"none"}
             style={[FONT.Regular, {

@@ -84,20 +84,6 @@ const GlobalNav = ({ token }: { token: string }) => {
           }}
           component={FeedDetail} />
         <Stack.Screen
-          name="ProductDetail"
-          options={{
-            title: "",
-            headerShown: false,
-          }}
-          component={ProductDetail} />
-        <Stack.Screen
-          name="ProductList"
-          options={{
-            title: "",
-            headerShown: false,
-          }}
-          component={ProductList} />
-        <Stack.Screen
           name="editProfile"
           component={EditProfile}
           options={{
