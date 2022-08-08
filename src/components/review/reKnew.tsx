@@ -89,7 +89,7 @@ const ReKnew = ({ review, filterBadge, type }: FeedReviewProps) => {
             </TouchableOpacity>
 
             <View style={{
-              width: Dimensions.get('window').width - d2p(135),
+              width: Dimensions.get('window').width - d2p(150),
               paddingLeft: d2p(10),
             }}>
               <View style={{ alignItems: "center", flexWrap: "wrap" }}>
@@ -107,7 +107,8 @@ const ReKnew = ({ review, filterBadge, type }: FeedReviewProps) => {
             </View>
 
             <Text style={[FONT.Regular, { fontSize: 10, color: theme.color.grayscale.a09ca4 }]}>
-              {simpleDate(review.created, "전")}</Text>
+              {simpleDate(review.created, "전")}
+            </Text>
           </View>
 
           <View style={{ marginLeft: type === "detail" ? d2p(25) : d2p(75) }}>

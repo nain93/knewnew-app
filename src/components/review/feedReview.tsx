@@ -4,7 +4,7 @@ import React, { memo, useEffect, useState } from 'react';
 import theme from '~/styles/theme';
 import { d2p, h2p, simpleDate } from '~/utils';
 import ReviewIcon from '../icon/reviewIcon';
-import { cart, colorCart, colorLike, comment, grayEyeIcon, like, more } from '~/assets/icons';
+import { bookmark, cart, colorCart, colorLike, comment, graybookmark, grayEyeIcon, like, more } from '~/assets/icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 //@ts-ignore
@@ -370,7 +370,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
               }
             }}
             style={styles.reviewIcon}>
-            <Image source={isBookmarkState ? colorCart : cart} style={styles.reviewImg} />
+            <Image source={isBookmarkState ? graybookmark : bookmark} style={styles.reviewImg} />
             <Text style={[FONT.Regular, styles.reviewCount]}>{bookmarkCount}</Text>
           </TouchableOpacity>
         </View>

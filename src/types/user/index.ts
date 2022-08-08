@@ -3,7 +3,8 @@ import { AuthorType } from "~/types";
 export interface UserInfoTagType {
   foodStyle: Array<string>,
   household: Array<string>,
-  occupation: Array<string>
+  occupation: Array<string>,
+  taste?: Array<string>
 }
 export interface BookmarkType {
   id: number,

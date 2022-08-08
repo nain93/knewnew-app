@@ -32,6 +32,10 @@ export interface BadgeType {
     title: string;
     isClick: boolean;
     content?: string
+  }>,
+  taste?: Array<{
+    title: string,
+    isClick: boolean
   }>
 }
 
