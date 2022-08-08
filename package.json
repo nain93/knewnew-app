@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@baronha/react-native-multiple-image-picker": "^0.4.10",
+    "@fawazahmed/react-native-read-more": "^2.3.7",
     "@georstat/react-native-image-cache": "^2.2.0",
     "@georstat/react-native-image-gallery": "^1.1.0",
     "@invertase/react-native-apple-authentication": "^2.1.5",
