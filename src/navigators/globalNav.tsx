@@ -25,6 +25,7 @@ import EditBeforeWrite from '~/screens/write/editBeforeWrite';
 import ProductDetail from '~/screens/feed/productDetail';
 import ProductList from '~/screens/feed/productList';
 import BlockList from '~/screens/setting/blockList';
+import ProductDetailReady from '~/screens/feed/productDetailReady';
 
 const Stack = createStackNavigator();
 
@@ -83,6 +84,27 @@ const GlobalNav = ({ token }: { token: string }) => {
             headerShown: false,
           }}
           component={FeedDetail} />
+        <Stack.Screen
+          name="ProductDetail"
+          options={{
+            title: "",
+            headerShown: false,
+          }}
+          component={ProductDetail} />
+        <Stack.Screen
+          name="ProductDetailReady"
+          options={{
+            title: "",
+            headerShown: false,
+          }}
+          component={ProductDetailReady} />
+        <Stack.Screen
+          name="ProductList"
+          options={{
+            title: "",
+            headerShown: false,
+          }}
+          component={ProductList} />
         <Stack.Screen
           name="editProfile"
           component={EditProfile}
