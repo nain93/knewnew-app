@@ -47,6 +47,20 @@ export const notificationList = async ({ token, offset }: { token: string, offse
   }
 };
 
+export const blockList = async ({ token, offset, id }: { token: string, id: number, offset?: number }) => {
+  const res = await axios.get(baseURL + `user/${id}/blocking/`, {
+    params: {
+      offset
+    },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+  if (res) {
+    return res.data;
+  }
+};
+
 interface EditNotificationType {
   token: string,
   id: number,

@@ -22,6 +22,9 @@ import TermScreen from '~/screens/setting/term';
 import OpenSource from '~/screens/setting/openSource';
 import Write from '~/screens/write';
 import EditBeforeWrite from '~/screens/write/editBeforeWrite';
+import ProductDetail from '~/screens/feed/productDetail';
+import ProductList from '~/screens/feed/productList';
+import BlockList from '~/screens/setting/blockList';
 
 const Stack = createStackNavigator();
 
@@ -117,6 +120,13 @@ const GlobalNav = ({ token }: { token: string }) => {
         <Stack.Screen
           name="openSource"
           component={OpenSource}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="BlockList"
+          component={BlockList}
           options={{
             headerShown: false
           }}
