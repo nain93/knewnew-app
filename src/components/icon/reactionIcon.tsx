@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
-import { like, reKnew, comment, colorLike, cart, colorCart } from "~/assets/icons";
+import { like, reKnew, comment, colorLike, cart, colorCart, bookmark, graybookmark } from "~/assets/icons";
 import theme from "~/styles/theme";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "react-navigation-stack/lib/typescript/src/vendor/types";
@@ -63,7 +63,7 @@ const ReactionIcon = ({ review, name, count, state, isState, mutation, id }: Rev
 const imgSource = (name: string) => {
   switch (name) {
     case "cart":
-      return { item: cart, colored: colorCart };
+      return { item: bookmark, colored: graybookmark };
     case "like":
       return { item: like, colored: colorLike };
     case "ReKnew":

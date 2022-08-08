@@ -92,9 +92,13 @@ const Mypage = ({ navigation, route }: MypageProps) => {
       <View pointerEvents="box-none" style={{ paddingHorizontal: d2p(20) }} >
         <View style={styles.profileImage} >
           <View>
-            {/* <Text style={[FONT.Bold, { color: theme.color.main, marginBottom: h2p(5) }]}>
-            느끼만렙 맵찔이
-          </Text> */}
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              {getMyProfileQuery.data?.tags.taste?.map(v =>
+                <Text style={[FONT.Bold, { color: theme.color.main, marginBottom: h2p(5) }]}>
+                  {`${v} `}
+                </Text>
+              )}
+            </View>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Text style={[FONT.Bold, { fontSize: 20 }]}>
                 {getMyProfileQuery.data?.nickname}

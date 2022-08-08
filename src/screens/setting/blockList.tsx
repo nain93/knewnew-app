@@ -12,6 +12,8 @@ import { useRecoilValue } from 'recoil';
 import { myIdState, tokenState } from '~/recoil/atoms';
 import { UserInfoTagType } from '~/types/user';
 import { blockUser } from '~/api/user';
+import { grayKnewnew } from '~/assets/icons';
+import Loading from '~/components/loading';
 
 interface BlockListType {
   id: number,
@@ -71,6 +73,17 @@ const BlockList = () => {
     </View>
     , []);
 
+  if (blockListQuery.isLoading) {
+    return (
+      <>
+        <Header
+          headerLeft={<LeftArrowIcon />}
+          title="차단 관리" />
+        <Loading />
+      </>
+    );
+  }
+
   return (
     <>
       <Header
@@ -78,6 +91,13 @@ const BlockList = () => {
         title="차단 관리" />
       <View style={styles.container}>
         <FlatList
+          ListEmptyComponent={() =>
+            <View style={{ justifyContent: "center", alignItems: "center", marginTop: h2p(150) }}>
+              <Image source={grayKnewnew} style={{ width: d2p(60), height: d2p(60) }} />
+              <Text style={[FONT.Regular, { color: theme.color.grayscale.C_79737e, fontSize: 16, marginTop: h2p(20) }]}>
+                차단 목록이 없습니다
+              </Text>
+            </View>}
           showsVerticalScrollIndicator={false}
           data={blockListQuery.data}
           renderItem={blockListRenderItem}
