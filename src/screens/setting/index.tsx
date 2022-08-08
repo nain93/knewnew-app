@@ -109,11 +109,11 @@ const Setting = ({ navigation }: SettingProps) => {
           <Text style={[FONT.Regular, styles.listText]}>알림 설정</Text>
           <ToggleButton isOn={isOn} setIsOn={setIsOn} />
         </View>
-        {/* 차단 기능 개발후 주석해제 */}
-        {/* <Pressable style={styles.list}>
+        <Pressable onPress={() => navigation.navigate("BlockList")}
+          style={styles.list}>
           <Text style={[FONT.Regular, styles.listText]}>차단 관리</Text>
           <Image source={rightArrow} style={{ width: d2p(12), height: d2p(25) }} />
-        </Pressable> */}
+        </Pressable>
         <Pressable
           onPress={() => navigation.navigate("termScreen")}
           style={styles.list}>

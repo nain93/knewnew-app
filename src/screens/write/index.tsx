@@ -26,6 +26,7 @@ import BasicButton from '~/components/button/basicButton';
 import { blackclose, circle, circleQuestion, graycircle, grayclose, grayheart, grayquestion, heart, question, reKnew } from '~/assets/icons';
 import FastImage from 'react-native-fast-image';
 import useFadeInOut from '~/hooks/useFadeInOut';
+import { hitslop } from '~/utils/constant';
 
 interface WriteProp {
   navigation: NavigationStackProp;
@@ -414,7 +415,7 @@ const Write = ({ navigation, route }: WriteProp) => {
                 {!writeData.content &&
                   <View
                     style={{
-                      position: "absolute", top: h2p(32), left: 0,
+                      position: "absolute", top: Platform.OS === "ios" ? h2p(34) : h2p(36), left: 0,
                       width: Dimensions.get("window").width - d2p(40),
                     }}>
                     <Text style={[FONT.Regular, {
@@ -447,7 +448,8 @@ const Write = ({ navigation, route }: WriteProp) => {
                   multiline
                   // onContentSizeChange={e => setNumberLine(Math.round(e.nativeEvent.contentSize.height / 20))}
                   style={[{
-                    paddingTop: h2p(34), padding: 0, fontSize: 16, color: theme.color.black,
+                    paddingTop: h2p(34), paddingHorizontal: 0,
+                    fontSize: 16, color: theme.color.black,
                   }, FONT.Regular]} />
               </View>
 
@@ -579,7 +581,7 @@ const Write = ({ navigation, route }: WriteProp) => {
             paddingHorizontal: d2p(20), marginBottom: h2p(10), marginTop: h2p(40)
           }}>
             <Text style={FONT.Bold}>상품명을 알고 있나요?</Text>
-            <Pressable onPress={() => setInfoOpen(true)}>
+            <Pressable hitSlop={hitslop} onPress={() => setInfoOpen(true)}>
               <Image source={circleQuestion} style={{ width: d2p(16), height: d2p(16) }} />
             </Pressable>
           </View>
