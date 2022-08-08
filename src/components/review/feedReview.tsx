@@ -1,10 +1,10 @@
-import { View, Pressable, StyleSheet, Dimensions, Image, TouchableOpacity, ViewStyle, ScrollView, FlatList } from 'react-native';
+import { View, Pressable, StyleSheet, Dimensions, Image, TouchableOpacity, ViewStyle } from 'react-native';
 import Text from '~/components/style/CustomText';
 import React, { memo, useEffect, useState } from 'react';
 import theme from '~/styles/theme';
 import { d2p, h2p, simpleDate } from '~/utils';
 import ReviewIcon from '../icon/reviewIcon';
-import { cart, colorCart, colorLike, comment, grayEyeIcon, like, more, tag } from '~/assets/icons';
+import { cart, colorCart, colorLike, comment, grayEyeIcon, like, more } from '~/assets/icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 //@ts-ignore
@@ -19,6 +19,7 @@ import { noProfile } from '~/assets/images';
 import ReKnew from '~/components/review/reKnew';
 import More from '~/components/more';
 import FastImage from 'react-native-fast-image';
+import ReadMore from '@fawazahmed/react-native-read-more';
 
 interface FeedReviewProps {
   review: ReviewListType,
@@ -44,6 +45,8 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
   const [isBookmarkState, setIsBookmarkState] = useState<boolean>(review.isBookmark);
   const [bookmarkCount, setBookmarkCount] = useState(review.bookmarkCount);
   const [apiBlock, setApiBlock] = useState(false);
+
+  const [isTruncated, setIsTruncated] = useState(true);
 
   const bookmarkMutation = useMutation("bookmark",
     ({ id, isBookmark }: { id: number, isBookmark: boolean }) => bookmarkReview(token, id, isBookmark), {
@@ -195,14 +198,28 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           style={[FONT.Regular, { fontSize: 15, marginBottom: h2p(10), marginLeft: d2p(30) }]}
         />
         :
-        <Text style={[{
-          color: theme.color.grayscale.C_79737e,
-          lineHeight: 21,
-          marginTop: 0,
-          marginLeft: d2p(30)
-        }, FONT.Regular]}>
-          {review.content}
-        </Text>
+        <View style={{ marginLeft: d2p(30) }}>
+          <ReadMore
+            seeMoreText="더보기 >"
+            expandOnly={true}
+            seeMoreStyle={[FONT.Medium, {
+              color: theme.color.grayscale.a09ca4, fontSize: 12
+            }]}
+            numberOfLines={3}
+            onSeeMoreBlocked={() => navigation.navigate("FeedDetail", {
+              authorId: review.author.id,
+              id: review.id, badge: filterBadge,
+              isLike: review.isLike, isBookmark: review.isBookmark
+            })}
+            style={[{
+              color: theme.color.grayscale.C_79737e,
+              lineHeight: 21,
+              marginTop: 0,
+            }, FONT.Regular]}
+          >
+            {review.content}
+          </ReadMore>
+        </View>
       }
 
       {
