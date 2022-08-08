@@ -177,7 +177,10 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           marginBottom: h2p(10)
         }}>
           <TouchableOpacity
-            onPress={() => navigation.navigate("ProductDetail")}
+            onPress={() => {
+              // navigation.navigate("ProductDetail")
+              navigation.navigate("ProductDetailReady");
+            }}
             style={{
               backgroundColor: "rgba(234,231,236,0.4)",
               paddingHorizontal: d2p(5),
