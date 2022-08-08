@@ -413,7 +413,10 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             flexDirection: 'row',
           }}>
             <TouchableOpacity
-              onPress={() => console.log("상품상세로 이동")}
+              onPress={() => {
+                // navigation.navigate("ProductDetail")
+                navigation.navigate("ProductDetailReady");
+              }}
               style={{
                 backgroundColor: "rgba(234,231,236,0.4)",
                 paddingHorizontal: d2p(5),

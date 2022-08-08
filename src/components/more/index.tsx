@@ -134,7 +134,11 @@ const More = ({ setSelectedIndex, isGobacK, handleCloseMore, userId, isMoreClick
     if (setSelectedIndex) {
       setSelectedIndex(-1);
     }
-    blockMutation.mutate({ id: review.author.id, isBlock: true });
+    setModalOpen({
+      isOpen: true,
+      content: "차단 하시겠습니까?",
+      okButton: () => blockMutation.mutate({ id: review.author.id, isBlock: true })
+    });
   };
 
   return (
@@ -142,6 +146,10 @@ const More = ({ setSelectedIndex, isGobacK, handleCloseMore, userId, isMoreClick
       {isMoreClick &&
         (myId === userId ?
           <View style={[styles.clickBox, clickBoxStyle]}>
+            <Pressable style={styles.press} onPress={handleSharePress}>
+              <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
+            </Pressable>
+            <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
             <Pressable style={styles.press} onPress={handleEditPress}>
               <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
             </Pressable>

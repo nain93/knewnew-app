@@ -152,10 +152,12 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             }]}>
               {getMyProfileQuery.data?.headline ? getMyProfileQuery.data?.headline : "자기소개를 입력해주세요."}
             </Text>
-            <Image
-              style={{ width: d2p(10.5), height: d2p(10.5) }}
-              source={graywrite}
-            />
+            {route.params?.id === myId &&
+              <Image
+                style={{ width: d2p(10.5), height: d2p(10.5) }}
+                source={graywrite}
+              />
+            }
           </Pressable>
 
           {/* 팔로우 기능 추가후 주석해제 */}
