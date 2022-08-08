@@ -7,7 +7,7 @@ import theme from '~/styles/theme';
 import { d2p, dateCommentFormat, h2p, simpleDate } from '~/utils';
 import ReviewIcon from '~/components/icon/reviewIcon';
 import ReactionIcon from '~/components/icon/reactionIcon';
-import { commentMore, marketIcon, more, reKnew, tag } from '~/assets/icons';
+import { bookmark, commentMore, marketIcon, more, reKnew, tag } from '~/assets/icons';
 import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { myIdState, okPopupState, popupState, refreshState, tokenState } from '~/recoil/atoms';
@@ -472,28 +472,32 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           <>
             <View style={{
               marginTop: h2p(20),
-              marginLeft: d2p(40),
+              marginLeft: d2p(20),
               marginRight: d2p(20),
+              borderWidth: 1,
+              borderColor: theme.color.grayscale.eae7ec,
+              borderRadius: 10,
+              paddingHorizontal: d2p(15),
             }}>
               <ReKnew
                 type="detail"
                 review={{ ...reviewDetailQuery.data.parent }}
               />
+              <TouchableOpacity
+                onPress={() => navigation.navigate("FeedDetail",
+                  { id: reviewDetailQuery.data.parent?.id })}
+                style={{
+                  marginTop: h2p(15),
+                  marginBottom: h2p(10),
+                  marginLeft: d2p(25),
+                  width: d2p(155), height: h2p(40),
+                  borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
+                  justifyContent: "center", alignItems: "center", borderRadius: 5
+                }}>
+                <Text style={[FONT.Medium, { fontSize: 12, color: theme.color.grayscale.C_443e49 }]}>
+                  원문으로</Text>
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("FeedDetail",
-                { id: reviewDetailQuery.data.parent?.id })}
-              style={{
-                marginTop: h2p(15),
-                marginBottom: h2p(10),
-                marginLeft: d2p(65),
-                width: d2p(155), height: h2p(40),
-                borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
-                justifyContent: "center", alignItems: "center", borderRadius: 5
-              }}>
-              <Text style={[FONT.Medium, { fontSize: 12, color: theme.color.grayscale.C_443e49 }]}>
-                원문으로</Text>
-            </TouchableOpacity>
           </>
         }
         <View style={[styles.reactionContainer, { paddingTop: reviewDetailQuery.data?.parent ? 0 : h2p(10) }]}>

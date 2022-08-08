@@ -1,10 +1,10 @@
-import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View, Platform } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View, Platform, Dimensions } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import Header from '~/components/header';
 import theme from '~/styles/theme';
 import { d2p, h2p } from '~/utils';
-import { plusIcon } from '~/assets/icons';
+import { knewnewIcon, plusIcon } from '~/assets/icons';
 import { TextInput } from 'react-native-gesture-handler';
 import BasicButton from '~/components/button/basicButton';
 import { NavigationStackProp } from 'react-navigation-stack';
@@ -51,11 +51,6 @@ interface EditProfileProps {
   }>;
 }
 
-interface BonusBadgeType {
-  title: string,
-  isClick: boolean
-}
-
 const EditProfile = ({ navigation, route }: EditProfileProps) => {
   const nameInputRef = useRef<TextInput>(null);
   const selfInputRef = useRef<TextInput>(null);
@@ -67,13 +62,13 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
     tags: {
       foodStyle: [],
       household: [],
-      occupation: []
+      occupation: [],
+      taste: []
     },
     remainingPeriod: 0
   });
 
   const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
-  const [bonusBadge, setBonusBadge] = useState<BonusBadgeType[]>(bonusTagData);
   const token = useRecoilValue(tokenState);
   const myId = useRecoilValue(myIdState);
   const queryClient = useQueryClient();
@@ -142,7 +137,11 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
           fields: {
             key: "user" + route.params.profile.profileImage?.split("user")[1]
           }
-        } : null
+        } : null,
+        tags: {
+          ...route.params.profile.tags,
+          taste: bonusTagData
+        }
       });
 
       setUserBadge({
@@ -166,14 +165,6 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
         })
       });
     }
-    // setInterestTag({
-    //   interest: interestTag.interest.map(v => {
-    //     if (route.params?.profile.tags.includes(v.title)) {
-    //       return { ...v, isClick: true };
-    //     }
-    //     return v;
-    //   })
-    // });
   }, [route.params]);
 
   if (editProfileMutation.isLoading) {
@@ -288,8 +279,9 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
               userBadge={userBadge} setUserBadge={(badge: BadgeType) => setUserBadge(badge)} />
           </View>
         </View>
-        {/* 보너스 입맛 기능 추가후 주석해제 */}
-        {/* <View style={{ marginTop: h2p(40) }}>
+
+        {/* 보너스 입맛 */}
+        <View style={{ marginTop: h2p(40) }}>
           <View style={{ marginHorizontal: d2p(20), marginBottom: h2p(10), flexDirection: "row", alignItems: "center" }}>
             <Image source={knewnewIcon} style={{ width: d2p(20), height: d2p(20), marginRight: d2p(5) }} />
             <Text style={[FONT.Bold, styles.inputTitle]}>보너스 입맛 태그</Text>
@@ -316,14 +308,20 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
                     <Text style={[FONT.Bold, { fontSize: 16 }]}>내 입맛을 알려주세요!</Text>
                     <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.main }]}> (중복가능)</Text>
                   </View>
-                  {React.Children.toArray(bonusBadge.map((bonus, bonusIdx) => (
+                  {React.Children.toArray(profileInfo.tags.taste?.map((bonus, bonusIdx) => (
                     <Pressable onPress={() => {
-                      setBonusBadge(bonusBadge.map((v, i) => {
-                        if (i === bonusIdx) {
-                          return { ...v, isClick: !v.isClick };
+                      setProfileInfo({
+                        ...profileInfo,
+                        tags: {
+                          ...profileInfo.tags,
+                          taste: profileInfo.tags.taste?.map((v, i) => {
+                            if (i === bonusIdx) {
+                              return { ...v, isClick: !v.isClick };
+                            }
+                            return v;
+                          })
                         }
-                        return v;
-                      }));
+                      });
                     }}>
                       <SelectTag viewStyle={{ paddingTop: h2p(15) }} name={bonus.title} isSelected={bonus.isClick} />
                     </Pressable>
@@ -332,7 +330,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
               </View>
             </View>
           </View>
-        </View> */}
+        </View>
         <BasicButton viewStyle={{ alignSelf: "center", marginTop: h2p(40) }}
           onPress={() => {
             if (!profileInfo.profileImage && !profile) {

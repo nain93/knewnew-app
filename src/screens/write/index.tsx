@@ -154,14 +154,6 @@ const Write = ({ navigation, route }: WriteProp) => {
   const { mutateAsync } = useMutation("deleteImages", (id: number) => deleteReviewImage(token, id));
 
   const handleAddWrite = async () => {
-    if (route.params?.type === "reKnewWrite" && writeData.satisfaction === "") {
-      setIspopupOpen({ isOpen: true, content: "선호도를 입력해주세요", popupStyle: { bottom: keyboardHeight + h2p(20) } });
-      return;
-    }
-    if (writeData.content === "") {
-      setIspopupOpen({ isOpen: true, content: "내용을 입력해주세요", popupStyle: { bottom: keyboardHeight + h2p(20) } });
-      return;
-    }
     setBlockSubmit(true);
     // * 이미지 업로드할때
     if (uploadBody.length > 0) {
@@ -311,9 +303,31 @@ const Write = ({ navigation, route }: WriteProp) => {
                 }
               });
             }
+            navigation.goBack();
           }
           else {
-            navigation.goBack();
+            if (writeData.content || writeData.product) {
+              setModalOpen({
+                isOpen: true,
+                content: "앗! 지금까지 작성하신 내용이 사라져요",
+                okButton: () => {
+                  navigation.goBack();
+                  setWriteData({
+                    images: [],
+                    content: "",
+                    satisfaction: "",
+                    market: undefined,
+                    parent: parentId,
+                    tags: {
+                      interest: []
+                    }
+                  });
+                }
+              });
+            }
+            else {
+              navigation.goBack();
+            }
           }
         }}
           imageStyle={{ width: d2p(11), height: h2p(25) }} />}
