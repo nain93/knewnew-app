@@ -204,6 +204,7 @@ const Write = ({ navigation, route }: WriteProp) => {
         content: route.params.review.content,
         satisfaction: route.params.review.satisfaction,
         market: route.params.review.market ? route.params.review.market : undefined,
+        product: route.params.review.product ? route.params.review.product : undefined,
         tags: {
           ...route.params.review.tags
         },
@@ -586,6 +587,7 @@ const Write = ({ navigation, route }: WriteProp) => {
           </View>
 
           <TextInput
+            value={writeData.product}
             onChangeText={(e) => setWriteData({ ...writeData, product: e })}
             autoCapitalize={"none"}
             style={[FONT.Regular, {
