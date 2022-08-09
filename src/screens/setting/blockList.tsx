@@ -1,5 +1,5 @@
 import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import { d2p, h2p } from '~/utils';
@@ -27,19 +27,27 @@ const BlockList = () => {
   const token = useRecoilValue(tokenState);
   const myId = useRecoilValue(myIdState);
   const queryClient = useQueryClient();
+  const [isBlockData, setIsBlockData] = useState<BlockListType[]>([]);
 
   const blockListQuery = useQuery<BlockListType[], Error>("blockList", () => blockList({ token, id: myId }));
   const blockMutation = useMutation("blockUser",
     ({ id, isBlock }: { id: number, isBlock: boolean }) => blockUser({ token, id, isBlock }), {
-    onSuccess: () => {
-      console.log('11');
-      queryClient.invalidateQueries("reviewList");
-      queryClient.invalidateQueries("userBookmarkList");
+    onSuccess: async () => {
+      await queryClient.invalidateQueries("reviewList");
+      await queryClient.invalidateQueries("userBookmarkList");
     }
   });
 
+  useEffect(() => {
+    if (blockListQuery.data) {
+      setIsBlockData(blockListQuery.data);
+    }
+  }, [blockListQuery.data]);
+
+  console.log(isBlockData, 'isBlockData');
+
   const blockListKey = useCallback((item) => item.id.toString(), []);
-  const blockListRenderItem = useCallback(({ item }: { item: BlockListType }) =>
+  const blockListRenderItem = useCallback(({ item, index }: { item: BlockListType, index: number }) =>
     <View style={{ flexDirection: "row", alignItems: "center", marginBottom: h2p(20) }}>
       <Image source={item.profileImage ? { uri: item.profileImage } : noProfile} style={{
         marginRight: d2p(8),
@@ -54,7 +62,15 @@ const BlockList = () => {
         </Text>
       </View>
       <TouchableOpacity
-        onPress={() => blockMutation.mutate({ id: item.id, isBlock: !item.isBlock })}
+        onPress={() => {
+          setIsBlockData(isBlockData.map((v, i) => {
+            if (i === index) {
+              return { ...v, isBlock: !v.isBlock };
+            }
+            return v;
+          }));
+          blockMutation.mutate({ id: item.id, isBlock: !item.isBlock });
+        }}
         style={{
           borderRadius: 12.5,
           width: d2p(76),
@@ -71,7 +87,7 @@ const BlockList = () => {
         </Text>
       </TouchableOpacity>
     </View>
-    , []);
+    , [blockMutation, isBlockData]);
 
   if (blockListQuery.isLoading) {
     return (
@@ -99,7 +115,7 @@ const BlockList = () => {
               </Text>
             </View>}
           showsVerticalScrollIndicator={false}
-          data={blockListQuery.data}
+          data={isBlockData}
           renderItem={blockListRenderItem}
           keyExtractor={blockListKey}
         />

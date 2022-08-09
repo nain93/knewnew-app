@@ -291,7 +291,7 @@ const ReKnew = ({ review, filterBadge, type }: FeedReviewProps) => {
               seeMoreStyle={[FONT.Medium, {
                 color: theme.color.grayscale.a09ca4, fontSize: 12
               }]}
-              numberOfLines={3}
+              numberOfLines={5}
               onSeeMoreBlocked={() => navigation.navigate("FeedDetail",
                 { id: review.id })}
               style={[{

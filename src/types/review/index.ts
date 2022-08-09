@@ -74,7 +74,10 @@ export interface ReviewListType {
   likeCount: number,
   market: MarketType,
   parent?: ReviewParentType,
-  product: string | null,
+  product?: {
+    id: number,
+    name: string
+  },
   satisfaction: "best" | "good" | "bad" | "question" | "",
   tags: {
     interest: Array<string>,
