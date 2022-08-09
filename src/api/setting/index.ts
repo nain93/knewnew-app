@@ -47,7 +47,7 @@ export const notificationList = async ({ token, offset }: { token: string, offse
   }
 };
 
-export const blockList = async ({ token, offset, id }: { token: string, id: number, offset?: number }) => {
+export const blockList = async ({ token, offset, id }: { token: string, id: number, offset: number }) => {
   const res = await axios.get(baseURL + `user/${id}/blocking/`, {
     params: {
       offset

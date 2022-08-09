@@ -35,6 +35,7 @@ import BasicButton from '~/components/button/basicButton';
 import MarketLayout from '~/components/layout/MarketLayout';
 import ReactionLayout from '~/components/layout/ReactionLayout';
 import CustomBottomSheet from '~/components/popup/CustomBottomSheet';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 function StatusBarPlaceHolder({ scrollOffset }: { scrollOffset: number }) {
@@ -156,7 +157,10 @@ const Feed = ({ navigation, route }: FeedProps) => {
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
         <TouchableOpacity
-          onPress={() => tagRefRBSheet.current?.open()}
+          onPress={() => {
+            setSelectedIndex(-1);
+            tagRefRBSheet.current?.open();
+          }}
           style={styles.filter}>
           <Image source={tagfilter} style={{ width: d2p(11), height: d2p(10), marginRight: d2p(10) }} />
           <Text style={[FONT.Medium, { fontSize: 12, color: theme.color.grayscale.C_443e49 }]}>다른 태그 보기</Text>
@@ -230,7 +234,10 @@ const Feed = ({ navigation, route }: FeedProps) => {
           </View>
           <TouchableOpacity
             hitSlop={hitslop}
-            onPress={() => sortRefSheet.current?.open()}
+            onPress={() => {
+              setSelectedIndex(-1);
+              sortRefSheet.current?.open();
+            }}
             style={{ flexDirection: "row", alignItems: "center" }}>
             <Text style={[FONT.Regular, { fontSize: 12, marginRight: d2p(5) }]}>
               {sort === "0" ? "최신순" : "인기순"}
@@ -263,12 +270,14 @@ const Feed = ({ navigation, route }: FeedProps) => {
 
   const reviewRenderItem = useCallback(({ item, index }) =>
     <Pressable
-      onPress={() =>
+      onPress={() => {
         navigation.navigate("FeedDetail", {
           authorId: item.author.id,
           id: item.id, badge: filterBadge,
           isLike: item.isLike, isBookmark: item.isBookmark
-        })}
+        });
+      }
+      }
       style={styles.review}>
       <FeedReview
         idx={index}
@@ -312,6 +321,12 @@ const Feed = ({ navigation, route }: FeedProps) => {
     }
   }, [route.params]);
 
+  useFocusEffect(useCallback(() => {
+    // * 화면 나갈때 ...팝업 끄기
+    return () => setSelectedIndex(-1);
+  }, []));
+
+
   useEffect(() => {
     if (!interestTag.interest.every(v => !v.isClick)) {
       setAllClick(false);
@@ -337,7 +352,10 @@ const Feed = ({ navigation, route }: FeedProps) => {
             {scrollOffset >= h2p(130) ?
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <TouchableOpacity
-                  onPress={() => tagRefRBSheet.current?.open()}
+                  onPress={() => {
+                    setSelectedIndex(-1);
+                    tagRefRBSheet.current?.open();
+                  }}
                   style={[styles.filter, { marginRight: d2p(10), marginBottom: 0 }]}>
                   <Image source={tagfilter} style={{ width: d2p(11), height: d2p(10), marginRight: d2p(10) }} />
                   <Text style={[FONT.Medium, { fontSize: 12 }]}>다른 태그 보기</Text>
@@ -397,7 +415,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
         }
         isBorder={scrollOffset >= h2p(130) ? true : false} bgColor={scrollOffset >= h2p(130) ? theme.color.white : theme.color.grayscale.f7f7fc}
       />
-      <View>
+      <Pressable onPress={() => setSelectedIndex(-1)}>
         <FlatList
           ref={flatListRef}
           onEndReached={reviewEndReached}
@@ -416,7 +434,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
           keyExtractor={reviewKey}
           onScroll={reviewOnScroll}
         />
-      </View>
+      </Pressable>
 
       {/* 다른 태그 보기 sheet */}
       <CustomBottomSheet
@@ -568,13 +586,15 @@ const Feed = ({ navigation, route }: FeedProps) => {
       <CustomBottomSheet
         height={Dimensions.get("window").height - h2p(480)}
         sheetRef={reactRefRBSheet}
-        onOpen={() =>
+        onOpen={() => {
+          setSelectedIndex(-1);
           setClickReact(clickedReact.map(v => {
             if (sortReact?.includes(v.title)) {
               return { ...v, isClick: true };
             }
             return { ...v, isClick: false };
-          }))
+          }));
+        }
         }
       >
         <>
@@ -611,14 +631,16 @@ const Feed = ({ navigation, route }: FeedProps) => {
       <CustomBottomSheet
         sheetRef={marketRefRBSheet}
         height={Dimensions.get("window").height - h2p(456)}
-        onOpen={() =>
+        onOpen={() => {
+
+          setSelectedIndex(-1);
           setClickMarket(clickedMarket.map(v => {
             if (sortMarket?.includes(v.title)) {
               return { ...v, isClick: true };
             }
             return { ...v, isClick: false };
-          }))
-        }
+          }));
+        }}
       >
         <>
           <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: d2p(10), marginBottom: h2p(30) }}>

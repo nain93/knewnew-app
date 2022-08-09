@@ -78,6 +78,13 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
     onError: () => setApiBlock(false)
   });
 
+  const handleOffpopup = () => {
+    // * ... 모달 팝업 끄기
+    if (setSelectedIndex) {
+      setSelectedIndex(-1);
+    }
+  };
+
   useEffect(() => {
     setLikeCount(review.likeCount);
   }, [review.likeCount]);
@@ -324,17 +331,20 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             <Text style={[FONT.Regular, styles.reviewCount]}>{review.viewCount}</Text>
           </View>
           <Pressable
-            onPress={() => navigation.navigate("FeedDetail", {
-              authorId: review.author.id,
-              id: review.id, badge: filterBadge,
-              isLike: review.isLike, isBookmark: review.isBookmark, toComment: true
-            })}
+            onPress={() => {
+              navigation.navigate("FeedDetail", {
+                authorId: review.author.id,
+                id: review.id, badge: filterBadge,
+                isLike: review.isLike, isBookmark: review.isBookmark, toComment: true
+              });
+            }}
             style={styles.reviewIcon}>
             <Image source={comment} style={styles.reviewImg} />
             <Text style={[FONT.Regular, styles.reviewCount]}>{review.commentCount}</Text>
           </Pressable>
           <TouchableOpacity
             onPress={() => {
+              handleOffpopup();
               if (!apiBlock) {
                 setApiBlock(true);
                 if (isLike) {
@@ -354,6 +364,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
+              handleOffpopup();
               if (!apiBlock) {
                 setApiBlock(true);
                 if (isBookmarkState) {

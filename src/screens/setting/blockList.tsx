@@ -6,7 +6,7 @@ import { d2p, h2p } from '~/utils';
 import { noProfile } from '~/assets/images';
 import { FONT } from '~/styles/fonts';
 import theme from '~/styles/theme';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
 import { blockList } from '~/api/setting';
 import { useRecoilValue } from 'recoil';
 import { myIdState, tokenState } from '~/recoil/atoms';
@@ -29,7 +29,11 @@ const BlockList = () => {
   const queryClient = useQueryClient();
   const [isBlockData, setIsBlockData] = useState<BlockListType[]>([]);
 
-  const blockListQuery = useQuery<BlockListType[], Error>("blockList", () => blockList({ token, id: myId }));
+  const blockListQuery = useInfiniteQuery<BlockListType[], Error>("blockList", ({ pageParam = 0 }) =>
+    blockList({ token, id: myId, offset: pageParam }), {
+    getNextPageParam: (next, all) => all.flat().length ?? undefined,
+  });
+
   const blockMutation = useMutation("blockUser",
     ({ id, isBlock }: { id: number, isBlock: boolean }) => blockUser({ token, id, isBlock }), {
     onSuccess: async () => {
@@ -40,11 +44,10 @@ const BlockList = () => {
 
   useEffect(() => {
     if (blockListQuery.data) {
-      setIsBlockData(blockListQuery.data);
+      setIsBlockData(blockListQuery.data?.pages.flat());
     }
   }, [blockListQuery.data]);
 
-  console.log(isBlockData, 'isBlockData');
 
   const blockListKey = useCallback((item) => item.id.toString(), []);
   const blockListRenderItem = useCallback(({ item, index }: { item: BlockListType, index: number }) =>
@@ -77,7 +80,8 @@ const BlockList = () => {
           height: h2p(25),
           paddingVertical: h2p(4),
           backgroundColor: item.isBlock ? theme.color.grayscale.eae7ec : theme.color.main,
-          marginLeft: "auto"
+          marginLeft: "auto",
+          justifyContent: "center"
         }}>
         <Text style={[FONT.Medium, {
           textAlign: "center",
@@ -107,6 +111,15 @@ const BlockList = () => {
         title="차단 관리" />
       <View style={styles.container}>
         <FlatList
+          refreshing={blockListQuery.isLoading}
+          onRefresh={blockListQuery.refetch}
+          onEndReachedThreshold={0.5}
+          onEndReached={() => {
+            if (blockListQuery.data &&
+              blockListQuery.data.pages.flat().length > 19) {
+              blockListQuery.fetchNextPage();
+            }
+          }}
           ListEmptyComponent={() =>
             <View style={{ justifyContent: "center", alignItems: "center", marginTop: h2p(150) }}>
               <Image source={grayKnewnew} style={{ width: d2p(60), height: d2p(60) }} />
@@ -128,6 +141,7 @@ export default BlockList;
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     padding: d2p(20)
   }
 });
