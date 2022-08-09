@@ -40,7 +40,7 @@ const ProductDetail = ({ navigation }: ProductDetailProps) => {
             width: d2p(60), height: d2p(60), borderRadius: 4, backgroundColor: "blue"
           }} />
           <Text
-            numberOfLines={3}
+            numberOfLines={5}
             style={[FONT.Medium, {
               lineHeight: 21,
               width: Dimensions.get("window").width - d2p(155),
