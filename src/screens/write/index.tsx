@@ -164,7 +164,10 @@ const Write = ({ navigation, route }: WriteProp) => {
       if (route.params?.isEdit && route.params.review?.id) {
         editReviewMutation.mutate({
           writeProps:
-            { ...writeData, parent: route.params.review.parent?.isActive ? writeData.parent : undefined },
+          {
+            ...writeData,
+            parent: route.params.review.parent?.isActive ? writeData.parent : undefined
+          },
           id: route.params.review?.id
         });
       }
@@ -197,7 +200,7 @@ const Write = ({ navigation, route }: WriteProp) => {
         content: route.params.review.content,
         satisfaction: route.params.review.satisfaction,
         market: route.params.review.market ? route.params.review.market : undefined,
-        product: route.params.review.product ? route.params.review.product : undefined,
+        product: route.params.review.product ? route.params.review.product.name : undefined,
         tags: {
           ...route.params.review.tags
         },
@@ -303,13 +306,15 @@ const Write = ({ navigation, route }: WriteProp) => {
                 }
               });
             }
-            navigation.goBack();
+            else {
+              navigation.goBack();
+            }
           }
           else {
             if (writeData.content || writeData.product) {
               setModalOpen({
                 isOpen: true,
-                content: "앗! 지금까지 작성하신 내용이 사라져요",
+                content: `앗! 지금까지 작성하신 내용이 사라져요\n(태그 변경은 작성완료 후 \n수정페이지에서 변경 가능합니다.)`,
                 okButton: () => {
                   navigation.goBack();
                   setWriteData({

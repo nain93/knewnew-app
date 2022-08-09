@@ -61,7 +61,10 @@ const More = ({ setSelectedIndex, isGobacK, handleCloseMore, userId, isMoreClick
   const handleEditPress = () => {
     if (type === "review") {
       if (review.parent) {
-        navigation.navigate("Write", { loading: true, isEdit: true, type: "reknew", nickname: review.author.nickname, review, filterBadge });
+        navigation.navigate("Write", {
+          loading: true, isEdit: true, type: "reknew",
+          nickname: review.author.nickname, review, filterBadge
+        });
       }
       else {
         navigation.navigate("Write", { loading: true, isEdit: true, review, filterBadge });

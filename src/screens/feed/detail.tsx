@@ -7,7 +7,7 @@ import theme from '~/styles/theme';
 import { d2p, dateCommentFormat, h2p, simpleDate } from '~/utils';
 import ReviewIcon from '~/components/icon/reviewIcon';
 import ReactionIcon from '~/components/icon/reactionIcon';
-import { bookmark, commentMore, marketIcon, more, reKnew, tag } from '~/assets/icons';
+import { commentMore, marketIcon, more, reKnew, tag } from '~/assets/icons';
 import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { myIdState, okPopupState, popupState, refreshState, tokenState } from '~/recoil/atoms';
@@ -424,7 +424,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                 borderRadius: 4
               }}>
               <Text style={[FONT.Medium, { color: theme.color.grayscale.C_79737e, }]}>
-                {`${reviewDetailQuery.data?.product} >`}
+                {`${reviewDetailQuery.data?.product.name} >`}
               </Text>
             </TouchableOpacity>
           </View>

@@ -46,8 +46,6 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
   const [bookmarkCount, setBookmarkCount] = useState(review.bookmarkCount);
   const [apiBlock, setApiBlock] = useState(false);
 
-  const [isTruncated, setIsTruncated] = useState(true);
-
   const bookmarkMutation = useMutation("bookmark",
     ({ id, isBookmark }: { id: number, isBookmark: boolean }) => bookmarkReview(token, id, isBookmark), {
     onSuccess: async () => {
@@ -188,7 +186,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
               borderRadius: 4
             }}>
             <Text style={[FONT.Medium, { color: theme.color.grayscale.C_79737e, }]}>
-              {`${review.product} >`}
+              {`${review.product.name} >`}
             </Text>
           </TouchableOpacity>
         </View>
@@ -208,7 +206,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             seeMoreStyle={[FONT.Medium, {
               color: theme.color.grayscale.a09ca4, fontSize: 12
             }]}
-            numberOfLines={3}
+            numberOfLines={5}
             onSeeMoreBlocked={() => navigation.navigate("FeedDetail", {
               authorId: review.author.id,
               id: review.id, badge: filterBadge,
