@@ -12,7 +12,7 @@ import { NavigationRoute } from 'react-navigation';
 import { noProfile } from '~/assets/images';
 import { FONT } from '~/styles/fonts';
 import { BadgeType } from '~/types';
-import { bonusTagData, initialBadgeData } from '~/utils/data';
+import { initialBadgeData } from '~/utils/data';
 import { useMutation, useQueryClient } from 'react-query';
 import { editUserProfile } from '~/api/user';
 import { useRecoilValue } from 'recoil';
@@ -34,7 +34,6 @@ interface ProfileEditType {
       key: string
     }
   } | null,
-  tags: BadgeType,
   remainingPeriod?: number
 }
 
@@ -42,7 +41,22 @@ interface ProfileType {
   nickname: string,
   headline: string,
   profileImage: string | null,
-  tags: BadgeType
+  tags: {
+    foodStyle: Array<{
+      title: string;
+      isClick: boolean;
+    }>,
+    household: Array<{
+      title: string;
+      isClick: boolean;
+    }>,
+    occupation: Array<{
+      title: string;
+      isClick: boolean;
+      content?: string
+    }>,
+    taste?: Array<string>
+  }
 }
 interface EditProfileProps {
   navigation: NavigationStackProp;
@@ -59,12 +73,6 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
     nickname: "",
     headline: "",
     profileImage: null,
-    tags: {
-      foodStyle: [],
-      household: [],
-      occupation: [],
-      taste: []
-    },
     remainingPeriod: 0
   });
 
@@ -95,7 +103,6 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
           await uploadImage(uploadBody, data[0]);
         }
         setProfileInfo({ ...profileInfo, profileImage: data[0] });
-
         editProfileMutation.mutate({
           profileImage: profile.includes("https") ? profile.split("com/")[1] : data[0].fields.key,
           nickname: profileInfo.nickname,
@@ -103,7 +110,8 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
           tags: {
             foodStyle: [userBadge.foodStyle.filter(v => v.isClick)[0].title],
             household: [userBadge.household.filter(v => v.isClick)[0].title],
-            occupation: [userBadge.occupation.filter(v => v.content || v.isClick)[0].title]
+            occupation: [userBadge.occupation.filter(v => v.content || v.isClick)[0].title],
+            taste: userBadge.taste && userBadge.taste.filter(v => v.isClick).map(v => v.title),
           }
         });
       }
@@ -137,11 +145,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
           fields: {
             key: "user" + route.params.profile.profileImage?.split("user")[1]
           }
-        } : null,
-        tags: {
-          ...route.params.profile.tags,
-          taste: bonusTagData
-        }
+        } : null
       });
 
       setUserBadge({
@@ -162,8 +166,17 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
             return { ...v, isClick: true };
           }
           return { ...v, isClick: false };
+        }),
+        taste: userBadge.taste?.map(v => {
+          if (route.params?.profile.tags.taste) {
+            if (route.params?.profile.tags.taste.includes(v.title)) {
+              return { ...v, isClick: true };
+            }
+          }
+          return { ...v, isClick: false };
         })
       });
+
     }
   }, [route.params]);
 
@@ -308,19 +321,16 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
                     <Text style={[FONT.Bold, { fontSize: 16 }]}>내 입맛을 알려주세요!</Text>
                     <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.main }]}> (중복가능)</Text>
                   </View>
-                  {React.Children.toArray(profileInfo.tags.taste?.map((bonus, bonusIdx) => (
+                  {React.Children.toArray(userBadge.taste?.map((bonus, bonusIdx) => (
                     <Pressable onPress={() => {
-                      setProfileInfo({
-                        ...profileInfo,
-                        tags: {
-                          ...profileInfo.tags,
-                          taste: profileInfo.tags.taste?.map((v, i) => {
-                            if (i === bonusIdx) {
-                              return { ...v, isClick: !v.isClick };
-                            }
-                            return v;
-                          })
-                        }
+                      setUserBadge({
+                        ...userBadge,
+                        taste: userBadge.taste?.map((v, i) => {
+                          if (i === bonusIdx) {
+                            return { ...v, isClick: !v.isClick };
+                          }
+                          return v;
+                        })
                       });
                     }}>
                       <SelectTag viewStyle={{ paddingTop: h2p(15) }} name={bonus.title} isSelected={bonus.isClick} />
@@ -341,7 +351,8 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
                 tags: {
                   foodStyle: [userBadge.foodStyle.filter(v => v.isClick)[0].title],
                   household: [userBadge.household.filter(v => v.isClick)[0].title],
-                  occupation: [userBadge.occupation.filter(v => v.content || v.isClick)[0].title]
+                  occupation: [userBadge.occupation.filter(v => v.content || v.isClick)[0].title],
+                  taste: userBadge.taste && userBadge.taste.filter(v => v.isClick).map(v => v.title),
                 }
               });
             }

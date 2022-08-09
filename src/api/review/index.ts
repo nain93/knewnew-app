@@ -68,6 +68,17 @@ export const bookmarkReview = async (token: string, id: number, state: boolean) 
   }
 };
 
+export const shareReview = async ({ token, id }: { token: string, id: number }) => {
+  const res = await axios.get(baseURL + `review/${id}/share/`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+  if (res) {
+    return res.data;
+  }
+};
+
 export const writeReview = async ({
   token, images, content,
   satisfaction, market,

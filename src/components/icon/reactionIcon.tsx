@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
-import { like, reKnew, comment, colorLike, cart, colorCart, bookmark, graybookmark } from "~/assets/icons";
+import { like, reKnew, comment, colorLike, cart, colorCart, bookmark, graybookmark, shareIcon } from "~/assets/icons";
 import theme from "~/styles/theme";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "react-navigation-stack/lib/typescript/src/vendor/types";
 import { UseMutationResult } from "react-query";
 import { FONT } from "~/styles/fonts";
 import { ReviewListType } from "~/types/review";
+import { d2p } from "~/utils";
 
 interface ReviewIconProp {
-  name: "like" | "cart" | "ReKnew" | "comment";
+  name: "like" | "cart" | "ReKnew" | "comment"
   count?: number;
   state?: boolean;
   isState?: (isState: boolean) => void;
@@ -27,7 +28,7 @@ const ReactionIcon = ({ review, name, count, state, isState, mutation, id }: Rev
 
   return (
     <TouchableOpacity style={{
-      flexDirection: "row", alignItems: 'center', justifyContent: 'space-between', position: 'relative', left: -13
+      flexDirection: "row", alignItems: 'center'
     }} onPress={() => {
       if (isState && id) {
         isState(!state);
@@ -53,9 +54,9 @@ const ReactionIcon = ({ review, name, count, state, isState, mutation, id }: Rev
       <Image
         source={!state ? imgSource(name)?.item : imgSource(name)?.colored}
         resizeMode="contain"
-        style={{ width: 26, height: 26 }}
+        style={{ width: d2p(26), height: d2p(26) }}
       />
-      <Text style={[{ fontSize: 12 }, !state ? styles.default : styles.clicked, { marginLeft: 9 }, FONT.Bold]}>{reactCount}</Text>
+      <Text style={[{ fontSize: 12 }, !state ? styles.default : styles.clicked, { marginLeft: d2p(9) }, FONT.Bold]}>{reactCount}</Text>
     </TouchableOpacity >
   );
 };

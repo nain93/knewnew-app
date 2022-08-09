@@ -7,15 +7,16 @@ import theme from '~/styles/theme';
 import { d2p, dateCommentFormat, h2p, simpleDate } from '~/utils';
 import ReviewIcon from '~/components/icon/reviewIcon';
 import ReactionIcon from '~/components/icon/reactionIcon';
-import { commentMore, marketIcon, more, reKnew, tag } from '~/assets/icons';
+import { commentMore, marketIcon, more, reKnew, shareIcon, tag } from '~/assets/icons';
 import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { myIdState, okPopupState, popupState, refreshState, tokenState } from '~/recoil/atoms';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from 'react-query';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
-import { bookmarkReview, getReviewDetail, likeReview } from '~/api/review';
+import { bookmarkReview, getReviewDetail, likeReview, shareReview } from '~/api/review';
 import FastImage from 'react-native-fast-image';
+import Share from 'react-native-share';
 
 import { ReviewListType } from '~/types/review';
 import Loading from '~/components/loading';
@@ -136,6 +137,13 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
 
   const boomarkMutation = useMutation("bookmark",
     ({ id, state }: { id: number, state: boolean }) => bookmarkReview(token, id, state), {
+    onSuccess: () => {
+      queryClient.invalidateQueries("reviewList");
+      setRefresh(true);
+    }
+  });
+
+  const shareMutation = useMutation("share", ({ id }: { id: number }) => shareReview({ token, id }), {
     onSuccess: () => {
       queryClient.invalidateQueries("reviewList");
       setRefresh(true);
@@ -524,12 +532,35 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
               }]}>{reviewDetailQuery.data?.childCount}</Text>
             </TouchableOpacity>
           }
+          {console.log(reviewDetailQuery.data, 'reviewDetailQuery')}
           <ReactionIcon name="like" count={reviewDetailQuery.data?.likeCount} state={like}
             isState={(isState: boolean) => setLike(isState)} mutation={likeReviewMutation} id={route.params?.id} />
           <ReactionIcon name="cart" state={cart} count={reviewDetailQuery.data?.bookmarkCount}
             mutation={boomarkMutation}
             id={route.params?.id}
             isState={(isState: boolean) => setCart(isState)} />
+          <TouchableOpacity
+            onPress={() => {
+              Share.open({
+                title: "뉴뉴",
+                url: `knewnnew://FeedDetail/${reviewDetailQuery.data?.id}`
+                // url: `https://knewnnew.co.kr/FeedDetail/${review.id}`
+              })
+                .then((res) => {
+                  if (reviewDetailQuery.data?.id) {
+                    shareMutation.mutate({ id: reviewDetailQuery.data.id });
+                  }
+                })
+                .catch((err) => {
+                  err && console.log(err);
+                });
+            }}
+            style={{ flexDirection: "row", alignItems: "center" }}>
+            <Image source={shareIcon} style={{ width: d2p(26), height: d2p(26) }} />
+            <Text style={[FONT.Bold, { fontSize: 12, color: theme.color.grayscale.C_79737e, marginLeft: d2p(9) }]}>
+              {reviewDetailQuery.data?.shareCount}
+            </Text>
+          </TouchableOpacity>
         </View>
         <Text style={[styles.commentMeta, FONT.Bold]}>작성된 댓글 {reviewDetailQuery.data?.commentCount}개</Text>
       </View>

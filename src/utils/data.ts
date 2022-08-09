@@ -13,13 +13,12 @@ export const initialBadgeData = {
     [{ title: "1인가구", isClick: false }, { title: "2인가구", isClick: false }, { title: "3인이상가구", isClick: false }],
   occupation:
     [{ title: "학생", isClick: false }, { title: "직장인", isClick: false }, { title: "주부", isClick: false },
-    { title: "기타", isClick: false, content: "" }]
+    { title: "기타", isClick: false, content: "" }],
+  taste: [
+    { title: "느끼만렙", isClick: false },
+    { title: "맵찔이", isClick: false },
+    { title: "맵고수", isClick: false },
+    { title: "달달함파", isClick: false },
+    { title: "짭조름파", isClick: false }
+  ]
 };
-
-export const bonusTagData = [
-  { title: "느끼만렙", isClick: false },
-  { title: "맵찔이", isClick: false },
-  { title: "맵고수", isClick: false },
-  { title: "달달함파", isClick: false },
-  { title: "짭조름파", isClick: false }
-];

@@ -296,6 +296,7 @@ if (!__DEV__) {
     environment: "production",
     dsn: Config.CENTRY_DSN,
     tracesSampleRate: 1.0,
+    // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
   });
 }
 
