@@ -1,6 +1,5 @@
 import axios from "axios";
 import { baseURL } from "~/api";
-import { BadgeType } from "~/types";
 import { UserInfoType } from "~/types/user";
 
 export const getMyProfile = async (token: string) => {

@@ -532,7 +532,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
               }]}>{reviewDetailQuery.data?.childCount}</Text>
             </TouchableOpacity>
           }
-          {console.log(reviewDetailQuery.data, 'reviewDetailQuery')}
+
           <ReactionIcon name="like" count={reviewDetailQuery.data?.likeCount} state={like}
             isState={(isState: boolean) => setLike(isState)} mutation={likeReviewMutation} id={route.params?.id} />
           <ReactionIcon name="cart" state={cart} count={reviewDetailQuery.data?.bookmarkCount}
