@@ -14,6 +14,7 @@ import { useQuery } from 'react-query';
 import { getProductDetail } from '~/api/product';
 import { useRecoilValue } from 'recoil';
 import { tokenState } from '~/recoil/atoms';
+import Loading from '~/components/loading';
 
 interface ProductDetailProps {
   navigation: NavigationStackProp;
@@ -22,6 +23,10 @@ interface ProductDetailProps {
   }>;
 }
 
+interface ReviewsType {
+  id: number,
+  content: string
+}
 interface ProductDetailType {
   id: number,
   brand: string,
@@ -31,7 +36,7 @@ interface ProductDetailType {
   expectedPrice: number,
   link: string,
   bookmarkCount: number,
-  reviews: Array<any>,
+  reviews: Array<ReviewsType>,
   reviewCount: number,
   externalRating: number,
   externalReviewCount: number,
@@ -67,7 +72,7 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
   });
 
   const foodLogKey = useCallback((v) => v.id.toString(), []);
-  const foodLogRenderItem = useCallback(() => {
+  const foodLogRenderItem = useCallback(({ item }: { item: ReviewsType }) => {
     return (
       <View style={styles.foodLogItem}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -99,8 +104,7 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
               height: h2p(60),
               color: theme.color.grayscale.C_79737e
             }]}>
-            닭가슴살만 먹기 질려서 이거 사봤는데, 고구마 달달하니 맛있어요
-            직장인 도시락으로도 괜찮ㅁzxvㅁㅁㅁzxv...
+            {item.content}
           </Text>
           <Text style={[FONT.Medium, {
             textAlign: "right",
@@ -114,6 +118,17 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
       </View>
     );
   }, []);
+
+  if (productDetailQuery.isLoading) {
+    return (
+      <>
+        <Header
+          headerLeft={<LeftArrowIcon />}
+          title="상품 상세" />
+        <Loading />
+      </>
+    );
+  }
 
   return (
     <>
@@ -181,7 +196,7 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
           <Text style={[FONT.Bold, { color: theme.color.grayscale.C_443e49, fontSize: 16 }]}>
             Best 푸드로그
           </Text>
-          <TouchableOpacity onPress={() => navigation.navigate("ProductList")}>
+          <TouchableOpacity onPress={() => navigation.navigate("ProductList", { product: productDetailQuery.data?.name })}>
             <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>
               <Text style={[FONT.Regular, { color: theme.color.main }]}>
                 {productDetailQuery.data?.reviewCount}개
@@ -198,7 +213,7 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
             marginTop: h2p(20),
             marginBottom: h2p(40)
           }}
-          data={[{ id: 0, content: "11" }, { id: 1, content: "22" }, { id: 2, content: "33" }]}
+          data={productDetailQuery.data?.reviews}
           renderItem={foodLogRenderItem}
           keyExtractor={foodLogKey}
         />

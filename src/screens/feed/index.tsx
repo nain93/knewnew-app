@@ -19,7 +19,7 @@ import { isNotiReadState, myIdState, tokenState } from '~/recoil/atoms';
 import Loading from '~/components/loading';
 import { getMyProfile } from '~/api/user';
 import { MyProfileType } from '~/types/user';
-import { MarketType, ReactionType, ReviewListType } from '~/types/review';
+import { MarketType, ReviewListType, SatisfactionType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
 import { interestTagData } from '~/utils/data';
 import { NavigationStackProp } from 'react-navigation-stack';
@@ -83,7 +83,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
     return { title: v, isClick: false };
   }));
   const [clickedReact, setClickReact] = useState<Array<{
-    title: ReactionType,
+    title: SatisfactionType,
     isClick: boolean
   }>>(reactList.map(v => {
     return { title: v, isClick: false };
@@ -337,7 +337,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
   }, [interestTag]);
 
   if (reviewListQuery.isLoading) {
-    return <Loading />;
+    <Loading />;
   }
 
   return (
@@ -607,7 +607,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
           <ReactionLayout
             clickedReact={clickedReact}
             setClickReact={(react: {
-              title: ReactionType,
+              title: SatisfactionType,
               isClick: boolean
             }[]) => setClickReact(react)}
           />

@@ -9,15 +9,51 @@ import theme from '~/styles/theme';
 import { d2p, h2p } from '~/utils';
 import { FONT } from '~/styles/fonts';
 import { leftArrow, whiteClose } from '~/assets/icons';
+import { ReviewListType, SatisfactionType } from '~/types/review';
+import { useInfiniteQuery } from 'react-query';
+import { getReviewList } from '~/api/review';
+import { useRecoilValue } from 'recoil';
+import { tokenState } from '~/recoil/atoms';
+import { reactList } from '~/utils/constant';
+import { loading } from '~/assets/gif';
+import Loading from '~/components/loading';
 
 interface ProductListProps {
   navigation: NavigationStackProp;
-  route: NavigationRoute;
+  route: NavigationRoute<{
+    product: string
+  }>;
 }
 
-const ProductList = ({ navigation }: ProductListProps) => {
+const ProductList = ({ navigation, route }: ProductListProps) => {
+  const token = useRecoilValue(tokenState);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [sort, setSort] = useState<"0" | "1">("0");
   const [sortReact, setSortReact] = useState<string[]>();
+  const [clickedReact, setClickReact] = useState<Array<{
+    title: SatisfactionType,
+    isClick: boolean
+  }>>(reactList.map(v => {
+    return { title: v, isClick: false };
+  }));
+
+  const reviewListQuery = useInfiniteQuery<ReviewListType[], Error>(["reviewList", sort, sortReact], ({ pageParam = 0 }) =>
+    getReviewList({
+      token,
+      product: route.params?.product,
+      satisfaction: (clickedReact.filter(v => v.isClick)).map(v => v.title).toString(),
+      offset: pageParam, limit: 5, sort
+    }), {
+    getNextPageParam: (next, all) => all.flat().length ?? undefined,
+    enabled: !!route.params?.product
+  });
+
+  const reviewFooter = useCallback(() => <View style={{ height: h2p(117) }} />, []);
+
+  const footerLoading = useCallback(() =>
+    <View style={{ height: h2p(117) }}>
+      <Image source={loading} style={{ alignSelf: "center", width: d2p(70), height: d2p(70) }} />
+    </View>, []);
 
   const foodLogKey = useCallback((v) => v.id.toString(), []);
   const foodLogHeader = useCallback(() => (
@@ -25,7 +61,7 @@ const ProductList = ({ navigation }: ProductListProps) => {
       <Text style={[FONT.Bold, { fontSize: 20, lineHeight: 25, marginBottom: h2p(33) }]}>
         {`뉴뉴 유저들이 남긴\n`}
         <Text style={{ color: theme.color.main }}>
-          {`탄단지 고구마를 품은 닭가슴살\n`}
+          {`${route.params?.product}\n`}
         </Text>
         푸드로그예요!
       </Text>
@@ -64,14 +100,26 @@ const ProductList = ({ navigation }: ProductListProps) => {
     <Pressable
       onPress={() => console.log("상세")}
       style={styles.review}>
-      {/* <FeedReview
+      <FeedReview
         idx={index}
         selectedIndex={selectedIndex}
         setSelectedIndex={(selectIdx: number) => setSelectedIndex(selectIdx)}
         review={item}
-      /> */}
+      />
     </Pressable>
     , [selectedIndex]);
+
+  if (reviewListQuery.isLoading) {
+    return (
+      <>
+        <Header
+          headerLeft={<LeftArrowIcon />}
+          title="푸드로그 전체보기" />
+        <Loading />
+      </>
+    );
+
+  }
 
   return (
     <>
@@ -81,9 +129,19 @@ const ProductList = ({ navigation }: ProductListProps) => {
       <FlatList
         ListHeaderComponent={foodLogHeader}
         renderItem={foodLogRenderItem}
-        data={[{ id: 0, content: "11" }, { id: 1, content: "22" }, { id: 2, content: "33" }]}
+        data={reviewListQuery.data?.pages.flat()}
         keyExtractor={foodLogKey}
-        style={{ marginTop: 0, marginBottom: h2p(80), backgroundColor: theme.color.grayscale.f7f7fc }}
+        onEndReachedThreshold={0.5}
+        maxToRenderPerBatch={5}
+        windowSize={5}
+        removeClippedSubviews={true}
+        showsVerticalScrollIndicator={false}
+        ListFooterComponent={reviewListQuery.isFetchingNextPage ? footerLoading : reviewFooter}
+        style={{
+          marginTop: 0,
+          // marginBottom: h2p(80),
+          backgroundColor: theme.color.grayscale.f7f7fc
+        }}
       />
     </>
   );

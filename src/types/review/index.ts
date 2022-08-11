@@ -6,27 +6,15 @@ export interface WriteImagesType {
   image: string,
 }
 
-export enum MarketType {
-  "네이버스토어" = "네이버스토어",
-  "마켓컬리" = "마켓컬리",
-  "쿠팡프레시" = "쿠팡프레시",
-  "SSG" = "SSG",
-  "B마트" = "B마트",
-  "윙잇" = "윙잇",
-  // "기타 (직접 입력)" = "기타 (직접 입력)",
-}
+export type MarketType = "네이버스토어" | "마켓컬리" | "쿠팡프레시" | "SSG" | "B마트" | "윙잇"
+// "기타 (직접 입력)"
 
-export enum ReactionType {
-  "best" = "best",
-  "good" = "good",
-  "bad" = "bad",
-  "question" = "question"
-}
+export type SatisfactionType = "good" | "bad" | "best" | "question" | ""
 
 export interface WriteReviewType {
   images?: Array<WriteImagesType>,
   content: string,
-  satisfaction: "best" | "good" | "bad" | "question" | "",
+  satisfaction: SatisfactionType,
   product?: string,
   parent?: number,
   parentReview?: ReviewParentType,
@@ -50,7 +38,7 @@ export interface ReviewParentType {
   images: Array<WriteImagesType>,
   market: MarketType,
   product: string | null,
-  satisfaction: "best" | "good" | "bad" | "question" | "",
+  satisfaction: SatisfactionType,
   tags: {
     interest: Array<string>,
     household: Array<string>,
@@ -78,7 +66,7 @@ export interface ReviewListType {
     id: number,
     name: string
   },
-  satisfaction: "best" | "good" | "bad" | "question" | "",
+  satisfaction: SatisfactionType,
   tags: {
     interest: Array<string>,
     household: Array<string>,
