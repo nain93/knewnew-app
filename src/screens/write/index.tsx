@@ -27,6 +27,7 @@ import { blackclose, circle, circleQuestion, graycircle, grayclose, grayheart, g
 import FastImage from 'react-native-fast-image';
 import useFadeInOut from '~/hooks/useFadeInOut';
 import { hitslop } from '~/utils/constant';
+import { useAndroidBackHandler } from 'react-navigation-backhandler';
 
 interface WriteProp {
   navigation: NavigationStackProp;
@@ -271,6 +272,64 @@ const Write = ({ navigation, route }: WriteProp) => {
     }
   };
 
+  const goBack = () => {
+    if (route.params?.isEdit) {
+      if (writeData.content
+        || writeData.satisfaction
+        || writeData.images && writeData.images.length > 0
+        || writeData.market
+        || writeData.tags.interest.length > 0) {
+        setModalOpen({
+          isOpen: true,
+          content: "앗! 지금까지 작성하신 내용이 사라져요",
+          okButton: () => {
+            navigation.goBack();
+            setWriteData({
+              images: [],
+              content: "",
+              satisfaction: "",
+              market: undefined,
+              parent: parentId,
+              tags: {
+                interest: []
+              }
+            });
+          }
+        });
+      }
+      else {
+        navigation.goBack();
+      }
+    }
+    else {
+      if (writeData.content || writeData.product) {
+        setModalOpen({
+          isOpen: true,
+          content: `앗! 지금까지 작성하신 내용이 사라져요\n(태그 변경은 작성완료 후 \n수정페이지에서 변경 가능합니다.)`,
+          okButton: () => {
+            navigation.goBack();
+            setWriteData({
+              images: [],
+              content: "",
+              satisfaction: "",
+              market: undefined,
+              parent: parentId,
+              tags: {
+                interest: []
+              }
+            });
+          }
+        });
+      }
+      else {
+        navigation.goBack();
+      }
+    }
+    return true;
+  };
+
+  useAndroidBackHandler(goBack);
+
   if ((route.params?.loading && !writeData.satisfaction) || addReviewMutation.isLoading || editReviewMutation.isLoading) {
     return (
       <Loading />
@@ -281,60 +340,7 @@ const Write = ({ navigation, route }: WriteProp) => {
     <>
       <Header
         isBorder={true}
-        headerLeft={<LeftArrowIcon onBackClick={() => {
-          if (route.params?.isEdit) {
-            if (writeData.content
-              || writeData.satisfaction
-              || writeData.images && writeData.images.length > 0
-              || writeData.market
-              || writeData.tags.interest.length > 0) {
-              setModalOpen({
-                isOpen: true,
-                content: "앗! 지금까지 작성하신 내용이 사라져요",
-                okButton: () => {
-                  navigation.goBack();
-                  setWriteData({
-                    images: [],
-                    content: "",
-                    satisfaction: "",
-                    market: undefined,
-                    parent: parentId,
-                    tags: {
-                      interest: []
-                    }
-                  });
-                }
-              });
-            }
-            else {
-              navigation.goBack();
-            }
-          }
-          else {
-            if (writeData.content || writeData.product) {
-              setModalOpen({
-                isOpen: true,
-                content: `앗! 지금까지 작성하신 내용이 사라져요\n(태그 변경은 작성완료 후 \n수정페이지에서 변경 가능합니다.)`,
-                okButton: () => {
-                  navigation.goBack();
-                  setWriteData({
-                    images: [],
-                    content: "",
-                    satisfaction: "",
-                    market: undefined,
-                    parent: parentId,
-                    tags: {
-                      interest: []
-                    }
-                  });
-                }
-              });
-            }
-            else {
-              navigation.goBack();
-            }
-          }
-        }}
+        headerLeft={<LeftArrowIcon onBackClick={goBack}
           imageStyle={{ width: d2p(11), height: h2p(25) }} />}
         title="글쓰기"
         headerRightPress={() => {
@@ -389,8 +395,8 @@ const Write = ({ navigation, route }: WriteProp) => {
               <Text style={[FONT.Bold, { marginBottom: h2p(10) }]}>오늘의 푸드로그
                 <Text style={[FONT.Regular, {
                   fontSize: 12,
-                  color: writeData.content.length === 300 ? theme.color.main : theme.color.grayscale.a09ca4
-                }]}>  ({writeData.content.length}/300)</Text>
+                  color: writeData.content.length === 500 ? theme.color.main : theme.color.grayscale.a09ca4
+                }]}>  ({writeData.content.length}/500)</Text>
               </Text>
             </View>
             <Pressable onPress={() => inputRef.current?.focus()}
@@ -454,9 +460,9 @@ const Write = ({ navigation, route }: WriteProp) => {
 
                 <TextInput
                   value={writeData.content}
-                  maxLength={301}
+                  maxLength={501}
                   onChangeText={(e) => {
-                    if (e.length > 300) {
+                    if (e.length > 500) {
                       setWriteData({ ...writeData, content: e.slice(0, e.length - 1) });
                     }
                     else {
@@ -484,8 +490,8 @@ const Write = ({ navigation, route }: WriteProp) => {
               <Text style={FONT.Bold}>오늘의 푸드로그
                 <Text style={[FONT.Regular, {
                   fontSize: 12,
-                  color: writeData.content.length === 300 ? theme.color.main : theme.color.grayscale.a09ca4
-                }]}>  ({writeData.content.length}/300)</Text>
+                  color: writeData.content.length === 500 ? theme.color.main : theme.color.grayscale.a09ca4
+                }]}>  ({writeData.content.length}/500)</Text>
               </Text>
               {route.params?.isEdit &&
                 <TouchableOpacity
@@ -533,10 +539,10 @@ const Write = ({ navigation, route }: WriteProp) => {
                 value={writeData.content}
                 autoCapitalize="none"
                 multiline
-                maxLength={301}
+                maxLength={501}
                 textAlignVertical="top"
                 onChangeText={(e) => {
-                  if (e.length > 300) {
+                  if (e.length > 500) {
                     setWriteData({ ...writeData, content: e.slice(0, e.length - 1) });
                   }
                   else {

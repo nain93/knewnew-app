@@ -305,14 +305,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   }, [commentIsEdit]);
 
   useEffect(() => {
-    // const copy: { [index: string]: Array<string> }
-    //   = { ...reviewDetailQuery.data?.tags };
-    // setTags(
-    //   Object.keys(copy).reduce<Array<string>>((acc, cur) => {
-    //     acc = acc.concat(copy[cur]);
-    //     return acc;
-    //   }, [])
-    // );
     if (reviewDetailQuery.data?.tags.interest) {
       setTags(reviewDetailQuery?.data.tags.interest);
     }
@@ -751,6 +743,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
 
   return (
     <Fragment>
+      {/* 이미지 확대 */}
       <ImageGallery
         initialIndex={initialIndex}
         close={closeGallery}
@@ -766,11 +759,13 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
         isBorder={true}
         headerLeft={<LeftArrowIcon onBackClick={() => {
           if (route.path) {
+            // * 공유하기로 들어와서 뒤로가기 눌렀을 경우 home으로 reset
             //@ts-ignore
             navigation.reset({ index: 0, routes: [{ name: "TabNav" }] });
           }
           else {
-            navigation.navigate("Feed");
+            navigation.goBack();
+            // navigation.navigate("Feed");
           }
         }}
           imageStyle={{ width: d2p(11), height: d2p(25) }} />}

@@ -31,6 +31,7 @@ interface ProductDetailType {
   expectedPrice: number,
   link: string,
   bookmarkCount: number,
+  reviews: Array<any>,
   reviewCount: number,
   externalRating: number,
   externalReviewCount: number,
@@ -131,8 +132,10 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
             position: "absolute",
             right: d2p(20),
             bottom: d2p(20),
-            flexDirection: "row", alignItems: "center"
+            flexDirection: "row", alignItems: "center",
+            width: Dimensions.get("window").width - d2p(40)
           }}>
+            <Text style={[FONT.Regular, { color: theme.color.grayscale.eae7ec, marginRight: "auto" }]}>출처</Text>
             <TouchableOpacity onPress={() => console.log("상품 공유하기")}>
               <Image source={shareIcon} style={{ marginRight: d2p(10), width: d2p(26), height: d2p(26) }} />
             </TouchableOpacity>
