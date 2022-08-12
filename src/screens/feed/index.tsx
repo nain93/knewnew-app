@@ -276,8 +276,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
           id: item.id, badge: filterBadge,
           isLike: item.isLike, isBookmark: item.isBookmark
         });
-      }
-      }
+      }}
       style={styles.review}>
       <FeedReview
         idx={index}

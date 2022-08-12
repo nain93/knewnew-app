@@ -41,6 +41,10 @@ export function dateCommentFormat(date: string) {
   return date.slice(0, 4) + '.' + date.slice(5, 7) + '.' + date.slice(8, 10) + ' ' + date.slice(11, 16);
 }
 
+export function dateNormalFormat(date: string) {
+  return date.slice(0, 4) + '-' + date.slice(5, 7) + '-' + date.slice(8, 10);
+}
+
 export async function hasAndroidPermission() {
   const permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
   const hasPermission = await PermissionsAndroid.check(permission);

@@ -472,12 +472,12 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           <>
             <View style={{
               marginTop: h2p(20),
-              marginLeft: d2p(20),
+              marginLeft: d2p(30),
               marginRight: d2p(20),
               borderWidth: 1,
               borderColor: theme.color.grayscale.eae7ec,
               borderRadius: 10,
-              paddingHorizontal: d2p(15),
+              paddingHorizontal: d2p(15)
             }}>
               <ReKnew
                 type="detail"

@@ -183,7 +183,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
         }}>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate("ProductDetail");
+              navigation.navigate("ProductDetail", { id: review.product?.id });
               // navigation.navigate("ProductDetailReady");
             }}
             style={{

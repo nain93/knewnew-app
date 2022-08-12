@@ -2,7 +2,7 @@ import { Dimensions, FlatList, Image, Linking, Pressable, ScrollView, StyleSheet
 import React, { useCallback, useState } from 'react';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
-import { d2p, h2p } from '~/utils';
+import { d2p, dateNormalFormat, h2p } from '~/utils';
 import { FONT } from '~/styles/fonts';
 import theme from '~/styles/theme';
 import { bookmark, circleQuestion, goldStarIcon, graybookmark, settingKnewnew, shareIcon, starIcon } from '~/assets/icons';
@@ -15,6 +15,10 @@ import { getProductDetail } from '~/api/product';
 import { useRecoilValue } from 'recoil';
 import { tokenState } from '~/recoil/atoms';
 import Loading from '~/components/loading';
+import { noProfile, popupBackground2 } from '~/assets/images';
+import { ReviewListType, SatisfactionType } from '~/types/review';
+import { AuthorType } from '~/types';
+import ReadMore from '@fawazahmed/react-native-read-more';
 
 interface ProductDetailProps {
   navigation: NavigationStackProp;
@@ -24,8 +28,11 @@ interface ProductDetailProps {
 }
 
 interface ReviewsType {
+  author: AuthorType,
   id: number,
-  content: string
+  content: string,
+  image?: string,
+  satisfaction: SatisfactionType
 }
 interface ProductDetailType {
   id: number,
@@ -36,27 +43,27 @@ interface ProductDetailType {
   expectedPrice: number,
   link: string,
   bookmarkCount: number,
-  reviews: Array<ReviewsType>,
+  reviews: Array<ReviewListType>,
   reviewCount: number,
   externalRating: number,
   externalReviewCount: number,
   isBookmark: boolean,
-  updated: string
+  updated: string,
+  imageSource: string
 }
 
 const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
   const token = useRecoilValue(tokenState);
   const [rating, setRating] = useState<boolean[]>();
+  const [priceInfoOpen, setPriceInfoOpen] = useState(false);
 
   const productDetailQuery = useQuery<ProductDetailType, Error>(["productDetail", route.params?.id], async () => {
-    const detail = await getProductDetail({ token, id: 12 });
-    return detail;
-    // if (route.params) {
-    //   const detail = await getProductDetail({ token, id: route.params?.id });
-    //   return detail;
-    // }
+    if (route.params) {
+      const detail = await getProductDetail({ token, id: route.params?.id });
+      return detail;
+    }
   }, {
-    // enabled: !!route.params?.id
+    enabled: !!route.params?.id,
     onSuccess: (data) => {
       const rate = [];
       for (let i = 1; i <= 5; i++) {
@@ -70,52 +77,66 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
       }
     }
   });
-
+  console.log(route.params?.id, 'route.params?.id');
+  // console.log(productDetailQuery.data, 'productDetailQuery.data?.reviews');
   const foodLogKey = useCallback((v) => v.id.toString(), []);
   const foodLogRenderItem = useCallback(({ item }: { item: ReviewsType }) => {
     return (
-      <View style={styles.foodLogItem}>
+      <Pressable
+        onPress={() => navigation.navigate("FeedDetail", {
+          authorId: item.author.id,
+          id: item.id,
+        })}
+        style={styles.foodLogItem}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <View style={{
-            width: d2p(20), height: d2p(20),
-            marginRight: d2p(10),
-            borderRadius: 20,
-            borderWidth: 1,
-            borderColor: theme.color.grayscale.e9e7ec
-          }} />
-          <Text style={[FONT.Medium, { marginRight: d2p(5) }]}>열려라참깨</Text>
+          <Image source={item.author.profileImage ? { uri: item.author.profileImage } : noProfile}
+            style={{
+              width: d2p(20), height: d2p(20),
+              marginRight: d2p(10),
+              borderRadius: 20,
+              borderWidth: 1,
+              borderColor: theme.color.grayscale.e9e7ec
+            }} />
+          <Text style={[FONT.Medium, { marginRight: d2p(5) }]}>{item.author.nickname}</Text>
           <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
-            · 비싸도FLEX
+            · {item.author.tags.foodStyle}
           </Text>
         </View>
-        <ReviewIcon review="best" viewStyle={{ marginVertical: h2p(10) }} />
+        <ReviewIcon review={item.satisfaction} viewStyle={{ marginVertical: h2p(10) }} />
         <View style={{ flexDirection: "row" }}>
-          <View style={{
-            marginRight: d2p(5),
-            width: d2p(60), height: d2p(60), borderRadius: 4,
-            borderWidth: 1,
-            borderColor: theme.color.grayscale.e9e7ec
-          }} />
-          <Text
+          {item.image &&
+            <Image
+              source={{ uri: item.image }}
+              style={{
+                marginRight: d2p(5),
+                width: d2p(60), height: d2p(60),
+                borderRadius: 4,
+                borderWidth: 1,
+                borderColor: theme.color.grayscale.e9e7ec,
+              }} />
+          }
+          <ReadMore
+            seeMoreText="더보기 >"
+            expandOnly={true}
+            seeMoreStyle={[FONT.Medium, {
+              color: theme.color.grayscale.a09ca4, fontSize: 12
+            }]}
             numberOfLines={5}
-            style={[FONT.Medium, {
+            onSeeMoreBlocked={() => navigation.navigate("FeedDetail", {
+              authorId: item.author.id,
+              id: item.id,
+            })}
+            style={[{
+              color: theme.color.grayscale.C_79737e,
               lineHeight: 21,
-              width: Dimensions.get("window").width - d2p(155),
-              height: h2p(60),
-              color: theme.color.grayscale.C_79737e
-            }]}>
+              marginTop: 0,
+              marginLeft: item.image ? 0 : d2p(5)
+            }, FONT.Medium]}
+          >
             {item.content}
-          </Text>
-          <Text style={[FONT.Medium, {
-            textAlign: "right",
-            color: theme.color.grayscale.a09ca4, fontSize: 12,
-            position: "absolute", right: 0, bottom: 0,
-            lineHeight: 21
-          }]}>
-            {`더보기 >`}
-          </Text>
+          </ReadMore>
         </View>
-      </View>
+      </Pressable>
     );
   }, []);
 
@@ -140,9 +161,20 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           backgroundColor: theme.color.grayscale.f7f7fc
-        }}
-      >
-        <View style={styles.mainImage}>
+        }}>
+        <View style={[styles.mainImage, {}]}>
+          <FlatList
+            horizontal
+            data={productDetailQuery.data?.images}
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <Image source={{ uri: item }} style={{
+                width: Dimensions.get("window").width,
+                aspectRatio: 1
+              }} />
+            )}
+          />
           <View style={{
             position: "absolute",
             right: d2p(20),
@@ -150,7 +182,9 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
             flexDirection: "row", alignItems: "center",
             width: Dimensions.get("window").width - d2p(40)
           }}>
-            <Text style={[FONT.Regular, { color: theme.color.grayscale.eae7ec, marginRight: "auto" }]}>출처</Text>
+            <Text style={[FONT.Regular, { color: theme.color.grayscale.eae7ec, marginRight: "auto" }]}>
+              출처 {productDetailQuery.data?.imageSource}
+            </Text>
             <TouchableOpacity onPress={() => console.log("상품 공유하기")}>
               <Image source={shareIcon} style={{ marginRight: d2p(10), width: d2p(26), height: d2p(26) }} />
             </TouchableOpacity>
@@ -159,8 +193,9 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
             </TouchableOpacity>
           </View>
         </View>
+
         <View style={styles.productContent}>
-          <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4, marginBottom: h2p(5) }]}>
+          <Text style={[FONT.Bold, { color: theme.color.grayscale.a09ca4, marginBottom: h2p(5) }]}>
             {productDetailQuery.data?.brand}
           </Text>
           <Text style={[FONT.Bold, { fontSize: 18 }]}>
@@ -170,8 +205,9 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
             <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>
               예상가격 {productDetailQuery.data?.expectedPrice}원
             </Text>
-            <Pressable onPress={() => console.log("popup")}>
-              <Image source={circleQuestion} style={{ marginLeft: d2p(7), width: d2p(16), height: d2p(16) }} />
+            <Pressable onPress={() => setPriceInfoOpen(true)}
+              style={{ marginLeft: d2p(7), }}>
+              <Image source={circleQuestion} style={{ width: d2p(16), height: d2p(16) }} />
             </Pressable>
             <TouchableOpacity
               onPress={() => {
@@ -205,6 +241,38 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
             </Text>
           </TouchableOpacity>
         </View>
+
+        {/* ? 팝업 */}
+        {/* {priceInfoOpen &&
+          <QuestionPopup isPopupOpen={priceInfoOpen} setIsPopupOpen={(priceInfo: boolean) => setPriceInfoOpen(priceInfo)}>
+            <>
+              <Image
+                source={popupBackground2}
+                style={{
+                  position: "absolute",
+                  top: h2p(-80),
+                  left: 0,
+                  width: Dimensions.get("window").width - d2p(20),
+                  height: h2p(130),
+                }} />
+              <View style={{
+                position: "absolute", top: h2p(-50), left: d2p(20),
+                width: Dimensions.get("window").width - d2p(60),
+                height: h2p(80)
+              }}>
+                <Text style={[FONT.Regular, { fontSize: 13, color: theme.color.white }]}>
+                  예상가격은 해당 상품을 판매 중인 판매처에서 책정된 가격의 평균 가격입니다.
+                </Text>
+                <Text style={[FONT.Regular, {
+                  fontSize: 13, color: theme.color.white,
+                  marginTop: h2p(20)
+                }]}>
+                  판매처의 상황 및 이벤트 등에 의하여 변경될 수 있습니다.
+                </Text>
+              </View>
+            </>
+          </QuestionPopup>
+        } */}
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -229,7 +297,7 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
               <Image source={circleQuestion} style={{ marginLeft: d2p(7), width: d2p(16), height: d2p(16) }} />
             </Pressable>
             <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4, marginLeft: "auto" }]}>
-              2022-08-01 기준
+              {productDetailQuery.data && dateNormalFormat(productDetailQuery.data?.updated)} 기준
             </Text>
           </View>
           <View style={{
@@ -284,7 +352,7 @@ const styles = StyleSheet.create({
   mainImage: {
     width: Dimensions.get("window").width,
     aspectRatio: 1,
-    backgroundColor: theme.color.white
+    backgroundColor: theme.color.white,
   },
   productContent: {
     paddingHorizontal: d2p(20),

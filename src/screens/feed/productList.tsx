@@ -1,5 +1,5 @@
 import { Dimensions, FlatList, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import FeedReview from '~/components/review/feedReview';
@@ -14,9 +14,15 @@ import { useInfiniteQuery } from 'react-query';
 import { getReviewList } from '~/api/review';
 import { useRecoilValue } from 'recoil';
 import { tokenState } from '~/recoil/atoms';
-import { reactList } from '~/utils/constant';
+import { hitslop, reactList } from '~/utils/constant';
 import { loading } from '~/assets/gif';
 import Loading from '~/components/loading';
+import CustomBottomSheet from '~/components/popup/CustomBottomSheet';
+import RBSheet from 'react-native-raw-bottom-sheet';
+import CloseIcon from '~/components/icon/closeIcon';
+import ReactionLayout from '~/components/layout/ReactionLayout';
+import ResetButton from '~/components/button/resetButton';
+import BasicButton from '~/components/button/basicButton';
 
 interface ProductListProps {
   navigation: NavigationStackProp;
@@ -28,6 +34,8 @@ interface ProductListProps {
 const ProductList = ({ navigation, route }: ProductListProps) => {
   const token = useRecoilValue(tokenState);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const reactRefRBSheet = useRef<RBSheet>(null);
+  const sortRefSheet = useRef<RBSheet>(null);
   const [sort, setSort] = useState<"0" | "1">("0");
   const [sortReact, setSortReact] = useState<string[]>();
   const [clickedReact, setClickReact] = useState<Array<{
@@ -71,7 +79,15 @@ const ProductList = ({ navigation, route }: ProductListProps) => {
         justifyContent: "space-between"
       }}>
         <TouchableOpacity
-          onPress={() => console.log("filter")}
+          onPress={() => {
+            if (sortReact && sortReact.length > 0) {
+              setClickReact(clickedReact.map(v => ({ ...v, isClick: false })));
+              setSortReact([]);
+            }
+            else {
+              reactRefRBSheet.current?.open();
+            }
+          }}
           style={[styles.filterTag, {
             backgroundColor: (sortReact && sortReact.length > 0) ? theme.color.grayscale.C_443e49 : theme.color.white,
           }]}>
@@ -88,17 +104,30 @@ const ProductList = ({ navigation, route }: ProductListProps) => {
           }
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => console.log("filter")}
+          hitSlop={hitslop}
+          onPress={() => {
+            setSelectedIndex(-1);
+            sortRefSheet.current?.open();
+          }}
+          style={{ flexDirection: "row", alignItems: "center" }}
         >
-          <Text style={[FONT.Regular, { fontSize: 12 }]}>{`최신순 >`}</Text>
+          <Text style={[FONT.Regular, { fontSize: 12, marginRight: d2p(5) }]}>
+            {sort === "0" ? "최신순" : "인기순"}
+          </Text>
+          <Image source={leftArrow} style={{ width: d2p(7), height: d2p(15), transform: [{ rotate: "270deg" }] }} />
         </TouchableOpacity>
       </View>
     </View>
-  ), []);
+  ), [sortReact]);
 
   const foodLogRenderItem = useCallback(({ item, index }) =>
     <Pressable
-      onPress={() => console.log("상세")}
+      onPress={() =>
+        navigation.navigate("FeedDetail", {
+          authorId: item.author.id,
+          id: item.id,
+          isLike: item.isLike, isBookmark: item.isBookmark
+        })}
       style={styles.review}>
       <FeedReview
         idx={index}
@@ -126,23 +155,104 @@ const ProductList = ({ navigation, route }: ProductListProps) => {
       <Header
         headerLeft={<LeftArrowIcon />}
         title="푸드로그 전체보기" />
-      <FlatList
-        ListHeaderComponent={foodLogHeader}
-        renderItem={foodLogRenderItem}
-        data={reviewListQuery.data?.pages.flat()}
-        keyExtractor={foodLogKey}
-        onEndReachedThreshold={0.5}
-        maxToRenderPerBatch={5}
-        windowSize={5}
-        removeClippedSubviews={true}
-        showsVerticalScrollIndicator={false}
-        ListFooterComponent={reviewListQuery.isFetchingNextPage ? footerLoading : reviewFooter}
-        style={{
-          marginTop: 0,
-          // marginBottom: h2p(80),
-          backgroundColor: theme.color.grayscale.f7f7fc
-        }}
-      />
+      <Pressable onPress={() => setSelectedIndex(-1)}>
+        <FlatList
+          ListHeaderComponent={foodLogHeader}
+          renderItem={foodLogRenderItem}
+          data={reviewListQuery.data?.pages.flat()}
+          keyExtractor={foodLogKey}
+          onEndReachedThreshold={0.5}
+          maxToRenderPerBatch={5}
+          windowSize={5}
+          removeClippedSubviews={true}
+          showsVerticalScrollIndicator={false}
+          ListFooterComponent={reviewListQuery.isFetchingNextPage ? footerLoading : reviewFooter}
+          style={{
+            marginTop: 0,
+            // marginBottom: h2p(80),
+            backgroundColor: theme.color.grayscale.f7f7fc
+          }}
+        />
+      </Pressable>
+      {/* 반응별 sheet */}
+      <CustomBottomSheet
+        height={Dimensions.get("window").height - h2p(480)}
+        sheetRef={reactRefRBSheet}
+        onOpen={() => {
+          setSelectedIndex(-1);
+          setClickReact(clickedReact.map(v => {
+            if (sortReact?.includes(v.title)) {
+              return { ...v, isClick: true };
+            }
+            return { ...v, isClick: false };
+          }));
+        }
+        }
+      >
+        <>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: d2p(10), marginBottom: h2p(30) }}>
+            <CloseIcon onPress={() => reactRefRBSheet.current?.close()}
+              imageStyle={{ width: d2p(15), height: h2p(15) }} />
+            <Text style={[{ fontSize: 16, marginRight: d2p(15) }, FONT.Bold]}>반응별로 보기</Text>
+            <View />
+          </View>
+          <ReactionLayout
+            clickedReact={clickedReact}
+            setClickReact={(react: {
+              title: SatisfactionType,
+              isClick: boolean
+            }[]) => setClickReact(react)}
+          />
+          <ResetButton resetClick={() => setClickReact(clickedReact.map(v => ({
+            title: v.title, isClick: false
+          })))}
+            viewStyle={{ marginTop: h2p(40), marginBottom: "auto" }} />
+          <BasicButton text="필터 저장하기"
+            onPress={() => {
+              setSortReact(clickedReact.filter(v => v.isClick).map(v => v.title));
+              reviewListQuery.refetch();
+              reactRefRBSheet.current?.close();
+            }}
+            bgColor={theme.color.main}
+            textColor={theme.color.white}
+          />
+        </>
+      </CustomBottomSheet>
+
+      {/* 최신순 sheet */}
+      <CustomBottomSheet
+        sheetRef={sortRefSheet}
+        height={Dimensions.get("window").height - h2p(600)}
+      >
+        <>
+          <TouchableOpacity
+            onPress={() => {
+              setSort("0");
+              sortRefSheet.current?.close();
+            }}
+            style={{
+              paddingVertical: h2p(12.5), paddingHorizontal: d2p(10),
+              borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc
+            }}>
+            <Text style={[FONT.Regular, {
+              color: sort === "0" ? theme.color.black : theme.color.grayscale.a09ca4
+            }]}>최신순</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setSort("1");
+              sortRefSheet.current?.close();
+            }}
+            style={{
+              paddingVertical: h2p(12.5), paddingHorizontal: d2p(10),
+              borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc
+            }}>
+            <Text style={[FONT.Regular, {
+              color: sort === "1" ? theme.color.black : theme.color.grayscale.a09ca4
+            }]}>인기순</Text>
+          </TouchableOpacity>
+        </>
+      </CustomBottomSheet>
     </>
   );
 };
