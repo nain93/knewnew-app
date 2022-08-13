@@ -329,7 +329,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             userId={reviewDetailQuery.data?.author.id}
             isMoreClick={isMoreClick}
             type="review"
-            isGobacK={() => navigation.goBack()}
+            isGoback={() => navigation.goBack()}
             handleCloseMore={() => setIsMoreClick(false)}
           />
         }

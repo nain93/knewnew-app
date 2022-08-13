@@ -15,6 +15,8 @@ import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { getFocusedRouteNameFromRoute, useRoute } from '@react-navigation/native';
 import BeforeWrite from '~/screens/write/beforeWrite';
+import Home from '~/screens/home';
+import HomeStackNav from '~/navigators/homeStackNav';
 
 const Tabs = createBottomTabNavigator();
 
@@ -67,15 +69,10 @@ const TabNavigator = () => {
         backgroundColor: theme.color.white,
       }}
     >
+      {/* todo stack 네비게이터로변경 */}
       <Tabs.Screen
-        name="Feed"
-        component={Feed}
-        listeners={({ navigation }) => ({
-          tabPress: e => {
-            e.preventDefault();
-            navigation.navigate('Feed', { refresh: routeName === "Feed" ? true : false });
-          },
-        })}
+        name="HomeStackNav"
+        component={HomeStackNav}
         options={{
           tabBarLabel: "홈",
           headerShown: false,

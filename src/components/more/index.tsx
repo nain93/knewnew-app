@@ -20,11 +20,11 @@ interface MoreProps {
   filterBadge?: string,
   handleCloseMore: () => void,
   clickBoxStyle?: ViewStyle,
-  isGobacK?: () => void,
+  isGoback?: () => void,
   setSelectedIndex?: (idx: number) => void
 }
 
-const More = ({ setSelectedIndex, isGobacK, handleCloseMore, userId, isMoreClick, type, review, filterBadge, clickBoxStyle }: MoreProps) => {
+const More = ({ setSelectedIndex, isGoback, handleCloseMore, userId, isMoreClick, type, review, filterBadge, clickBoxStyle }: MoreProps) => {
   const navigation = useNavigation<StackNavigationProp>();
   const myId = useRecoilValue(myIdState);
   const token = useRecoilValue(tokenState);
@@ -35,8 +35,8 @@ const More = ({ setSelectedIndex, isGobacK, handleCloseMore, userId, isMoreClick
   const deleteMutation = useMutation("deleteReview",
     (id: number) => deleteReview(token, id), {
     onSuccess: () => {
-      if (isGobacK) {
-        isGobacK();
+      if (isGoback) {
+        isGoback();
       }
     }
   });
@@ -47,8 +47,8 @@ const More = ({ setSelectedIndex, isGobacK, handleCloseMore, userId, isMoreClick
       queryClient.invalidateQueries("reviewList");
       queryClient.invalidateQueries("userBookmarkList");
       setIspopupOpen({ isOpen: true, content: "차단되었습니다." });
-      if (isGobacK) {
-        isGobacK();
+      if (isGoback) {
+        isGoback();
       }
     }
   });

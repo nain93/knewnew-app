@@ -62,7 +62,6 @@ const Write = ({ navigation, route }: WriteProp) => {
 
   const [interestTag, setInterestTag] = useState<InterestTagType>(interestTagData);
   const inputRef = useRef<TextInput>(null);
-  const [keyboardHeight, setKeyBoardHeight] = useState(0);
   const queryClient = useQueryClient();
   const token = useRecoilValue(tokenState);
   const [blockSubmit, setBlockSubmit] = useState(false);
@@ -224,30 +223,6 @@ const Write = ({ navigation, route }: WriteProp) => {
     }
   }, [route.params]);
 
-  useEffect(() => {
-    if (Platform.OS === "ios") {
-      Keyboard.addListener("keyboardWillShow", (e) => {
-        setKeyBoardHeight(e.endCoordinates.height);
-      });
-      Keyboard.addListener("keyboardWillHide", () => {
-        setKeyBoardHeight(h2p(20));
-      });
-    }
-    else {
-      Keyboard.addListener("keyboardDidShow", (e) => {
-        if ((route.params?.type === "reKnewWrite" || route.params?.type === "reknew")) {
-          setKeyBoardHeight(e.endCoordinates.height - 50);
-        }
-        else {
-          setKeyBoardHeight(e.endCoordinates.height);
-        }
-      });
-      Keyboard.addListener("keyboardDidHide", () => {
-        setKeyBoardHeight(h2p(20));
-      });
-    }
-  }, [route.params?.type]);
-
   const openPicker = async () => {
     try {
       const response = await MultipleImagePicker.openPicker({
@@ -396,7 +371,7 @@ const Write = ({ navigation, route }: WriteProp) => {
                 <Text style={[FONT.Regular, {
                   fontSize: 12,
                   color: writeData.content.length === 500 ? theme.color.main : theme.color.grayscale.a09ca4
-                }]}>  ({writeData.content.length}/500)</Text>
+                }]}>  ({writeData.content.length}/500자)</Text>
               </Text>
             </View>
             <Pressable onPress={() => inputRef.current?.focus()}
@@ -491,7 +466,7 @@ const Write = ({ navigation, route }: WriteProp) => {
                 <Text style={[FONT.Regular, {
                   fontSize: 12,
                   color: writeData.content.length === 500 ? theme.color.main : theme.color.grayscale.a09ca4
-                }]}>  ({writeData.content.length}/500)</Text>
+                }]}>  ({writeData.content.length}/500자)</Text>
               </Text>
               {route.params?.isEdit &&
                 <TouchableOpacity
