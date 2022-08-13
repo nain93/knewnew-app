@@ -16,12 +16,13 @@ import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import BasicButton from '~/components/button/basicButton';
 import { ReviewListType } from '~/types/review';
-import { graywrite } from '~/assets/icons';
+import { bookmark, graybookmark, graywrite } from '~/assets/icons';
 import FastImage from 'react-native-fast-image';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import CustomBottomSheet from '~/components/popup/CustomBottomSheet';
 import FollowBottomTab from '~/screens/mypage/followBottomTab';
 import CloseIcon from '~/components/icon/closeIcon';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface MypageProps {
   navigation: NavigationStackProp;
@@ -40,7 +41,6 @@ const Mypage = ({ navigation, route }: MypageProps) => {
   const reviewRef = useRef<FlatList>(null);
   const bookmarkRef = useRef<FlatList>(null);
   const queryClient = useQueryClient();
-
   const followRef = useRef<RBSheet>(null);
 
   const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", route.params?.id], async () => {
@@ -442,17 +442,18 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     <>
       <Tabs.Container
         onIndexChange={setIndex}
+        initialTabName={`작성 글 ${getMyProfileQuery.data?.reviewCount}`}
         containerStyle={styles.container}
         renderTabBar={(props) => <MaterialTabBar
           contentContainerStyle={{ paddingBottom: h2p(4.5), paddingTop: h2p(20) }}
           indicatorStyle={{
             height: 2,
             backgroundColor: theme.color.black,
-            marginBottom: d2p(-1),
+            marginBottom: d2p(-1)
           }} TabItemComponent={(tabs) => (
             <Pressable
               onPress={() => props.onTabPress(tabs.label)}
-              style={{ width: Dimensions.get("window").width / 2 }}>
+              style={{ width: Dimensions.get("window").width / 3 }}>
               <Text style={[{
                 fontSize: 16,
                 textAlign: "center"
@@ -500,6 +501,58 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             data={userBookmarkListQuery.data?.pages.flat()}
             renderItem={bookmarkRenderItem}
             keyExtractor={bookmarkKey}
+          />
+        </Tabs.Tab>
+        <Tabs.Tab name={`담은 상품 ${getMyProfileQuery.data?.bookmarkCount}`}>
+          <Tabs.FlatList
+            ref={bookmarkRef}
+            ListHeaderComponent={Platform.OS === "android" ? bookmarkHeader : null}
+            ListEmptyComponent={bookmarkEmpty}
+            onEndReached={bookmarkEndReached}
+            onEndReachedThreshold={0.5}
+            maxToRenderPerBatch={5}
+            windowSize={5}
+            removeClippedSubviews={true}
+            refreshing={userBookmarkListQuery.isLoading}
+            onRefresh={bookmarkRefresh}
+            showsVerticalScrollIndicator={false}
+            ListFooterComponent={bookmarkFooter}
+            style={{ paddingHorizontal: d2p(20) }}
+            // data={userBookmarkListQuery.data?.pages.flat()}
+            // keyExtractor={bookmarkKey}
+            data={["zz", "aa", "cc"]}
+            renderItem={({ item }) => (
+              <View style={{
+                marginTop: h2p(30),
+                flexDirection: "row",
+                alignItems: "center"
+              }}>
+                <View
+                  style={{
+                    width: d2p(70), height: d2p(70),
+                    borderRadius: 5, borderWidth: 1,
+                    borderColor: theme.color.grayscale.eae7ec,
+                    marginRight: d2p(10)
+                  }}
+                />
+                <View>
+                  <View style={{
+                    flexDirection: "row",
+                    width: Dimensions.get("window").width - d2p(120),
+                    alignItems: "center", justifyContent: "space-between"
+                  }}>
+                    <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4 }]}>
+                      스위트베네
+                    </Text>
+                    <Image source={graybookmark} style={{ width: d2p(26), height: d2p(26) }} />
+                  </View>
+                  <Text style={[FONT.Bold, { fontSize: 16 }]}>탄단지 고구마를 품은 닭가슴살</Text>
+                  <Text style={[FONT.Regular, { marginTop: h2p(9), color: theme.color.grayscale.C_443e49 }]}>
+                    예상가격 3,500원
+                  </Text>
+                </View>
+              </View>
+            )}
           />
         </Tabs.Tab>
       </Tabs.Container>

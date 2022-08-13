@@ -6,8 +6,7 @@ export interface WriteImagesType {
   image: string,
 }
 
-export type MarketType = "네이버스토어" | "마켓컬리" | "쿠팡프레시" | "SSG" | "B마트" | "윙잇"
-// "기타 (직접 입력)"
+export type MarketType = "네이버스토어" | "마켓컬리" | "쿠팡프레시" | "SSG" | "B마트" | "윙잇" | string
 
 export type SatisfactionType = "good" | "bad" | "best" | "question" | ""
 

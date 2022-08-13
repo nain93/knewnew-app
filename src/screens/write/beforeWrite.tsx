@@ -1,10 +1,10 @@
-import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { FONT } from '~/styles/fonts';
 import theme from '~/styles/theme';
 import ReactionLayout from '~/components/layout/ReactionLayout';
 import { marketList, reactList } from '~/utils/constant';
-import { ReactionType, WriteReviewType } from '~/types/review';
+import { SatisfactionType, WriteReviewType } from '~/types/review';
 import { d2p, h2p } from '~/utils';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
@@ -29,7 +29,7 @@ interface BeforeWriteProp {
 const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
   const marketRefRBSheet = useRef<RBSheet>(null);
   const [clickedReact, setClickReact] = useState<Array<{
-    title: ReactionType,
+    title: SatisfactionType,
     isClick: boolean
   }>>(reactList.map(v => {
     return { title: v, isClick: false };
@@ -45,6 +45,10 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
     }
   });
   const [interestTag, setInterestTag] = useState<InterestTagType>(interestTagData);
+  const [etcInputOpen, setEtcInputOpen] = useState(false);
+  const [etcMarket, setEtcMarket] = useState("");
+  const etcInputRef = useRef<TextInput>(null);
+  const bottomScrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     if (route.params?.stateReset) {
@@ -89,7 +93,7 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
             multiSelect={false}
             clickedReact={clickedReact}
             setClickReact={(react: {
-              title: ReactionType,
+              title: SatisfactionType,
               isClick: boolean
             }[]) => setClickReact(react)}
           />
@@ -138,7 +142,8 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
       </View>
       <CustomBottomSheet
         sheetRef={marketRefRBSheet}
-        height={Dimensions.get("window").height - h2p(380)}
+        height={Dimensions.get("window").height - h2p(340)}
+        onClose={() => setEtcInputOpen(false)}
       >
         <>
           <View style={{
@@ -151,10 +156,20 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
             <View />
           </View>
           <ScrollView
+            keyboardShouldPersistTaps="always"
+            ref={bottomScrollRef}
             showsVerticalScrollIndicator={false}>
             {React.Children.toArray(marketList.map((market) =>
               <TouchableOpacity
                 onPress={() => {
+                  if (market === "기타 (직접 입력)") {
+                    setEtcInputOpen(true);
+                    setTimeout(() => {
+                      etcInputRef.current?.focus();
+                      bottomScrollRef.current?.scrollToEnd();
+                    }, 100);
+                    return;
+                  }
                   setWriteData({ ...writeData, market });
                   marketRefRBSheet.current?.close();
                 }}
@@ -162,9 +177,33 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
                   paddingVertical: h2p(12.5), paddingHorizontal: d2p(10),
                   borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc
                 }}>
-                <Text style={FONT.Medium}>{market}</Text>
+                <Text style={[(market === "기타 (직접 입력)" && etcInputOpen) ? FONT.Bold : FONT.Medium, {
+                  color: (market === "기타 (직접 입력)" && etcInputOpen) ? theme.color.main : theme.color.black
+                }]}>{market}</Text>
               </TouchableOpacity>
             ))}
+            {etcInputOpen &&
+              <>
+                <TextInput
+                  onChangeText={(e) => setEtcMarket(e)}
+                  ref={etcInputRef}
+                  autoCapitalize="none"
+                  style={[FONT.Regular, {
+                    fontSize: 16,
+                    paddingVertical: h2p(12.5), paddingHorizontal: d2p(10),
+                    borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc,
+                    color: theme.color.black
+                  }]}
+                  placeholder="구매하신 사이트명을 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
+                <BasicButton
+                  onPress={() => {
+                    setWriteData({ ...writeData, market: etcMarket });
+                    marketRefRBSheet.current?.close();
+                  }}
+                  viewStyle={{ marginVertical: h2p(20) }}
+                  text="필터 저장하기" bgColor={theme.color.main} textColor={theme.color.white} />
+              </>
+            }
           </ScrollView>
         </>
       </CustomBottomSheet>

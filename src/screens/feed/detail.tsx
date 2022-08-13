@@ -124,7 +124,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           navigation.goBack();
         }
       }
-    },
+    }
   });
 
   const likeReviewMutation = useMutation('likeReview',
