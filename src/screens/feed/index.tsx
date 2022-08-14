@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, FlatList, Dimensions, TouchableOpacity, Animated, Pressable, AppState, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Text, View, Image, FlatList, Dimensions, TouchableOpacity, Pressable } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
@@ -18,10 +18,9 @@ import { FoodLogType, MarketType, ReviewListType, SatisfactionType } from '~/typ
 import { FONT } from '~/styles/fonts';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
-import SplashScreen from 'react-native-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { loading } from '~/assets/gif';
-import { hitslop, marketList, reactList } from '~/utils/constant';
+import { hitslop, markeForFiltertList, marketList, reactList } from '~/utils/constant';
 import CloseIcon from '~/components/icon/closeIcon';
 import ResetButton from '~/components/button/resetButton';
 import BasicButton from '~/components/button/basicButton';
@@ -35,7 +34,8 @@ export interface FeedProps {
   navigation: NavigationStackProp;
   route: NavigationRoute<{
     refresh: boolean,
-    foodLog?: FoodLogType | "all"
+    foodLog?: FoodLogType | "all",
+    market?: MarketType
   }>;
 }
 
@@ -48,6 +48,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const isNotiRead = useRecoilValue(isNotiReadState);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [filterBadge, setFilterBadge] = useState("");
+  const [marketFilter, setMarketFilter] = useState("");
   const flatListRef = useRef<FlatList>(null);
 
   const [sort, setSort] = useState<"0" | "1">("0");
@@ -56,7 +57,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const [clickedMarket, setClickMarket] = useState<Array<{
     title: MarketType,
     isClick: boolean
-  }>>(marketList.map(v => {
+  }>>(markeForFiltertList.map(v => {
     return { title: v, isClick: false };
   }));
   const [clickedReact, setClickReact] = useState<Array<{
@@ -90,10 +91,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
     });
     return queryData;
   }, {
-    getNextPageParam: (next, all) => all.flat().length ?? undefined,
-    onSettled: () => {
-      SplashScreen.hide();
-    }
+    getNextPageParam: (next, all) => all.flat().length ?? undefined
   });
 
   const reviewKey = useCallback((review) => String(review.id), []);
@@ -236,6 +234,15 @@ const Feed = ({ navigation, route }: FeedProps) => {
     , [filterBadge, selectedIndex]);
 
   useEffect(() => {
+    if (route.params?.market) {
+      setClickMarket(clickedMarket.map(v => {
+        if (v.title === route.params?.market) {
+          return { ...v, isClick: true };
+        }
+        return v;
+      }));
+      setSortMarket([route.params.market]);
+    }
     if (route.params?.foodLog) {
       if (route.params.foodLog === "all") {
         setFilterBadge("");
@@ -381,7 +388,6 @@ const Feed = ({ navigation, route }: FeedProps) => {
         sheetRef={marketRefRBSheet}
         height={Dimensions.get("window").height - h2p(456)}
         onOpen={() => {
-
           setSelectedIndex(-1);
           setClickMarket(clickedMarket.map(v => {
             if (sortMarket?.includes(v.title)) {

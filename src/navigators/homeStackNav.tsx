@@ -24,6 +24,7 @@ const HomeStackNav = () => {
         options={{
           title: "",
           headerShown: false,
+          cardStyle: { backgroundColor: theme.color.grayscale.f7f7fc }
         }}
         component={Home}
       />

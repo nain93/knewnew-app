@@ -81,9 +81,6 @@ const App = () => {
     if (storageToken) {
       setToken(storageToken);
     }
-    else {
-      SplashScreen.hide();
-    }
   };
 
   useEffect(() => {
@@ -92,6 +89,7 @@ const App = () => {
     versionCheck();
     // * 코드푸시 업데이트 체크
     installUpdateIfAvailable();
+    SplashScreen.hide();
   }, []);
 
   const linking = {

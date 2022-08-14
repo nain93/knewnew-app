@@ -8,7 +8,7 @@ export interface WriteImagesType {
 
 export type FoodLogType = "빵식가" | "애주가" | "디저트러버" | "캠퍼" | "오늘한끼" | "다이어터" | "비건" | "홈카페" | "신상탐험대"
 
-export type MarketType = "네이버스토어" | "마켓컬리" | "쿠팡프레시" | "SSG" | "B마트" | "윙잇" | string
+export type MarketType = "네이버 쇼핑" | "마켓컬리" | "쿠팡프레시" | "SSG" | "B마트" | "윙잇" | string
 
 export type SatisfactionType = "good" | "bad" | "best" | "question" | ""
 

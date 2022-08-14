@@ -69,7 +69,6 @@ const TabNavigator = () => {
         backgroundColor: theme.color.white,
       }}
     >
-      {/* todo stack 네비게이터로변경 */}
       <Tabs.Screen
         name="HomeStackNav"
         component={HomeStackNav}

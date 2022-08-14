@@ -115,7 +115,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
         setCart(data.isBookmark);
       }
     },
-    onSettled: () => SplashScreen.hide(),
     onError: (error) => {
       if (axios.isAxiosError(error) && error.response) {
         //@ts-ignore
