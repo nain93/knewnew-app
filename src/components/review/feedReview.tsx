@@ -45,7 +45,6 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
   const [isBookmarkState, setIsBookmarkState] = useState<boolean>(review.isBookmark);
   const [bookmarkCount, setBookmarkCount] = useState(review.bookmarkCount);
   const [apiBlock, setApiBlock] = useState(false);
-
   const bookmarkMutation = useMutation("bookmark",
     ({ id, isBookmark }: { id: number, isBookmark: boolean }) => bookmarkReview(token, id, isBookmark), {
     onSuccess: async () => {
@@ -102,7 +101,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
   }, [review.isBookmark]);
 
   useEffect(() => {
-    setTags(review.tags.interest);
+    setTags(review.tags?.interest);
   }, [review.tags]);
 
   return (
@@ -119,18 +118,18 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
             marginRight: d2p(10)
           }}>
-          <FastImage resizeMode="cover" source={review.author.profileImage ? { uri: review.author.profileImage } : noProfile}
+          <FastImage resizeMode="cover" source={review.author?.profileImage ? { uri: review.author.profileImage } : noProfile}
             style={{ width: d2p(20), height: d2p(20) }} />
         </TouchableOpacity>
 
         <View style={{ width: Dimensions.get('window').width - d2p(80) }}>
           <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap" }}>
             <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: review.author.id })}>
-              <Text style={[styles.title, FONT.Medium]}>{review.author.nickname}</Text>
+              <Text style={[styles.title, FONT.Medium]}>{review.author?.nickname}</Text>
             </TouchableOpacity>
             {/* todo 뱃지 추가 */}
             <Text style={[FONT.Regular, { fontSize: 13, color: theme.color.grayscale.a09ca4 }]}>
-              · {review.author.tags?.foodStyle}
+              · {review.author?.tags?.foodStyle}
             </Text>
           </View>
         </View>
@@ -182,10 +181,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           marginBottom: h2p(10)
         }}>
           <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("ProductDetail", { id: review.product?.id });
-              // navigation.navigate("ProductDetailReady");
-            }}
+            onPress={() => navigation.navigate("ProductDetail", { id: review.product?.id })}
             style={{
               backgroundColor: "rgba(234,231,236,0.4)",
               paddingHorizontal: d2p(5),
@@ -232,7 +228,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
 
       {
         (() => {
-          switch (review.images.length) {
+          switch (review.images?.length) {
             // * 사진 없음
             case 0: {
               return null;
@@ -276,7 +272,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
               return (
                 <View
                   style={[styles.imageWrap, { borderWidth: 0, flexDirection: "row" }]}>
-                  {React.Children.toArray(review.images.slice(0, 3).map((v, i) => (
+                  {React.Children.toArray(review.images?.slice(0, 3).map((v, i) => (
                     <View>
                       <FastImage
                         source={{ uri: v.image, priority: FastImage.priority.high }} style={{
@@ -392,7 +388,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           clickBoxStyle={clickBoxStyle}
           review={review}
           filterBadge={filterBadge}
-          userId={review.author.id}
+          userId={review.author?.id}
           isMoreClick={selectedIndex === idx}
           type="review"
           handleCloseMore={() => {

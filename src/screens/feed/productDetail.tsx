@@ -10,12 +10,12 @@ import ReviewIcon from '~/components/icon/reviewIcon';
 import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
-import { useQuery } from 'react-query';
-import { getProductDetail } from '~/api/product';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { getProductDetail, productBookmark } from '~/api/product';
 import { useRecoilValue } from 'recoil';
 import { tokenState } from '~/recoil/atoms';
 import Loading from '~/components/loading';
-import { noProfile, popupBackground2 } from '~/assets/images';
+import { noProfile } from '~/assets/images';
 import { ReviewListType, SatisfactionType } from '~/types/review';
 import { AuthorType } from '~/types';
 import ReadMore from '@fawazahmed/react-native-read-more';
@@ -42,7 +42,8 @@ interface ProductDetailType {
   name: string,
   expectedPrice: number,
   link: string,
-  bookmarkCount: number,
+  reviewBookmarkCount: number,
+  productBookmarkCount: number,
   reviews: Array<ReviewListType>,
   reviewCount: number,
   externalRating: number,
@@ -53,9 +54,12 @@ interface ProductDetailType {
 }
 
 const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
+  const queryClient = useQueryClient();
   const token = useRecoilValue(tokenState);
   const [rating, setRating] = useState<boolean[]>();
   const [priceInfoOpen, setPriceInfoOpen] = useState(false);
+  const [isBookmark, setIsBookmark] = useState(false);
+  const [apiBlock, setApiBlock] = useState(false);
 
   const productDetailQuery = useQuery<ProductDetailType, Error>(["productDetail", route.params?.id], async () => {
     if (route.params) {
@@ -65,6 +69,7 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
   }, {
     enabled: !!route.params?.id,
     onSuccess: (data) => {
+      setIsBookmark(data.isBookmark);
       const rate = [];
       for (let i = 1; i <= 5; i++) {
         if (Math.floor(data.externalRating) < i) {
@@ -77,8 +82,20 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
       }
     }
   });
-  console.log(route.params?.id, 'route.params?.id');
-  // console.log(productDetailQuery.data, 'productDetailQuery.data?.reviews');
+
+  const productBookmarkMutation = useMutation(["productBookmark", route.params?.id], async (isBookmarkProp: boolean) => {
+    if (route.params) {
+      const bookmarkData = await productBookmark({ token, id: route.params.id, isBookmark: isBookmarkProp });
+      return bookmarkData;
+    }
+  }, {
+    onSuccess: async () => {
+      queryClient.invalidateQueries("productDetail");
+      queryClient.invalidateQueries("userProductBookmark");
+    },
+    onSettled: () => setApiBlock(false)
+  });
+
   const foodLogKey = useCallback((v) => v.id.toString(), []);
   const foodLogRenderItem = useCallback(({ item }: { item: ReviewsType }) => {
     return (
@@ -188,8 +205,14 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
             <TouchableOpacity onPress={() => console.log("상품 공유하기")}>
               <Image source={shareIcon} style={{ marginRight: d2p(10), width: d2p(26), height: d2p(26) }} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => console.log("상품 북마크")}>
-              <Image source={productDetailQuery.data?.isBookmark ? graybookmark : bookmark} style={{ width: d2p(26), height: d2p(26) }} />
+            <TouchableOpacity onPress={() => {
+              if (!apiBlock) {
+                setIsBookmark(!isBookmark);
+                setApiBlock(true);
+                productBookmarkMutation.mutate(!isBookmark);
+              }
+            }}>
+              <Image source={isBookmark ? graybookmark : bookmark} style={{ width: d2p(26), height: d2p(26) }} />
             </TouchableOpacity>
           </View>
         </View>

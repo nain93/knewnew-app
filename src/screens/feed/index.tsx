@@ -69,11 +69,6 @@ const Feed = ({ navigation, route }: FeedProps) => {
 
   const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", token, filterBadge], () => getMyProfile(token), {
     enabled: !!token,
-    onSuccess: (data) => {
-      if (data) {
-        setMyId(data.id);
-      }
-    },
     onError: () => {
       setToken("");
       AsyncStorage.removeItem("token");

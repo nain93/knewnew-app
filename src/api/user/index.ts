@@ -178,7 +178,22 @@ interface GetUserBookmarkListType {
 }
 
 export const getUserBookmarkList = async ({ token, id, offset, limit }: GetUserBookmarkListType) => {
-  const res = await axios.get(baseURL + `user/${id}/bookmarks/`, {
+  const res = await axios.get(baseURL + `user/${id}/bookmark/review/`, {
+    params: {
+      offset,
+      limit
+    },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+  if (res) {
+    return res.data;
+  }
+};
+
+export const getUserProductBookmarkList = async ({ token, id, offset, limit }: GetUserBookmarkListType) => {
+  const res = await axios.get(baseURL + `user/${id}/bookmark/product/`, {
     params: {
       offset,
       limit

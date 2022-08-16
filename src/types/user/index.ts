@@ -51,7 +51,8 @@ export interface MyProfileType {
   tags: UserInfoTagType,
   created: string,
   reviewCount: number,
-  bookmarkCount: number,
+  reviewBookmarkCount: number,
+  productBookmarkCount: number,
   remainingPeriod: number,
   isNotifiable: boolean,
   isMarketing: boolean

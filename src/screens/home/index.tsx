@@ -8,12 +8,16 @@ import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import theme from '~/styles/theme';
 import { noticeIcon } from '~/assets/icons';
-import { isNotiReadState } from '~/recoil/atoms';
-import { useRecoilValue } from 'recoil';
+import { isNotiReadState, myIdState, tokenState } from '~/recoil/atoms';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { FONT } from '~/styles/fonts';
 import { beerFoodlog, begunFoodlog, breadFoodlog, cafeFoodlog, cakeFoodlog, campFoodlog, coupangImage, dieterFoodlog, etcImage, kurlyImage, naverImage, newFoodlog, riceFoodlog, ssgImage } from '~/assets/images/home';
 import { interestTagData } from '~/utils/data';
 import { fireImg } from '~/assets/images';
+import { useQuery } from 'react-query';
+import { getMyProfile } from '~/api/user';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MyProfileType } from '~/types/user';
 
 export interface HomeProps {
   navigation: NavigationStackProp;
@@ -22,8 +26,25 @@ export interface HomeProps {
 
 const dummy = ["zz", "cc", "bb"];
 const Home = ({ navigation }: HomeProps) => {
+  const [token, setToken] = useRecoilState(tokenState);
+  const setMyId = useSetRecoilState(myIdState);
   const isNotiRead = useRecoilValue(isNotiReadState);
   const [scrollIdx, setScrollIdx] = useState(0);
+
+  useQuery<MyProfileType, Error>(["myProfile", token], () => getMyProfile(token), {
+    enabled: !!token,
+    onSuccess: (data) => {
+      if (data) {
+        setMyId(data.id);
+      }
+    },
+    onError: () => {
+      setToken("");
+      AsyncStorage.removeItem("token");
+      //@ts-ignore
+      navigation.reset({ index: 0, routes: [{ name: "OnBoarding" }] });
+    }
+  });
 
   return (
     <>

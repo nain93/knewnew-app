@@ -1,8 +1,6 @@
 import { Image, StyleSheet, View } from 'react-native';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from 'react';
-import Feed from '~/screens/feed';
-import Write from '~/screens/write';
 import Search from '~/screens/search';
 import Mypage from '~/screens/mypage';
 import theme from '~/styles/theme';
