@@ -6,7 +6,7 @@ import { hitslop } from '~/utils/constant';
 import { FONT } from '~/styles/fonts';
 import { bookmark, graybookmark } from '~/assets/icons';
 import { ProductListType } from '~/types/product';
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation } from 'react-query';
 import { productBookmark } from '~/api/product';
 import { useRecoilValue } from 'recoil';
 import { tokenState } from '~/recoil/atoms';
@@ -22,17 +22,12 @@ interface ProductBookmarkProps {
 const ProductBookmark = ({ product, setApiBlock, apiBlock }: ProductBookmarkProps) => {
   const navigation = useNavigation<StackNavigationProp>();
   const token = useRecoilValue(tokenState);
-  const queryClient = useQueryClient();
   const [isBookmark, setIsBookmark] = useState(false);
 
   const productBookmarkMutation = useMutation(["productBookmark"], async ({ isBookmarkProp, bookmarkId }: { isBookmarkProp: boolean, bookmarkId: number }) => {
     const bookmarkData = await productBookmark({ token, id: bookmarkId, isBookmark: isBookmarkProp });
     return bookmarkData;
   }, {
-    onSuccess: () => {
-      // queryClient.invalidateQueries(["myProfile", route.params?.id]);
-      // queryClient.invalidateQueries(["userProductBookmark", route.params?.id]);
-    },
     onSettled: () => setApiBlock(false)
   });
 

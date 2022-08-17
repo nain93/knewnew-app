@@ -9,8 +9,8 @@ import { leftArrow, noticeIcon, whiteClose } from '~/assets/icons';
 import RBSheet from "react-native-raw-bottom-sheet";
 import { useInfiniteQuery, useQuery } from 'react-query';
 import { getReviewList } from '~/api/review';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { isNotiReadState, myIdState, tokenState } from '~/recoil/atoms';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { isNotiReadState, tokenState } from '~/recoil/atoms';
 import Loading from '~/components/loading';
 import { getMyProfile } from '~/api/user';
 import { MyProfileType } from '~/types/user';
@@ -20,7 +20,7 @@ import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { loading } from '~/assets/gif';
-import { hitslop, markeForFiltertList, marketList, reactList } from '~/utils/constant';
+import { hitslop, markeForFiltertList, reactList } from '~/utils/constant';
 import CloseIcon from '~/components/icon/closeIcon';
 import ResetButton from '~/components/button/resetButton';
 import BasicButton from '~/components/button/basicButton';
@@ -44,11 +44,9 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const sortRefSheet = useRef<RBSheet>(null);
   const marketRefRBSheet = useRef<RBSheet>(null);
   const [token, setToken] = useRecoilState(tokenState);
-  const setMyId = useSetRecoilState(myIdState);
   const isNotiRead = useRecoilValue(isNotiReadState);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [filterBadge, setFilterBadge] = useState("");
-  const [marketFilter, setMarketFilter] = useState("");
   const flatListRef = useRef<FlatList>(null);
 
   const [sort, setSort] = useState<"0" | "1">("0");
@@ -86,7 +84,8 @@ const Feed = ({ navigation, route }: FeedProps) => {
     });
     return queryData;
   }, {
-    getNextPageParam: (next, all) => all.flat().length ?? undefined
+    getPreviousPageParam: (next, all) => all.flat().length - 5,
+    getNextPageParam: (next, all) => all.flat().length
   });
 
   const reviewKey = useCallback((review) => String(review.id), []);
@@ -203,7 +202,9 @@ const Feed = ({ navigation, route }: FeedProps) => {
 
   const reviewEndReached = useCallback(() => {
     if (reviewListQuery.data &&
-      reviewListQuery.data.pages.flat().length > 4) {
+      reviewListQuery.data.pages.flat().length > 4 &&
+      reviewListQuery.hasNextPage
+    ) {
       reviewListQuery.fetchNextPage();
     }
   }, [reviewListQuery]);

@@ -1,5 +1,5 @@
 import { Dimensions, FlatList, Image, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import { d2p, h2p } from '~/utils';
 import mainLogo from '~/assets/logo';
@@ -26,6 +26,7 @@ export interface HomeProps {
 
 const dummy = ["zz", "cc", "bb"];
 const Home = ({ navigation }: HomeProps) => {
+  const bannerListRef = useRef<FlatList>(null);
   const [token, setToken] = useRecoilState(tokenState);
   const setMyId = useSetRecoilState(myIdState);
   const isNotiRead = useRecoilValue(isNotiReadState);
@@ -45,6 +46,22 @@ const Home = ({ navigation }: HomeProps) => {
       navigation.reset({ index: 0, routes: [{ name: "OnBoarding" }] });
     }
   });
+
+  useEffect(() => {
+    // * 배너 자동 스크롤
+    const totalIndex = 3;
+    let index = 0;
+    setInterval(() => {
+      index++;
+      if (index < totalIndex) {
+        bannerListRef.current?.scrollToIndex({ animated: true, index: index });
+      }
+      else {
+        index = 0;
+        bannerListRef.current?.scrollToIndex({ animated: true, index });
+      }
+    }, 3000);
+  }, []);
 
   return (
     <>
@@ -120,6 +137,7 @@ const Home = ({ navigation }: HomeProps) => {
           </View>
           <View>
             <FlatList
+              ref={bannerListRef}
               horizontal
               pagingEnabled
               bounces={false}
@@ -215,6 +233,7 @@ const Home = ({ navigation }: HomeProps) => {
                 alignItems: "center",
                 width: Dimensions.get("window").width - d2p(40),
                 shadowColor: "rgba(0, 0, 0, 0.16)",
+                backgroundColor: theme.color.white,
                 shadowOffset: {
                   width: 0,
                   height: 3
