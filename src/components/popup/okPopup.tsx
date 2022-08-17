@@ -11,6 +11,8 @@ interface OkPopupProps {
   title: string;
   handleOkayButton: () => void;
   children?: JSX.Element;
+  isBackdrop?: boolean;
+  isCancleButton?: boolean
 }
 
 const OkPopup = (props: OkPopupProps) => {
@@ -21,25 +23,27 @@ const OkPopup = (props: OkPopupProps) => {
       hideModalContentWhileAnimating={true}
       animationIn="fadeIn"
       animationOut="fadeOut"
-      onBackdropPress={() => props.setModalOpen(false)}
+      onBackdropPress={() => props.isBackdrop ? props.setModalOpen(false) : null}
       backdropTransitionOutTiming={0}
-      onBackButtonPress={() => props.setModalOpen(false)}
+      onBackButtonPress={() => props.isBackdrop ? props.setModalOpen(false) : null}
     >
       <View style={styles.modal}>
         <Text style={[FONT.Regular,
         { textAlign: "center", marginVertical: d2p(44) }]}>{props.title}</Text>
         <View style={styles.modalButton}>
-          <TouchableOpacity onPress={() => props.setModalOpen(false)} style={{
-            width: "50%",
-            paddingVertical: d2p(18),
-            borderRightColor: theme.color.grayscale.e9e7ec,
-            borderRightWidth: 1,
-          }}>
-            <Text style={[FONT.Regular, {
-              textAlign: "center",
-              color: theme.color.grayscale.d3d0d5
-            }]}>취소</Text>
-          </TouchableOpacity>
+          {props.isCancleButton &&
+            <TouchableOpacity onPress={() => props.setModalOpen(false)} style={{
+              width: "50%",
+              paddingVertical: d2p(18),
+              borderRightColor: theme.color.grayscale.e9e7ec,
+              borderRightWidth: 1,
+            }}>
+              <Text style={[FONT.Regular, {
+                textAlign: "center",
+                color: theme.color.grayscale.d3d0d5
+              }]}>취소</Text>
+            </TouchableOpacity>
+          }
           <TouchableOpacity onPress={() => {
             props.handleOkayButton();
             props.setModalOpen(false);

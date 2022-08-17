@@ -46,7 +46,9 @@ interface OkPopupStateType {
   isOpen: boolean;
   content: string;
   popupStyle?: ViewStyle;
-  okButton: () => void
+  okButton: () => void,
+  isBackdrop?: boolean,
+  isCancleButton?: boolean
 }
 
 export const okPopupState = atom<OkPopupStateType>({
@@ -55,7 +57,9 @@ export const okPopupState = atom<OkPopupStateType>({
     isOpen: false,
     content: "",
     okButton: () => null,
-    popupStyle: {}
+    popupStyle: {},
+    isBackdrop: true,
+    isCancleButton: true
   }
 });
 

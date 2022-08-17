@@ -78,3 +78,14 @@ export const preSiginedProfile = async ({ token, path, id }: preSiginedProfileTy
     return res.data;
   }
 };
+
+export const getRecommendFoodLog = async ({ sort }: { sort: "0" | "1" }) => {
+  const res = await axios.get(baseURL + "recommend/hot/", {
+    params: {
+      sort
+    }
+  });
+  if (res) {
+    return res.data;
+  }
+};

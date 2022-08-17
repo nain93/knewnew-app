@@ -18,10 +18,17 @@ import { useQuery } from 'react-query';
 import { getMyProfile } from '~/api/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MyProfileType } from '~/types/user';
+import { getRecommendFoodLog } from '~/api';
 
 export interface HomeProps {
   navigation: NavigationStackProp;
   route: NavigationRoute;
+}
+
+interface RecommendFoodType {
+  id: number,
+  title: string,
+  contents: string
 }
 
 const dummy = ["zz", "cc", "bb"];
@@ -31,6 +38,9 @@ const Home = ({ navigation }: HomeProps) => {
   const setMyId = useSetRecoilState(myIdState);
   const isNotiRead = useRecoilValue(isNotiReadState);
   const [scrollIdx, setScrollIdx] = useState(0);
+
+  const getRecommendFoodQuery = useQuery<RecommendFoodType[], Error>("recommendFoodLog", () =>
+    getRecommendFoodLog({ sort: "0" }));
 
   useQuery<MyProfileType, Error>(["myProfile", token], () => getMyProfile(token), {
     enabled: !!token,
@@ -270,8 +280,8 @@ const Home = ({ navigation }: HomeProps) => {
               contentContainerStyle={{ paddingHorizontal: d2p(15) }}
               style={{ marginTop: h2p(30) }}
               showsHorizontalScrollIndicator={false}
-              data={["aa", "bb", "cc", "dd"]}
-              renderItem={() => (
+              data={getRecommendFoodQuery.data}
+              renderItem={({ item }) => (
                 <View style={{ paddingTop: h2p(11.5) }}>
                   <View style={{
                     width: d2p(130), height: d2p(23), backgroundColor: theme.color.white,

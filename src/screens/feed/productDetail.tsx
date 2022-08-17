@@ -12,8 +12,8 @@ import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { getProductDetail, productBookmark } from '~/api/product';
-import { useRecoilValue } from 'recoil';
-import { tokenState } from '~/recoil/atoms';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { okPopupState, tokenState } from '~/recoil/atoms';
 import Loading from '~/components/loading';
 import { noProfile } from '~/assets/images';
 import { ReviewListType, SatisfactionType } from '~/types/review';
@@ -60,6 +60,7 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
   const [priceInfoOpen, setPriceInfoOpen] = useState(false);
   const [isBookmark, setIsBookmark] = useState(false);
   const [apiBlock, setApiBlock] = useState(false);
+  const setModalOpen = useSetRecoilState(okPopupState);
 
   const productDetailQuery = useQuery<ProductDetailType, Error>(["productDetail", route.params?.id], async () => {
     if (route.params) {
@@ -80,6 +81,15 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
         }
         setRating(rate);
       }
+    },
+    onError: (error) => {
+      setModalOpen({
+        isOpen: true,
+        content: "아직 등록되지 않은 상품입니다.",
+        okButton: () => navigation.goBack(),
+        isBackdrop: false,
+        isCancleButton: false
+      });
     }
   });
 
@@ -166,6 +176,10 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
         <Loading />
       </>
     );
+  }
+
+  if (!productDetailQuery.data) {
+    return null;
   }
 
   return (

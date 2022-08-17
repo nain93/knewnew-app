@@ -3,7 +3,7 @@ import { Animated, AppState, Linking, Platform } from 'react-native';
 import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import SplashScreen from 'react-native-splash-screen';
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 import codePush from "react-native-code-push";
@@ -283,7 +283,10 @@ const App = () => {
       }
       {/* 확인, 취소 버튼 팝업 */}
       {modalOpen.isOpen &&
-        <OkPopup title={modalOpen.content}
+        <OkPopup
+          isCancleButton={modalOpen.isCancleButton}
+          isBackdrop={modalOpen.isBackdrop}
+          title={modalOpen.content}
           handleOkayButton={modalOpen.okButton}
           modalOpen={modalOpen.isOpen}
           setModalOpen={(isModalOpen: boolean) => setModalOpen({ ...modalOpen, isOpen: isModalOpen })} />
