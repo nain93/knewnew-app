@@ -166,62 +166,65 @@ const Home = ({ navigation }: HomeProps) => {
             </TouchableOpacity>
           </View>
           <View>
-            <FlatList
-              ref={bannerListRef}
-              horizontal
-              pagingEnabled
-              bounces={false}
-              ListEmptyComponent={() =>
-                <View style={styles.banner}>
-                  <Loading viewStyle={{ top: 0 }} />
-                </View>
-              }
-              onScroll={e => {
-                setScrollIdx(Math.min(
-                  getBannerQuery.data?.length ?? 0,
-                  Math.max(0, Math.round(e.nativeEvent.contentOffset.x / (Dimensions.get("window").width - d2p(20))))));
-              }}
-              keyExtractor={(item) => item.id.toString()}
-              showsHorizontalScrollIndicator={false}
-              data={getBannerQuery.data}
-              renderItem={({ item }) => (
-                <View style={styles.banner}>
-                  <Image
-                    style={{
-                      width: "100%", height: h2p(80),
-                      borderRadius: 10,
-                    }}
-                    source={{ uri: item.image }} />
-                </View>
-              )}
-            />
-            {(getBannerQuery.data?.length || 0) > 1 &&
-              <View style={{
-                position: "absolute", bottom: h2p(10),
-                flexDirection: "row",
-                alignSelf: "center"
-              }}>
-                {React.Children.toArray(getBannerQuery.data?.map((_, i) => {
-                  if (i === scrollIdx) {
-                    return (
-                      <View style={{
-                        width: d2p(6), height: d2p(6),
-                        borderRadius: 6,
-                        backgroundColor: theme.color.main,
-                        marginRight: d2p(10)
-                      }} />
-                    );
-                  }
-                  return (
-                    <View style={{
-                      width: d2p(6), height: d2p(6),
-                      borderRadius: 6,
-                      backgroundColor: theme.color.white,
-                      marginRight: d2p(10)
-                    }} />
-                  );
-                }))}
+            {getBannerQuery.isLoading ?
+              <View style={styles.banner}>
+                <Loading viewStyle={{ top: 0 }} />
               </View>
+              :
+              <>
+                <FlatList
+                  ref={bannerListRef}
+                  horizontal
+                  pagingEnabled
+                  bounces={false}
+                  onScroll={e => {
+                    setScrollIdx(Math.min(
+                      getBannerQuery.data?.length ?? 0,
+                      Math.max(0, Math.round(e.nativeEvent.contentOffset.x / (Dimensions.get("window").width - d2p(20))))));
+                  }}
+                  keyExtractor={(item) => item.id.toString()}
+                  showsHorizontalScrollIndicator={false}
+                  data={getBannerQuery.data}
+                  renderItem={({ item }) => (
+                    <View style={styles.banner}>
+                      <Image
+                        style={{
+                          width: "100%", height: h2p(80),
+                          borderRadius: 10,
+                        }}
+                        source={{ uri: item.image }} />
+                    </View>
+                  )}
+                />
+                {(getBannerQuery.data?.length || 0) > 1 &&
+                  <View style={{
+                    position: "absolute", bottom: h2p(10),
+                    flexDirection: "row",
+                    alignSelf: "center"
+                  }}>
+                    {React.Children.toArray(getBannerQuery.data?.map((_, i) => {
+                      if (i === scrollIdx) {
+                        return (
+                          <View style={{
+                            width: d2p(6), height: d2p(6),
+                            borderRadius: 6,
+                            backgroundColor: theme.color.main,
+                            marginRight: d2p(10)
+                          }} />
+                        );
+                      }
+                      return (
+                        <View style={{
+                          width: d2p(6), height: d2p(6),
+                          borderRadius: 6,
+                          backgroundColor: theme.color.white,
+                          marginRight: d2p(10)
+                        }} />
+                      );
+                    }))}
+                  </View>
+                }
+              </>
             }
           </View>
 
