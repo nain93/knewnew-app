@@ -35,7 +35,8 @@ export interface FeedProps {
   route: NavigationRoute<{
     refresh: boolean,
     foodLog?: FoodLogType | "all",
-    market?: MarketType
+    market?: MarketType,
+    sort?: "0" | "1" | "2"
   }>;
 }
 
@@ -49,7 +50,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const [filterBadge, setFilterBadge] = useState("");
   const flatListRef = useRef<FlatList>(null);
 
-  const [sort, setSort] = useState<"0" | "1">("0");
+  const [sort, setSort] = useState<"0" | "1" | "2">("0");
   const [sortMarket, setSortMarket] = useState<string[]>();
   const [sortReact, setSortReact] = useState<string[]>();
   const [clickedMarket, setClickMarket] = useState<Array<{
@@ -80,7 +81,8 @@ const Feed = ({ navigation, route }: FeedProps) => {
       token, tag: filterBadge,
       market: (clickedMarket.filter(v => v.isClick)).map(v => v.title).toString(),
       satisfaction: (clickedReact.filter(v => v.isClick)).map(v => v.title).toString(),
-      offset: pageParam, limit: 5, sort
+      offset: pageParam, limit: 5,
+      sort
     });
     return queryData;
   }, {
@@ -246,6 +248,9 @@ const Feed = ({ navigation, route }: FeedProps) => {
       else {
         setFilterBadge(route.params.foodLog);
       }
+    }
+    if (route.params?.sort) {
+      setSort(route.params.sort);
     }
     if (route.params?.refresh) {
       flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });

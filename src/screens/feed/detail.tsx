@@ -412,10 +412,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             flexDirection: 'row',
           }}>
             <TouchableOpacity
-              onPress={() => {
-                // navigation.navigate("ProductDetail")
-                navigation.navigate("ProductDetailReady");
-              }}
+              onPress={() => navigation.navigate("ProductDetail", { id: reviewDetailQuery.data.product?.id })}
               style={{
                 backgroundColor: "rgba(234,231,236,0.4)",
                 paddingHorizontal: d2p(5),

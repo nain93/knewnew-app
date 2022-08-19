@@ -18,20 +18,38 @@ import { useQuery } from 'react-query';
 import { getMyProfile } from '~/api/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MyProfileType } from '~/types/user';
-import { getRecommendFoodLog } from '~/api';
+import FastImage from 'react-native-fast-image';
+import { getBanner, getFoodLogCount, getRecommendFoodLog } from '~/api/home';
+import Loading from '~/components/loading';
+import { loading } from '~/assets/gif';
 
 export interface HomeProps {
   navigation: NavigationStackProp;
   route: NavigationRoute;
 }
 
+interface BannerType {
+  id: number,
+  image: string,
+  content: string,
+  isActive: boolean,
+  priority: number
+}
+
 interface RecommendFoodType {
   id: number,
   title: string,
-  contents: string
+  contents: Array<{
+    author: string,
+    id: number,
+    reviewId: number,
+    bookmarkCount: number,
+    likeCount: number,
+    comment: string,
+    image: string | null
+  }>
 }
 
-const dummy = ["zz", "cc", "bb"];
 const Home = ({ navigation }: HomeProps) => {
   const bannerListRef = useRef<FlatList>(null);
   const [token, setToken] = useRecoilState(tokenState);
@@ -39,8 +57,10 @@ const Home = ({ navigation }: HomeProps) => {
   const isNotiRead = useRecoilValue(isNotiReadState);
   const [scrollIdx, setScrollIdx] = useState(0);
 
-  const getRecommendFoodQuery = useQuery<RecommendFoodType[], Error>("recommendFoodLog", () =>
-    getRecommendFoodLog({ sort: "0" }));
+  const getBannerQuery = useQuery<BannerType[], Error>("banner", () => getBanner(token));
+  const getFoodLogCountQuery = useQuery<{ count: number }, Error>("foodLogCount", () => getFoodLogCount(token));
+  const getRecommendFoodQuery = useQuery<RecommendFoodType, Error>("recommendFoodLog", () =>
+    getRecommendFoodLog({ token, sort: "0" }));
 
   useQuery<MyProfileType, Error>(["myProfile", token], () => getMyProfile(token), {
     enabled: !!token,
@@ -151,22 +171,37 @@ const Home = ({ navigation }: HomeProps) => {
               horizontal
               pagingEnabled
               bounces={false}
+              ListEmptyComponent={() =>
+                <View style={styles.banner}>
+                  <Loading viewStyle={{ top: 0 }} />
+                </View>
+              }
               onScroll={e => {
                 setScrollIdx(Math.min(
-                  dummy.length ?? 0,
+                  getBannerQuery.data?.length ?? 0,
                   Math.max(0, Math.round(e.nativeEvent.contentOffset.x / (Dimensions.get("window").width - d2p(20))))));
               }}
+              keyExtractor={(item) => item.id.toString()}
               showsHorizontalScrollIndicator={false}
-              data={dummy}
-              renderItem={() => <View style={styles.banner} />}
+              data={getBannerQuery.data}
+              renderItem={({ item }) => (
+                <View style={styles.banner}>
+                  <Image
+                    style={{
+                      width: "100%", height: h2p(80),
+                      borderRadius: 10,
+                    }}
+                    source={{ uri: item.image }} />
+                </View>
+              )}
             />
-            {(dummy.length || 0) > 1 &&
+            {(getBannerQuery.data?.length || 0) > 1 &&
               <View style={{
                 position: "absolute", bottom: h2p(10),
                 flexDirection: "row",
                 alignSelf: "center"
               }}>
-                {React.Children.toArray(dummy.map((v, i) => {
+                {React.Children.toArray(getBannerQuery.data?.map((_, i) => {
                   if (i === scrollIdx) {
                     return (
                       <View style={{
@@ -252,7 +287,7 @@ const Home = ({ navigation }: HomeProps) => {
                 shadowOpacity: 1,
               }}>
               <Text style={FONT.Bold}>실시간
-                <Text style={{ color: theme.color.main }}> 3,654개</Text>
+                <Text style={{ color: theme.color.main }}> {getFoodLogCountQuery.data?.count}개</Text>
                 의 모든 푸드로그 보기!</Text>
             </TouchableOpacity>
           </View>
@@ -267,7 +302,7 @@ const Home = ({ navigation }: HomeProps) => {
               </Text>
               <TouchableOpacity
                 hitSlop={hitslop}
-                onPress={() => console.log("more")}>
+                onPress={() => navigation.navigate("Feed", { sort: "2" })}>
                 <Text style={[FONT.Medium, {
                   color: theme.color.grayscale.a09ca4, fontSize: 12
                 }]}>{`더보기 >`}
@@ -280,9 +315,12 @@ const Home = ({ navigation }: HomeProps) => {
               contentContainerStyle={{ paddingHorizontal: d2p(15) }}
               style={{ marginTop: h2p(30) }}
               showsHorizontalScrollIndicator={false}
-              data={getRecommendFoodQuery.data}
+              keyExtractor={(item) => item.id.toString()}
+              data={getRecommendFoodQuery.data?.contents.slice(0, 5)}
               renderItem={({ item }) => (
-                <View style={{ paddingTop: h2p(11.5) }}>
+                <Pressable
+                  onPress={() => navigation.navigate("FeedDetail", { id: item.reviewId })}
+                  style={{ paddingTop: h2p(11.5) }}>
                   <View style={{
                     width: d2p(130), height: d2p(23), backgroundColor: theme.color.white,
                     borderWidth: 1,
@@ -298,32 +336,35 @@ const Home = ({ navigation }: HomeProps) => {
                   }}>
                     <Image source={fireImg} style={{ width: d2p(15), height: d2p(15) }} />
                     <Text style={[FONT.Medium, { fontSize: 13 }]}><Text style={{ color: theme.color.main }}>
-                      {` 56명`}</Text>이 담았어요!
+                      {` ${item.bookmarkCount}명`}</Text>이 담았어요!
                     </Text>
                   </View>
                   <View style={{
-                    width: d2p(180), height: h2p(230),
+                    width: d2p(180), minHeight: h2p(230),
                     marginHorizontal: d2p(5),
                     backgroundColor: theme.color.white,
                     borderRadius: 10,
                     paddingHorizontal: d2p(12),
-                    paddingVertical: d2p(10)
+                    paddingVertical: d2p(10),
                   }}>
-                    <View style={{
-                      backgroundColor: theme.color.grayscale.f7f7fc,
-                      borderRadius: 5,
-                      marginVertical: h2p(10),
-                      width: "100%",
-                      aspectRatio: 1
-                    }} />
-                    <Text style={[FONT.Regular, { lineHeight: 20, }]}>
+                    {item.image &&
+                      <FastImage style={{
+                        backgroundColor: theme.color.grayscale.f7f7fc,
+                        borderRadius: 5,
+                        marginVertical: h2p(10),
+                        width: "100%",
+                        aspectRatio: 1
+                      }}
+                        source={{ uri: item.image }}
+                      />}
+                    <Text style={[FONT.Regular, { lineHeight: 20 }]}>
                       <Text style={[FONT.Bold, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
-                        또롱뚜롱
+                        {item.author}
                       </Text><Text style={[FONT.Regular, { fontSize: 12 }]}>{`님의\n`}</Text>
-                      다이어트 비밀템, 메밀국수
+                      {item.comment}
                     </Text>
                   </View>
-                </View>
+                </Pressable>
               )}
             />
           </View>
@@ -352,9 +393,10 @@ const styles = StyleSheet.create({
     width: Dimensions.get("window").width - d2p(20),
     height: h2p(80),
     marginTop: h2p(20),
-    backgroundColor: theme.color.black,
     borderRadius: 10,
-    marginHorizontal: d2p(10)
+    marginHorizontal: d2p(10),
+    borderWidth: 1,
+    borderColor: theme.color.grayscale.eae7ec
   },
   foodlogWrap: {
     borderTopWidth: 4,
