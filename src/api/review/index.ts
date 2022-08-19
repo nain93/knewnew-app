@@ -6,7 +6,7 @@ interface GetReviewListType {
   tag?: string,
   market?: string,
   satisfaction?: string,
-  sort: "0" | "1",
+  sort: "0" | "1" | "2",
   offset: number,
   limit?: number,
   product?: string

@@ -1,4 +1,5 @@
 import { AuthorType } from "~/types";
+import { FoodLogType } from "~/types/review";
 
 export interface UserInfoTagType {
   foodStyle: Array<string>,
@@ -45,12 +46,13 @@ export interface MyProfileType {
   occupation?: string,
   profileImage: string,
   headline: string,
-  representBadge: "빵식가" | "애주가" | "디저트러버" | "캠핑족" | "속편한식사" | "다이어터" | "비건" | "간편식" | "한끼식사",
+  representBadge: FoodLogType,
   household: "자취생" | "애기가족" | "가족한끼" | "신혼부부",
   tags: UserInfoTagType,
   created: string,
   reviewCount: number,
-  bookmarkCount: number,
+  reviewBookmarkCount: number,
+  productBookmarkCount: number,
   remainingPeriod: number,
   isNotifiable: boolean,
   isMarketing: boolean

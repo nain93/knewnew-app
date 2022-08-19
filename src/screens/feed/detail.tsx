@@ -115,7 +115,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
         setCart(data.isBookmark);
       }
     },
-    onSettled: () => SplashScreen.hide(),
     onError: (error) => {
       if (axios.isAxiosError(error) && error.response) {
         //@ts-ignore
@@ -329,7 +328,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             userId={reviewDetailQuery.data?.author.id}
             isMoreClick={isMoreClick}
             type="review"
-            isGobacK={() => navigation.goBack()}
+            isGoback={() => navigation.goBack()}
             handleCloseMore={() => setIsMoreClick(false)}
           />
         }
@@ -413,10 +412,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             flexDirection: 'row',
           }}>
             <TouchableOpacity
-              onPress={() => {
-                // navigation.navigate("ProductDetail")
-                navigation.navigate("ProductDetailReady");
-              }}
+              onPress={() => navigation.navigate("ProductDetail", { id: reviewDetailQuery.data.product?.id })}
               style={{
                 backgroundColor: "rgba(234,231,236,0.4)",
                 paddingHorizontal: d2p(5),

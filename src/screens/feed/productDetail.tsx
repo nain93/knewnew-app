@@ -10,15 +10,16 @@ import ReviewIcon from '~/components/icon/reviewIcon';
 import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
-import { useQuery } from 'react-query';
-import { getProductDetail } from '~/api/product';
-import { useRecoilValue } from 'recoil';
-import { tokenState } from '~/recoil/atoms';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { getProductDetail, productBookmark } from '~/api/product';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { okPopupState, tokenState } from '~/recoil/atoms';
 import Loading from '~/components/loading';
-import { noProfile, popupBackground2 } from '~/assets/images';
+import { noProfile } from '~/assets/images';
 import { ReviewListType, SatisfactionType } from '~/types/review';
 import { AuthorType } from '~/types';
 import ReadMore from '@fawazahmed/react-native-read-more';
+import LinearGradient from 'react-native-linear-gradient';
 
 interface ProductDetailProps {
   navigation: NavigationStackProp;
@@ -26,7 +27,6 @@ interface ProductDetailProps {
     id: number
   }>;
 }
-
 interface ReviewsType {
   author: AuthorType,
   id: number,
@@ -38,11 +38,16 @@ interface ProductDetailType {
   id: number,
   brand: string,
   category: string,
-  images: string[],
+  images: Array<{
+    id: number,
+    image: string,
+    priority: number
+  }>,
   name: string,
   expectedPrice: number,
   link: string,
-  bookmarkCount: number,
+  reviewBookmarkCount: number,
+  productBookmarkCount: number,
   reviews: Array<ReviewListType>,
   reviewCount: number,
   externalRating: number,
@@ -53,9 +58,13 @@ interface ProductDetailType {
 }
 
 const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
+  const queryClient = useQueryClient();
   const token = useRecoilValue(tokenState);
   const [rating, setRating] = useState<boolean[]>();
   const [priceInfoOpen, setPriceInfoOpen] = useState(false);
+  const [isBookmark, setIsBookmark] = useState(false);
+  const [apiBlock, setApiBlock] = useState(false);
+  const setModalOpen = useSetRecoilState(okPopupState);
 
   const productDetailQuery = useQuery<ProductDetailType, Error>(["productDetail", route.params?.id], async () => {
     if (route.params) {
@@ -65,6 +74,7 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
   }, {
     enabled: !!route.params?.id,
     onSuccess: (data) => {
+      setIsBookmark(data.isBookmark);
       const rate = [];
       for (let i = 1; i <= 5; i++) {
         if (Math.floor(data.externalRating) < i) {
@@ -75,10 +85,31 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
         }
         setRating(rate);
       }
+    },
+    onError: (error) => {
+      setModalOpen({
+        isOpen: true,
+        content: "아직 등록되지 않은 상품입니다.",
+        okButton: () => navigation.goBack(),
+        isBackdrop: false,
+        isCancleButton: false
+      });
     }
   });
-  console.log(route.params?.id, 'route.params?.id');
-  // console.log(productDetailQuery.data, 'productDetailQuery.data?.reviews');
+
+  const productBookmarkMutation = useMutation(["productBookmark", route.params?.id], async (isBookmarkProp: boolean) => {
+    if (route.params) {
+      const bookmarkData = await productBookmark({ token, id: route.params.id, isBookmark: isBookmarkProp });
+      return bookmarkData;
+    }
+  }, {
+    onSuccess: async () => {
+      queryClient.invalidateQueries("productDetail");
+      queryClient.invalidateQueries("userProductBookmark");
+    },
+    onSettled: () => setApiBlock(false)
+  });
+
   const foodLogKey = useCallback((v) => v.id.toString(), []);
   const foodLogRenderItem = useCallback(({ item }: { item: ReviewsType }) => {
     return (
@@ -151,6 +182,10 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
     );
   }
 
+  if (!productDetailQuery.data) {
+    return null;
+  }
+
   return (
     <>
       <Header
@@ -169,27 +204,37 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
             pagingEnabled
             showsHorizontalScrollIndicator={false}
             renderItem={({ item }) => (
-              <Image source={{ uri: item }} style={{
+              <Image source={{ uri: item.image }} style={{
                 width: Dimensions.get("window").width,
                 aspectRatio: 1
               }} />
             )}
           />
-          <View style={{
-            position: "absolute",
-            right: d2p(20),
-            bottom: d2p(20),
-            flexDirection: "row", alignItems: "center",
-            width: Dimensions.get("window").width - d2p(40)
-          }}>
+          <View
+            style={{
+              position: "absolute",
+              bottom: d2p(0),
+              flexDirection: "row", alignItems: "center",
+              width: Dimensions.get("window").width,
+              paddingHorizontal: d2p(20),
+              paddingVertical: h2p(5),
+              backgroundColor: "rgba(0,0,0,0.4)"
+            }}>
             <Text style={[FONT.Regular, { color: theme.color.grayscale.eae7ec, marginRight: "auto" }]}>
               출처 {productDetailQuery.data?.imageSource}
             </Text>
-            <TouchableOpacity onPress={() => console.log("상품 공유하기")}>
+            {/* 상품 공유 기능후 주석 해제 */}
+            {/* <TouchableOpacity onPress={() => console.log("상품 공유하기")}>
               <Image source={shareIcon} style={{ marginRight: d2p(10), width: d2p(26), height: d2p(26) }} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => console.log("상품 북마크")}>
-              <Image source={productDetailQuery.data?.isBookmark ? graybookmark : bookmark} style={{ width: d2p(26), height: d2p(26) }} />
+            </TouchableOpacity> */}
+            <TouchableOpacity onPress={() => {
+              if (!apiBlock) {
+                setIsBookmark(!isBookmark);
+                setApiBlock(true);
+                productBookmarkMutation.mutate(!isBookmark);
+              }
+            }}>
+              <Image source={isBookmark ? graybookmark : bookmark} style={{ width: d2p(26), height: d2p(26) }} />
             </TouchableOpacity>
           </View>
         </View>
@@ -232,14 +277,15 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
           <Text style={[FONT.Bold, { color: theme.color.grayscale.C_443e49, fontSize: 16 }]}>
             Best 푸드로그
           </Text>
-          <TouchableOpacity onPress={() => navigation.navigate("ProductList", { product: productDetailQuery.data?.name })}>
-            <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>
-              <Text style={[FONT.Regular, { color: theme.color.main }]}>
-                {productDetailQuery.data?.reviewCount}개
+          {productDetailQuery.data?.reviewCount > 0 &&
+            <TouchableOpacity onPress={() => navigation.navigate("ProductList", { product: productDetailQuery.data?.name })}>
+              <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>
+                <Text style={[FONT.Regular, { color: theme.color.main }]}>
+                  {productDetailQuery.data?.reviewCount}개
+                </Text>
+                {` 전체 보기 >`}
               </Text>
-              {` 전체 보기 >`}
-            </Text>
-          </TouchableOpacity>
+            </TouchableOpacity>}
         </View>
 
         {/* ? 팝업 */}

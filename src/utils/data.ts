@@ -1,8 +1,8 @@
 export const interestTagData = {
   interest:
     [{ title: "빵식가", isClick: false }, { title: "애주가", isClick: false }, { title: "디저트러버", isClick: false },
-    { title: "캠퍼", isClick: false }, { title: "오늘한끼", isClick: false }, { title: "다이어터", isClick: false },
-    { title: "비건", isClick: false }, { title: "홈카페", isClick: false }, { title: "신상탐험대", isClick: false }]
+    { title: "신상탐험대", isClick: false }, { title: "오늘한끼", isClick: false }, { title: "다이어터", isClick: false },
+    { title: "비건", isClick: false }, { title: "홈카페", isClick: false }, { title: "캠퍼", isClick: false }]
 };
 
 export const initialBadgeData = {
