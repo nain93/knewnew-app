@@ -1,18 +1,18 @@
 import axios from "axios";
 import { baseURL } from "~/api";
 import { WriteReviewType } from "~/types/review";
-
 interface GetReviewListType {
   token: string,
   tag?: string,
   market?: string,
   satisfaction?: string,
-  sort: "0" | "1",
+  sort: "0" | "1" | "2",
   offset: number,
-  limit?: number
+  limit?: number,
+  product?: string
 }
 
-export const getReviewList = async ({ token, tag, market, satisfaction, sort, offset, limit }: GetReviewListType) => {
+export const getReviewList = async ({ token, tag, market, satisfaction, sort, offset, product, limit }: GetReviewListType) => {
   const res = await axios.get(baseURL + "review/", {
     params: {
       offset,
@@ -20,7 +20,8 @@ export const getReviewList = async ({ token, tag, market, satisfaction, sort, of
       tag,
       market,
       satisfaction,
-      sort
+      sort,
+      product
     },
     headers: {
       Authorization: `Bearer ${token}`,

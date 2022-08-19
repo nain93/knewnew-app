@@ -4,7 +4,8 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import { d2p } from '~/utils';
 
 interface BottomSheetProps {
-  onOpen?: () => void
+  onOpen?: () => void,
+  onClose?: () => void,
   sheetRef: React.RefObject<RBSheet>,
   height: number,
   children: JSX.Element,
@@ -15,12 +16,13 @@ interface BottomSheetProps {
   }
 }
 
-const CustomBottomSheet = ({ sheetRef, height, customStyles, children, onOpen }: BottomSheetProps) => {
+const CustomBottomSheet = ({ sheetRef, height, customStyles, children, onOpen, onClose }: BottomSheetProps) => {
 
   return (
     <RBSheet
       ref={sheetRef}
       onOpen={onOpen}
+      onClose={onClose}
       closeOnDragDown
       dragFromTopOnly
       animationType="fade"

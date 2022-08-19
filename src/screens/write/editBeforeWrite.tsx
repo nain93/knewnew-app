@@ -4,7 +4,7 @@ import { FONT } from '~/styles/fonts';
 import theme from '~/styles/theme';
 import ReactionLayout from '~/components/layout/ReactionLayout';
 import { marketList, reactList } from '~/utils/constant';
-import { ReactionType, ReviewListType, WriteReviewType } from '~/types/review';
+import { ReviewListType, SatisfactionType, WriteReviewType } from '~/types/review';
 import { d2p, h2p } from '~/utils';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
@@ -39,7 +39,7 @@ const EditBeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
   const queryClient = useQueryClient();
   const marketRefRBSheet = useRef<RBSheet>(null);
   const [clickedReact, setClickReact] = useState<Array<{
-    title: ReactionType,
+    title: SatisfactionType,
     isClick: boolean
   }>>(reactList.map(v => {
     return { title: v, isClick: false };
@@ -150,7 +150,7 @@ const EditBeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
             multiSelect={false}
             clickedReact={clickedReact}
             setClickReact={(react: {
-              title: ReactionType,
+              title: SatisfactionType,
               isClick: boolean
             }[]) => setClickReact(react)}
           />

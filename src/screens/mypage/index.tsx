@@ -1,4 +1,4 @@
-import { Dimensions, FlatList, Image, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
@@ -16,12 +16,16 @@ import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import BasicButton from '~/components/button/basicButton';
 import { ReviewListType } from '~/types/review';
-import { graywrite } from '~/assets/icons';
+import { bookmark, graybookmark, graywrite } from '~/assets/icons';
 import FastImage from 'react-native-fast-image';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import CustomBottomSheet from '~/components/popup/CustomBottomSheet';
 import FollowBottomTab from '~/screens/mypage/followBottomTab';
 import CloseIcon from '~/components/icon/closeIcon';
+import { productBookmark, productBookmarkList } from '~/api/product';
+import { ProductListType } from '~/types/product';
+import { hitslop } from '~/utils/constant';
+import ProductBookmark from '~/screens/feed/productBookmark';
 
 interface MypageProps {
   navigation: NavigationStackProp;
@@ -37,12 +41,9 @@ const Mypage = ({ navigation, route }: MypageProps) => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [index, setIndex] = useState(0);
   const [followIndex, setFollowIndex] = useState(0);
-  const reviewRef = useRef<FlatList>(null);
-  const bookmarkRef = useRef<FlatList>(null);
+  const [apiBlock, setApiBlock] = useState(false);
   const queryClient = useQueryClient();
-
   const followRef = useRef<RBSheet>(null);
-
   const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", route.params?.id], async () => {
     if (route.params?.id && (route.params.id !== myId)) {
       const queryData = await getUserProfile(token, route.params?.id);
@@ -73,6 +74,16 @@ const Mypage = ({ navigation, route }: MypageProps) => {
   const userBookmarkListQuery = useInfiniteQuery<ReviewListType[], Error>(["userBookmarkList", route.params?.id], async ({ pageParam = 0 }) => {
     if (route.params?.id) {
       const queryData = await getUserBookmarkList({ token, id: route.params?.id, offset: pageParam, limit: 5 });
+      return queryData;
+    }
+  }, {
+    enabled: !!route.params?.id,
+    getNextPageParam: (next, all) => all.flat().length
+  });
+
+  const userProductBookmarkQuery = useInfiniteQuery<ProductListType[], Error>(["userProductBookmark", route.params?.id], async ({ pageParam }) => {
+    if (route.params?.id) {
+      const queryData = await productBookmarkList({ token, id: route.params?.id, offset: pageParam, limit: 5 });
       return queryData;
     }
   }, {
@@ -352,7 +363,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
   }, []);
   const reviewFooter = useCallback(() => <View style={{ height: h2p(100) }} />, []);
 
-  // * 담은글
+  // * 리뷰 담은글
   const bookmarkKey = useCallback((v) => (v.id).toString(), []);
   const bookmarkEmpty = useCallback(() => {
     if (!userBookmarkListQuery.isLoading) {
@@ -424,6 +435,63 @@ const Mypage = ({ navigation, route }: MypageProps) => {
 
   const bookmarkFooter = useCallback(() => <View style={{ height: h2p(100) }} />, []);
 
+
+  // * 상품 담은 글 //
+  const productHeader = useCallback(() => {
+    if (userProductBookmarkQuery.isLoading) {
+      return (
+        <Loading viewStyle={{
+          position: "relative",
+          top: h2p(90)
+        }} />
+      );
+    }
+    return null;
+  }, [userProductBookmarkQuery.isLoading]);
+
+  const productEmpty = useCallback(() => {
+    if (!userProductBookmarkQuery.isLoading) {
+      return (
+        <View style={{ paddingTop: h2p(100) }}>
+          <View style={{ marginBottom: h2p(180) }}>
+            <Text style={[FONT.Regular,
+            {
+              color: theme.color.grayscale.C_79737e,
+              textAlign: "center",
+            }]}>
+              담은 상품이 없습니다.</Text>
+          </View>
+          {(route.params?.id === myId) &&
+            <BasicButton
+              onPress={() => navigation.navigate('Feed')}
+              text="담으러 가기" textColor={theme.color.main} bgColor={theme.color.white} />
+          }
+        </View>
+      );
+    }
+    return null;
+  }, [userProductBookmarkQuery.isLoading, route.params?.id]);
+
+  const proudctRenderItem = useCallback((products) =>
+    <ProductBookmark
+      apiBlock={apiBlock}
+      setApiBlock={(isApi: boolean) => setApiBlock(isApi)}
+      product={products.item} />, [userProductBookmarkQuery.isLoading]);
+
+  const productEndReached = useCallback(() => {
+    if (userProductBookmarkQuery.data &&
+      userProductBookmarkQuery.data?.pages.flat().length > 4) {
+      userProductBookmarkQuery.fetchNextPage();
+    }
+  }, [userProductBookmarkQuery]);
+
+  const productRefresh = useCallback(() => {
+    userProductBookmarkQuery.refetch();
+    getMyProfileQuery.refetch();
+  }, []);
+
+  const productFooter = useCallback(() => <View style={{ height: h2p(100) }} />, []);
+
   useEffect(() => {
     // * 로그아웃시 온보딩화면으로
     if (!token) {
@@ -442,17 +510,18 @@ const Mypage = ({ navigation, route }: MypageProps) => {
     <>
       <Tabs.Container
         onIndexChange={setIndex}
+        initialTabName={`작성 글 ${getMyProfileQuery.data?.reviewCount}`}
         containerStyle={styles.container}
         renderTabBar={(props) => <MaterialTabBar
           contentContainerStyle={{ paddingBottom: h2p(4.5), paddingTop: h2p(20) }}
           indicatorStyle={{
             height: 2,
             backgroundColor: theme.color.black,
-            marginBottom: d2p(-1),
+            marginBottom: d2p(-1)
           }} TabItemComponent={(tabs) => (
             <Pressable
               onPress={() => props.onTabPress(tabs.label)}
-              style={{ width: Dimensions.get("window").width / 2 }}>
+              style={{ width: Dimensions.get("window").width / 3 }}>
               <Text style={[{
                 fontSize: 16,
                 textAlign: "center"
@@ -465,7 +534,6 @@ const Mypage = ({ navigation, route }: MypageProps) => {
         <Tabs.Tab
           name={`작성 글 ${getMyProfileQuery.data?.reviewCount}`}>
           <Tabs.FlatList
-            ref={reviewRef}
             ListHeaderComponent={Platform.OS === "android" ? reviewHeader : null}
             ListEmptyComponent={reviewEmpty}
             onEndReached={reviewEndReached}
@@ -483,9 +551,8 @@ const Mypage = ({ navigation, route }: MypageProps) => {
           />
 
         </Tabs.Tab>
-        <Tabs.Tab name={`담은 글 ${getMyProfileQuery.data?.bookmarkCount}`}>
+        <Tabs.Tab name={`담은 글 ${getMyProfileQuery.data?.reviewBookmarkCount}`}>
           <Tabs.FlatList
-            ref={bookmarkRef}
             ListHeaderComponent={Platform.OS === "android" ? bookmarkHeader : null}
             ListEmptyComponent={bookmarkEmpty}
             onEndReached={bookmarkEndReached}
@@ -500,6 +567,25 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             data={userBookmarkListQuery.data?.pages.flat()}
             renderItem={bookmarkRenderItem}
             keyExtractor={bookmarkKey}
+          />
+        </Tabs.Tab>
+        <Tabs.Tab name={`담은 상품 ${getMyProfileQuery.data?.productBookmarkCount}`}>
+          <Tabs.FlatList
+            ListHeaderComponent={Platform.OS === "android" ? productHeader : null}
+            ListEmptyComponent={productEmpty}
+            onEndReached={productEndReached}
+            onEndReachedThreshold={0.5}
+            maxToRenderPerBatch={5}
+            windowSize={5}
+            removeClippedSubviews={true}
+            refreshing={userProductBookmarkQuery.isLoading}
+            onRefresh={productRefresh}
+            showsVerticalScrollIndicator={false}
+            ListFooterComponent={productFooter}
+            style={{ paddingHorizontal: d2p(20) }}
+            data={userProductBookmarkQuery.data?.pages.flat()}
+            keyExtractor={bookmarkKey}
+            renderItem={proudctRenderItem}
           />
         </Tabs.Tab>
       </Tabs.Container>

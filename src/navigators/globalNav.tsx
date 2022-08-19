@@ -26,6 +26,7 @@ import ProductDetail from '~/screens/feed/productDetail';
 import ProductList from '~/screens/feed/productList';
 import BlockList from '~/screens/setting/blockList';
 import ProductDetailReady from '~/screens/feed/productDetailReady';
+import Feed from '~/screens/feed';
 
 const Stack = createStackNavigator();
 

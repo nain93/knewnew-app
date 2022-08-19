@@ -115,7 +115,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
         setCart(data.isBookmark);
       }
     },
-    onSettled: () => SplashScreen.hide(),
     onError: (error) => {
       if (axios.isAxiosError(error) && error.response) {
         //@ts-ignore
@@ -124,7 +123,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           navigation.goBack();
         }
       }
-    },
+    }
   });
 
   const likeReviewMutation = useMutation('likeReview',
@@ -305,14 +304,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   }, [commentIsEdit]);
 
   useEffect(() => {
-    // const copy: { [index: string]: Array<string> }
-    //   = { ...reviewDetailQuery.data?.tags };
-    // setTags(
-    //   Object.keys(copy).reduce<Array<string>>((acc, cur) => {
-    //     acc = acc.concat(copy[cur]);
-    //     return acc;
-    //   }, [])
-    // );
     if (reviewDetailQuery.data?.tags.interest) {
       setTags(reviewDetailQuery?.data.tags.interest);
     }
@@ -337,7 +328,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             userId={reviewDetailQuery.data?.author.id}
             isMoreClick={isMoreClick}
             type="review"
-            isGobacK={() => navigation.goBack()}
+            isGoback={() => navigation.goBack()}
             handleCloseMore={() => setIsMoreClick(false)}
           />
         }
@@ -421,10 +412,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             flexDirection: 'row',
           }}>
             <TouchableOpacity
-              onPress={() => {
-                // navigation.navigate("ProductDetail")
-                navigation.navigate("ProductDetailReady");
-              }}
+              onPress={() => navigation.navigate("ProductDetail", { id: reviewDetailQuery.data.product?.id })}
               style={{
                 backgroundColor: "rgba(234,231,236,0.4)",
                 paddingHorizontal: d2p(5),
@@ -480,12 +468,12 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           <>
             <View style={{
               marginTop: h2p(20),
-              marginLeft: d2p(20),
+              marginLeft: d2p(30),
               marginRight: d2p(20),
               borderWidth: 1,
               borderColor: theme.color.grayscale.eae7ec,
               borderRadius: 10,
-              paddingHorizontal: d2p(15),
+              paddingHorizontal: d2p(15)
             }}>
               <ReKnew
                 type="detail"
@@ -532,7 +520,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
               }]}>{reviewDetailQuery.data?.childCount}</Text>
             </TouchableOpacity>
           }
-          {console.log(reviewDetailQuery.data, 'reviewDetailQuery')}
+
           <ReactionIcon name="like" count={reviewDetailQuery.data?.likeCount} state={like}
             isState={(isState: boolean) => setLike(isState)} mutation={likeReviewMutation} id={route.params?.id} />
           <ReactionIcon name="cart" state={cart} count={reviewDetailQuery.data?.bookmarkCount}
@@ -751,6 +739,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
 
   return (
     <Fragment>
+      {/* 이미지 확대 */}
       <ImageGallery
         initialIndex={initialIndex}
         close={closeGallery}
@@ -766,11 +755,13 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
         isBorder={true}
         headerLeft={<LeftArrowIcon onBackClick={() => {
           if (route.path) {
+            // * 공유하기로 들어와서 뒤로가기 눌렀을 경우 home으로 reset
             //@ts-ignore
             navigation.reset({ index: 0, routes: [{ name: "TabNav" }] });
           }
           else {
-            navigation.navigate("Feed");
+            navigation.goBack();
+            // navigation.navigate("Feed");
           }
         }}
           imageStyle={{ width: d2p(11), height: d2p(25) }} />}

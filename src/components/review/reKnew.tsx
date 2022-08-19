@@ -38,7 +38,7 @@ const ReKnew = ({ review, filterBadge, type }: FeedReviewProps) => {
 
   if (!review.isActive) {
     return (
-      <View style={{ paddingBottom: 0, paddingTop: h2p(15) }}>
+      <View style={{ paddingBottom: 0, paddingTop: d2p(15) }}>
         <View style={{ flexDirection: "row" }}>
           <Image source={retweetfrom}
             style={{ width: d2p(15), height: d2p(40) }} />
@@ -67,8 +67,7 @@ const ReKnew = ({ review, filterBadge, type }: FeedReviewProps) => {
           <View style={{
             flexDirection: "row",
             alignItems: "center",
-            height: h2p(20),
-            marginTop: h2p(20),
+            marginTop: d2p(15),
           }}>
             <TouchableOpacity
               onPress={() => navigation.navigate("Mypage", { id: review.author.id })}

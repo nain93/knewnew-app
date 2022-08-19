@@ -4,16 +4,16 @@ import { FONT } from '~/styles/fonts';
 import { d2p, h2p } from '~/utils';
 import { circle, graycircle, grayclose, grayheart, grayquestion, heart, question, smallClose } from '~/assets/icons';
 import theme from '~/styles/theme';
-import { ReactionType } from '~/types/review';
+import { SatisfactionType } from '~/types/review';
 import { reactList } from '~/utils/constant';
 
 interface ReactionLayoutProps {
   clickedReact: {
-    title: ReactionType,
+    title: SatisfactionType,
     isClick: boolean
   }[],
   setClickReact: (reactList: {
-    title: ReactionType,
+    title: SatisfactionType,
     isClick: boolean
   }[]) => void,
   multiSelect?: boolean

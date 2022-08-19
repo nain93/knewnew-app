@@ -27,13 +27,13 @@ export const latestVerionsState = atom<string>({
   default: ""
 });
 
-interface popupStateType {
+interface PopupStateType {
   isOpen: boolean;
   content: string;
   popupStyle?: ViewStyle
 }
 
-export const popupState = atom<popupStateType>({
+export const popupState = atom<PopupStateType>({
   key: "popupState",
   default: {
     isOpen: false,
@@ -42,29 +42,33 @@ export const popupState = atom<popupStateType>({
   }
 });
 
-interface okPopupStateType {
+interface OkPopupStateType {
   isOpen: boolean;
   content: string;
   popupStyle?: ViewStyle;
-  okButton: () => void
+  okButton: () => void,
+  isBackdrop?: boolean,
+  isCancleButton?: boolean
 }
 
-export const okPopupState = atom<okPopupStateType>({
+export const okPopupState = atom<OkPopupStateType>({
   key: "okPopupState",
   default: {
     isOpen: false,
     content: "",
     okButton: () => null,
-    popupStyle: {}
+    popupStyle: {},
+    isBackdrop: true,
+    isCancleButton: true
   }
 });
 
-interface notificationPopupType extends popupStateType {
+interface NotificationPopupType extends PopupStateType {
   onPress: () => void,
   id: number
 }
 
-export const notificationPopup = atom<notificationPopupType>({
+export const notificationPopup = atom<NotificationPopupType>({
   key: "notificationState",
   default: {
     id: -1,
@@ -74,7 +78,7 @@ export const notificationPopup = atom<notificationPopupType>({
   }
 });
 
-interface BottomSheetProps {
+interface BottomSheetType {
   onOpen?: () => void
   isOpen: boolean,
   height: number,
@@ -86,7 +90,7 @@ interface BottomSheetProps {
   }
 }
 
-export const bottomSheetState = atom<BottomSheetProps | null>({
+export const bottomSheetState = atom<BottomSheetType | null>({
   key: "bottomSheetState",
   default: null
 });

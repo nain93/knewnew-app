@@ -15,26 +15,16 @@ interface HeaderProps {
   headerRightPress?: () => void;
   customRight?: JSX.Element;
   viewStyle?: ViewStyle;
-  type?: "feed"
 }
 
-function StatusBarPlaceHolder() {
-  return (
-    <View style={{
-      width: "100%",
-      height: getStatusBarHeight(),
-      backgroundColor: theme.color.white
-    }} />
-  );
-}
-
-const Header = ({ type, headerRightPress, headerLeft, headerRight, customRight, title, isBorder = true, bgColor, viewStyle }: HeaderProps) => {
+const Header = ({ headerRightPress, headerLeft, headerRight, customRight, title, isBorder = true, bgColor, viewStyle }: HeaderProps) => {
   return (
     <>
-      {(type !== "feed" && !isIphoneX() && Platform.OS === "ios") &&
-        <StatusBarPlaceHolder />}
       <View style={[styles.container, viewStyle, { borderBottomWidth: isBorder ? 1 : 0 },
-      { backgroundColor: bgColor ? bgColor : theme.color.white }]}>
+      {
+        backgroundColor: bgColor ? bgColor : theme.color.white,
+        marginTop: Platform.OS === "ios" ? getStatusBarHeight() : 0
+      }]}>
         <View
           style={{ position: "absolute", left: d2p(20) }}>
           {headerLeft}
@@ -67,7 +57,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderBottomColor: theme.color.grayscale.e9e7ec,
-    marginTop: isIphoneX() ? getStatusBarHeight() : 0,
     paddingVertical: h2p(20),
   }
 });

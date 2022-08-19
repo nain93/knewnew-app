@@ -13,6 +13,7 @@ interface ImageRenderItemProps {
 
 const ImageFlatlist = ({ data, onPress }: ImageRenderItemProps) => {
   const [scrollIdx, setScrollIdx] = useState(0);
+
   return (
     <View>
       <FlatList
