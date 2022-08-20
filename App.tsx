@@ -21,6 +21,8 @@ import * as Sentry from "@sentry/react-native";
 import VersionCheck from 'react-native-version-check';
 import Config from 'react-native-config';
 import NotificationPopup from '~/components/popup/notificationPopup';
+import { versioningAOS, versioningIOS } from '~/utils/constant';
+import ShouldUpdatePopup from '~/components/popup/shouldUpdatePopup';
 
 
 export const navigationRef = createNavigationContainerRef();
@@ -34,6 +36,7 @@ const App = () => {
   const [isVisible, setIsVisible] = useState(false);
   const setIsNotiReadState = useSetRecoilState(isNotiReadState);
   const setLatestVerions = useSetRecoilState(latestVerionsState);
+  const [versionCheckModal, setVersionCheckModal] = useState(false);
 
   // const sendLoggedFiles = useCallback(() => {
   //   FileLogger.sendLogFilesByEmail({
@@ -60,16 +63,34 @@ const App = () => {
     if (Platform.OS === "ios") {
       VersionCheck.getLatestVersion({
         provider: "appStore"
-      }).then((latestVersion: string) => {
-        setLatestVerions(latestVersion);
+      }).then((latest: string) => {
+        // * 특정 버전에서 강제 업데이트 (1.1.00 전버전)
+        if (!__DEV__ && versioningIOS !== latest) {
+          // * 강제 업데이트 팝업
+          setVersionCheckModal(true);
+        }
+        else {
+          setVersionCheckModal(false);
+        }
+
+        setLatestVerions(latest);
       });
     }
 
     if (Platform.OS === "android") {
       VersionCheck.getLatestVersion({
         provider: "playStore"
-      }).then((latestVersion: string) => {
-        setLatestVerions(latestVersion);
+      }).then((latest: string) => {
+        // * 특정 버전에서 강제 업데이트 (1.1.00 전버전)
+        if (!__DEV__ && versioningAOS !== latest) {
+          // * 강제 업데이트 팝업
+          setVersionCheckModal(true);
+        }
+        else {
+          setVersionCheckModal(false);
+        }
+
+        setLatestVerions(latest);
       });
     }
   };
@@ -249,7 +270,9 @@ const App = () => {
     <SafeAreaProvider>
       {/*@ts-ignore*/}
       <NavigationContainer linking={linking} ref={navigationRef} fallback={<Loading />}>
-        <GlobalNav token={token} />
+        {versionCheckModal ? null :
+          <GlobalNav token={token} />
+        }
       </NavigationContainer>
       {/* 위에서 내려오는 알림 팝업 */}
       {isVisible &&
@@ -274,6 +297,11 @@ const App = () => {
         <Animated.View style={{ opacity: fadeAnim ? fadeAnim : 1, zIndex: fadeAnim ? fadeAnim : -1 }}>
           <AlertPopup text={isPopupOpen.content} popupStyle={isPopupOpen.popupStyle} />
         </Animated.View>}
+
+      {/* 강제 업데이트 팝업 */}
+      {versionCheckModal &&
+        <ShouldUpdatePopup modalOpen={versionCheckModal} />
+      }
     </SafeAreaProvider>
   );
 };

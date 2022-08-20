@@ -93,11 +93,11 @@ const Mypage = ({ navigation, route }: MypageProps) => {
         <View style={styles.profileImage} >
           <View>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-              {getMyProfileQuery.data?.tags.taste?.map(v =>
+              {React.Children.toArray(getMyProfileQuery.data?.tags.taste?.map(v =>
                 <Text style={[FONT.Bold, { color: theme.color.main, marginBottom: h2p(5) }]}>
                   {`${v} `}
                 </Text>
-              )}
+              ))}
             </View>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Text style={[FONT.Bold, { fontSize: 20 }]}>
