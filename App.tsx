@@ -64,13 +64,15 @@ const App = () => {
       VersionCheck.getLatestVersion({
         provider: "appStore"
       }).then((latest: string) => {
-        if (!__DEV__ && versioningIOS !== latest) {
-          // * 강제 업데이트 팝업
-          setVersionCheckModal(true);
-        }
-        else {
-          setVersionCheckModal(false);
-        }
+        // // * 특정 버전에서 강제 업데이트 (1.1.00 전버전)
+        // if (!__DEV__ && versioningIOS !== latest) {
+        //   // * 강제 업데이트 팝업
+        //   setVersionCheckModal(true);
+        // }
+        // else {
+        //   setVersionCheckModal(false);
+        // }
+
         setLatestVerions(latest);
       });
     }
@@ -79,13 +81,15 @@ const App = () => {
       VersionCheck.getLatestVersion({
         provider: "playStore"
       }).then((latest: string) => {
-        if (!__DEV__ && versioningAOS !== latest) {
-          // * 강제 업데이트 팝업
-          setVersionCheckModal(true);
-        }
-        else {
-          setVersionCheckModal(false);
-        }
+        // // * 특정 버전에서 강제 업데이트 (1.1.00 전버전)
+        // if (!__DEV__ && versioningAOS !== latest) {
+        //   // * 강제 업데이트 팝업
+        //   setVersionCheckModal(true);
+        // }
+        // else {
+        //   setVersionCheckModal(false);
+        // }
+
         setLatestVerions(latest);
       });
     }

@@ -79,19 +79,21 @@ const Home = ({ navigation }: HomeProps) => {
 
   useEffect(() => {
     // * 배너 자동 스크롤
-    const totalIndex = 3;
+    const totalIndex = getBannerQuery.data?.length || 0;
     let index = 0;
-    setInterval(() => {
-      index++;
-      if (index < totalIndex) {
-        bannerListRef.current?.scrollToIndex({ animated: true, index: index });
-      }
-      else {
-        index = 0;
-        bannerListRef.current?.scrollToIndex({ animated: true, index });
-      }
-    }, 3000);
-  }, []);
+    if (getBannerQuery.data && getBannerQuery.data?.length > 0) {
+      setInterval(() => {
+        index++;
+        if (index < totalIndex) {
+          bannerListRef.current?.scrollToIndex({ animated: true, index: index });
+        }
+        else {
+          index = 0;
+          bannerListRef.current?.scrollToIndex({ animated: true, index });
+        }
+      }, 3000);
+    }
+  }, [getBannerQuery.data?.length]);
 
   return (
     <>

@@ -56,7 +56,8 @@ const ReactionIcon = ({ review, name, count, state, isState, mutation, id }: Rev
         resizeMode="contain"
         style={{ width: d2p(26), height: d2p(26) }}
       />
-      <Text style={[{ fontSize: 12 }, !state ? styles.default : styles.clicked, { marginLeft: d2p(9) }, FONT.Bold]}>{reactCount}</Text>
+      <Text style={[{ fontSize: 12 }, !state ? styles.default : styles.clicked, { marginLeft: d2p(9) }, state ? FONT.Bold : FONT.Regular]}>
+        {reactCount}</Text>
     </TouchableOpacity >
   );
 };

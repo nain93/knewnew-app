@@ -545,7 +545,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             }}
             style={{ flexDirection: "row", alignItems: "center" }}>
             <Image source={shareIcon} style={{ width: d2p(26), height: d2p(26) }} />
-            <Text style={[FONT.Bold, { fontSize: 12, color: theme.color.grayscale.C_79737e, marginLeft: d2p(9) }]}>
+            <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_79737e, marginLeft: d2p(9) }]}>
               {reviewDetailQuery.data?.shareCount}
             </Text>
           </TouchableOpacity>
