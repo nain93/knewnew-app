@@ -20,9 +20,9 @@ import * as Sentry from "@sentry/react-native";
 //@ts-ignore
 import VersionCheck from 'react-native-version-check';
 import NotificationPopup from '~/components/popup/notificationPopup';
-import ShouldUpdatePopup from '~/components/popup/shouldUpdatePopup';
 import Config from 'react-native-config';
 import { versioningAOS, versioningIOS } from '~/utils/constant';
+import ShouldUpdatePopup from '~/components/popup/shouldUpdatePopup';
 
 
 export const navigationRef = createNavigationContainerRef();
