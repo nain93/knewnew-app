@@ -305,14 +305,15 @@ const Home = ({ navigation }: HomeProps) => {
               <Text style={[FONT.Bold, { fontSize: 18 }]}>
                 {`지금 뉴뉴에서\n가장 많이 담긴 푸드로그는?!`}
               </Text>
-              <TouchableOpacity
+              {/* 더보기 잠시 주석처리 */}
+              {/* <TouchableOpacity
                 hitSlop={hitslop}
                 onPress={() => navigation.navigate("Feed", { sort: "2" })}>
                 <Text style={[FONT.Medium, {
                   color: theme.color.grayscale.a09ca4, fontSize: 12
                 }]}>{`더보기 >`}
                 </Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
 
             <FlatList
@@ -345,7 +346,7 @@ const Home = ({ navigation }: HomeProps) => {
                     </Text>
                   </View>
                   <View style={{
-                    width: d2p(180), minHeight: h2p(230),
+                    width: d2p(180),
                     marginHorizontal: d2p(5),
                     backgroundColor: theme.color.white,
                     borderRadius: 10,

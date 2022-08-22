@@ -110,7 +110,10 @@ const Mypage = ({ navigation, route }: MypageProps) => {
                 </Text>
               ))}
             </View>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View style={{
+              flexDirection: "row", alignItems: "center",
+              width: Dimensions.get("window").width - d2p(110),
+            }}>
               <Text style={[FONT.Bold, { fontSize: 20 }]}>
                 {getMyProfileQuery.data?.nickname}
               </Text>

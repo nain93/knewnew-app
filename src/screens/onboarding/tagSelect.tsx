@@ -17,6 +17,7 @@ import { userSignup } from '~/api/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import UserTagLayout from '~/components/layout/UserTagLayout';
 import useNotification from '~/hooks/useNotification';
+import Loading from '~/components/loading';
 
 interface BadgeSelectProps {
   navigation: NavigationStackProp
@@ -97,6 +98,11 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
     }
   }, [userBadge]);
 
+  if (signupMutation.isLoading) {
+    return (
+      <Loading />
+    );
+  }
 
   return (
     <KeyboardAwareScrollView
