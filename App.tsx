@@ -19,8 +19,8 @@ import FadeInOut from '~/hooks/useFadeInOut';
 import * as Sentry from "@sentry/react-native";
 //@ts-ignore
 import VersionCheck from 'react-native-version-check';
-import Config from 'react-native-config';
 import NotificationPopup from '~/components/popup/notificationPopup';
+import Config from 'react-native-config';
 import { versioningAOS, versioningIOS } from '~/utils/constant';
 import ShouldUpdatePopup from '~/components/popup/shouldUpdatePopup';
 
@@ -64,14 +64,14 @@ const App = () => {
       VersionCheck.getLatestVersion({
         provider: "appStore"
       }).then((latest: string) => {
-        // * 특정 버전에서 강제 업데이트 (1.1.00 전버전)
-        if (!__DEV__ && versioningIOS !== latest) {
-          // * 강제 업데이트 팝업
-          setVersionCheckModal(true);
-        }
-        else {
-          setVersionCheckModal(false);
-        }
+        // // * 특정 버전에서 강제 업데이트 (1.1.00 전버전)
+        // if (!__DEV__ && versioningIOS !== latest) {
+        //   // * 강제 업데이트 팝업
+        //   setVersionCheckModal(true);
+        // }
+        // else {
+        //   setVersionCheckModal(false);
+        // }
 
         setLatestVerions(latest);
       });
@@ -81,14 +81,14 @@ const App = () => {
       VersionCheck.getLatestVersion({
         provider: "playStore"
       }).then((latest: string) => {
-        // * 특정 버전에서 강제 업데이트 (1.1.00 전버전)
-        if (!__DEV__ && versioningAOS !== latest) {
-          // * 강제 업데이트 팝업
-          setVersionCheckModal(true);
-        }
-        else {
-          setVersionCheckModal(false);
-        }
+        // // * 특정 버전에서 강제 업데이트 (1.1.00 전버전)
+        // if (!__DEV__ && versioningAOS !== latest) {
+        //   // * 강제 업데이트 팝업
+        //   setVersionCheckModal(true);
+        // }
+        // else {
+        //   setVersionCheckModal(false);
+        // }
 
         setLatestVerions(latest);
       });
@@ -102,17 +102,17 @@ const App = () => {
     if (storageToken) {
       setToken(storageToken);
     }
-    else {
-      SplashScreen.hide();
-    }
   };
 
   useEffect(() => {
     // *스플래시 로딩중
-    getToken();
     versionCheck();
+    getToken();
     // * 코드푸시 업데이트 체크
-    installUpdateIfAvailable();
+    if (!__DEV__) {
+      installUpdateIfAvailable();
+    }
+    SplashScreen.hide();
   }, []);
 
   const linking = {
@@ -287,7 +287,10 @@ const App = () => {
       }
       {/* 확인, 취소 버튼 팝업 */}
       {modalOpen.isOpen &&
-        <OkPopup title={modalOpen.content}
+        <OkPopup
+          isCancleButton={modalOpen.isCancleButton}
+          isBackdrop={modalOpen.isBackdrop}
+          title={modalOpen.content}
           handleOkayButton={modalOpen.okButton}
           modalOpen={modalOpen.isOpen}
           setModalOpen={(isModalOpen: boolean) => setModalOpen({ ...modalOpen, isOpen: isModalOpen })} />
@@ -305,6 +308,7 @@ const App = () => {
     </SafeAreaProvider>
   );
 };
+
 // * 코드푸시떄 테스트
 // codePush.getUpdateMetadata().then(update => {
 //   console.log(update, 'update');
@@ -324,6 +328,7 @@ if (!__DEV__) {
     environment: "production",
     dsn: Config.CENTRY_DSN,
     tracesSampleRate: 1.0,
+    // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
   });
 }
 

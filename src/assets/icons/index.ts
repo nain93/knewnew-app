@@ -64,6 +64,7 @@ import starIcon from "./starIcon.png";
 import goldStarIcon from "./goldStarIcon.png";
 import graybookmark from "./graybookmark.png";
 import bookmark from "./bookmark.png";
+import shareIcon from "./shareIcon.png";
 
 export {
   close, leftArrow, more, heart, like, reKnew, comment, commentMore, circle, maincart, maintag,
@@ -72,6 +73,7 @@ export {
   graywrite, graylogo, graymypage, graysearch, mainmypage, mainlogoIcon, write, plusIcon, recommentIcon,
   handIcon, tagFood, tagHome, tagLife, emailicon, noticeIcon, alertIcon, eyeIcon, colorEyeIcon, checkIcon, tagIcon,
   selectTagIcon, knewnewIcon, settingIcon, rightArrow, settingKnewnew, grayCheckIcon, question, grayquestion, smallClose, whiteClose,
-  grayEyeIcon, grayKnewnew, grayCart, circleQuestion, marketIcon, goldStarIcon, starIcon, bookmark, graybookmark
+  grayEyeIcon, grayKnewnew, grayCart, circleQuestion, marketIcon, goldStarIcon, starIcon, bookmark, graybookmark,
+  shareIcon
 };
 

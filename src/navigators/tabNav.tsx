@@ -1,8 +1,6 @@
 import { Image, StyleSheet, View } from 'react-native';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from 'react';
-import Feed from '~/screens/feed';
-import Write from '~/screens/write';
 import Search from '~/screens/search';
 import Mypage from '~/screens/mypage';
 import theme from '~/styles/theme';
@@ -15,6 +13,8 @@ import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { getFocusedRouteNameFromRoute, useRoute } from '@react-navigation/native';
 import BeforeWrite from '~/screens/write/beforeWrite';
+import Home from '~/screens/home';
+import HomeStackNav from '~/navigators/homeStackNav';
 
 const Tabs = createBottomTabNavigator();
 
@@ -68,14 +68,8 @@ const TabNavigator = () => {
       }}
     >
       <Tabs.Screen
-        name="Feed"
-        component={Feed}
-        listeners={({ navigation }) => ({
-          tabPress: e => {
-            e.preventDefault();
-            navigation.navigate('Feed', { refresh: routeName === "Feed" ? true : false });
-          },
-        })}
+        name="HomeStackNav"
+        component={HomeStackNav}
         options={{
           tabBarLabel: "홈",
           headerShown: false,

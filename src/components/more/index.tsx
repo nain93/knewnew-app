@@ -10,7 +10,6 @@ import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/v
 import { ReviewListType } from '~/types/review';
 import { useMutation, useQueryClient } from 'react-query';
 import { deleteReview } from '~/api/review';
-import Share from 'react-native-share';
 import { blockUser } from '~/api/user';
 
 interface MoreProps {
@@ -21,11 +20,11 @@ interface MoreProps {
   filterBadge?: string,
   handleCloseMore: () => void,
   clickBoxStyle?: ViewStyle,
-  isGobacK?: () => void,
+  isGoback?: () => void,
   setSelectedIndex?: (idx: number) => void
 }
 
-const More = ({ setSelectedIndex, isGobacK, handleCloseMore, userId, isMoreClick, type, review, filterBadge, clickBoxStyle }: MoreProps) => {
+const More = ({ setSelectedIndex, isGoback, handleCloseMore, userId, isMoreClick, type, review, filterBadge, clickBoxStyle }: MoreProps) => {
   const navigation = useNavigation<StackNavigationProp>();
   const myId = useRecoilValue(myIdState);
   const token = useRecoilValue(tokenState);
@@ -36,8 +35,8 @@ const More = ({ setSelectedIndex, isGobacK, handleCloseMore, userId, isMoreClick
   const deleteMutation = useMutation("deleteReview",
     (id: number) => deleteReview(token, id), {
     onSuccess: () => {
-      if (isGobacK) {
-        isGobacK();
+      if (isGoback) {
+        isGoback();
       }
     }
   });
@@ -48,15 +47,11 @@ const More = ({ setSelectedIndex, isGobacK, handleCloseMore, userId, isMoreClick
       queryClient.invalidateQueries("reviewList");
       queryClient.invalidateQueries("userBookmarkList");
       setIspopupOpen({ isOpen: true, content: "차단되었습니다." });
-      if (isGobacK) {
-        isGobacK();
+      if (isGoback) {
+        isGoback();
       }
     }
   });
-
-  const closeMore = () => {
-    handleCloseMore();
-  };
 
   const handleEditPress = () => {
     if (type === "review") {
@@ -114,20 +109,6 @@ const More = ({ setSelectedIndex, isGobacK, handleCloseMore, userId, isMoreClick
     }
   };
 
-  const handleSharePress = () => {
-    Share.open({
-      title: "뉴뉴",
-      url: `knewnnew://FeedDetail/${review.id}`
-      // url: `https://knewnnew.co.kr/FeedDetail/${review.id}`
-    })
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        err && console.log(err);
-      });
-    closeMore();
-  };
 
   const handleReportPress = () => {
     navigation.navigate("report", { review });
@@ -149,9 +130,6 @@ const More = ({ setSelectedIndex, isGobacK, handleCloseMore, userId, isMoreClick
       {isMoreClick &&
         (myId === userId ?
           <View style={[styles.clickBox, clickBoxStyle]}>
-            <Pressable style={styles.press} onPress={handleSharePress}>
-              <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
-            </Pressable>
             <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
             <Pressable style={styles.press} onPress={handleEditPress}>
               <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
@@ -172,9 +150,6 @@ const More = ({ setSelectedIndex, isGobacK, handleCloseMore, userId, isMoreClick
           </View>
           :
           <View style={[styles.clickBox, clickBoxStyle]}>
-            <Pressable style={styles.press} onPress={handleSharePress}>
-              <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>공유</Text>
-            </Pressable>
             <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
             <Pressable style={styles.press} onPress={handleReportPress}>
               <Text style={[{ color: theme.color.main }, FONT.Regular]}>신고</Text>

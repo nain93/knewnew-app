@@ -7,7 +7,6 @@ import { d2p, h2p } from '~/utils';
 import { FONT } from '~/styles/fonts';
 import theme from '~/styles/theme';
 import BasicButton from '~/components/button/basicButton';
-import { NavigationRoute } from 'react-navigation';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { settingKnewnew } from '~/assets/icons';
 
