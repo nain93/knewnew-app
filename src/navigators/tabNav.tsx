@@ -5,15 +5,13 @@ import Search from '~/screens/search';
 import Mypage from '~/screens/mypage';
 import theme from '~/styles/theme';
 import { d2p, h2p } from '~/utils';
-import { mainSearchIcon, graylogo, graymypage, graysearch, graywrite, mainmypage, mainlogoIcon, more, settingIcon } from '~/assets/icons';
+import { mainSearchIcon, graylogo, graymypage, graysearch, graywrite, mainmypage, mainlogoIcon, settingIcon } from '~/assets/icons';
 import { useRecoilValue } from 'recoil';
 import { myIdState } from '~/recoil/atoms';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
-import { getFocusedRouteNameFromRoute, useRoute } from '@react-navigation/native';
 import BeforeWrite from '~/screens/write/beforeWrite';
-import Home from '~/screens/home';
 import HomeStackNav from '~/navigators/homeStackNav';
 
 const Tabs = createBottomTabNavigator();
@@ -32,8 +30,6 @@ function StatusBarPlaceHolder() {
 
 const TabNavigator = () => {
   const myId = useRecoilValue(myIdState);
-  const screen = useRoute();
-  const routeName = getFocusedRouteNameFromRoute(screen);
 
   return (
     <Tabs.Navigator
