@@ -19,7 +19,6 @@ import { noProfile } from '~/assets/images';
 import { ReviewListType, SatisfactionType } from '~/types/review';
 import { AuthorType } from '~/types';
 import ReadMore from '@fawazahmed/react-native-read-more';
-import LinearGradient from 'react-native-linear-gradient';
 
 interface ProductDetailProps {
   navigation: NavigationStackProp;
@@ -146,13 +145,24 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
                 borderColor: theme.color.grayscale.e9e7ec,
               }} />
           }
-          <ReadMore
-            seeMoreText="더보기 >"
-            expandOnly={true}
+          <Text
+            numberOfLines={3}
+            ellipsizeMode={"tail"}
+            style={[{
+              color: theme.color.grayscale.C_79737e,
+              lineHeight: 21,
+              marginTop: 0,
+              marginLeft: item.image ? 0 : d2p(5),
+              width: d2p(200)
+            }, FONT.Medium]}>
+            {item.content}
+          </Text>
+          {/* <ReadMore
+            seeMoreText=" 더보기 >"
             seeMoreStyle={[FONT.Medium, {
               color: theme.color.grayscale.a09ca4, fontSize: 12
             }]}
-            numberOfLines={5}
+            numberOfLines={3}
             onSeeMoreBlocked={() => navigation.navigate("FeedDetail", {
               authorId: item.author.id,
               id: item.id,
@@ -161,11 +171,12 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
               color: theme.color.grayscale.C_79737e,
               lineHeight: 21,
               marginTop: 0,
-              marginLeft: item.image ? 0 : d2p(5)
+              marginLeft: item.image ? 0 : d2p(5),
+              width: d2p(200)
             }, FONT.Medium]}
           >
             {item.content}
-          </ReadMore>
+          </ReadMore> */}
         </View>
       </Pressable>
     );
