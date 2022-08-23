@@ -142,20 +142,40 @@ const App = () => {
     },
   };
 
+  const handleAlarm = (remoteMessage: any) => {
+    if (Platform.OS === "ios") {
+      // * 링크 없는 공지알람
+      if (!remoteMessage.data?.custom_data.link) {
+        //@ts-ignore
+        navigationRef.navigate("TabNav");
+      }
+      else {
+        // * 푸시알람
+        //@ts-ignore
+        navigationRef.navigate("FeedDetail", { id: remoteMessage.data.custom_data.link.split("/")[1] });
+      }
+    }
+    else {
+      // * 링크 없는 공지알람
+      if (!remoteMessage.data?.link) {
+        //@ts-ignore
+        navigationRef.navigate("TabNav");
+      }
+      else {
+        // * 푸시알람
+        //@ts-ignore
+        navigationRef.navigate("FeedDetail", { id: remoteMessage.data.link.split("/")[1] });
+      }
+    }
+  };
+
   useEffect(() => {
     const state = AppState.addEventListener('change', (nextAppState) => {
       if (nextAppState === "active") {
         // * 백그라운드 알람 클릭시
         messaging().getInitialNotification().then(remoteMessage => {
           if (remoteMessage) {
-            if (Platform.OS === "ios") {
-              //@ts-ignore
-              navigationRef.navigate("FeedDetail", { id: remoteMessage.data.custom_data.link.split("/")[1] });
-            }
-            else {
-              //@ts-ignore
-              navigationRef.navigate("FeedDetail", { id: remoteMessage.data.link.split("/")[1] });
-            }
+            handleAlarm(remoteMessage);
           }
         });
         // * 알림 읽은정보 저장
@@ -179,15 +199,7 @@ const App = () => {
           isOpen: true, content: remoteMessage.notification.body,
           onPress: () => {
             if (navigationRef.isReady()) {
-              // * 알람팝업 클릭시 화면 navigate
-              if (Platform.OS === "ios") {
-                //@ts-ignore
-                navigationRef.navigate("FeedDetail", { id: remoteMessage.data.custom_data.link.split("/")[1] });
-              }
-              else {
-                //@ts-ignore
-                navigationRef.navigate("FeedDetail", { id: remoteMessage.data.link.split("/")[1] });
-              }
+              handleAlarm(remoteMessage);
             }
           }
         });
