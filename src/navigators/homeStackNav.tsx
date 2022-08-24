@@ -1,4 +1,4 @@
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import React from 'react';
 import theme from '~/styles/theme';
@@ -22,7 +22,6 @@ const HomeStackNav = () => {
       <Stack.Screen
         name="Home"
         options={{
-          title: "",
           headerShown: false,
           cardStyle: { backgroundColor: theme.color.grayscale.f7f7fc }
         }}
@@ -31,8 +30,7 @@ const HomeStackNav = () => {
       <Stack.Screen
         name="Feed"
         options={{
-          title: "",
-          headerShown: false,
+          headerShown: false
         }}
         component={Feed}
       />

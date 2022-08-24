@@ -9,6 +9,7 @@
     "build-android": "ENVFILE=env/.env.production cd android && ./gradlew bundleRelease",
     "build-android-apk": "ENVFILE=env/.env.development cd android && ./gradlew assembleRelease",
     "ios": "react-native run-ios",
+    "ios:SE": "react-native run-ios --scheme Product --simulator iPhone SE",
     "ios:prod": "react-native run-ios --scheme Product",
     "ios:staging": "react-native run-ios --scheme Staging",
     "ios:device": "react-native run-ios --device 'iPhone' --configuration Debug",

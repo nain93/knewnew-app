@@ -1,4 +1,4 @@
-import { Animated, Dimensions, Image, Keyboard, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Animated, Dimensions, Image, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import theme from '~/styles/theme';
@@ -201,9 +201,7 @@ const Write = ({ navigation, route }: WriteProp) => {
         satisfaction: route.params.review.satisfaction,
         market: route.params.review.market ? route.params.review.market : undefined,
         product: route.params.review.product ? route.params.review.product.name : undefined,
-        tags: {
-          ...route.params.review.tags
-        },
+        tags: route.params.review.tags,
       });
     }
     else {
@@ -428,7 +426,7 @@ const Write = ({ navigation, route }: WriteProp) => {
                       <Text style={[FONT.Regular, { color: theme.color.main, fontSize: 12, lineHeight: 23 }]}> (필수)</Text>
                     </Text>
                     <Text style={[FONT.Regular, { lineHeight: 23, color: theme.color.grayscale.a09ca4 }]}>
-                      Tip. 내 평소 입맛, 나만의 특별한 조리법 등 다른 분들에게 도움이 되는 꿀팁을 함께 나눠주시면 더욱 좋아요!
+                      Tip. 내 평소 입맛, 더 맛있게 먹을 수 있는 나만의 활용법과 꿀조합  등 다른 유저에게 도움이 되는 꿀팁을 함께 나눠주시면 더욱 좋아요!
                     </Text>
                   </View>
                 }
@@ -505,7 +503,7 @@ const Write = ({ navigation, route }: WriteProp) => {
                     <Text style={[FONT.Regular, { color: theme.color.main, fontSize: 12, lineHeight: 23 }]}> (필수)</Text>
                   </Text>
                   <Text style={[FONT.Regular, { lineHeight: 23, color: theme.color.grayscale.a09ca4 }]}>
-                    Tip. 내 평소 입맛, 나만의 특별한 조리법 등 다른 분들에게 도움이 되는 꿀팁을 함께 나눠주시면 더욱 좋아요!
+                    Tip. 내 평소 입맛, 더 맛있게 먹을 수 있는 나만의 활용법과 꿀조합  등 다른 유저에게 도움이 되는 꿀팁을 함께 나눠주시면 더욱 좋아요!
                   </Text>
                 </View>
               }
