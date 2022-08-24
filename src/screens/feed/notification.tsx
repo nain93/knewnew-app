@@ -11,7 +11,7 @@ import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
 import { allReadNotification, notificationList } from '~/api/setting';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { isNotiReadState, tokenState } from '~/recoil/atoms';
-import { knewnewIcon } from '~/assets/icons';
+import { grayEyeIcon, knewnewIcon } from '~/assets/icons';
 import Loading from '~/components/loading';
 import { NotificationListType } from '~/types/setting';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -120,6 +120,16 @@ const Notification = ({ navigation }: NotificationProps) => {
               case "review_bookmark": {
                 return (
                   <NotiContainer source={cart} isRead={item.isRead} title="담기" />
+                );
+              }
+              case "admin_noti": {
+                return (
+                  <NotiContainer source={knewnewIcon} isRead={item.isRead} title="" />
+                );
+              }
+              case "review_view": {
+                return (
+                  <NotiContainer source={grayEyeIcon} isRead={item.isRead} title="조회수" />
                 );
               }
               default: {

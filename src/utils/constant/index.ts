@@ -2,8 +2,8 @@ import { MarketType, SatisfactionType } from "~/types/review";
 import { d2p } from "~/utils";
 import Config from "react-native-config";
 
-export const marketList: Array<MarketType> = ["네이버 쇼핑", "마켓컬리", "쿠팡프레시", "SSG", "B마트", "윙잇", "기타 (직접 입력)"];
-export const markeForFiltertList: Array<"네이버 쇼핑" | "마켓컬리" | "쿠팡프레시" | "SSG" | "기타"> = ["네이버 쇼핑", "마켓컬리", "쿠팡프레시", "SSG", "기타"];
+export const marketList: Array<MarketType> = ["네이버 쇼핑", "마켓컬리", "쿠팡", "SSG", "B마트", "윙잇", "기타 (직접 입력)"];
+export const markeForFiltertList: Array<"네이버 쇼핑" | "마켓컬리" | "쿠팡" | "SSG" | "기타"> = ["네이버 쇼핑", "마켓컬리", "쿠팡", "SSG", "기타"];
 
 export const reactList: Array<SatisfactionType> = ["best", "good", "bad", "question"];
 
