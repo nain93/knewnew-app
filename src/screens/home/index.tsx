@@ -11,7 +11,10 @@ import { noticeIcon } from '~/assets/icons';
 import { isNotiReadState, myIdState, tokenState } from '~/recoil/atoms';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { FONT } from '~/styles/fonts';
-import { beerFoodlog, begunFoodlog, breadFoodlog, cafeFoodlog, cakeFoodlog, campFoodlog, coupangImage, dieterFoodlog, etcImage, kurlyImage, naverImage, newFoodlog, riceFoodlog, ssgImage } from '~/assets/images/home';
+import {
+  beerFoodlog, begunFoodlog, breadFoodlog, cafeFoodlog, cakeFoodlog, campFoodlog,
+  coupangImage, dieterFoodlog, etcImage, kurlyImage, naverImage, newFoodlog, riceFoodlog, ssgImage
+} from '~/assets/images/home';
 import { interestTagData } from '~/utils/data';
 import { fireImg } from '~/assets/images';
 import { useQuery } from 'react-query';
@@ -43,7 +46,7 @@ interface RecommendFoodType {
     author: string,
     id: number,
     reviewId: number,
-    bookmarkCount: number,
+    countMessage: string,
     likeCount: number,
     comment: string,
     image: string | null
@@ -124,7 +127,6 @@ const Home = ({ navigation }: HomeProps) => {
       <ScrollView
         bounces={false}
         showsVerticalScrollIndicator={false}
-        style={{ marginBottom: h2p(80) }}
       >
         <View style={styles.container}>
           <Text style={[FONT.Bold, { fontSize: 12, marginTop: h2p(10), marginLeft: d2p(20) }]}>
@@ -230,7 +232,7 @@ const Home = ({ navigation }: HomeProps) => {
             }
           </View>
 
-          <View style={styles.foodlogWrap}>
+          <View style={[styles.foodlogWrap, styles.borderBar]}>
             {React.Children.toArray(interestTagData.interest.map((v) => (
               <TouchableOpacity
                 onPress={() => navigation.navigate("Feed", { foodLog: v.title })}
@@ -296,14 +298,51 @@ const Home = ({ navigation }: HomeProps) => {
                 의 모든 푸드로그 보기!</Text>
             </TouchableOpacity>
           </View>
-          <View style={{ marginVertical: h2p(30) }}>
-            <View style={{
-              flexDirection: "row",
-              alignItems: "flex-end", justifyContent: "space-between",
-              marginHorizontal: d2p(20)
-            }}>
+
+          {/* 추천컨텐츠 개발후 주석해제 */}
+          {/* <View style={[styles.borderBar, { paddingVertical: h2p(30), paddingHorizontal: d2p(15) }]}>
+            <View style={[styles.title, { marginBottom: h2p(10), marginHorizontal: d2p(5) }]}>
               <Text style={[FONT.Bold, { fontSize: 18 }]}>
-                {`지금 뉴뉴에서\n가장 많이 담긴 푸드로그는?!`}
+                {`추천컨텐츠\n제목(어드민에서 입력)`}
+              </Text>
+              <Text style={[FONT.Regular, {
+                fontSize: 12,
+                color: theme.color.grayscale.C_443e49
+              }]}>
+                추천컨텐츠 테마에 대한 설명
+              </Text>
+            </View>
+
+            <View style={{ flexDirection: "row" }}>
+              <TouchableOpacity>
+                <View style={{
+                  marginVertical: h2p(10),
+                  marginHorizontal: d2p(5),
+                  width: d2p(155), aspectRatio: 1, backgroundColor: theme.color.white, borderRadius: 5
+                }} />
+                <Text style={[FONT.Medium, { fontSize: 12, width: d2p(155) }]}>
+                  컨텐츠에 대한 간략한 설명 (어드민 입력)
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity>
+                <View style={{
+                  marginVertical: h2p(10),
+                  marginHorizontal: d2p(5),
+                  width: d2p(155), aspectRatio: 1, backgroundColor: theme.color.white, borderRadius: 5
+                }} />
+                <Text style={[FONT.Medium, { fontSize: 12, width: d2p(155) }]}>
+                  컨텐츠에 대한 간략한 설명 (어드민 입력)
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View> */}
+
+          <View style={[styles.borderBar, { paddingVertical: h2p(30) }]}>
+            <View style={[styles.title, { marginHorizontal: d2p(20) }]}>
+              <Text style={[FONT.Bold, { fontSize: 18 }]}>
+                {/* {`지금 뉴뉴에서\n가장 많이 담긴 푸드로그는?!`} */}
+                {getRecommendFoodQuery.data?.title}
               </Text>
               {/* 더보기 잠시 주석처리 */}
               {/* <TouchableOpacity
@@ -327,24 +366,28 @@ const Home = ({ navigation }: HomeProps) => {
                 <Pressable
                   onPress={() => navigation.navigate("FeedDetail", { id: item.reviewId })}
                   style={{ paddingTop: h2p(11.5) }}>
-                  <View style={{
-                    width: d2p(130), height: d2p(23), backgroundColor: theme.color.white,
-                    borderWidth: 1,
-                    borderColor: theme.color.grayscale.e9e7ec,
-                    borderRadius: 11.5,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    position: "absolute",
-                    alignSelf: "center",
-                    top: 0,
-                    zIndex: 10,
-                    flexDirection: "row"
-                  }}>
-                    <Image source={fireImg} style={{ width: d2p(15), height: d2p(15) }} />
-                    <Text style={[FONT.Medium, { fontSize: 13 }]}><Text style={{ color: theme.color.main }}>
-                      {` ${item.bookmarkCount}명`}</Text>이 담았어요!
-                    </Text>
-                  </View>
+                  {item.countMessage &&
+                    <View style={{
+                      width: d2p(130), height: d2p(23), backgroundColor: theme.color.white,
+                      borderWidth: 1,
+                      borderColor: theme.color.grayscale.e9e7ec,
+                      borderRadius: 11.5,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      position: "absolute",
+                      alignSelf: "center",
+                      top: 0,
+                      zIndex: 10,
+                      flexDirection: "row"
+                    }}>
+                      <Image source={fireImg} style={{ width: d2p(15), height: d2p(15) }} />
+                      <Text style={[FONT.Medium, { fontSize: 13 }]}><Text style={{ color: theme.color.main }}>
+                        {`${item.countMessage.split("명")[0]}명`}
+                      </Text>
+                        {`${item.countMessage.split("명")[1]}`}
+                      </Text>
+                    </View>
+                  }
                   <View style={{
                     width: d2p(180),
                     marginHorizontal: d2p(5),
@@ -373,6 +416,7 @@ const Home = ({ navigation }: HomeProps) => {
                 </Pressable>
               )}
             />
+
           </View>
         </View>
       </ScrollView >
@@ -384,7 +428,8 @@ export default Home;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.color.grayscale.f7f7fc
+    backgroundColor: theme.color.grayscale.f7f7fc,
+    marginBottom: h2p(80)
   },
   marketImage: {
     width: d2p(52),
@@ -404,11 +449,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.color.grayscale.eae7ec
   },
-  foodlogWrap: {
+  borderBar: {
     borderTopWidth: 4,
     borderTopColor: theme.color.grayscale.eae7ec,
-    borderBottomWidth: 4,
-    borderBottomColor: theme.color.grayscale.eae7ec,
+  },
+  foodlogWrap: {
     paddingHorizontal: d2p(20),
     paddingVertical: h2p(25),
     marginTop: h2p(15),
@@ -441,5 +486,10 @@ const styles = StyleSheet.create({
     width: d2p(36),
     height: d2p(36),
     marginBottom: h2p(8)
+  },
+  title: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between"
   }
 });

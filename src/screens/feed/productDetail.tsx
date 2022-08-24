@@ -265,7 +265,7 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
               style={{ marginLeft: d2p(7), }}>
               <Image source={circleQuestion} style={{ width: d2p(16), height: d2p(16) }} />
             </Pressable>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() => {
                 if (productDetailQuery.data?.link) {
                   Linking.openURL(productDetailQuery.data?.link);
@@ -275,7 +275,7 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
               <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>
                 {`최저가로 이동하기 >`}
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
         <View style={{
@@ -342,7 +342,8 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
           renderItem={foodLogRenderItem}
           keyExtractor={foodLogKey}
         />
-        <View style={{ paddingHorizontal: d2p(20) }}>
+        {/* 포털 사이트 주석 */}
+        {/* <View style={{ paddingHorizontal: d2p(20) }}>
           <View style={{
             alignItems: "center",
             flexDirection: "row"
@@ -397,7 +398,7 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
             marginBottom: isIphoneX() ? getBottomSpace() : h2p(30),
             marginTop: "auto", width: d2p(96), height: d2p(20)
           }} />
-        </View>
+        </View> */}
       </ScrollView>
     </>
   );
@@ -422,7 +423,6 @@ const styles = StyleSheet.create({
   },
   foodLogItem: {
     width: d2p(290),
-    height: h2p(145),
     padding: d2p(10),
     marginRight: d2p(10),
     backgroundColor: theme.color.white,

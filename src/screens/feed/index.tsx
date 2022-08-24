@@ -124,7 +124,6 @@ const Feed = ({ navigation, route }: FeedProps) => {
           flexDirection: "row", alignItems: "center",
           justifyContent: "space-between",
           marginBottom: h2p(10),
-          // marginTop: h2p(10)
         }}>
           <View style={{ flexDirection: "row" }}>
             <TouchableOpacity
@@ -371,7 +370,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
           <ResetButton resetClick={() => setClickReact(clickedReact.map(v => ({
             title: v.title, isClick: false
           })))}
-            viewStyle={{ marginTop: h2p(40), marginBottom: "auto" }} />
+            viewStyle={{ marginTop: h2p(30), marginBottom: "auto" }} />
           <BasicButton text="필터 저장하기"
             onPress={() => {
               setSortReact(clickedReact.filter(v => v.isClick).map(v => v.title));
@@ -416,7 +415,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
           />
           <ResetButton resetClick={() => {
             setClickMarket(clickedMarket.map(v => ({ title: v.title, isClick: false })));
-          }} viewStyle={{ marginTop: h2p(40), marginBottom: "auto" }} />
+          }} viewStyle={{ marginTop: h2p(30), marginBottom: "auto" }} />
           <BasicButton text="필터 저장하기"
             onPress={() => {
               setSortMarket(clickedMarket.filter(v => v.isClick).map(v => v.title));
