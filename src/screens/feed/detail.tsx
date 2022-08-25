@@ -123,6 +123,12 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           navigation.goBack();
         }
       }
+    },
+    onSettled: () => {
+      if (route.path) {
+        // * 딥링크 타고 들어왔을경우 SplashScreen hide
+        SplashScreen.hide();
+      }
     }
   });
 

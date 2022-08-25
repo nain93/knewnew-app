@@ -112,7 +112,7 @@ const App = () => {
     if (!__DEV__) {
       installUpdateIfAvailable();
     }
-    SplashScreen.hide();
+    // SplashScreen.hide();
   }, []);
 
   const linking = {
@@ -144,27 +144,27 @@ const App = () => {
 
   const handleAlarm = (remoteMessage: any) => {
     if (Platform.OS === "ios") {
-      // * 링크 없는 공지알람
-      if (!remoteMessage.data?.custom_data.link) {
-        //@ts-ignore
-        navigationRef.navigate("TabNav");
-      }
-      else {
+      if (remoteMessage.data?.custom_data.link) {
         // * 푸시알람
         //@ts-ignore
         navigationRef.navigate("FeedDetail", { id: remoteMessage.data.custom_data.link.split("/")[1] });
       }
-    }
-    else {
-      // * 링크 없는 공지알람
-      if (!remoteMessage.data?.link) {
+      else {
+        // * 링크 없는 공지알람
         //@ts-ignore
         navigationRef.navigate("TabNav");
       }
-      else {
+    }
+    else {
+      if (remoteMessage.data?.link) {
         // * 푸시알람
         //@ts-ignore
         navigationRef.navigate("FeedDetail", { id: remoteMessage.data.link.split("/")[1] });
+      }
+      else {
+        // * 링크 없는 공지알람
+        //@ts-ignore
+        navigationRef.navigate("TabNav");
       }
     }
   };

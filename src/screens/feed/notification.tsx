@@ -6,12 +6,12 @@ import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import { d2p, h2p, simpleDate } from '~/utils';
 import { FONT } from '~/styles/fonts';
 import theme from '~/styles/theme';
-import { cart, comment, likeComment, mention, reComment } from '~/assets/icons/notificationIcon';
+import { mention, notiBookmark, notiComment, notiHeart, notiLike, notiMention, notiRecomment, notiView, reknewRenewal } from '~/assets/icons/notificationIcon';
 import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
 import { allReadNotification, notificationList } from '~/api/setting';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { isNotiReadState, tokenState } from '~/recoil/atoms';
-import { grayEyeIcon, knewnewIcon } from '~/assets/icons';
+import { knewnewIcon } from '~/assets/icons';
 import Loading from '~/components/loading';
 import { NotificationListType } from '~/types/setting';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -27,7 +27,7 @@ interface NotiContainerProp {
 const NotiContainer = ({ source, title, isRead }: NotiContainerProp) => {
   return (
     <>
-      <Image source={source} resizeMode="contain" style={{ width: d2p(18), height: d2p(18) }} />
+      <Image source={source} resizeMode="contain" style={{ width: d2p(24), height: d2p(24) }} />
       <View>
         {!isRead &&
           <View style={{
@@ -89,47 +89,47 @@ const Notification = ({ navigation }: NotificationProps) => {
             switch (item.type) {
               case "review_popular": {
                 return (
-                  <NotiContainer source={knewnewIcon} isRead={item.isRead} title="활동" />
+                  <NotiContainer source={reknewRenewal} isRead={item.isRead} title="활동" />
                 );
               }
               case "review_comment": {
                 return (
-                  <NotiContainer source={comment} isRead={item.isRead} title="댓글" />
+                  <NotiContainer source={notiComment} isRead={item.isRead} title="댓글" />
                 );
               }
               case "review_comment_like": {
                 return (
-                  <NotiContainer source={likeComment} isRead={item.isRead} title="좋아요" />
+                  <NotiContainer source={notiHeart} isRead={item.isRead} title="좋아요" />
                 );
               }
               case "review_child_comment": {
                 return (
-                  <NotiContainer source={reComment} isRead={item.isRead} title="답글" />
+                  <NotiContainer source={notiRecomment} isRead={item.isRead} title="답글" />
                 );
               }
               case "comment_mention": {
                 return (
-                  <NotiContainer source={mention} isRead={item.isRead} title="언급" />
+                  <NotiContainer source={notiMention} isRead={item.isRead} title="언급" />
                 );
               }
               case "review_like": {
                 return (
-                  <NotiContainer source={likeComment} isRead={item.isRead} title="좋아요" />
+                  <NotiContainer source={notiLike} isRead={item.isRead} title="좋아요" />
                 );
               }
               case "review_bookmark": {
                 return (
-                  <NotiContainer source={cart} isRead={item.isRead} title="담기" />
+                  <NotiContainer source={notiBookmark} isRead={item.isRead} title="담기" />
                 );
               }
               case "admin_noti": {
                 return (
-                  <NotiContainer source={knewnewIcon} isRead={item.isRead} title="" />
+                  <NotiContainer source={reknewRenewal} isRead={item.isRead} title="알림" />
                 );
               }
               case "review_view": {
                 return (
-                  <NotiContainer source={grayEyeIcon} isRead={item.isRead} title="조회수" />
+                  <NotiContainer source={notiView} isRead={item.isRead} title="활동" />
                 );
               }
               default: {

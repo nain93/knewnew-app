@@ -24,7 +24,7 @@ import { MyProfileType } from '~/types/user';
 import FastImage from 'react-native-fast-image';
 import { getBanner, getFoodLogCount, getRecommendFoodLog } from '~/api/home';
 import Loading from '~/components/loading';
-import { loading } from '~/assets/gif';
+import SplashScreen from 'react-native-splash-screen';
 
 export interface HomeProps {
   navigation: NavigationStackProp;
@@ -45,9 +45,8 @@ interface RecommendFoodType {
   contents: Array<{
     author: string,
     id: number,
-    reviewId: number,
+    review: number,
     countMessage: string,
-    likeCount: number,
     comment: string,
     image: string | null
   }>
@@ -97,6 +96,12 @@ const Home = ({ navigation }: HomeProps) => {
       }, 3000);
     }
   }, [getBannerQuery.data?.length]);
+
+  useEffect(() => {
+    if (getFoodLogCountQuery.data && getRecommendFoodQuery.data) {
+      SplashScreen.hide();
+    }
+  }, [getFoodLogCountQuery.data, getRecommendFoodQuery.data]);
 
   return (
     <>
@@ -364,7 +369,7 @@ const Home = ({ navigation }: HomeProps) => {
               data={getRecommendFoodQuery.data?.contents.slice(0, 5)}
               renderItem={({ item }) => (
                 <Pressable
-                  onPress={() => navigation.navigate("FeedDetail", { id: item.reviewId })}
+                  onPress={() => navigation.navigate("FeedDetail", { id: item.review })}
                   style={{ paddingTop: h2p(11.5) }}>
                   {item.countMessage &&
                     <View style={{
