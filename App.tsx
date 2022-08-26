@@ -149,9 +149,16 @@ const App = () => {
     console.log(remoteMessage, 'remoteMessage');
     if (Platform.OS === "ios") {
       if (remoteMessage.data?.custom_data.link) {
-        // * 푸시알람
-        //@ts-ignore
-        navigationRef.navigate("FeedDetail", { id: remoteMessage.data.custom_data.link.split("/")[1] });
+        if (remoteMessage.data?.custom_data.link.includes("home")) {
+          // * 링크 없는 공지알람
+          //@ts-ignore
+          navigationRef.navigate("TabNav");
+        }
+        else {
+          // * 푸시알람
+          //@ts-ignore
+          navigationRef.navigate("FeedDetail", { id: remoteMessage.data.custom_data.link.split("/")[1] });
+        }
       }
       else {
         // * 링크 없는 공지알람
@@ -161,9 +168,16 @@ const App = () => {
     }
     else {
       if (remoteMessage.data?.link) {
-        // * 푸시알람
-        //@ts-ignore
-        navigationRef.navigate("FeedDetail", { id: remoteMessage.data.link.split("/")[1] });
+        if (remoteMessage.data?.link.includes("home")) {
+          // * 링크 없는 공지알람
+          //@ts-ignore
+          navigationRef.navigate("TabNav");
+        }
+        else {
+          // * 푸시알람
+          //@ts-ignore
+          navigationRef.navigate("FeedDetail", { id: remoteMessage.data.link.split("/")[1] });
+        }
       }
       else {
         // * 링크 없는 공지알람
