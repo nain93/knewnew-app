@@ -15,24 +15,27 @@ interface OkPopupProps {
   isCancleButton?: boolean
 }
 
-const OkPopup = (props: OkPopupProps) => {
+const OkPopup = ({ modalOpen, setModalOpen, title, handleOkayButton, children,
+  isBackdrop = true
+  , isCancleButton = true
+}: OkPopupProps) => {
   return (
     <Modal
-      isVisible={props.modalOpen}
+      isVisible={modalOpen}
       style={{ alignItems: "center" }}
       hideModalContentWhileAnimating={true}
       animationIn="fadeIn"
       animationOut="fadeOut"
-      onBackdropPress={() => props.isBackdrop ? props.setModalOpen(false) : null}
+      onBackdropPress={() => isBackdrop ? setModalOpen(false) : null}
       backdropTransitionOutTiming={0}
-      onBackButtonPress={() => props.isBackdrop ? props.setModalOpen(false) : null}
+      onBackButtonPress={() => isBackdrop ? setModalOpen(false) : null}
     >
       <View style={styles.modal}>
         <Text style={[FONT.Regular,
-        { textAlign: "center", marginVertical: d2p(44) }]}>{props.title}</Text>
+        { textAlign: "center", marginVertical: d2p(44) }]}>{title}</Text>
         <View style={styles.modalButton}>
-          {props.isCancleButton &&
-            <TouchableOpacity onPress={() => props.setModalOpen(false)} style={{
+          {isCancleButton &&
+            <TouchableOpacity onPress={() => setModalOpen(false)} style={{
               width: "50%",
               paddingVertical: d2p(18),
               borderRightColor: theme.color.grayscale.e9e7ec,
@@ -45,8 +48,8 @@ const OkPopup = (props: OkPopupProps) => {
             </TouchableOpacity>
           }
           <TouchableOpacity onPress={() => {
-            props.handleOkayButton();
-            props.setModalOpen(false);
+            handleOkayButton();
+            setModalOpen(false);
           }}
             style={{ width: "50%", paddingVertical: d2p(15) }}>
             <Text style={[FONT.Regular, {
@@ -55,7 +58,7 @@ const OkPopup = (props: OkPopupProps) => {
             }]}>확인</Text>
           </TouchableOpacity>
         </View>
-        {props.children}
+        {children}
       </View>
     </Modal>
   );

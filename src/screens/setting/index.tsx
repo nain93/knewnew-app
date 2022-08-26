@@ -54,6 +54,7 @@ const Setting = ({ navigation }: SettingProps) => {
 
   // * 알람 디바이스 해제
   const unregisterDevice = async () => {
+    messaging().deleteToken();
     messaging().unregisterDeviceForRemoteMessages();
     AsyncStorage.removeItem("isNotification");
   };
