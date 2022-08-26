@@ -1,4 +1,4 @@
-import { Dimensions, FlatList, Image, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, Platform, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import { d2p, h2p } from '~/utils';
@@ -16,13 +16,13 @@ import {
   coupangImage, dieterFoodlog, etcImage, kurlyImage, naverImage, newFoodlog, riceFoodlog, ssgImage
 } from '~/assets/images/home';
 import { interestTagData } from '~/utils/data';
-import { fireImg } from '~/assets/images';
+import { fireImg, noProfile } from '~/assets/images';
 import { useQuery } from 'react-query';
 import { getMyProfile } from '~/api/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MyProfileType } from '~/types/user';
 import FastImage from 'react-native-fast-image';
-import { getBanner, getFoodLogCount, getRecommendFoodLog } from '~/api/home';
+import { getBanner, getFoodLogCount, getRecommend, getRecommendFoodLog } from '~/api/home';
 import Loading from '~/components/loading';
 import SplashScreen from 'react-native-splash-screen';
 
@@ -52,6 +52,18 @@ interface RecommendFoodType {
   }>
 }
 
+interface RecommendType {
+  id: number,
+  subtitle: string,
+  title: string,
+  contents: Array<{
+    id: number,
+    review: number,
+    comment: string,
+    image: string | null
+  }>
+}
+
 const Home = ({ navigation }: HomeProps) => {
   const bannerListRef = useRef<FlatList>(null);
   const [token, setToken] = useRecoilState(tokenState);
@@ -61,9 +73,9 @@ const Home = ({ navigation }: HomeProps) => {
 
   const getBannerQuery = useQuery<BannerType[], Error>("banner", () => getBanner(token));
   const getFoodLogCountQuery = useQuery<{ count: number }, Error>("foodLogCount", () => getFoodLogCount(token));
+  const getRecommendQuery = useQuery<RecommendType, Error>("recommend", () => getRecommend({ token }));
   const getRecommendFoodQuery = useQuery<RecommendFoodType, Error>("recommendFoodLog", () =>
     getRecommendFoodLog({ token, sort: "0" }));
-
   useQuery<MyProfileType, Error>(["myProfile", token], () => getMyProfile(token), {
     enabled: !!token,
     onSuccess: (data) => {
@@ -130,7 +142,19 @@ const Home = ({ navigation }: HomeProps) => {
         </View>} />
 
       <ScrollView
-        bounces={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={
+              getFoodLogCountQuery.isLoading &&
+              getRecommendFoodQuery.isLoading &&
+              getRecommendQuery.isLoading}
+            onRefresh={() => {
+              getFoodLogCountQuery.refetch();
+              getRecommendQuery.refetch();
+              getRecommendFoodQuery.refetch();
+            }}
+          />
+        }
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.container}>
@@ -303,46 +327,47 @@ const Home = ({ navigation }: HomeProps) => {
                 의 모든 푸드로그 보기!</Text>
             </TouchableOpacity>
           </View>
-
-          {/* 추천컨텐츠 개발후 주석해제 */}
-          {/* <View style={[styles.borderBar, { paddingVertical: h2p(30), paddingHorizontal: d2p(15) }]}>
-            <View style={[styles.title, { marginBottom: h2p(10), marginHorizontal: d2p(5) }]}>
-              <Text style={[FONT.Bold, { fontSize: 18 }]}>
-                {`추천컨텐츠\n제목(어드민에서 입력)`}
-              </Text>
-              <Text style={[FONT.Regular, {
-                fontSize: 12,
-                color: theme.color.grayscale.C_443e49
-              }]}>
-                추천컨텐츠 테마에 대한 설명
-              </Text>
-            </View>
-
-            <View style={{ flexDirection: "row" }}>
-              <TouchableOpacity>
-                <View style={{
-                  marginVertical: h2p(10),
-                  marginHorizontal: d2p(5),
-                  width: d2p(155), aspectRatio: 1, backgroundColor: theme.color.white, borderRadius: 5
-                }} />
-                <Text style={[FONT.Medium, { fontSize: 12, width: d2p(155) }]}>
-                  컨텐츠에 대한 간략한 설명 (어드민 입력)
+          {getRecommendQuery.data &&
+            <View style={[styles.borderBar, { paddingVertical: h2p(30), paddingHorizontal: d2p(15) }]}>
+              <View style={[styles.title, { marginBottom: h2p(10), marginHorizontal: d2p(5) }]}>
+                <Text style={[FONT.Bold, { fontSize: 18 }]}>
+                  {/* {`추천컨텐츠\n제목(어드민에서 입력)`} */}
+                  {getRecommendQuery.data.title}
                 </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity>
-                <View style={{
-                  marginVertical: h2p(10),
-                  marginHorizontal: d2p(5),
-                  width: d2p(155), aspectRatio: 1, backgroundColor: theme.color.white, borderRadius: 5
-                }} />
-                <Text style={[FONT.Medium, { fontSize: 12, width: d2p(155) }]}>
-                  컨텐츠에 대한 간략한 설명 (어드민 입력)
+                <Text style={[FONT.Regular, {
+                  fontSize: 12,
+                  color: theme.color.grayscale.C_443e49
+                }]}>
+                  {getRecommendQuery.data.subtitle}
                 </Text>
-              </TouchableOpacity>
-            </View>
-          </View> */}
+              </View>
 
+              <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                {React.Children.toArray(getRecommendQuery.data.contents.map(v => (
+                  <Pressable
+                    onPress={() => navigation.navigate("FeedDetail", { id: v.review })}
+                  >
+                    {v.image &&
+                      <Image
+                        source={{ uri: v.image }}
+                        style={{
+                          marginVertical: h2p(10),
+                          marginHorizontal: d2p(5),
+                          width: d2p(155), aspectRatio: 1, backgroundColor: theme.color.white, borderRadius: 5
+                        }} />
+                    }
+                    <Text style={[FONT.Medium, {
+                      fontSize: 12,
+                      width: d2p(155),
+                      marginLeft: d2p(5)
+                    }]}>
+                      {v.comment}
+                    </Text>
+                  </Pressable>
+                )))}
+              </View>
+            </View>
+          }
           <View style={[styles.borderBar, { paddingVertical: h2p(30) }]}>
             <View style={[styles.title, { marginHorizontal: d2p(20) }]}>
               <Text style={[FONT.Bold, { fontSize: 18 }]}>
@@ -369,8 +394,7 @@ const Home = ({ navigation }: HomeProps) => {
               data={getRecommendFoodQuery.data?.contents.slice(0, 5)}
               renderItem={({ item }) => (
                 <Pressable
-                  onPress={() => navigation.navigate("FeedDetail", { id: item.review })}
-                  style={{ paddingTop: h2p(11.5) }}>
+                  onPress={() => navigation.navigate("FeedDetail", { id: item.review })}>
                   {item.countMessage &&
                     <View style={{
                       width: d2p(130), height: d2p(23), backgroundColor: theme.color.white,
