@@ -102,6 +102,9 @@ const App = () => {
     if (storageToken) {
       setToken(storageToken);
     }
+    else {
+      SplashScreen.hide();
+    }
   };
 
   useEffect(() => {
@@ -143,6 +146,7 @@ const App = () => {
   };
 
   const handleAlarm = (remoteMessage: any) => {
+    console.log(remoteMessage, 'remoteMessage');
     if (Platform.OS === "ios") {
       if (remoteMessage.data?.custom_data.link) {
         // * 푸시알람

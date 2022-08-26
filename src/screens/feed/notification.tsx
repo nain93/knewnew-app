@@ -78,7 +78,11 @@ const Notification = ({ navigation }: NotificationProps) => {
   const renderItem = useCallback(({ item }: { item: NotificationListType, index: number }) => {
     return (
       <Pressable
-        onPress={() => navigation.navigate("FeedDetail", { id: item.link.split("/")[1] })}
+        onPress={() => {
+          if (item.link) {
+            navigation.navigate("FeedDetail", { id: item.link.split("/")[1] });
+          }
+        }}
         style={{ flexDirection: "row" }}>
         <View style={{
           marginRight: d2p(10),

@@ -59,6 +59,7 @@ const ToggleButton = ({ isOn, setIsOn }: ToggleButtonProps) => {
 
   // * 알람 디바이스 해제
   const unregisterDevice = async () => {
+    messaging().deleteToken();
     messaging().unregisterDeviceForRemoteMessages();
     AsyncStorage.setItem("isNotification", JSON.stringify(false));
     const profileData: (postProfileType | undefined) = await queryClient.getQueryData("myProfile");
