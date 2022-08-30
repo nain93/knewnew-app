@@ -182,7 +182,7 @@ const Write = ({ navigation, route }: WriteProp) => {
     setImageIds([]);
     if (route.params?.review && route.params.type !== "reKnewWrite") {
       setImages(route.params.review.images);
-      setImageList(route.params.review.images.map(v => v.image));
+      setImageList(route.params.review.images?.map(v => v.image));
 
       if (Object.keys(route.params?.review?.tags).length !== 0) {
         setInterestTag({
@@ -196,7 +196,7 @@ const Write = ({ navigation, route }: WriteProp) => {
       }
       setWriteData({
         ...writeData,
-        images: route.params.review.images.map(v => ({ ...v, image: "review" + v.image?.split("review")[1] })),
+        images: route.params.review.images?.map(v => ({ ...v, image: "review" + v.image?.split("review")[1] })),
         content: route.params.review.content,
         satisfaction: route.params.review.satisfaction,
         market: route.params.review.market ? route.params.review.market : undefined,
@@ -629,7 +629,7 @@ const Write = ({ navigation, route }: WriteProp) => {
                 paddingLeft: (!route.params?.isEdit || !route.params.review?.id) ? 0 : d2p(20)
               }}
               horizontal showsHorizontalScrollIndicator={false}>
-              {React.Children.toArray(images.map((image, idx) => {
+              {React.Children.toArray(images?.map((image, idx) => {
                 return (
                   <View style={[styles.images, { marginRight: (idx === imageList.length - 1) ? d2p(20) : d2p(5) }]}>
                     <View style={{ alignItems: "center" }}>

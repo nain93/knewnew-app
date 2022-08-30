@@ -110,10 +110,10 @@ const Home = ({ navigation }: HomeProps) => {
   }, [getBannerQuery.data?.length]);
 
   useEffect(() => {
-    if (getFoodLogCountQuery.data && getRecommendFoodQuery.data) {
+    if (getFoodLogCountQuery.data) {
       SplashScreen.hide();
     }
-  }, [getFoodLogCountQuery.data, getRecommendFoodQuery.data]);
+  }, [getFoodLogCountQuery.data]);
 
   return (
     <>
@@ -126,7 +126,7 @@ const Home = ({ navigation }: HomeProps) => {
           alignItems: "center",
           width: Dimensions.get("window").width - d2p(40)
         }}>
-          <Image source={mainLogo} resizeMode="contain" style={{ width: d2p(96), height: d2p(20) }} />
+          <Image source={mainLogo}  style={{ width: d2p(104), height: d2p(14) }} />
           <Pressable hitSlop={hitslop} onPress={() => navigation.navigate("notification")} >
             {!isNotiRead &&
               <View style={{
@@ -388,12 +388,13 @@ const Home = ({ navigation }: HomeProps) => {
             <FlatList
               horizontal
               contentContainerStyle={{ paddingHorizontal: d2p(15) }}
-              style={{ marginTop: h2p(30) }}
+              style={{ marginTop: h2p(20) }}
               showsHorizontalScrollIndicator={false}
               keyExtractor={(item) => item.id.toString()}
               data={getRecommendFoodQuery.data?.contents.slice(0, 5)}
               renderItem={({ item }) => (
                 <Pressable
+                  style={{ paddingTop: h2p(10) }}
                   onPress={() => navigation.navigate("FeedDetail", { id: item.review })}>
                   {item.countMessage &&
                     <View style={{

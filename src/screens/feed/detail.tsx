@@ -746,17 +746,19 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   return (
     <Fragment>
       {/* 이미지 확대 */}
-      <ImageGallery
-        initialIndex={initialIndex}
-        close={closeGallery}
-        images={reviewDetailQuery.data?.images.map(v => ({ id: v.id, url: v.image, thumbUrl: v.image })) || []}
-        isOpen={isOpen}
-        setIsOpen={(open: boolean) => setIsOpen(open)}
-        renderCustomImage={renderCustomImage}
-        renderHeaderComponent={renderHeaderComponent}
-        resizeMode="contain"
-        thumbSize={84}
-      />
+      {reviewDetailQuery.data?.images &&
+        <ImageGallery
+          initialIndex={initialIndex}
+          close={closeGallery}
+          images={reviewDetailQuery.data?.images.map(v => ({ id: v.id, url: v.image, thumbUrl: v.image })) || []}
+          isOpen={isOpen}
+          setIsOpen={(open: boolean) => setIsOpen(open)}
+          renderCustomImage={renderCustomImage}
+          renderHeaderComponent={renderHeaderComponent}
+          resizeMode="contain"
+          thumbSize={84}
+        />
+      }
       <Header
         isBorder={true}
         headerLeft={<LeftArrowIcon onBackClick={() => {
