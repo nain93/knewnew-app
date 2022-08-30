@@ -199,7 +199,9 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           highlightStyle={[FONT.Bold, { fontSize: 15, color: theme.color.main }]}
           searchWords={[keyword]}
           textToHighlight={review.content}
-          style={[FONT.Regular, { fontSize: 15, marginBottom: h2p(10), marginLeft: d2p(30) }]}
+          style={[FONT.Regular, { fontSize: 15,  marginBottom: h2p(10), marginLeft: d2p(30),
+            color: theme.color.grayscale.C_79737e,
+          }]}
         />
         :
         <View style={{ marginLeft: d2p(30) }}>
@@ -219,6 +221,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
               color: theme.color.grayscale.C_79737e,
               lineHeight: 21,
               marginTop: 0,
+              fontSize:15
             }, FONT.Regular]}
           >
             {review.content}

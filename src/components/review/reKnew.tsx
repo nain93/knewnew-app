@@ -137,6 +137,7 @@ const ReKnew = ({ review, filterBadge, type }: FeedReviewProps) => {
             </View>
             <Text style={[{ lineHeight: 21, color: theme.color.grayscale.C_79737e }, FONT.Regular]}>{review.content}</Text>
             {
+              review.images &&
               (() => {
                 switch (review.images.length) {
                   // * 사진 없음
@@ -302,6 +303,7 @@ const ReKnew = ({ review, filterBadge, type }: FeedReviewProps) => {
               {review.content}
             </ReadMore>
             {
+              review.images &&
               (() => {
                 switch (review.images.length) {
                   // * 사진 없음
