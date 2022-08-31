@@ -265,7 +265,7 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
               style={{ marginLeft: d2p(7), }}>
               <Image source={circleQuestion} style={{ width: d2p(16), height: d2p(16) }} />
             </Pressable>
-            {/* <TouchableOpacity
+            <TouchableOpacity
               onPress={() => {
                 if (productDetailQuery.data?.link) {
                   Linking.openURL(productDetailQuery.data?.link);
@@ -275,7 +275,7 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
               <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>
                 {`최저가로 이동하기 >`}
               </Text>
-            </TouchableOpacity> */}
+            </TouchableOpacity>
           </View>
         </View>
         <View style={{

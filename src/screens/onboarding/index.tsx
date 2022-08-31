@@ -7,7 +7,6 @@ import {
   naverImg,
   appleImg
 } from "~/assets/images/snsImg/index";
-import mainLogo from '~/assets/logo';
 
 import Config from "react-native-config";
 import { NavigationType } from '~/types';
@@ -24,6 +23,8 @@ import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-ipho
 import theme from '~/styles/theme';
 import { emailicon } from '~/assets/icons';
 import useNotification from '~/hooks/useNotification';
+import { mainLogo } from '~/assets/logo';
+import Loading from '~/components/loading';
 
 const iosKeys = {
   kConsumerKey: Config.NAVER_KEY,
@@ -42,6 +43,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
   const setToken = useSetRecoilState(tokenState);
   const [apiBlock, setApiBlock] = useState(false);
   const usePermission = useNotification();
+  const [loading, setLoading] = useState(false);
 
   const goToBadgeSelect = (userData: {
     email: string,
@@ -92,7 +94,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
       NaverLogin.login(Platform.OS === "ios" ? iosKeys : aosKeys, async (err, token) => {
         if (token) {
           const { accessToken } = token;
-          const data = await userLogin({ token: accessToken, providerType: "naver" });
+          const data = await userLogin({ token: accessToken, providerType: "kakao" });
           if (data.accessToken) {
             // * 이미 가입된 유저
             setToken(data.accessToken);
@@ -171,12 +173,16 @@ const Onboarding = ({ navigation }: NavigationType) => {
     }
   };
 
+  if (loading) {
+    return <Loading />;
+  }
+
   return (
     <View style={styles.container}>
       <View style={{ marginBottom: "auto" }}>
         <Text style={[{ fontSize: 20, textAlign: "center" }, FONT.SemiBold]}>
           제대로 된 맛있는 발견</Text>
-        <Image source={mainLogo} style={styles.logo} />
+        <Image source={mainLogo} resizeMode="contain" style={styles.logo} />
       </View>
       <View style={{ marginBottom: h2p(145) }}>
         <View style={{ flexDirection: "row", justifyContent: "center" }}>
