@@ -4,7 +4,7 @@ import { d2p, h2p } from '~/utils';
 import messaging from '@react-native-firebase/messaging';
 import theme from '~/styles/theme';
 import { useMutation, useQueryClient } from 'react-query';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { myIdState, tokenState } from '~/recoil/atoms';
 import { postProfileType } from '~/types/user';
 import { editUserProfile } from '~/api/user';

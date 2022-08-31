@@ -1,5 +1,5 @@
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React from 'react';
+import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { RefObject } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import { checkIcon } from '~/assets/icons';
@@ -14,11 +14,10 @@ interface SelectLayoutProps {
   isInitial?: boolean;
   type?: "filter" | "write" | "normal",
   headerComponent?: JSX.Element,
-  remainingPeriod?: number
-  setIsPopupOpen?: (popup: { isOpen: boolean, content: string }) => void
+  focusRef: RefObject<TextInput>
 }
 
-const SelectLayout = ({ setIsPopupOpen, remainingPeriod, headerComponent, isInitial, interestTag, setInterestTag, type = "normal" }: SelectLayoutProps) => {
+const SelectLayout = ({ focusRef, headerComponent, isInitial, interestTag, setInterestTag, type = "normal" }: SelectLayoutProps) => {
   const resetIsClick = () => {
     setInterestTag({
       interest: interestTag.interest.map(v => ({ title: v.title, isClick: false }))
@@ -40,6 +39,11 @@ const SelectLayout = ({ setIsPopupOpen, remainingPeriod, headerComponent, isInit
                     setInterestTag({
                       interest: interestTag.interest.map((v, i) => {
                         if (idx === i) {
+                          if (v.title.includes("기타") && !v.isClick) {
+                            setTimeout(() => {
+                              focusRef.current?.focus();
+                            }, 100);
+                          }
                           return { ...v, isClick: !v.isClick };
                         }
                         return v;

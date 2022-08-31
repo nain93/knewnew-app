@@ -586,20 +586,37 @@ const Write = ({ navigation, route }: WriteProp) => {
             </Pressable>
           </View>
 
-          <TextInput
-            value={writeData.product}
-            onChangeText={(e) => setWriteData({ ...writeData, product: e })}
-            autoCapitalize={"none"}
-            style={[FONT.Regular, {
-              borderTopColor: theme.color.grayscale.eae7ec,
-              borderTopWidth: 1,
-              borderBottomColor: theme.color.grayscale.e9e7ec,
-              borderBottomWidth: 1,
-              paddingHorizontal: d2p(20),
-              paddingVertical: h2p(15),
-              fontSize: 16,
-              color: theme.color.black
-            }]} placeholder="상품명을 입력해주세요. 비워둬도 괜찮아요!" placeholderTextColor={theme.color.grayscale.a09ca4} />
+          <View style={{ justifyContent: "center" }}>
+            <TextInput
+              value={writeData.product}
+              maxLength={31}
+              onChangeText={(e) => {
+                if (e.length > 30) {
+                  setWriteData({ ...writeData, product: e.slice(0, e.length - 1) });
+                }
+                else {
+                  setWriteData({ ...writeData, product: e });
+                }
+              }}
+              autoCapitalize={"none"}
+              style={[FONT.Regular, {
+                borderTopColor: theme.color.grayscale.eae7ec,
+                borderTopWidth: 1,
+                borderBottomColor: theme.color.grayscale.e9e7ec,
+                borderBottomWidth: 1,
+                paddingLeft: d2p(20),
+                paddingRight: d2p(60),
+                paddingTop: h2p(15),
+                paddingBottom: h2p(15),
+                fontSize: 16,
+                color: theme.color.black,
+              }]} placeholder="상품명을 입력해주세요. 비워둬도 괜찮아요!" placeholderTextColor={theme.color.grayscale.a09ca4} />
+            <Text style={[FONT.Regular, {
+              position: "absolute",
+              right: d2p(20),
+              color: writeData.product?.length === 30 ? theme.color.main : theme.color.grayscale.a09ca4,
+            }]} >{writeData.product?.length || 0}/30</Text>
+          </View>
 
           {(!route.params?.isEdit || !route.params.review?.id) &&
             <Text style={[FONT.Bold, {

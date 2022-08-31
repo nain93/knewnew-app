@@ -79,7 +79,10 @@ const Notification = ({ navigation }: NotificationProps) => {
     return (
       <Pressable
         onPress={() => {
-          if (item.link) {
+          if (item.link.includes("home")) {
+            return;
+          }
+          else {
             navigation.navigate("FeedDetail", { id: item.link.split("/")[1] });
           }
         }}

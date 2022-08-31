@@ -146,7 +146,6 @@ const App = () => {
   };
 
   const handleAlarm = (remoteMessage: any) => {
-    console.log(remoteMessage, 'remoteMessage');
     if (Platform.OS === "ios") {
       if (remoteMessage.data?.custom_data.link) {
         if (remoteMessage.data?.custom_data.link.includes("home")) {

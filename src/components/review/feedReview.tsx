@@ -11,8 +11,8 @@ import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/v
 import Highlighter from 'react-native-highlight-words';
 import { ReviewListType } from '~/types/review';
 import { useMutation, useQueryClient } from 'react-query';
-import { useRecoilValue } from 'recoil';
-import { tokenState } from '~/recoil/atoms';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { okPopupState, tokenState } from '~/recoil/atoms';
 import { bookmarkReview, likeReview } from '~/api/review';
 import { FONT } from '~/styles/fonts';
 import { noProfile } from '~/assets/images';
@@ -45,6 +45,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
   const [isBookmarkState, setIsBookmarkState] = useState<boolean>(review.isBookmark);
   const [bookmarkCount, setBookmarkCount] = useState(review.bookmarkCount);
   const [apiBlock, setApiBlock] = useState(false);
+  const setModalOpen = useSetRecoilState(okPopupState);
   const bookmarkMutation = useMutation("bookmark",
     ({ id, isBookmark }: { id: number, isBookmark: boolean }) => bookmarkReview(token, id, isBookmark), {
     onSuccess: async () => {
@@ -181,14 +182,29 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           marginBottom: h2p(10)
         }}>
           <TouchableOpacity
-            onPress={() => navigation.navigate("ProductDetail", { id: review.product?.id })}
+            onPress={() => {
+              if (review.isVerified) {
+                navigation.navigate("ProductDetail", { id: review.product?.id });
+              }
+              else {
+                setModalOpen({
+                  isOpen: true,
+                  content: "아직 등록되지 않은 상품입니다.",
+                  okButton: () => navigation.goBack(),
+                  isBackdrop: false,
+                  isCancleButton: false
+                });
+              }
+            }}
             style={{
               backgroundColor: "rgba(234,231,236,0.4)",
               paddingHorizontal: d2p(5),
               paddingVertical: h2p(4),
               borderRadius: 4
             }}>
-            <Text style={[FONT.Medium, { color: theme.color.grayscale.C_79737e, }]}>
+            <Text style={[FONT.Medium, {
+              color: review.isVerified ? "#5193f6" : theme.color.grayscale.C_79737e,
+            }]}>
               {`${review.product.name} >`}
             </Text>
           </TouchableOpacity>
@@ -199,7 +215,8 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           highlightStyle={[FONT.Bold, { fontSize: 15, color: theme.color.main }]}
           searchWords={[keyword]}
           textToHighlight={review.content}
-          style={[FONT.Regular, { fontSize: 15,  marginBottom: h2p(10), marginLeft: d2p(30),
+          style={[FONT.Regular, {
+            fontSize: 15, marginBottom: h2p(10), marginLeft: d2p(30),
             color: theme.color.grayscale.C_79737e,
           }]}
         />
@@ -221,7 +238,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
               color: theme.color.grayscale.C_79737e,
               lineHeight: 21,
               marginTop: 0,
-              fontSize:15
+              fontSize: 15
             }, FONT.Regular]}
           >
             {review.content}

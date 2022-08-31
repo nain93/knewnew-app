@@ -77,5 +77,6 @@ export interface ReviewListType {
   isBookmark: boolean,
   isEdit: boolean,
   viewCount: number,
-  shareCount: number
+  shareCount: number,
+  isVerified: boolean
 }

@@ -18,6 +18,7 @@ import { colorCart, grayCart, rightArrow } from '~/assets/icons';
 import CustomBottomSheet from '~/components/popup/CustomBottomSheet';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import CloseIcon from '~/components/icon/closeIcon';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 interface BeforeWriteProp {
   navigation: NavigationStackProp;
@@ -28,6 +29,7 @@ interface BeforeWriteProp {
 
 const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
   const marketRefRBSheet = useRef<RBSheet>(null);
+  const [foodTag, setFoodTag] = useState("");
   const [clickedReact, setClickReact] = useState<Array<{
     title: SatisfactionType,
     isClick: boolean
@@ -49,6 +51,7 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
   const [etcMarket, setEtcMarket] = useState("");
   const etcInputRef = useRef<TextInput>(null);
   const bottomScrollRef = useRef<ScrollView>(null);
+  const foodTagRef = useRef<TextInput>(null);
 
   useEffect(() => {
     if (route.params?.stateReset) {
@@ -63,6 +66,12 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
       }));
     }
   }, [route.params]);
+
+  useEffect(() => {
+    if (!interestTag.interest[interestTag.interest.length - 1].isClick) {
+      setFoodTag("");
+    }
+  }, [interestTag]);
 
   return (
     <>
@@ -83,26 +92,63 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
       //   임시저장
       // </Text>}
       />
-      <View style={styles.container}>
-        <Text style={[FONT.Regular, { fontSize: 16 }]}>오늘의 푸드로그는</Text>
-        <Text style={[FONT.Bold, { fontSize: 20 }]}>한마디로,
-          <Text style={[FONT.Regular, { color: theme.color.main, fontSize: 12 }]}> (필수)</Text>
-        </Text>
-        <View style={styles.reactionWrap}>
-          <ReactionLayout
-            multiSelect={false}
-            clickedReact={clickedReact}
-            setClickReact={(react: {
-              title: SatisfactionType,
-              isClick: boolean
-            }[]) => setClickReact(react)}
-          />
+      <KeyboardAwareScrollView
+        showsVerticalScrollIndicator={false}>
+        <View style={{ marginHorizontal: d2p(20), marginTop: h2p(40) }}>
+          <Text style={[FONT.Regular, { fontSize: 16 }]}>오늘의 푸드로그는</Text>
+          <Text style={[FONT.Bold, { fontSize: 20 }]}>한마디로,
+            <Text style={[FONT.Regular, { color: theme.color.main, fontSize: 12 }]}> (필수)</Text>
+          </Text>
+          <View style={styles.reactionWrap}>
+            <ReactionLayout
+              multiSelect={false}
+              clickedReact={clickedReact}
+              setClickReact={(react: {
+                title: SatisfactionType,
+                isClick: boolean
+              }[]) => setClickReact(react)}
+            />
+          </View>
+          <Text style={[FONT.Bold, { fontSize: 20, marginBottom: h2p(10) }]}>추천 대상은,
+            <Text style={[FONT.Regular, { color: theme.color.main, fontSize: 12 }]}> (필수)</Text>
+          </Text>
+          <SelectLayout type="write" focusRef={foodTagRef} interestTag={interestTag} setInterestTag={setInterestTag} />
         </View>
-        <Text style={[FONT.Bold, { fontSize: 20, marginBottom: h2p(10) }]}>푸드 태그는,
-          <Text style={[FONT.Regular, { color: theme.color.main, fontSize: 12 }]}> (필수)</Text>
-        </Text>
-        <SelectLayout type="write" interestTag={interestTag} setInterestTag={setInterestTag} />
-        <View style={{ marginTop: h2p(60), marginBottom: h2p(15) }}>
+        {interestTag.interest[interestTag.interest.length - 1].isClick &&
+          <View style={{ marginTop: h2p(20), justifyContent: "center" }}>
+            <TextInput
+              ref={foodTagRef}
+              autoCapitalize="none"
+              value={foodTag}
+              style={[FONT.Regular, {
+                borderColor: theme.color.grayscale.eae7ec,
+                borderTopWidth: 1,
+                borderBottomWidth: 1,
+                paddingHorizontal: d2p(20),
+                paddingVertical: h2p(15),
+                color: theme.color.black,
+                fontSize: 16
+              }]}
+              maxLength={16}
+              onChangeText={(e) => {
+                if (e.length > 15) {
+                  setFoodTag(e.slice(0, e.length - 1));
+                }
+                else {
+                  setFoodTag(e);
+                }
+              }}
+              placeholderTextColor={theme.color.grayscale.a09ca4}
+              placeholder="푸드태그를 입력해주세요"
+            />
+            <Text style={[FONT.Regular, {
+              position: "absolute",
+              right: d2p(20),
+              color: foodTag.length === 15 ? theme.color.main : theme.color.grayscale.a09ca4,
+            }]} >{foodTag.length}/15</Text>
+          </View>
+        }
+        <View style={{ marginTop: h2p(60), marginBottom: h2p(15), marginHorizontal: d2p(20) }}>
           <Text style={[FONT.Bold, { fontSize: 20, marginBottom: h2p(5) }]}>구매한 곳은,
           </Text>
         </View>
@@ -113,8 +159,8 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
             borderTopColor: theme.color.grayscale.f7f7fc,
             borderBottomWidth: 1,
             borderBottomColor: theme.color.grayscale.f7f7fc,
-            paddingHorizontal: d2p(10), paddingVertical: h2p(13.5),
-            marginBottom: "auto",
+            paddingHorizontal: d2p(30), paddingVertical: h2p(13.5),
+            marginBottom: h2p(80),
             flexDirection: "row",
             alignItems: "center"
           }}>
@@ -126,25 +172,32 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
           <Image source={rightArrow} style={{ marginLeft: "auto", width: d2p(12), height: d2p(25) }} />
         </TouchableOpacity>
         <BasicButton
-          disabled={interestTag.interest.every(v => !v.isClick) || clickedReact.every(v => !v.isClick)}
+          viewStyle={{ marginHorizontal: d2p(20), marginBottom: h2p(40) }}
+          disabled={interestTag.interest.every(v => !v.isClick) || clickedReact.every(v => !v.isClick)
+            || (interestTag.interest[interestTag.interest.length - 1].isClick && foodTag === "")
+          }
           text="다음으로" bgColor={theme.color.white} textColor={theme.color.main}
           onPress={() => navigation.navigate("Write", {
             review: {
               ...writeData,
               satisfaction: clickedReact.filter(v => v.isClick).map(v => v.title)[0],
               tags: {
-                interest: interestTag.interest.filter(v => v.isClick).map(v => v.title)
+                interest: interestTag.interest.filter(v => {
+                  if (v.title.includes("기타")) {
+                    return false;
+                  }
+                  return v.isClick;
+                }).map(v => v.title).concat(foodTag)
               }
             },
             loading: false, isEdit: false
           })}
         />
-      </View>
+      </KeyboardAwareScrollView>
       <CustomBottomSheet
         sheetRef={marketRefRBSheet}
         height={Dimensions.get("window").height - h2p(340)}
-        onClose={() => setEtcInputOpen(false)}
-      >
+        onClose={() => setEtcInputOpen(false)}>
         <>
           <View style={{
             flexDirection: "row", justifyContent: "space-between",
@@ -184,17 +237,34 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
             ))}
             {etcInputOpen &&
               <>
-                <TextInput
-                  onChangeText={(e) => setEtcMarket(e)}
-                  ref={etcInputRef}
-                  autoCapitalize="none"
-                  style={[FONT.Regular, {
-                    fontSize: 16,
-                    paddingVertical: h2p(12.5), paddingHorizontal: d2p(10),
-                    borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc,
-                    color: theme.color.black
-                  }]}
-                  placeholder="구매하신 사이트명을 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
+                <View style={{ justifyContent: "center" }}>
+                  <TextInput
+                    maxLength={16}
+                    value={etcMarket}
+                    onChangeText={(e) => {
+                      if (e.length > 15) {
+                        setEtcMarket(e.slice(0, e.length - 1));
+                      }
+                      else {
+                        setEtcMarket(e);
+                      }
+                    }}
+                    ref={etcInputRef}
+                    autoCapitalize="none"
+                    style={[FONT.Regular, {
+                      fontSize: 16,
+                      paddingVertical: h2p(12.5), paddingHorizontal: d2p(10),
+                      borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc,
+                      color: theme.color.black
+                    }]}
+                    placeholder="구매하신 사이트명을 입력해주세요."
+                    placeholderTextColor={theme.color.grayscale.a09ca4} />
+                  <Text style={[FONT.Regular, {
+                    position: "absolute",
+                    right: d2p(20),
+                    color: etcMarket.length === 15 ? theme.color.main : theme.color.grayscale.a09ca4,
+                  }]} >{etcMarket.length}/15</Text>
+                </View>
                 <BasicButton
                   onPress={() => {
                     setWriteData({ ...writeData, market: etcMarket });
@@ -214,11 +284,6 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
 export default BeforeWrite;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: d2p(20),
-    paddingVertical: h2p(40)
-  },
   reactionWrap: {
     marginTop: h2p(20),
     marginBottom: h2p(60),

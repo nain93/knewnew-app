@@ -1,8 +1,7 @@
-import { Dimensions, FlatList, Image, Platform, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, Linking, Platform, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import { d2p, h2p } from '~/utils';
-import mainLogo from '~/assets/logo';
 import { hitslop } from '~/utils/constant';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
@@ -25,6 +24,7 @@ import FastImage from 'react-native-fast-image';
 import { getBanner, getFoodLogCount, getRecommend, getRecommendFoodLog } from '~/api/home';
 import Loading from '~/components/loading';
 import SplashScreen from 'react-native-splash-screen';
+import { homeLogo } from '~/assets/logo';
 
 export interface HomeProps {
   navigation: NavigationStackProp;
@@ -36,7 +36,8 @@ interface BannerType {
   image: string,
   content: string,
   isActive: boolean,
-  priority: number
+  priority: number,
+  link: string
 }
 
 interface RecommendFoodType {
@@ -126,7 +127,7 @@ const Home = ({ navigation }: HomeProps) => {
           alignItems: "center",
           width: Dimensions.get("window").width - d2p(40)
         }}>
-          <Image source={mainLogo}  style={{ width: d2p(104), height: d2p(14) }} />
+          <Image source={homeLogo} style={{ width: d2p(104), height: d2p(14) }} />
           <Pressable hitSlop={hitslop} onPress={() => navigation.navigate("notification")} >
             {!isNotiRead &&
               <View style={{
@@ -219,14 +220,20 @@ const Home = ({ navigation }: HomeProps) => {
                   showsHorizontalScrollIndicator={false}
                   data={getBannerQuery.data}
                   renderItem={({ item }) => (
-                    <View style={styles.banner}>
+                    <Pressable
+                      onPress={() => {
+                        if (item.link) {
+                          Linking.openURL(item.link);
+                        }
+                      }}
+                      style={styles.banner}>
                       <Image
                         style={{
                           width: "100%", height: h2p(80),
                           borderRadius: 10,
                         }}
                         source={{ uri: item.image }} />
-                    </View>
+                    </Pressable>
                   )}
                 />
                 {(getBannerQuery.data?.length || 0) > 1 &&
@@ -262,48 +269,52 @@ const Home = ({ navigation }: HomeProps) => {
           </View>
 
           <View style={[styles.foodlogWrap, styles.borderBar]}>
-            {React.Children.toArray(interestTagData.interest.map((v) => (
-              <TouchableOpacity
-                onPress={() => navigation.navigate("Feed", { foodLog: v.title })}
-                style={styles.foodlog}>
-                {(
-                  () => {
-                    switch (v.title) {
-                      case "빵식가": {
-                        return <Image source={breadFoodlog} style={styles.foodlogImg} />;
+            {React.Children.toArray(interestTagData.interest.map((v) => {
+              if (!v.title.includes("기타")) {
+                return (
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate("Feed", { foodLog: v.title })}
+                    style={styles.foodlog}>
+                    {(
+                      () => {
+                        switch (v.title) {
+                          case "빵식가": {
+                            return <Image source={breadFoodlog} style={styles.foodlogImg} />;
+                          }
+                          case "애주가": {
+                            return <Image source={beerFoodlog} style={styles.foodlogImg} />;
+                          }
+                          case "디저트러버": {
+                            return <Image source={cakeFoodlog} style={styles.foodlogImg} />;
+                          }
+                          case "캠퍼": {
+                            return <Image source={campFoodlog} style={styles.foodlogImg} />;
+                          }
+                          case "오늘한끼": {
+                            return <Image source={riceFoodlog} style={styles.foodlogImg} />;
+                          }
+                          case "다이어터": {
+                            return <Image source={dieterFoodlog} style={styles.foodlogImg} />;
+                          }
+                          case "비건": {
+                            return <Image source={begunFoodlog} style={styles.foodlogImg} />;
+                          }
+                          case "홈카페": {
+                            return <Image source={cafeFoodlog} style={styles.foodlogImg} />;
+                          }
+                          case "신상탐험대": {
+                            return <Image source={newFoodlog} style={styles.foodlogImg} />;
+                          }
+                          default:
+                            return null;
+                        }
                       }
-                      case "애주가": {
-                        return <Image source={beerFoodlog} style={styles.foodlogImg} />;
-                      }
-                      case "디저트러버": {
-                        return <Image source={cakeFoodlog} style={styles.foodlogImg} />;
-                      }
-                      case "캠퍼": {
-                        return <Image source={campFoodlog} style={styles.foodlogImg} />;
-                      }
-                      case "오늘한끼": {
-                        return <Image source={riceFoodlog} style={styles.foodlogImg} />;
-                      }
-                      case "다이어터": {
-                        return <Image source={dieterFoodlog} style={styles.foodlogImg} />;
-                      }
-                      case "비건": {
-                        return <Image source={begunFoodlog} style={styles.foodlogImg} />;
-                      }
-                      case "홈카페": {
-                        return <Image source={cafeFoodlog} style={styles.foodlogImg} />;
-                      }
-                      case "신상탐험대": {
-                        return <Image source={newFoodlog} style={styles.foodlogImg} />;
-                      }
-                      default:
-                        return null;
-                    }
-                  }
-                )()}
-                <Text style={FONT.Medium}>{v.title}</Text>
-              </TouchableOpacity>
-            )))}
+                    )()}
+                    <Text style={FONT.Medium}>{v.title}</Text>
+                  </TouchableOpacity>
+                );
+              }
+            }))}
             <TouchableOpacity
               onPress={() => navigation.navigate("Feed", { foodLog: "all" })}
               style={{
