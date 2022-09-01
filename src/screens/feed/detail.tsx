@@ -9,7 +9,7 @@ import ReviewIcon from '~/components/icon/reviewIcon';
 import ReactionIcon from '~/components/icon/reactionIcon';
 import { commentMore, marketIcon, more, reKnew, shareIcon, tag } from '~/assets/icons';
 import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { bottomDotSheetState, myIdState, okPopupState, popupState, refreshState, tokenState } from '~/recoil/atoms';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from 'react-query';
 import { NavigationStackProp } from 'react-navigation-stack';
@@ -86,7 +86,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [commentLoading, setCommentLoading] = useState(false);
 
   const setRefresh = useSetRecoilState(refreshState);
-  const setModalOpen = useSetRecoilState(okPopupState);
+  const [modalOpen, setModalOpen] = useRecoilState(okPopupState);
   const setIspopupOpen = useSetRecoilState(popupState);
   const setIsBottomDotSheet = useSetRecoilState(bottomDotSheetState);
 
@@ -522,14 +522,26 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             flexDirection: 'row',
           }}>
             <TouchableOpacity
-              onPress={() => navigation.navigate("ProductDetail", { id: reviewDetailQuery.data.product?.id })}
+              onPress={() => {
+                if (reviewDetailQuery.data.product?.isVerified) {
+                  navigation.navigate("ProductDetail", { id: reviewDetailQuery.data.product?.id });
+                }
+                else {
+                  setModalOpen({
+                    isOpen: true,
+                    content: "아직 등록되지 않은 상품입니다.",
+                    okButton: () => setModalOpen({ ...modalOpen, isOpen: false }),
+                    isCancleButton: false
+                  });
+                }
+              }}
               style={{
                 backgroundColor: "rgba(234,231,236,0.4)",
                 paddingHorizontal: d2p(5),
                 paddingVertical: h2p(4),
                 borderRadius: 4
               }}>
-              <Text style={[FONT.Medium, { color: theme.color.grayscale.C_79737e, }]}>
+              <Text style={[FONT.Medium, { color: reviewDetailQuery.data.product.isVerified ? "#5193f6" : theme.color.grayscale.C_79737e, }]}>
                 {`${reviewDetailQuery.data?.product.name} >`}
               </Text>
             </TouchableOpacity>
