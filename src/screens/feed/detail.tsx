@@ -10,11 +10,11 @@ import ReactionIcon from '~/components/icon/reactionIcon';
 import { commentMore, marketIcon, more, reKnew, shareIcon, tag } from '~/assets/icons';
 import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { myIdState, okPopupState, popupState, refreshState, tokenState } from '~/recoil/atoms';
+import { bottomDotSheetState, myIdState, okPopupState, popupState, refreshState, tokenState } from '~/recoil/atoms';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from 'react-query';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
-import { bookmarkReview, getReviewDetail, likeReview, shareReview } from '~/api/review';
+import { bookmarkReview, deleteReview, getReviewDetail, likeReview, shareReview } from '~/api/review';
 import FastImage from 'react-native-fast-image';
 import Share from 'react-native-share';
 
@@ -38,7 +38,7 @@ import { CommentListType } from '~/types/comment';
 import SplashScreen from 'react-native-splash-screen';
 import ImageFlatlist from '~/screens/feed/ImageFlatlist';
 import { MyProfileType } from '~/types/user';
-import { getMyProfile } from '~/api/user';
+import { blockUser, getMyProfile } from '~/api/user';
 
 interface FeedDetailProps {
   navigation: NavigationStackProp
@@ -88,6 +88,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const setRefresh = useSetRecoilState(refreshState);
   const setModalOpen = useSetRecoilState(okPopupState);
   const setIspopupOpen = useSetRecoilState(popupState);
+  const setIsBottomDotSheet = useSetRecoilState(bottomDotSheetState);
 
   const detailScrollRef = useRef<FlatList>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -226,6 +227,18 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     onSettled: () => setApiBlock(false)
   });
 
+  const deleteMutation = useMutation("deleteReview",
+    (id: number) => deleteReview(token, id));
+
+  const blockMutation = useMutation("blockUser",
+    ({ id, isBlock }: { id: number, isBlock: boolean }) => blockUser({ token, id, isBlock }), {
+    onSuccess: () => {
+      queryClient.invalidateQueries("reviewList");
+      queryClient.invalidateQueries("userBookmarkList");
+      setIspopupOpen({ isOpen: true, content: "차단되었습니다." });
+    }
+  });
+
   const handleWriteComment = () => {
     if (content === "") {
       return;
@@ -289,6 +302,54 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
         />
       </View>
     );
+  };
+
+  const handleDeletePress = () => {
+    queryClient.setQueriesData("myProfile", (profileQuery: any) => {
+      return {
+        ...profileQuery, reviewCount: profileQuery?.reviewCount > 0 && profileQuery?.reviewCount - 1
+      };
+    });
+    queryClient.setQueriesData("reviewList", (data) => {
+      if (data) {
+        return {
+          //@ts-ignore
+          ...data, pages: [data.pages.flat().filter(v => v.id !== reviewDetailQuery.data.id).map(v => {
+            if (v.parent?.id === reviewDetailQuery.data?.id) {
+              return { ...v, parent: { ...v.parent, isActive: false } };
+            }
+            return v;
+          })]
+        };
+      }
+    });
+    queryClient.setQueriesData("userReviewList", (data) => {
+      if (data) {
+        //@ts-ignore
+        return { ...data, pages: [data.pages.flat().filter(v => v.id !== reviewDetailQuery.data.id)] };
+      }
+    });
+    queryClient.setQueriesData("userBookmarkList", (data) => {
+      if (data) {
+        //@ts-ignore
+        return { ...data, pages: [data.pages.flat().filter(v => v.id !== reviewDetailQuery.data.id)] };
+      }
+    });
+    if (reviewDetailQuery.data) {
+      deleteMutation.mutate(reviewDetailQuery.data?.id);
+    }
+  };
+
+  const handleEditPress = () => {
+    if (reviewDetailQuery.data?.parent) {
+      navigation.navigate("Write", {
+        loading: true, isEdit: true, type: "reknew",
+        nickname: reviewDetailQuery.data?.author.nickname, review: reviewDetailQuery.data
+      });
+    }
+    else {
+      navigation.navigate("Write", { loading: true, isEdit: true, review: reviewDetailQuery.data });
+    }
   };
 
 
@@ -379,7 +440,50 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           </View>
 
           <View style={{ alignItems: "flex-end", }}>
-            <TouchableOpacity onPress={() => setIsMoreClick((isClick) => !isClick)}>
+            <TouchableOpacity onPress={() => {
+              if (reviewDetailQuery.data?.author.id === myId) {
+                setIsBottomDotSheet({
+                  isOpen: true,
+                  topTitle: "푸드로그 수정",
+                  topPress: () => handleEditPress(),
+                  middleTitle: "푸드로그 삭제",
+                  middlePress: () => {
+                    setModalOpen({
+                      isOpen: true,
+                      content: "글을 삭제할까요?",
+                      okButton: () => {
+                        handleDeletePress();
+                        navigation.goBack();
+                      }
+                    });
+                  },
+                  middleTextStyle: { color: theme.color.main },
+                  bottomTitle: "취소하기"
+                });
+              }
+              else {
+                setIsBottomDotSheet({
+                  isOpen: true,
+                  topTitle: "푸드로그 신고",
+                  topPress: () => navigation.navigate("report", { review: reviewDetailQuery.data }),
+                  middleTitle: "푸드로그 차단",
+                  middlePress: () => {
+                    setModalOpen({
+                      isOpen: true,
+                      content: "차단 하시겠습니까?",
+                      okButton: () => {
+                        if (reviewDetailQuery.data) {
+                          blockMutation.mutate({ id: reviewDetailQuery.data?.author.id, isBlock: true });
+                          navigation.goBack();
+                        }
+                      }
+                    });
+                  },
+                  middleTextStyle: { color: theme.color.main },
+                  bottomTitle: "취소하기"
+                });
+              }
+            }}>
               <Image
                 source={more}
                 resizeMode="contain"

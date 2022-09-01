@@ -182,12 +182,19 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
               ...writeData,
               satisfaction: clickedReact.filter(v => v.isClick).map(v => v.title)[0],
               tags: {
-                interest: interestTag.interest.filter(v => {
+                interest: foodTag ? interestTag.interest.filter(v => {
                   if (v.title.includes("기타")) {
                     return false;
                   }
                   return v.isClick;
                 }).map(v => v.title).concat(foodTag)
+                  :
+                  interestTag.interest.filter(v => {
+                    if (v.title.includes("기타")) {
+                      return false;
+                    }
+                    return v.isClick;
+                  }).map(v => v.title)
               }
             },
             loading: false, isEdit: false

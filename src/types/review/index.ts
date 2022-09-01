@@ -65,7 +65,8 @@ export interface ReviewListType {
   parent?: ReviewParentType,
   product?: {
     id: number,
-    name: string
+    name: string,
+    isVerified: boolean
   },
   satisfaction: SatisfactionType,
   tags: {
@@ -77,6 +78,5 @@ export interface ReviewListType {
   isBookmark: boolean,
   isEdit: boolean,
   viewCount: number,
-  shareCount: number,
-  isVerified: boolean
+  shareCount: number
 }

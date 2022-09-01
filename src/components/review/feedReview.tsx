@@ -1,4 +1,4 @@
-import { View, Pressable, StyleSheet, Dimensions, Image, TouchableOpacity, ViewStyle } from 'react-native';
+import { View, Pressable, StyleSheet, Dimensions, Image, TouchableOpacity } from 'react-native';
 import Text from '~/components/style/CustomText';
 import React, { memo, useEffect, useState } from 'react';
 import theme from '~/styles/theme';
@@ -11,41 +11,38 @@ import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/v
 import Highlighter from 'react-native-highlight-words';
 import { ReviewListType } from '~/types/review';
 import { useMutation, useQueryClient } from 'react-query';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { okPopupState, tokenState } from '~/recoil/atoms';
-import { bookmarkReview, likeReview } from '~/api/review';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { bottomDotSheetState, myIdState, okPopupState, popupState, tokenState } from '~/recoil/atoms';
+import { bookmarkReview, deleteReview, likeReview } from '~/api/review';
 import { FONT } from '~/styles/fonts';
 import { noProfile } from '~/assets/images';
 import ReKnew from '~/components/review/reKnew';
-import More from '~/components/more';
 import FastImage from 'react-native-fast-image';
 import ReadMore from '@fawazahmed/react-native-read-more';
+import { blockUser } from '~/api/user';
 
 interface FeedReviewProps {
   review: ReviewListType,
   isRetweet?: boolean,
   type?: "reKnewWrite" | "normal"
-  setSelectedIndex?: (idx: number) => void
-  selectedIndex?: number
-  idx?: number
-  clickBoxStyle?: ViewStyle
   filterBadge?: string,
   keyword?: string,
 }
 
-const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
-  clickBoxStyle, keyword,
-  type = "normal", filterBadge, review }: FeedReviewProps) => {
+const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedReviewProps) => {
   const navigation = useNavigation<StackNavigationProp>();
   const [tags, setTags] = useState<Array<string>>([]);
   const token = useRecoilValue(tokenState);
+  const myId = useRecoilValue(myIdState);
   const queryClient = useQueryClient();
   const [isLike, setIsLike] = useState<boolean>(review.isLike);
   const [likeCount, setLikeCount] = useState(review.likeCount);
   const [isBookmarkState, setIsBookmarkState] = useState<boolean>(review.isBookmark);
   const [bookmarkCount, setBookmarkCount] = useState(review.bookmarkCount);
   const [apiBlock, setApiBlock] = useState(false);
-  const setModalOpen = useSetRecoilState(okPopupState);
+  const [modalOpen, setModalOpen] = useRecoilState(okPopupState);
+  const setIsBottomDotSheet = useSetRecoilState(bottomDotSheetState);
+  const setIspopupOpen = useSetRecoilState(popupState);
   const bookmarkMutation = useMutation("bookmark",
     ({ id, isBookmark }: { id: number, isBookmark: boolean }) => bookmarkReview(token, id, isBookmark), {
     onSuccess: async () => {
@@ -78,10 +75,61 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
     onError: () => setApiBlock(false)
   });
 
-  const handleOffpopup = () => {
-    // * ... 모달 팝업 끄기
-    if (setSelectedIndex) {
-      setSelectedIndex(-1);
+  const deleteMutation = useMutation("deleteReview",
+    (id: number) => deleteReview(token, id));
+
+  const blockMutation = useMutation("blockUser",
+    ({ id, isBlock }: { id: number, isBlock: boolean }) => blockUser({ token, id, isBlock }), {
+    onSuccess: () => {
+      queryClient.invalidateQueries("reviewList");
+      queryClient.invalidateQueries("userBookmarkList");
+      setIspopupOpen({ isOpen: true, content: "차단되었습니다." });
+    }
+  });
+
+  const handleDeletePress = () => {
+    queryClient.setQueriesData("myProfile", (profileQuery: any) => {
+      return {
+        ...profileQuery, reviewCount: profileQuery?.reviewCount > 0 && profileQuery?.reviewCount - 1
+      };
+    });
+    queryClient.setQueriesData("reviewList", (data) => {
+      if (data) {
+        return {
+          //@ts-ignore
+          ...data, pages: [data.pages.flat().filter(v => v.id !== review.id).map(v => {
+            if (v.parent?.id === review.id) {
+              return { ...v, parent: { ...v.parent, isActive: false } };
+            }
+            return v;
+          })]
+        };
+      }
+    });
+    queryClient.setQueriesData("userReviewList", (data) => {
+      if (data) {
+        //@ts-ignore
+        return { ...data, pages: [data.pages.flat().filter(v => v.id !== review.id)] };
+      }
+    });
+    queryClient.setQueriesData("userBookmarkList", (data) => {
+      if (data) {
+        //@ts-ignore
+        return { ...data, pages: [data.pages.flat().filter(v => v.id !== review.id)] };
+      }
+    });
+    deleteMutation.mutate(review.id);
+  };
+
+  const handleEditPress = () => {
+    if (review.parent) {
+      navigation.navigate("Write", {
+        loading: true, isEdit: true, type: "reknew",
+        nickname: review.author.nickname, review, filterBadge
+      });
+    }
+    else {
+      navigation.navigate("Write", { loading: true, isEdit: true, review, filterBadge });
     }
   };
 
@@ -104,6 +152,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
   useEffect(() => {
     setTags(review.tags?.interest);
   }, [review.tags]);
+
 
   return (
     <>
@@ -140,13 +189,40 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           <TouchableOpacity
             style={{ position: "absolute", right: 0, top: 0 }}
             onPress={() => {
-              if (setSelectedIndex)
-                if (selectedIndex === idx) {
-                  setSelectedIndex(-1);
-                }
-                else {
-                  setSelectedIndex(idx);
-                }
+              if (review.author.id === myId) {
+                setIsBottomDotSheet({
+                  isOpen: true,
+                  topTitle: "푸드로그 수정",
+                  topPress: () => handleEditPress(),
+                  middleTitle: "푸드로그 삭제",
+                  middlePress: () => {
+                    setModalOpen({
+                      isOpen: true,
+                      content: "글을 삭제할까요?",
+                      okButton: handleDeletePress
+                    });
+                  },
+                  middleTextStyle: { color: theme.color.main },
+                  bottomTitle: "취소하기"
+                });
+              }
+              else {
+                setIsBottomDotSheet({
+                  isOpen: true,
+                  topTitle: "푸드로그 신고",
+                  topPress: () => navigation.navigate("report", { review }),
+                  middleTitle: "푸드로그 차단",
+                  middlePress: () => {
+                    setModalOpen({
+                      isOpen: true,
+                      content: "차단 하시겠습니까?",
+                      okButton: () => blockMutation.mutate({ id: review.author.id, isBlock: true })
+                    });
+                  },
+                  middleTextStyle: { color: theme.color.main },
+                  bottomTitle: "취소하기"
+                });
+              }
             }}>
             <Image
               source={more}
@@ -183,15 +259,14 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
         }}>
           <TouchableOpacity
             onPress={() => {
-              if (review.isVerified) {
+              if (review.product?.isVerified) {
                 navigation.navigate("ProductDetail", { id: review.product?.id });
               }
               else {
                 setModalOpen({
                   isOpen: true,
                   content: "아직 등록되지 않은 상품입니다.",
-                  okButton: () => navigation.goBack(),
-                  isBackdrop: false,
+                  okButton: () => setModalOpen({ ...modalOpen, isOpen: false }),
                   isCancleButton: false
                 });
               }
@@ -203,7 +278,7 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
               borderRadius: 4
             }}>
             <Text style={[FONT.Medium, {
-              color: review.isVerified ? "#5193f6" : theme.color.grayscale.C_79737e,
+              color: review.product.isVerified ? "#5193f6" : theme.color.grayscale.C_79737e,
             }]}>
               {`${review.product.name} >`}
             </Text>
@@ -360,7 +435,6 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           </Pressable>
           <TouchableOpacity
             onPress={() => {
-              handleOffpopup();
               if (!apiBlock) {
                 setApiBlock(true);
                 if (isLike) {
@@ -380,7 +454,6 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              handleOffpopup();
               if (!apiBlock) {
                 setApiBlock(true);
                 if (isBookmarkState) {
@@ -399,24 +472,6 @@ const FeedReview = ({ selectedIndex, setSelectedIndex, idx = -1,
             <Text style={[FONT.Regular, styles.reviewCount]}>{bookmarkCount}</Text>
           </TouchableOpacity>
         </View>
-      }
-
-      {
-        type === "normal" &&
-        <More
-          setSelectedIndex={(seIdx: number) => setSelectedIndex && setSelectedIndex(seIdx)}
-          clickBoxStyle={clickBoxStyle}
-          review={review}
-          filterBadge={filterBadge}
-          userId={review.author?.id}
-          isMoreClick={selectedIndex === idx}
-          type="review"
-          handleCloseMore={() => {
-            if (setSelectedIndex) {
-              setSelectedIndex(-1);
-            }
-          }}
-        />
       }
     </>
   );
