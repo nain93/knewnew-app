@@ -54,59 +54,49 @@ const More = ({ setSelectedIndex, isGoback, handleCloseMore, userId, isMoreClick
   });
 
   const handleEditPress = () => {
-    if (type === "review") {
-      if (review.parent) {
-        navigation.navigate("Write", {
-          loading: true, isEdit: true, type: "reknew",
-          nickname: review.author.nickname, review, filterBadge
-        });
-      }
-      else {
-        navigation.navigate("Write", { loading: true, isEdit: true, review, filterBadge });
-      }
+    if (review.parent) {
+      navigation.navigate("Write", {
+        loading: true, isEdit: true, type: "reknew",
+        nickname: review.author.nickname, review, filterBadge
+      });
     }
-    if (type === "comment") {
-
+    else {
+      navigation.navigate("Write", { loading: true, isEdit: true, review, filterBadge });
     }
   };
 
   const handleDeletePress = () => {
-    if (type === "review") {
-      queryClient.setQueriesData("myProfile", (profileQuery: any) => {
+    queryClient.setQueriesData("myProfile", (profileQuery: any) => {
+      return {
+        ...profileQuery, reviewCount: profileQuery?.reviewCount > 0 && profileQuery?.reviewCount - 1
+      };
+    });
+    queryClient.setQueriesData("reviewList", (data) => {
+      if (data) {
         return {
-          ...profileQuery, reviewCount: profileQuery?.reviewCount > 0 && profileQuery?.reviewCount - 1
+          //@ts-ignore
+          ...data, pages: [data.pages.flat().filter(v => v.id !== review.id).map(v => {
+            if (v.parent?.id === review.id) {
+              return { ...v, parent: { ...v.parent, isActive: false } };
+            }
+            return v;
+          })]
         };
-      });
-      queryClient.setQueriesData("reviewList", (data) => {
-        if (data) {
-          return {
-            //@ts-ignore
-            ...data, pages: [data.pages.flat().filter(v => v.id !== review.id).map(v => {
-              if (v.parent?.id === review.id) {
-                return { ...v, parent: { ...v.parent, isActive: false } };
-              }
-              return v;
-            })]
-          };
-        }
-      });
-      queryClient.setQueriesData("userReviewList", (data) => {
-        if (data) {
-          //@ts-ignore
-          return { ...data, pages: [data.pages.flat().filter(v => v.id !== review.id)] };
-        }
-      });
-      queryClient.setQueriesData("userBookmarkList", (data) => {
-        if (data) {
-          //@ts-ignore
-          return { ...data, pages: [data.pages.flat().filter(v => v.id !== review.id)] };
-        }
-      });
-      deleteMutation.mutate(review.id);
-    }
-    if (type === "comment") {
-
-    }
+      }
+    });
+    queryClient.setQueriesData("userReviewList", (data) => {
+      if (data) {
+        //@ts-ignore
+        return { ...data, pages: [data.pages.flat().filter(v => v.id !== review.id)] };
+      }
+    });
+    queryClient.setQueriesData("userBookmarkList", (data) => {
+      if (data) {
+        //@ts-ignore
+        return { ...data, pages: [data.pages.flat().filter(v => v.id !== review.id)] };
+      }
+    });
+    deleteMutation.mutate(review.id);
   };
 
 

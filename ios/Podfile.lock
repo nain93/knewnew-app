@@ -211,7 +211,7 @@ PODS:
   - GTMSessionFetcher/Core (1.7.2)
   - JWT (3.0.0-beta.14):
     - Base64 (~> 1.1.2)
-  - kakao-login (4.2.2):
+  - kakao-login (4.2.3):
     - KakaoSDK (= 2.9.0)
     - KakaoSDKAuth (= 2.9.0)
     - KakaoSDKCommon (= 2.9.0)
@@ -963,7 +963,7 @@ SPEC CHECKSUMS:
   GTMAppAuth: 4d8f864896f3646f0c33baf38a28362f4c601e15
   GTMSessionFetcher: 5595ec75acf5be50814f81e9189490412bad82ba
   JWT: ef71dfb03e1f842081e64dc42eef0e164f35d251
-  kakao-login: 78dd96772c70702916ef237da2af25aa2a6e0bab
+  kakao-login: 6c75ad420e66f0708eb109d39212650906bd39f2
   KakaoSDK: d5a5a38ebf4da97beeecf100ac3dc9a020e19648
   KakaoSDKAuth: 5d9eec3317320dc60015ba8d597b2ad32fc70b1a
   KakaoSDKCommon: aaed06bb779b92cd6f5c35e94160d4ecfaaac511

@@ -1,4 +1,4 @@
-import { StyleProp, ViewStyle } from "react-native";
+import { StyleProp, TextStyle, ViewStyle } from "react-native";
 import { atom } from "recoil";
 
 // * 토큰여부에 따라서 로그인 여부 확인
@@ -93,4 +93,28 @@ interface BottomSheetType {
 export const bottomSheetState = atom<BottomSheetType | null>({
   key: "bottomSheetState",
   default: null
+});
+
+interface BottomDotSheetType {
+  onOpen?: () => void
+  isOpen: boolean,
+  topTitle: string,
+  topPress: () => void,
+  middleTitle: string,
+  middlePress: () => void,
+  bottomTitle: string,
+  middleTextStyle?: TextStyle
+}
+
+export const bottomDotSheetState = atom<BottomDotSheetType>({
+  key: "bottomDotSheetState",
+  default: {
+    onOpen: () => null,
+    isOpen: false,
+    topTitle: "",
+    topPress: () => null,
+    middleTitle: "",
+    middlePress: () => null,
+    bottomTitle: ""
+  }
 });

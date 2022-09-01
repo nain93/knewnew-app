@@ -12,8 +12,8 @@ import { leftArrow, whiteClose } from '~/assets/icons';
 import { ReviewListType, SatisfactionType } from '~/types/review';
 import { useInfiniteQuery } from 'react-query';
 import { getReviewList } from '~/api/review';
-import { useRecoilValue } from 'recoil';
-import { tokenState } from '~/recoil/atoms';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { bottomDotSheetState, tokenState } from '~/recoil/atoms';
 import { hitslop, reactList } from '~/utils/constant';
 import { loading } from '~/assets/gif';
 import Loading from '~/components/loading';
@@ -35,7 +35,7 @@ const ProductList = ({ navigation, route }: ProductListProps) => {
   const token = useRecoilValue(tokenState);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const reactRefRBSheet = useRef<RBSheet>(null);
-  const sortRefSheet = useRef<RBSheet>(null);
+  const [isBottomDotSheet, setIsBottomDotSheet] = useRecoilState(bottomDotSheetState);
   const [sort, setSort] = useState<"0" | "1">("0");
   const [sortReact, setSortReact] = useState<string[]>();
   const [clickedReact, setClickReact] = useState<Array<{
@@ -107,7 +107,14 @@ const ProductList = ({ navigation, route }: ProductListProps) => {
           hitSlop={hitslop}
           onPress={() => {
             setSelectedIndex(-1);
-            sortRefSheet.current?.open();
+            setIsBottomDotSheet({
+              isOpen: true,
+              topTitle: "최신순 보기",
+              topPress: () => setSort("0"),
+              middleTitle: "인기순 보기",
+              middlePress: () => setSort("1"),
+              bottomTitle: "닫기"
+            });
           }}
           style={{ flexDirection: "row", alignItems: "center" }}
         >
@@ -130,9 +137,6 @@ const ProductList = ({ navigation, route }: ProductListProps) => {
         })}
       style={styles.review}>
       <FeedReview
-        idx={index}
-        selectedIndex={selectedIndex}
-        setSelectedIndex={(selectIdx: number) => setSelectedIndex(selectIdx)}
         review={item}
       />
     </Pressable>
@@ -216,41 +220,6 @@ const ProductList = ({ navigation, route }: ProductListProps) => {
             bgColor={theme.color.main}
             textColor={theme.color.white}
           />
-        </>
-      </CustomBottomSheet>
-
-      {/* 최신순 sheet */}
-      <CustomBottomSheet
-        sheetRef={sortRefSheet}
-        height={Dimensions.get("window").height - h2p(600)}
-      >
-        <>
-          <TouchableOpacity
-            onPress={() => {
-              setSort("0");
-              sortRefSheet.current?.close();
-            }}
-            style={{
-              paddingVertical: h2p(12.5), paddingHorizontal: d2p(10),
-              borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc
-            }}>
-            <Text style={[FONT.Regular, {
-              color: sort === "0" ? theme.color.black : theme.color.grayscale.a09ca4
-            }]}>최신순</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setSort("1");
-              sortRefSheet.current?.close();
-            }}
-            style={{
-              paddingVertical: h2p(12.5), paddingHorizontal: d2p(10),
-              borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc
-            }}>
-            <Text style={[FONT.Regular, {
-              color: sort === "1" ? theme.color.black : theme.color.grayscale.a09ca4
-            }]}>인기순</Text>
-          </TouchableOpacity>
         </>
       </CustomBottomSheet>
     </>

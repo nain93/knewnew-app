@@ -9,8 +9,8 @@ import { leftArrow, noticeIcon, whiteClose } from '~/assets/icons';
 import RBSheet from "react-native-raw-bottom-sheet";
 import { useInfiniteQuery, useQuery } from 'react-query';
 import { getReviewList } from '~/api/review';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { isNotiReadState, tokenState } from '~/recoil/atoms';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { bottomDotSheetState, isNotiReadState, tokenState } from '~/recoil/atoms';
 import Loading from '~/components/loading';
 import { getMyProfile } from '~/api/user';
 import { MyProfileType } from '~/types/user';
@@ -42,13 +42,13 @@ export interface FeedProps {
 
 const Feed = ({ navigation, route }: FeedProps) => {
   const reactRefRBSheet = useRef<RBSheet>(null);
-  const sortRefSheet = useRef<RBSheet>(null);
   const marketRefRBSheet = useRef<RBSheet>(null);
   const [token, setToken] = useRecoilState(tokenState);
   const isNotiRead = useRecoilValue(isNotiReadState);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [filterBadge, setFilterBadge] = useState("");
   const flatListRef = useRef<FlatList>(null);
+  const setIsBottomDotSheet = useSetRecoilState(bottomDotSheetState);
 
   const [sort, setSort] = useState<"0" | "1" | "2">("0");
   const [sortMarket, setSortMarket] = useState<string[]>();
@@ -181,7 +181,14 @@ const Feed = ({ navigation, route }: FeedProps) => {
             hitSlop={hitslop}
             onPress={() => {
               setSelectedIndex(-1);
-              sortRefSheet.current?.open();
+              setIsBottomDotSheet({
+                isOpen: true,
+                topTitle: "최신순 보기",
+                topPress: () => setSort("0"),
+                middleTitle: "인기순 보기",
+                middlePress: () => setSort("1"),
+                bottomTitle: "닫기"
+              });
             }}
             style={{ flexDirection: "row", alignItems: "center" }}>
             <Text style={[FONT.Regular, { fontSize: 12, marginRight: d2p(5) }]}>
@@ -221,9 +228,6 @@ const Feed = ({ navigation, route }: FeedProps) => {
       }}
       style={styles.review}>
       <FeedReview
-        idx={index}
-        selectedIndex={selectedIndex}
-        setSelectedIndex={(selectIdx: number) => setSelectedIndex(selectIdx)}
         review={item}
         filterBadge={filterBadge}
       />
@@ -302,41 +306,6 @@ const Feed = ({ navigation, route }: FeedProps) => {
           keyExtractor={reviewKey}
         />
       </Pressable>
-
-      {/* 최신순 sheet */}
-      <CustomBottomSheet
-        sheetRef={sortRefSheet}
-        height={Dimensions.get("window").height - h2p(600)}
-      >
-        <>
-          <TouchableOpacity
-            onPress={() => {
-              setSort("0");
-              sortRefSheet.current?.close();
-            }}
-            style={{
-              paddingVertical: h2p(12.5), paddingHorizontal: d2p(10),
-              borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc
-            }}>
-            <Text style={[FONT.Regular, {
-              color: sort === "0" ? theme.color.black : theme.color.grayscale.a09ca4
-            }]}>최신순</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setSort("1");
-              sortRefSheet.current?.close();
-            }}
-            style={{
-              paddingVertical: h2p(12.5), paddingHorizontal: d2p(10),
-              borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc
-            }}>
-            <Text style={[FONT.Regular, {
-              color: sort === "1" ? theme.color.black : theme.color.grayscale.a09ca4
-            }]}>인기순</Text>
-          </TouchableOpacity>
-        </>
-      </CustomBottomSheet>
 
       {/* 반응별 sheet */}
       <CustomBottomSheet

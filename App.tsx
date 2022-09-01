@@ -3,26 +3,27 @@ import { Animated, AppState, Linking, Platform } from 'react-native';
 import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import SplashScreen from 'react-native-splash-screen';
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 import codePush from "react-native-code-push";
 import { FileLogger } from "react-native-file-logger";
 
 import GlobalNav from './src/navigators/globalNav';
-import AlertPopup from '~/components/popup/alertPopup';
-import { isNotiReadState, latestVerionsState, notificationPopup, okPopupState, popupState, tokenState } from '~/recoil/atoms';
-import OkPopup from '~/components/popup/okPopup';
+import AlertPopup from '~/components/popup/AlertPopup';
+import { bottomDotSheetState, isNotiReadState, latestVerionsState, notificationPopup, okPopupState, popupState, tokenState } from '~/recoil/atoms';
+import OkPopup from '~/components/popup/OkPopup';
 import Loading from '~/components/loading';
 import FadeInOut from '~/hooks/useFadeInOut';
 
 import * as Sentry from "@sentry/react-native";
 //@ts-ignore
 import VersionCheck from 'react-native-version-check';
-import NotificationPopup from '~/components/popup/notificationPopup';
+import NotificationPopup from '~/components/popup/NotificationPopup';
 import Config from 'react-native-config';
 import { versioningAOS, versioningIOS } from '~/utils/constant';
-import ShouldUpdatePopup from '~/components/popup/shouldUpdatePopup';
+import ShouldUpdatePopup from '~/components/popup/ShouldUpdatePopup';
+import BottomDotSheet from '~/components/popup/BottomDotSheet';
 
 
 export const navigationRef = createNavigationContainerRef();
@@ -35,6 +36,7 @@ const App = () => {
   const [token, setToken] = useRecoilState(tokenState);
   const [isVisible, setIsVisible] = useState(false);
   const setIsNotiReadState = useSetRecoilState(isNotiReadState);
+  const [isBottomDotSheet, setIsBottomDotSheet] = useRecoilState(bottomDotSheetState);
   const setLatestVerions = useSetRecoilState(latestVerionsState);
   const [versionCheckModal, setVersionCheckModal] = useState(false);
 
@@ -330,6 +332,18 @@ const App = () => {
           <AlertPopup text={isPopupOpen.content} popupStyle={isPopupOpen.popupStyle} />
         </Animated.View>}
 
+      {isBottomDotSheet?.isOpen &&
+        <BottomDotSheet
+          topTitle={isBottomDotSheet.topTitle}
+          topPress={isBottomDotSheet.topPress}
+          middleTitle={isBottomDotSheet.middleTitle}
+          middlePress={isBottomDotSheet.middlePress}
+          bottomTitle={isBottomDotSheet.bottomTitle}
+          modalOpen={isBottomDotSheet.isOpen}
+          middleTextStyle={isBottomDotSheet.middleTextStyle}
+          setModalOpen={(isModalOpen: boolean) => setIsBottomDotSheet({ ...isBottomDotSheet, isOpen: isModalOpen })}
+        />
+      }
       {/* 강제 업데이트 팝업 */}
       {versionCheckModal &&
         <ShouldUpdatePopup modalOpen={versionCheckModal} />
