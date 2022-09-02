@@ -33,9 +33,8 @@ interface ProductListProps {
 
 const ProductList = ({ navigation, route }: ProductListProps) => {
   const token = useRecoilValue(tokenState);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
   const reactRefRBSheet = useRef<RBSheet>(null);
-  const [isBottomDotSheet, setIsBottomDotSheet] = useRecoilState(bottomDotSheetState);
+  const setIsBottomDotSheet = useSetRecoilState(bottomDotSheetState);
   const [sort, setSort] = useState<"0" | "1">("0");
   const [sortReact, setSortReact] = useState<string[]>();
   const [clickedReact, setClickReact] = useState<Array<{
@@ -53,13 +52,14 @@ const ProductList = ({ navigation, route }: ProductListProps) => {
       offset: pageParam, limit: 5, sort
     }), {
     getNextPageParam: (next, all) => all.flat().length ?? undefined,
+    getPreviousPageParam: (next, all) => all.flat().length - 5,
     enabled: !!route.params?.product
   });
 
-  const reviewFooter = useCallback(() => <View style={{ height: h2p(117) }} />, []);
+  const reviewFooter = useCallback(() => <View style={{ height: h2p(40) }} />, []);
 
   const footerLoading = useCallback(() =>
-    <View style={{ height: h2p(117) }}>
+    <View style={{ height: h2p(40) }}>
       <Image source={loading} style={{ alignSelf: "center", width: d2p(70), height: d2p(70) }} />
     </View>, []);
 
@@ -106,7 +106,6 @@ const ProductList = ({ navigation, route }: ProductListProps) => {
         <TouchableOpacity
           hitSlop={hitslop}
           onPress={() => {
-            setSelectedIndex(-1);
             setIsBottomDotSheet({
               isOpen: true,
               topTitle: "최신순 보기",
@@ -125,7 +124,7 @@ const ProductList = ({ navigation, route }: ProductListProps) => {
         </TouchableOpacity>
       </View>
     </View>
-  ), [sortReact]);
+  ), [sortReact, sort]);
 
   const foodLogRenderItem = useCallback(({ item, index }) =>
     <Pressable
@@ -140,7 +139,16 @@ const ProductList = ({ navigation, route }: ProductListProps) => {
         review={item}
       />
     </Pressable>
-    , [selectedIndex]);
+    , []);
+
+    const foodLogEndReached = useCallback(() => {
+      if (reviewListQuery.data &&
+        reviewListQuery.data.pages.flat().length > 4 &&
+        reviewListQuery.hasNextPage
+      ) {
+        reviewListQuery.fetchNextPage();
+      }
+    }, [reviewListQuery]);
 
   if (reviewListQuery.isLoading) {
     return (
@@ -151,7 +159,6 @@ const ProductList = ({ navigation, route }: ProductListProps) => {
         <Loading />
       </>
     );
-
   }
 
   return (
@@ -159,12 +166,14 @@ const ProductList = ({ navigation, route }: ProductListProps) => {
       <Header
         headerLeft={<LeftArrowIcon />}
         title="푸드로그 전체보기" />
-      <Pressable onPress={() => setSelectedIndex(-1)}>
         <FlatList
           ListHeaderComponent={foodLogHeader}
+          refreshing={reviewListQuery.isLoading}
+          onRefresh={reviewListQuery.refetch}
           renderItem={foodLogRenderItem}
           data={reviewListQuery.data?.pages.flat()}
           keyExtractor={foodLogKey}
+          onEndReached={foodLogEndReached}
           onEndReachedThreshold={0.5}
           maxToRenderPerBatch={5}
           windowSize={5}
@@ -173,17 +182,14 @@ const ProductList = ({ navigation, route }: ProductListProps) => {
           ListFooterComponent={reviewListQuery.isFetchingNextPage ? footerLoading : reviewFooter}
           style={{
             marginTop: 0,
-            // marginBottom: h2p(80),
             backgroundColor: theme.color.grayscale.f7f7fc
           }}
         />
-      </Pressable>
       {/* 반응별 sheet */}
       <CustomBottomSheet
         height={Dimensions.get("window").height - h2p(480)}
         sheetRef={reactRefRBSheet}
         onOpen={() => {
-          setSelectedIndex(-1);
           setClickReact(clickedReact.map(v => {
             if (sortReact?.includes(v.title)) {
               return { ...v, isClick: true };

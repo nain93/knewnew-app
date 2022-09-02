@@ -150,15 +150,15 @@ const App = () => {
   const handleAlarm = (remoteMessage: any) => {
     if (Platform.OS === "ios") {
       if (remoteMessage.data?.custom_data.link) {
-        if (remoteMessage.data?.custom_data.link.includes("home")) {
-          // * 링크 없는 공지알람
-          //@ts-ignore
-          navigationRef.navigate("TabNav");
-        }
-        else {
+        if (remoteMessage.data?.custom_data.link.includes("review")){
           // * 푸시알람
           //@ts-ignore
           navigationRef.navigate("FeedDetail", { id: remoteMessage.data.custom_data.link.split("/")[1] });
+        }
+        else {
+          // * 링크 없는 공지알람
+          //@ts-ignore
+          navigationRef.navigate("TabNav");
         }
       }
       else {
@@ -169,15 +169,15 @@ const App = () => {
     }
     else {
       if (remoteMessage.data?.link) {
-        if (remoteMessage.data?.link.includes("home")) {
-          // * 링크 없는 공지알람
-          //@ts-ignore
-          navigationRef.navigate("TabNav");
-        }
-        else {
+        if (remoteMessage.data?.link.includes("review")) {
           // * 푸시알람
           //@ts-ignore
           navigationRef.navigate("FeedDetail", { id: remoteMessage.data.link.split("/")[1] });
+        }
+        else {
+          // * 링크 없는 공지알람
+          //@ts-ignore
+          navigationRef.navigate("TabNav");
         }
       }
       else {

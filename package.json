@@ -5,6 +5,7 @@
   "scripts": {
     "postinstall": "npx patch-package",
     "android": "ENVFILE=env/.env.development react-native run-android",
+    "android-release": "ENVFILE=env/.env.development react-native run-android --variant=release",
     "android:prod": "ENVFILE=env/.env.production react-native run-android",
     "build-android": "ENVFILE=env/.env.production cd android && ./gradlew bundleRelease",
     "build-android-apk": "ENVFILE=env/.env.development cd android && ./gradlew assembleRelease",

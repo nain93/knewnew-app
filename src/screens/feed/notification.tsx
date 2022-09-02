@@ -79,11 +79,11 @@ const Notification = ({ navigation }: NotificationProps) => {
     return (
       <Pressable
         onPress={() => {
-          if (item.link.includes("home")) {
-            return;
+          if (item.link.includes("review")) {
+            navigation.navigate("FeedDetail", { id: item.link.split("/")[1] });
           }
           else {
-            navigation.navigate("FeedDetail", { id: item.link.split("/")[1] });
+            navigation.navigate("HomeStackNav");
           }
         }}
         style={{ flexDirection: "row" }}>
