@@ -6,7 +6,7 @@ import { hitslop } from '~/utils/constant';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import theme from '~/styles/theme';
-import { noticeIcon } from '~/assets/icons';
+import { graysearch } from '~/assets/icons';
 import { isNotiReadState, myIdState, tokenState } from '~/recoil/atoms';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { FONT } from '~/styles/fonts';
@@ -15,7 +15,7 @@ import {
   coupangImage, dieterFoodlog, etcImage, kurlyImage, naverImage, newFoodlog, riceFoodlog, ssgImage
 } from '~/assets/images/home';
 import { interestTagData } from '~/utils/data';
-import { fireImg, noProfile } from '~/assets/images';
+import { fireImg } from '~/assets/images';
 import { useQuery } from 'react-query';
 import { getMyProfile } from '~/api/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -69,7 +69,6 @@ const Home = ({ navigation }: HomeProps) => {
   const bannerListRef = useRef<FlatList>(null);
   const [token, setToken] = useRecoilState(tokenState);
   const setMyId = useSetRecoilState(myIdState);
-  const isNotiRead = useRecoilValue(isNotiReadState);
   const [scrollIdx, setScrollIdx] = useState(0);
 
   const getBannerQuery = useQuery<BannerType[], Error>("banner", () => getBanner(token));
@@ -128,17 +127,8 @@ const Home = ({ navigation }: HomeProps) => {
           width: Dimensions.get("window").width - d2p(40)
         }}>
           <Image source={homeLogo} style={{ width: d2p(104), height: d2p(14) }} />
-          <Pressable hitSlop={hitslop} onPress={() => navigation.navigate("notification")} >
-            {!isNotiRead &&
-              <View style={{
-                position: "absolute",
-                top: 0,
-                right: 0,
-                borderRadius: 4,
-                width: d2p(4), height: d2p(4), backgroundColor: theme.color.main
-              }} />
-            }
-            <Image source={noticeIcon} style={{ width: d2p(24), height: d2p(24) }} />
+          <Pressable hitSlop={hitslop} onPress={() => navigation.navigate("search")} >
+            <Image source={graysearch} style={{ width: d2p(24), height: d2p(24) }} />
           </Pressable>
         </View>} />
 

@@ -1,18 +1,18 @@
 import { Image, StyleSheet, View } from 'react-native';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from 'react';
-import Search from '~/screens/search';
 import Mypage from '~/screens/mypage';
 import theme from '~/styles/theme';
 import { d2p, h2p } from '~/utils';
-import { mainSearchIcon, graylogo, graymypage, graysearch, graywrite, mainmypage, mainlogoIcon, settingIcon } from '~/assets/icons';
+import { graylogo, graymypage, graywrite, mainmypage, mainlogoIcon, settingIcon, mainNotiIcon, notiIcon } from '~/assets/icons';
 import { useRecoilValue } from 'recoil';
-import { myIdState } from '~/recoil/atoms';
+import { isNotiReadState, myIdState } from '~/recoil/atoms';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import BeforeWrite from '~/screens/write/beforeWrite';
 import HomeStackNav from '~/navigators/homeStackNav';
+import Notification from '~/screens/feed/notification';
 
 const Tabs = createBottomTabNavigator();
 
@@ -30,6 +30,7 @@ function StatusBarPlaceHolder() {
 
 const TabNavigator = () => {
   const myId = useRecoilValue(myIdState);
+  const isNotiRead = useRecoilValue(isNotiReadState);
 
   return (
     <Tabs.Navigator
@@ -71,7 +72,7 @@ const TabNavigator = () => {
           headerShown: false,
           tabBarIcon: ({ focused }) => (
             <Image
-              style={{ width: d2p(20), height: d2p(20) }}
+              style={{ width: d2p(25), height: d2p(16) }}
               source={focused ? mainlogoIcon : graylogo}
             />
           )
@@ -99,16 +100,28 @@ const TabNavigator = () => {
         }}
       />
       <Tabs.Screen
-        name="Search"
-        component={Search}
+        name="Notification"
+        component={Notification}
         options={{
-          tabBarLabel: "검색",
+          tabBarLabel: "소식",
           headerShown: false,
           tabBarIcon: ({ focused }) => (
-            <Image
-              style={{ width: d2p(20), height: d2p(20) }}
-              source={focused ? mainSearchIcon : graysearch}
-            />
+            <View>
+              <Image
+                style={{ width: d2p(20), height: d2p(20) }}
+                source={focused ? mainNotiIcon : notiIcon}
+              />
+              {!isNotiRead &&
+                <View style={{
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  alignSelf: "center",
+                  borderRadius: 4,
+                  width: d2p(4), height: d2p(4), backgroundColor: theme.color.main
+                }} />
+              }
+            </View>
           )
         }}
       />

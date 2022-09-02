@@ -27,6 +27,7 @@ import ProductList from '~/screens/feed/productList';
 import BlockList from '~/screens/setting/blockList';
 import ProductDetailReady from '~/screens/feed/productDetailReady';
 import Feed from '~/screens/feed';
+import Search from '~/screens/search';
 
 const Stack = createStackNavigator();
 
@@ -197,8 +198,8 @@ const GlobalNav = ({ token }: { token: string }) => {
           }}
         />
         <Stack.Screen
-          name="notification"
-          component={Notification}
+          name="search"
+          component={Search}
           options={{
             headerShown: false
           }}

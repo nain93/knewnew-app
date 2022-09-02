@@ -19,6 +19,7 @@ import { noProfile } from '~/assets/images';
 import { ReviewListType, SatisfactionType } from '~/types/review';
 import { AuthorType } from '~/types';
 import ReadMore from '@fawazahmed/react-native-read-more';
+import QuestionPopup from '~/components/popup/QuestionPopup';
 
 interface ProductDetailProps {
   navigation: NavigationStackProp;
@@ -299,26 +300,22 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
             </TouchableOpacity>}
         </View>
 
-        {/* ? 팝업 */}
-        {/* {priceInfoOpen &&
+        {priceInfoOpen &&
           <QuestionPopup isPopupOpen={priceInfoOpen} setIsPopupOpen={(priceInfo: boolean) => setPriceInfoOpen(priceInfo)}>
             <>
-              <Image
-                source={popupBackground2}
+              <View
                 style={{
                   position: "absolute",
-                  top: h2p(-80),
-                  left: 0,
-                  width: Dimensions.get("window").width - d2p(20),
-                  height: h2p(130),
-                }} />
-              <View style={{
-                position: "absolute", top: h2p(-50), left: d2p(20),
-                width: Dimensions.get("window").width - d2p(60),
-                height: h2p(80)
-              }}>
+                  top: h2p(-70),
+                  width: Dimensions.get("window").width - d2p(40),
+                  backgroundColor: "rgba(68,62,73,1)",
+                  alignSelf: "center",
+                  borderRadius: 15,
+                  paddingHorizontal: d2p(10),
+                  paddingVertical: h2p(10)
+                }}>
                 <Text style={[FONT.Regular, { fontSize: 13, color: theme.color.white }]}>
-                  예상가격은 해당 상품을 판매 중인 판매처에서 책정된 가격의 평균 가격입니다.
+                  <Text style={FONT.Bold}>예상가격</Text>은 해당 상품을 판매 중인 판매처에서 책정된 가격의 평균 가격입니다.
                 </Text>
                 <Text style={[FONT.Regular, {
                   fontSize: 13, color: theme.color.white,
@@ -329,7 +326,7 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
               </View>
             </>
           </QuestionPopup>
-        } */}
+        }
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}

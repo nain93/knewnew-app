@@ -4,13 +4,13 @@ import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import Header from '~/components/header';
 import FeedReview from '~/components/review/feedReview';
-import { leftArrow, noticeIcon, whiteClose } from '~/assets/icons';
+import { graysearch, leftArrow, whiteClose } from '~/assets/icons';
 
 import RBSheet from "react-native-raw-bottom-sheet";
 import { useInfiniteQuery, useQuery } from 'react-query';
 import { getReviewList } from '~/api/review';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { bottomDotSheetState, isNotiReadState, tokenState } from '~/recoil/atoms';
+import { useRecoilState, useSetRecoilState } from 'recoil';
+import { bottomDotSheetState, tokenState } from '~/recoil/atoms';
 import Loading from '~/components/loading';
 import { getMyProfile } from '~/api/user';
 import { MyProfileType } from '~/types/user';
@@ -44,7 +44,6 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const reactRefRBSheet = useRef<RBSheet>(null);
   const marketRefRBSheet = useRef<RBSheet>(null);
   const [token, setToken] = useRecoilState(tokenState);
-  const isNotiRead = useRecoilValue(isNotiReadState);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [filterBadge, setFilterBadge] = useState("");
   const flatListRef = useRef<FlatList>(null);
@@ -273,17 +272,8 @@ const Feed = ({ navigation, route }: FeedProps) => {
     <>
       <Header
         headerLeft={<LeftArrowIcon />}
-        headerRight={<Pressable hitSlop={hitslop} onPress={() => navigation.navigate("notification")} >
-          {!isNotiRead &&
-            <View style={{
-              position: "absolute",
-              top: 0,
-              right: 0,
-              borderRadius: 4,
-              width: d2p(4), height: d2p(4), backgroundColor: theme.color.main
-            }} />
-          }
-          <Image source={noticeIcon} style={{ width: d2p(24), height: d2p(24) }} />
+        headerRight={<Pressable hitSlop={hitslop} onPress={() => navigation.navigate("search")} >
+          <Image source={graysearch} style={{ width: d2p(24), height: d2p(24) }} />
         </Pressable>}
         title={`#${filterBadge === "" ? "모든메뉴" : filterBadge}`}
       />
