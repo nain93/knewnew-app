@@ -94,7 +94,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
       NaverLogin.login(Platform.OS === "ios" ? iosKeys : aosKeys, async (err, token) => {
         if (token) {
           const { accessToken } = token;
-          const data = await userLogin({ token: accessToken, providerType: "kakao" });
+          const data = await userLogin({ token: accessToken, providerType: "naver" });
           if (data.accessToken) {
             // * 이미 가입된 유저
             setToken(data.accessToken);

@@ -213,7 +213,14 @@ const Home = ({ navigation }: HomeProps) => {
                     <Pressable
                       onPress={() => {
                         if (item.link) {
-                          Linking.openURL(item.link);
+                          Linking.canOpenURL(item.link).then(supported => {
+                            if (supported) {
+                              Linking.openURL(item.link);
+                            }
+                            else {
+                              // todo 경고 문구
+                            }
+                          });
                         }
                       }}
                       style={styles.banner}>
