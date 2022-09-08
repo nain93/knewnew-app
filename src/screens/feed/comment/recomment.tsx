@@ -1,4 +1,4 @@
-import { Dimensions, Image, Platform, Pressable, StyleSheet, TouchableOpacity, View, Text } from 'react-native';
+import { Dimensions, Image, Platform, StyleSheet, TouchableOpacity, View, Text } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import theme from '~/styles/theme';
 import { useNavigation } from '@react-navigation/native';

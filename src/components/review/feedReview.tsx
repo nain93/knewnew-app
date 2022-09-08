@@ -18,7 +18,6 @@ import { FONT } from '~/styles/fonts';
 import { noProfile } from '~/assets/images';
 import ReKnew from '~/components/review/reKnew';
 import FastImage from 'react-native-fast-image';
-import ReadMore from '@fawazahmed/react-native-read-more';
 import { blockUser } from '~/api/user';
 
 interface FeedReviewProps {
@@ -297,27 +296,21 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
         />
         :
         <View style={{ marginLeft: d2p(30) }}>
-          <ReadMore
-            seeMoreText="더보기 >"
-            expandOnly={true}
-            seeMoreStyle={[FONT.Medium, {
-              color: theme.color.grayscale.a09ca4, fontSize: 12
-            }]}
+          <Text
             numberOfLines={5}
-            onSeeMoreBlocked={() => navigation.navigate("FeedDetail", {
-              authorId: review.author.id,
-              id: review.id, badge: filterBadge,
-              isLike: review.isLike, isBookmark: review.isBookmark
-            })}
             style={[{
               color: theme.color.grayscale.C_79737e,
               lineHeight: 21,
               marginTop: 0,
               fontSize: 15
-            }, FONT.Regular]}
-          >
+            }, FONT.Regular]}>
             {review.content}
-          </ReadMore>
+          </Text>
+          <Text style={[FONT.Medium, {
+            color: theme.color.grayscale.a09ca4, fontSize: 12
+          }]}>
+            {"... 더보기>"}
+          </Text>
         </View>
       }
 

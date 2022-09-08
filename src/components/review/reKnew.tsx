@@ -10,7 +10,6 @@ import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/v
 import { useNavigation } from '@react-navigation/native';
 import { noProfile } from '~/assets/images';
 import FastImage from 'react-native-fast-image';
-import ReadMore from '@fawazahmed/react-native-read-more';
 
 interface FeedReviewProps {
   review: ReviewParentType,
@@ -285,23 +284,21 @@ const ReKnew = ({ review, filterBadge, type }: FeedReviewProps) => {
               </TouchableOpacity>
             </View>
 
-            <ReadMore
-              seeMoreText="더보기 >"
-              expandOnly={true}
-              seeMoreStyle={[FONT.Medium, {
-                color: theme.color.grayscale.a09ca4, fontSize: 12
-              }]}
+            <Text
               numberOfLines={5}
-              onSeeMoreBlocked={() => navigation.navigate("FeedDetail",
-                { id: review.id })}
               style={[{
                 color: theme.color.grayscale.C_79737e,
                 lineHeight: 21,
                 marginTop: 0,
-              }, FONT.Regular]}
-            >
+                fontSize: 15
+              }, FONT.Regular]}>
               {review.content}
-            </ReadMore>
+            </Text>
+            <Text style={[FONT.Medium, {
+              color: theme.color.grayscale.a09ca4, fontSize: 12
+            }]}>
+              {"... 더보기>"}
+            </Text>
             {
               review.images &&
               (() => {

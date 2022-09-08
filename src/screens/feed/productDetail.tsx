@@ -18,7 +18,6 @@ import Loading from '~/components/loading';
 import { noProfile } from '~/assets/images';
 import { ReviewListType, SatisfactionType } from '~/types/review';
 import { AuthorType } from '~/types';
-import ReadMore from '@fawazahmed/react-native-read-more';
 import QuestionPopup from '~/components/popup/QuestionPopup';
 
 interface ProductDetailProps {
@@ -158,26 +157,6 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
             }, FONT.Medium]}>
             {item.content}
           </Text>
-          {/* <ReadMore
-            seeMoreText=" 더보기 >"
-            seeMoreStyle={[FONT.Medium, {
-              color: theme.color.grayscale.a09ca4, fontSize: 12
-            }]}
-            numberOfLines={3}
-            onSeeMoreBlocked={() => navigation.navigate("FeedDetail", {
-              authorId: item.author.id,
-              id: item.id,
-            })}
-            style={[{
-              color: theme.color.grayscale.C_79737e,
-              lineHeight: 21,
-              marginTop: 0,
-              marginLeft: item.image ? 0 : d2p(5),
-              width: d2p(200)
-            }, FONT.Medium]}
-          >
-            {item.content}
-          </ReadMore> */}
         </View>
       </Pressable>
     );
