@@ -100,8 +100,9 @@ interface BottomDotSheetType {
   isOpen: boolean,
   topTitle: string,
   topPress: () => void,
-  middleTitle: string,
-  middlePress: () => void,
+  topTextStyle?: TextStyle,
+  middleTitle?: string,
+  middlePress?: () => void,
   bottomTitle: string,
   middleTextStyle?: TextStyle
 }

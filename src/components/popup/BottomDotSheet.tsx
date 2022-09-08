@@ -10,15 +10,16 @@ interface BottomDotSheetType {
   setModalOpen: (modalOpen: boolean) => void,
   topTitle: string,
   topPress: () => void,
-  middleTitle: string,
-  middlePress: () => void,
+  topTextStyle?: TextStyle,
+  middleTitle?: string,
+  middlePress?: () => void,
   middleTextStyle?: TextStyle,
   bottomTitle: string
 }
 
 const BottomDotSheet = ({
   topTitle, topPress, middleTitle,
-  middlePress, bottomTitle,
+  middlePress, bottomTitle, topTextStyle,
   modalOpen, setModalOpen, middleTextStyle }: BottomDotSheetType) => {
   return (
     <>
@@ -31,30 +32,36 @@ const BottomDotSheet = ({
         backdropTransitionOutTiming={0}
         onBackButtonPress={() => setModalOpen(false)}
       >
-        <View style={styles.buttonWrap}>
+        <View style={[styles.buttonWrap, { height: middleTitle ? h2p(100) : h2p(50) }]}>
           <TouchableOpacity
             onPress={() => {
               topPress();
               setModalOpen(false);
             }}
             style={{ width: "100%", alignItems: "center" }}>
-            <Text style={[FONT.Regular, { fontSize: 16, marginVertical: h2p(15) }]}>{topTitle}</Text>
+            <Text style={[FONT.Regular, topTextStyle, { fontSize: 16, marginVertical: h2p(15) }]}>{topTitle}</Text>
           </TouchableOpacity>
-          <View style={{
-            height: 1,
-            width: Dimensions.get("window").width - d2p(60),
-            backgroundColor: theme.color.grayscale.e9e7ec,
-            alignSelf: "center"
-          }} />
-          <TouchableOpacity
-            onPress={() => {
-              middlePress();
-              setModalOpen(false);
-            }}
-            style={{ width: "100%", alignItems: "center" }}>
-            <Text style={[FONT.Regular, middleTextStyle, { fontSize: 16, marginVertical: h2p(15) }]}>{middleTitle}</Text>
-          </TouchableOpacity>
+          {
+            (middleTitle && middlePress) &&
+            <>
+              <View style={{
+                height: 1,
+                width: Dimensions.get("window").width - d2p(60),
+                backgroundColor: theme.color.grayscale.e9e7ec,
+                alignSelf: "center"
+              }} />
+              <TouchableOpacity
+                onPress={() => {
+                  middlePress();
+                  setModalOpen(false);
+                }}
+                style={{ width: "100%", alignItems: "center" }}>
+                <Text style={[FONT.Regular, middleTextStyle, { fontSize: 16, marginVertical: h2p(15) }]}>{middleTitle}</Text>
+              </TouchableOpacity>
+            </>
+          }
         </View>
+
         <TouchableOpacity
           onPress={() => setModalOpen(false)}
           style={{
@@ -78,7 +85,6 @@ const styles = StyleSheet.create({
   buttonWrap: {
     backgroundColor: theme.color.white,
     borderRadius: 10,
-    height: h2p(100),
     width: Dimensions.get("window").width - d2p(20),
     alignSelf: "center",
     marginTop: "auto",

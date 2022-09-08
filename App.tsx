@@ -150,7 +150,7 @@ const App = () => {
   const handleAlarm = (remoteMessage: any) => {
     if (Platform.OS === "ios") {
       if (remoteMessage.data?.custom_data.link) {
-        if (remoteMessage.data?.custom_data.link.includes("review")){
+        if (remoteMessage.data?.custom_data.link.includes("review")) {
           // * 푸시알람
           //@ts-ignore
           navigationRef.navigate("FeedDetail", { id: remoteMessage.data.custom_data.link.split("/")[1] });
@@ -336,6 +336,7 @@ const App = () => {
         <BottomDotSheet
           topTitle={isBottomDotSheet.topTitle}
           topPress={isBottomDotSheet.topPress}
+          topTextStyle={isBottomDotSheet.topTextStyle}
           middleTitle={isBottomDotSheet.middleTitle}
           middlePress={isBottomDotSheet.middlePress}
           bottomTitle={isBottomDotSheet.bottomTitle}

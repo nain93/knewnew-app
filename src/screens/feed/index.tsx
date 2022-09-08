@@ -49,7 +49,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const flatListRef = useRef<FlatList>(null);
   const setIsBottomDotSheet = useSetRecoilState(bottomDotSheetState);
 
-  const [sort, setSort] = useState<"0" | "1" | "2">("0");
+  const [sort, setSort] = useState<"0" | "1" | "2" | "3">("0");
   const [sortMarket, setSortMarket] = useState<string[]>();
   const [sortReact, setSortReact] = useState<string[]>();
   const [clickedMarket, setClickMarket] = useState<Array<{
@@ -191,7 +191,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
             }}
             style={{ flexDirection: "row", alignItems: "center" }}>
             <Text style={[FONT.Regular, { fontSize: 12, marginRight: d2p(5) }]}>
-              {sort === "0" ? "최신순" : "인기순"}
+              {sort === "0" ? "최신순" : sort === "1" ? "인기순" : "최신순"}
             </Text>
             <Image source={leftArrow} style={{ width: d2p(7), height: d2p(15), transform: [{ rotate: "270deg" }] }} />
           </TouchableOpacity>
@@ -282,7 +282,14 @@ const Feed = ({ navigation, route }: FeedProps) => {
           ref={flatListRef}
           onEndReached={reviewEndReached}
           refreshing={reviewListQuery.isLoading}
-          onRefresh={reviewListQuery.refetch}
+          onRefresh={() => {
+            if (sort === "3") {
+              reviewListQuery.refetch();
+            }
+            else {
+              setSort("3");
+            }
+          }}
           data={reviewListQuery.data?.pages.flat()}
           ListHeaderComponent={reviewHeader}
           showsVerticalScrollIndicator={false}

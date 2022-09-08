@@ -4,18 +4,20 @@ import { baseURL } from "~/api";
 interface AddReortType {
   token: string,
   objectType: "auth" | "review_comment" | "product" | "review",
-  objectId: number,
   content: string,
+  review?: number,
+  reviewComment?: number,
   qnaType: "qna" | "report",
   images?: Array<{ priority: number, image: string }>
 }
 
-export const addReport = async ({ token, objectType, objectId, content, qnaType, images }: AddReortType) => {
+export const addReport = async ({ token, objectType, content, qnaType, images, review, reviewComment }: AddReortType) => {
   const res = await axios.post(baseURL + "qna/", {
     objectType,
-    objectId,
     content,
     qnaType,
+    review,
+    reviewComment,
     images
   }, {
     headers: {

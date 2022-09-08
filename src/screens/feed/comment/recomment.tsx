@@ -6,7 +6,7 @@ import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/v
 import { d2p, dateCommentFormat, h2p } from '~/utils';
 import { FONT } from '~/styles/fonts';
 import FastImage from 'react-native-fast-image';
-import { myIdState, okPopupState, tokenState } from '~/recoil/atoms';
+import { bottomDotSheetState, myIdState, okPopupState, popupState, tokenState } from '~/recoil/atoms';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { commentMore, recommentIcon } from '~/assets/icons';
 import { noProfile } from '~/assets/images';
@@ -14,16 +14,17 @@ import { RecommentType } from '~/types/comment';
 import { useMutation, useQueryClient } from 'react-query';
 import { deleteReviewComment, likeComment } from '~/api/comment';
 import { hitslop } from '~/utils/constant';
+import { addReport } from '~/api/report';
 
 interface RecommentProps {
   authorName: string
   setContent: (reContent: string) => void
   setCommentIsEdit: (isEdit: boolean) => void
   setEditCommentId: (editId: number) => void
-  setCommentSelectedIdx: (selectIdx: number) => void
-  setModifyingIdx: (mdIdx: number) => void;
+  setModifyingIdx: (mdIdx: number) => void
   commentIsEdit: boolean
   modifyingIdx: number
+  setCommentLoading: (isLoading: boolean) => void
   reviewId: number | undefined
 }
 
@@ -32,26 +33,28 @@ const Recomment = ({ child, authorName,
   commentIsEdit,
   setCommentIsEdit,
   setEditCommentId,
-  setCommentSelectedIdx,
   setModifyingIdx,
   modifyingIdx,
-  reviewId
+  reviewId,
+  setCommentLoading
 }: RecommentProps & RecommentType) => {
   const navigation = useNavigation<StackNavigationProp>();
   const setModalOpen = useSetRecoilState(okPopupState);
   const myId = useRecoilValue(myIdState);
   const token = useRecoilValue(tokenState);
   const queryClient = useQueryClient();
-  const [recommentSelectedIdx, setRecommentSelectedIdx] = useState(-1);
   const [reModifyingIdx, setReModifyingIdx] = useState(-1);
   const [apiBlock, setApiBlock] = useState(false);
+  const setIsBottomDotSheet = useSetRecoilState(bottomDotSheetState);
+  const setIspopupOpen = useSetRecoilState(popupState);
 
   const deleteCommentMutation = useMutation('deleteComment', (id: number) =>
     deleteReviewComment(token, id), {
     onSuccess: () => {
       queryClient.invalidateQueries('getCommentList');
       queryClient.invalidateQueries("reviewList");
-    }
+    },
+    onSettled: () => setCommentLoading(false)
   });
 
   const commentLikeMutation = useMutation("likeCount", ({ commentId, isLike }: { commentId: number, isLike: boolean }) =>
@@ -62,6 +65,15 @@ const Recomment = ({ child, authorName,
     },
     onError: () => setApiBlock(false)
   });
+
+  const addReportMutation = useMutation("addReport", ({ commentContent, commentId }: { commentContent: string, commentId: number }) =>
+    addReport({ token, objectType: "review_comment", qnaType: "report", content: commentContent, reviewComment: commentId })
+    , {
+      onSuccess: () => {
+        setIspopupOpen({ isOpen: true, content: "신고 되었습니다" });
+      }
+    }
+  );
 
   useEffect(() => {
     if (modifyingIdx !== -1) {
@@ -113,22 +125,51 @@ const Recomment = ({ child, authorName,
                       styles.commentDate, FONT.Regular]}>{dateCommentFormat(item.created)}
                     </Text>
                   </View>
-                  {myId === item.author.id &&
-                    <TouchableOpacity onPress={() => {
-                      setCommentSelectedIdx(-1);
-                      if (recommentSelectedIdx === index) {
-                        setRecommentSelectedIdx(-1);
-                      } else {
-                        setRecommentSelectedIdx(index);
-                      }
-                    }}>
-                      <Image
-                        source={commentMore}
-                        resizeMode="contain"
-                        style={{ width: d2p(12), height: d2p(16) }}
-                      />
-                    </TouchableOpacity>
-                  }
+                  <TouchableOpacity onPress={() => {
+                    // * 내 댓글
+                    if (item.author.id === myId) {
+                      setIsBottomDotSheet({
+                        isOpen: true,
+                        topTitle: "댓글 수정",
+                        topPress: () => {
+                          setContent(item.content);
+                          setCommentIsEdit(true);
+                          setEditCommentId(item.id);
+                          setModifyingIdx(-1);
+                          setReModifyingIdx(index);
+                        },
+                        middleTitle: "댓글 삭제",
+                        middlePress: () => {
+                          setModalOpen({
+                            isOpen: true,
+                            content: "댓글을 삭제할까요?",
+                            okButton: () => {
+                              setCommentLoading(true);
+                              deleteCommentMutation.mutate(item.id);
+                            }
+                          });
+                        },
+                        middleTextStyle: { color: theme.color.main },
+                        bottomTitle: "취소하기"
+                      });
+                    }
+                    // * 다른유저 댓글
+                    else {
+                      setIsBottomDotSheet({
+                        isOpen: true,
+                        topTitle: "댓글 신고",
+                        topPress: () => addReportMutation.mutate({ commentContent: item.content, commentId: item.id }),
+                        topTextStyle: { color: theme.color.main },
+                        bottomTitle: "취소하기"
+                      });
+                    }
+                  }}>
+                    <Image
+                      source={commentMore}
+                      resizeMode="contain"
+                      style={{ width: d2p(12), height: d2p(16) }}
+                    />
+                  </TouchableOpacity>
                 </View>
               </View>
               <View style={styles.commentContent}>
@@ -147,7 +188,7 @@ const Recomment = ({ child, authorName,
                 <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_79737e }]}>답글달기</Text>
               </TouchableOpacity>
               </View> */}
-              
+
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <TouchableOpacity
                   hitSlop={hitslop}
@@ -164,37 +205,6 @@ const Recomment = ({ child, authorName,
                   </Text>
                 </TouchableOpacity>
               </View>
-              {recommentSelectedIdx === index &&
-                <View style={styles.clickBox}>
-                  <Pressable
-                    style={{
-                      justifyContent: "center", alignItems: "center", width: d2p(70), height: d2p(35)
-                    }}
-                    onPress={() => {
-                      setContent(item.content);
-                      setCommentIsEdit(true);
-                      setModifyingIdx(-1);
-                      setReModifyingIdx(recommentSelectedIdx);
-                      setEditCommentId(item.id);
-                      setRecommentSelectedIdx(-1);
-                    }}>
-                    <Text style={[{ color: theme.color.grayscale.C_443e49 }, FONT.Regular]}>수정</Text>
-                  </Pressable>
-                  <View style={{ borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.eae7ec, width: d2p(47) }} />
-                  <Pressable
-                    style={{ justifyContent: "center", alignItems: "center", width: d2p(70), height: d2p(35) }}
-                    onPress={() => {
-                      setModalOpen({
-                        isOpen: true,
-                        content: "댓글을 삭제할까요?",
-                        okButton: () => deleteCommentMutation.mutate(item.id)
-                      });
-                      setRecommentSelectedIdx(-1);
-                    }}>
-                    <Text style={[{ color: theme.color.main }, FONT.Regular]}>삭제</Text>
-                  </Pressable>
-                </View>
-              }
             </View>
           </View>
         )))

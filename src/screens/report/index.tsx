@@ -29,8 +29,8 @@ const Report = ({ navigation, route }: ReportProps) => {
   const setIspopupOpen = useSetRecoilState(popupState);
   const [report, setReport] = useState("");
 
-  const addReportMutation = useMutation("addReport", ({ content, objectId }: { content: string, objectId: number }) =>
-    addReport({ token, objectType: "review", qnaType: "report", content, objectId })
+  const addReportMutation = useMutation("addReport", ({ content, reviewId }: { content: string, reviewId: number }) =>
+    addReport({ token, objectType: "review", qnaType: "report", content, review: reviewId })
     , {
       onSuccess: () => {
         setReport("");
@@ -46,7 +46,7 @@ const Report = ({ navigation, route }: ReportProps) => {
       return;
     }
     if (route.params?.review.id) {
-      addReportMutation.mutate({ content: report, objectId: route.params?.review.id });
+      addReportMutation.mutate({ content: report, reviewId: route.params?.review.id });
     }
   };
 
