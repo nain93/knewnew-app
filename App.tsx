@@ -7,6 +7,7 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 import codePush from "react-native-code-push";
+import analytics from '@react-native-firebase/analytics';
 import { FileLogger } from "react-native-file-logger";
 
 import GlobalNav from './src/navigators/globalNav';
@@ -39,6 +40,9 @@ const App = () => {
   const [isBottomDotSheet, setIsBottomDotSheet] = useRecoilState(bottomDotSheetState);
   const setLatestVerions = useSetRecoilState(latestVerionsState);
   const [versionCheckModal, setVersionCheckModal] = useState(false);
+
+  const routeNameRef = React.useRef(null);
+
 
   // const sendLoggedFiles = useCallback(() => {
   //   FileLogger.sendLogFilesByEmail({
@@ -300,7 +304,27 @@ const App = () => {
   return (
     <SafeAreaProvider>
       {/*@ts-ignore*/}
-      <NavigationContainer linking={linking} ref={navigationRef} fallback={<Loading />}>
+      <NavigationContainer linking={linking} ref={navigationRef} fallback={<Loading />}
+        onReady={() => {
+          //@ts-ignore 
+          routeNameRef.current = navigationRef.current.getCurrentRoute().name;
+        }}
+        onStateChange={async () => {
+          const previousRouteName = routeNameRef.current;
+          //@ts-ignore 
+          const currentRouteName = navigationRef.current.getCurrentRoute().name;
+
+          if (previousRouteName !== currentRouteName) {
+            // * 구글 애널리틱스 추적
+            await analytics().logScreenView({
+              screen_name: currentRouteName,
+              screen_class: currentRouteName,
+            });
+          }
+          //@ts-ignore 
+          routeNameRef.current = currentRouteName;
+        }}
+      >
         {versionCheckModal ? null :
           <GlobalNav token={token} />
         }

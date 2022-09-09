@@ -1,4 +1,5 @@
 import { Dimensions, PermissionsAndroid } from "react-native";
+import analytics from '@react-native-firebase/analytics';
 
 export function d2p(size: number) {
   //Zeplin에 나와있는 디자인을 iPhone에 맞춰 ppi 값에 따라서 배수를 곱해준다.
@@ -53,4 +54,12 @@ export async function hasAndroidPermission() {
   }
   const status = await PermissionsAndroid.request(permission);
   return status === "granted";
+}
+
+export async function googleAnalytics(screen: string) {
+  if (!__DEV__) {
+    await analytics().logScreenView({
+      screen_name: screen
+    });
+  }
 }

@@ -1,16 +1,17 @@
-import { StyleProp, Text, TextStyle } from 'react-native';
+import { NativeSyntheticEvent, StyleProp, Text, TextInputContentSizeChangeEventData, TextStyle } from 'react-native';
 import React from 'react';
-import ReadMore from '@fawazahmed/react-native-read-more';
 
 interface CustomTextProps {
   children: React.ReactNode
   style?: StyleProp<TextStyle>
   numberOfLines?: number
+  ellipsizeMode?: "clip" | "head" | "middle" | "tail"
 }
 
-const CustomText = ({ children, style, numberOfLines }: CustomTextProps) => {
+const CustomText = ({ ellipsizeMode, children, style, numberOfLines }: CustomTextProps) => {
   return (
     <Text
+      ellipsizeMode={ellipsizeMode}
       numberOfLines={numberOfLines}
       style={[{ fontSize: 15 }, style]}>{children}</Text>
   );

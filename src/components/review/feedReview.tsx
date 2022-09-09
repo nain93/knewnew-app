@@ -298,6 +298,7 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
         <View style={{ marginLeft: d2p(30) }}>
           <Text
             numberOfLines={5}
+            ellipsizeMode={"clip"}
             style={[{
               color: theme.color.grayscale.C_79737e,
               lineHeight: 21,

@@ -574,6 +574,10 @@ PODS:
     - React-Core
     - SDWebImage (~> 5.11.1)
     - SDWebImageWebPCoder (~> 0.8.4)
+  - RNFBAnalytics (14.11.1):
+    - Firebase/Analytics (= 8.15.0)
+    - React-Core
+    - RNFBApp
   - RNFBApp (14.11.1):
     - Firebase/CoreOnly (= 8.15.0)
     - React-Core
@@ -730,6 +734,7 @@ DEPENDENCIES:
   - "RNAppleAuthentication (from `../node_modules/@invertase/react-native-apple-authentication`)"
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - RNFastImage (from `../node_modules/react-native-fast-image`)
+  - "RNFBAnalytics (from `../node_modules/@react-native-firebase/analytics`)"
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
   - RNFileLogger (from `../node_modules/react-native-file-logger`)
@@ -896,6 +901,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNFastImage:
     :path: "../node_modules/react-native-fast-image"
+  RNFBAnalytics:
+    :path: "../node_modules/@react-native-firebase/analytics"
   RNFBApp:
     :path: "../node_modules/@react-native-firebase/app"
   RNFBMessaging:
@@ -1016,6 +1023,7 @@ SPEC CHECKSUMS:
   RNAppleAuthentication: dab41edef916715148ce94a7dd04041a01590ddc
   RNCAsyncStorage: d81ee5c3db1060afd49ea7045ad460eff82d2b7d
   RNFastImage: 1f2cab428712a4baaf78d6169eaec7f622556dd7
+  RNFBAnalytics: e332a2d0b4c28884dbeacbe21fe68688abdf34b9
   RNFBApp: 9646e09d041ea159b84584865212e4cf33acd179
   RNFBMessaging: 3e2682ea5e15fe86da24d16d16019395a881f33c
   RNFileLogger: 677ab4bfd2cc920a70f0820d47fc5c353bb7a000

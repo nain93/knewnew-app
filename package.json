@@ -24,6 +24,7 @@
     "@georstat/react-native-image-gallery": "^1.1.0",
     "@invertase/react-native-apple-authentication": "^2.1.5",
     "@react-native-async-storage/async-storage": "^1.17.3",
+    "@react-native-firebase/analytics": "14.11.1",
     "@react-native-firebase/app": "14.11.1",
     "@react-native-firebase/messaging": "14.11.1",
     "@react-native-google-signin/google-signin": "^7.2.2",
