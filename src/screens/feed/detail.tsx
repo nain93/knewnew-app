@@ -14,10 +14,11 @@ import { bottomDotSheetState, myIdState, okPopupState, popupState, refreshState,
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from 'react-query';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
-import { bookmarkReview, deleteReview, getReviewDetail, likeReview, shareReview } from '~/api/review';
+import dynamicLinks from '@react-native-firebase/dynamic-links';
 import FastImage from 'react-native-fast-image';
 import Share from 'react-native-share';
 
+import { bookmarkReview, deleteReview, getReviewDetail, likeReview, shareReview } from '~/api/review';
 import { ReviewListType } from '~/types/review';
 import Loading from '~/components/loading';
 import { FONT } from '~/styles/fonts';
@@ -359,6 +360,42 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     }
   };
 
+  // * 딥링크 생성
+  async function buildLink(reviewId?: number) {
+
+    // const link = await dynamicLinks().buildShortLink({
+    //   link: `https://knewnew.co.kr/link?id=${reviewId}`,
+    //   domainUriPrefix: 'https://knewnew.co.kr',
+    //   android: {
+    //     packageName: "com.mealing.knewnnew"
+    //   },
+    //   ios: {
+    //     appStoreId: "1626766280",
+    //     bundleId: "com.mealing.knewnnew"
+    //   }
+    // });
+
+    try {
+      const link = await dynamicLinks().buildShortLink({
+        link: `https://dev.knewnew.co.kr/link?id=${reviewId}`,
+        domainUriPrefix: 'https://dev.knewnew.co.kr',
+        android: {
+          packageName: "com.mealing.knewnnew"
+        },
+        ios: {
+          appStoreId: "1626766280",
+          bundleId: "com.mealing.knewnnew"
+        }
+      }, dynamicLinks.ShortLinkType.DEFAULT
+      );
+      return link;
+    }
+
+    catch (error) {
+      console.log(error, 'error');
+    }
+  }
+
 
   // * 키보드 높이 컨트롤
   useEffect(() => {
@@ -647,11 +684,11 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             id={route.params?.id}
             isState={(isState: boolean) => setCart(isState)} />
           <TouchableOpacity
-            onPress={() => {
+            onPress={async () => {
+              const getUrl = await buildLink(reviewDetailQuery.data?.id);
               Share.open({
                 title: "뉴뉴",
-                url: `knewnnew://FeedDetail/${reviewDetailQuery.data?.id}`
-                // url: `https://knewnnew.co.kr/FeedDetail/${review.id}`
+                url: getUrl
               })
                 .then((res) => {
                   if (reviewDetailQuery.data?.id) {

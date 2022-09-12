@@ -70,6 +70,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
 
   const handleKakaoLogin = async () => {
     handleApiBlock();
+    //@ts-ignore
     const { accessToken } = await login();
     const data = await userLogin({ token: accessToken, providerType: "kakao" });
     setApiBlock(false);

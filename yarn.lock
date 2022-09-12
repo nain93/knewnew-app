@@ -1389,6 +1389,11 @@
     opencollective-postinstall "^2.0.1"
     superstruct "^0.6.2"
 
+"@react-native-firebase/dynamic-links@14.11.1":
+  version "14.11.1"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/dynamic-links/-/dynamic-links-14.11.1.tgz#d7438aba230a27b17cbd2a36d7eb46a62cc24cf3"
+  integrity sha512-PfSsWoHgkwny8Q4UoNIKlptT4T1AYPQ43GRaU5U9AT64LwSfHA03mdhhDzqWGbbIT/hJnczGFgYgLCccmbu0Xg==
+
 "@react-native-firebase/messaging@14.11.1":
   version "14.11.1"
   resolved "https://registry.yarnpkg.com/@react-native-firebase/messaging/-/messaging-14.11.1.tgz#891b92f5606386e83ae377e72659d0836ac7bd6b"
@@ -1399,10 +1404,10 @@
   resolved "https://registry.yarnpkg.com/@react-native-google-signin/google-signin/-/google-signin-7.2.2.tgz#29e416d5c8484b52de3dc97f982f04b0083f27fe"
   integrity sha512-FqSJAEYz+SNeIOyokFX3e7nbBgK0js/Hye0YNY+cV0Qf1NxKw1vRt2MQB3kfuVWFCb+OSovgQCl6W8dhYvsblw==
 
-"@react-native-seoul/kakao-login@^4.0.0":
-  version "4.2.3"
-  resolved "https://registry.yarnpkg.com/@react-native-seoul/kakao-login/-/kakao-login-4.2.3.tgz#70a04151c501ba2f4a5fc91a128375f89425e8d2"
-  integrity sha512-r1SdCi2xxvzZ+nDxIZr8dZttOw2FZEoK093MrfDjAQ8EI2gcnMvWJrssb691Vo5WLh+niZmqNgczmIE2J7nFqQ==
+"@react-native-seoul/kakao-login@^5.1.1":
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/@react-native-seoul/kakao-login/-/kakao-login-5.1.1.tgz#c5812b4f4c4373e4496950c099f318ac6051b2aa"
+  integrity sha512-mgvUBERV6s0s1+GPApCHeHbc1HMBDMOnEHENcO9AHaYLP9t4oF9BzoHIW9XVYtWUZL67SUSjN5BldAZr2yjJ7g==
   dependencies:
     dooboolab-welcome "^1.3.2"
 

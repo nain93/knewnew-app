@@ -3,11 +3,12 @@ import { Animated, AppState, Linking, Platform } from 'react-native';
 import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import SplashScreen from 'react-native-splash-screen';
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 import codePush from "react-native-code-push";
 import analytics from '@react-native-firebase/analytics';
+import dynamicLinks, { FirebaseDynamicLinksTypes } from '@react-native-firebase/dynamic-links';
 import { FileLogger } from "react-native-file-logger";
 
 import GlobalNav from './src/navigators/globalNav';
@@ -121,11 +122,39 @@ const App = () => {
     if (!__DEV__) {
       installUpdateIfAvailable();
     }
-    // SplashScreen.hide();
+  }, []);
+
+  // * 포어그라운드에서 딥링크 들어올때
+  const handleDynamicLink = (link: FirebaseDynamicLinksTypes.DynamicLink) => {
+    // Handle dynamic link inside your own application
+    if (link?.url.includes("knewnew")) {
+      //@ts-ignore
+      navigationRef.navigate("FeedDetail", { id: link.url.split("id=")[1] });
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = dynamicLinks().onLink(handleDynamicLink);
+    // When the component is unmounted, remove the listener
+    return () => unsubscribe();
+  }, []);
+
+  // * 백그라운드에서 딥링크 들어올때
+  useEffect(() => {
+    dynamicLinks()
+      .getInitialLink()
+      .then(link => {
+        if (link?.url.includes("knewnew")) {
+          setTimeout(() => {
+            //@ts-ignore
+            navigationRef.navigate("FeedDetail", { id: link.url.split("id=")[1] });
+          }, 1000);
+
+        }
+      });
   }, []);
 
   const linking = {
-    // prefixes: ["https://"],
     prefixes: ["knewnnew://"],
     config: {
       screens: {
@@ -143,12 +172,11 @@ const App = () => {
       }
     },
     async getInitialURL() {
-      // Check if app was opened from a deep link
       const url = await Linking.getInitialURL();
       if (url != null) {
         return url;
       }
-    },
+    }
   };
 
   const handleAlarm = (remoteMessage: any) => {
