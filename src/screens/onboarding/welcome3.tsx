@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Image, Animated, Easing } from 'react-native';
 import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { NavigationRoute } from 'react-navigation';
 import { NavigationStackProp } from 'react-navigation-stack';
@@ -24,6 +24,29 @@ export interface NavigationType {
 }
 
 const Welcome3 = ({ navigation, route }: NavigationType) => {
+  const moveAnim = useRef(new Animated.Value(0)).current;
+
+  const upDown = () => {
+    Animated.timing(moveAnim, {
+      toValue: h2p(15),
+      duration: 1000,
+      easing: Easing.linear,
+      useNativeDriver: true
+    }).start(() => downUp());
+  };
+
+  const downUp = () => {
+    Animated.timing(moveAnim, {
+      toValue: h2p(0),
+      duration: 1000,
+      easing: Easing.linear,
+      useNativeDriver: true
+    }).start(() => upDown());
+  };
+
+  useEffect(() => {
+    upDown();
+  }, []);
 
   const handleSignIn = () => {
     //@ts-ignore
@@ -60,12 +83,13 @@ const Welcome3 = ({ navigation, route }: NavigationType) => {
             맛있는 발견을 하러 가볼까요?
           </Text>
         </View>
-        <Image source={welcomeImage}
+        <Animated.Image source={welcomeImage}
           resizeMode="contain"
           style={{
             alignSelf: "center",
             width: d2p(156), height: h2p(151),
             marginTop: h2p(75),
+            transform: [{ translateY: moveAnim }]
           }} />
       </View>
       <View style={{ marginBottom: h2p(40), marginTop: "auto", marginHorizontal: d2p(20) }}>

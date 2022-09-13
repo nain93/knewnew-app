@@ -33,7 +33,7 @@ const NotificationPopup = ({ id, content, modalOpen, setIsVisible, setModalOpen,
     }).start(() => setIsVisible(false));
   };
 
-  const moveDown = async () => {
+  const moveDown = () => {
     Animated.timing(moveAnim, {
       toValue: h2p(20) + getStatusBarHeight(),
       duration: 200,
