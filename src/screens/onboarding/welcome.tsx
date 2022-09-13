@@ -1,17 +1,19 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
-import { NavigationRoute } from 'react-navigation';
+import { Dimensions, Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { TabView } from 'react-native-tab-view';
+import Welcome3 from '~/screens/onboarding/welcome3';
 import { NavigationStackProp } from 'react-navigation-stack';
-import { handIcon, tagFood, tagHome, tagLife } from '~/assets/icons';
-import BasicButton from '~/components/button/basicButton';
-import Header from '~/components/header';
-import CloseIcon from '~/components/icon/closeIcon';
-import { FONT } from '~/styles/fonts';
-import theme from '~/styles/theme';
+import { NavigationRoute } from 'react-navigation';
 import { UserInfoType } from '~/types/user';
+import { FONT } from '~/styles/fonts';
 import { d2p, h2p } from '~/utils';
+import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
+import { eyesIcon } from '~/assets/icons';
+import theme from '~/styles/theme';
+import { hitslop } from '~/utils/constant';
+import { welcomeImage2, welcomeImage3 } from '~/assets/logo';
 
-export interface NavigationType {
+export interface WelcomeType {
   navigation: NavigationStackProp;
   route?: NavigationRoute<{
     userInfo: UserInfoType,
@@ -23,112 +25,143 @@ export interface NavigationType {
   }>;
 }
 
-const Welcome = ({ navigation, route }: NavigationType) => {
+const Welcome = ({ navigation, route }: WelcomeType) => {
+  const [index, setIndex] = useState(0);
+  const [routes] = useState([
+    { key: "welcome" },
+    { key: "welcome2" },
+    { key: "welcome3" },
+  ]);
 
-  const handleSignIn = () => {
+  const skipWelcome = () => {
     //@ts-ignore
     navigation.reset({ routes: [{ name: "TabNav" }] });
   };
 
   return (
-    <>
-      <Header isBorder={false}
-        headerLeft={<CloseIcon onPress={() => {
-          //@ts-ignore
-          navigation.reset({ index: 0, routes: [{ name: "TabNav" }] });
-        }} />}
+    <View style={{ flex: 1 }}>
+      <TabView
+        onIndexChange={setIndex}
+        navigationState={{ index, routes }}
+        renderScene={({ route: tabKey }) => {
+          switch (tabKey.key) {
+            case "welcome":
+              return (
+                <View style={styles.container}>
+                  <View style={styles.header}>
+                    <View style={{ flexDirection: "row", alignItems: "center" }}>
+                      <Text style={[FONT.Regular, { fontSize: 16 }]}>뉴뉴 빠르게 훑어보기</Text>
+                      <Image source={eyesIcon} style={{ width: d2p(20), height: d2p(20), marginLeft: d2p(5) }} />
+                    </View>
+                    <TouchableOpacity
+                      onPress={skipWelcome}
+                      hitSlop={hitslop}>
+                      <Text style={[FONT.Medium, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
+                        {`skip >`}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <Text style={[FONT.SemiBold, { fontSize: 26, marginTop: h2p(90), lineHeight: 36 }]}>
+                    {`뉴뉴는\n온라인 장보기 전\n추천템을 모아보는\n`}
+                    <Text style={[FONT.SemiBold, { color: theme.color.main }]}>
+                      소비자들의 공간</Text>
+                    이에요.
+                  </Text>
+                  <Text style={[FONT.Regular, { fontSize: 16, marginTop: h2p(40), lineHeight: 22 }]}>
+                    {`쓱, 컬리, 쿠팡, 네이버 등 온라인에서 발굴한\n다른 유저들의 인생템을 구경하세요!`}
+                  </Text>
+                  <Image source={welcomeImage2}
+                    resizeMode="contain"
+                    style={{
+                      marginTop: h2p(72),
+                      width: d2p(296),
+                      height: h2p(193),
+                      marginLeft: "auto"
+                    }} />
+                </View>
+              );
+            case "welcome2":
+              return (
+                <View style={styles.container}>
+                  <View style={styles.header}>
+                    <View style={{ flexDirection: "row", alignItems: "center" }}>
+                      <Text style={[FONT.Regular, { fontSize: 16 }]}>뉴뉴 빠르게 훑어보기</Text>
+                      <Image source={eyesIcon} style={{ width: d2p(20), height: d2p(20), marginLeft: d2p(5) }} />
+                    </View>
+                    <TouchableOpacity
+                      onPress={skipWelcome}
+                      hitSlop={hitslop}>
+                      <Text style={[FONT.Medium, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
+                        {`skip >`}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <Text style={[FONT.SemiBold, { fontSize: 26, marginTop: h2p(90), lineHeight: 36 }]}>
+                    <Text style={[FONT.SemiBold, { color: theme.color.main }]}>
+                      {`협찬과 광고를\n엄격히 금지`}</Text>
+                    하고 있어요.
+                  </Text>
+                  <Text style={[FONT.Regular, { marginTop: h2p(40), fontSize: 16, lineHeight: 22 }]}>
+                    {`광고없는 공간을 위해\n뉴뉴가 실시간으로 광고를 추적하고 있어요.\n`}
+                    광고로 판정될 경우 <Text style={{ color: theme.color.main }}>계정이 영구 정지</Text>됩니다.
+                  </Text>
+                  <View style={{
+                    backgroundColor: theme.color.grayscale.f7f7fc,
+                    paddingHorizontal: d2p(10),
+                    paddingVertical: h2p(8),
+                    marginTop: h2p(10)
+                  }}>
+                    <Text style={[FONT.Regular, { fontSize: 13, lineHeight: 18 }]}>
+                      {` ※ 광고임을 밝히지 않는 이른바 '뒷광고'는\n표시광고법 제3조 제1항에 의거하여 `}
+                      <Text style={FONT.Bold}>엄연한 불법행위</Text>입니다.
+                    </Text>
+                  </View>
+                  <Image source={welcomeImage3}
+                    resizeMode="contain"
+                    style={{
+                      marginTop: h2p(83),
+                      alignSelf: "center",
+                      width: d2p(146), height: h2p(151)
+                    }} />
+                </View>
+              );
+            case "welcome3":
+              return (<Welcome3 navigation={navigation} route={route} />);
+            default:
+              return null;
+          }
+        }}
+        renderTabBar={(p) => null}
       />
-      <View style={{ flex: 1 }}>
-        <View style={styles.container}>
-          <View style={{ marginTop: h2p(40) }}>
-            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: h2p(10) }}>
-              <Image source={tagHome} style={{ marginRight: d2p(12), width: d2p(16), height: d2p(16) }} />
-              <Text style={[FONT.SemiBold, { fontSize: 18, color: theme.color.grayscale.C_79737e }]}>
-                {route?.params?.userBadge.household}</Text>
-            </View>
-            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: h2p(10) }}>
-              <Image source={tagLife} style={{ marginRight: d2p(12), width: d2p(16), height: d2p(16) }} />
-              <Text style={[FONT.SemiBold, { fontSize: 18, color: theme.color.grayscale.C_79737e }]}>
-                {route?.params?.userBadge.lifeStyle}</Text>
-            </View>
-            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: h2p(10) }}>
-              <Image source={tagFood} style={{ marginRight: d2p(12), width: d2p(16), height: d2p(16) }} />
-              <Text style={[FONT.SemiBold, { fontSize: 18, color: theme.color.grayscale.C_79737e }]}>
-                {route?.params?.userBadge.foodLife}</Text>
-            </View>
-          </View>
-          <View style={styles.main}>
-            <Text style={[styles.mainText, { color: theme.color.main }, { lineHeight: 36 }, FONT.SemiBold]}>
-              {route?.params?.userInfo.nickname}</Text>
-            <Text style={[styles.mainText, { lineHeight: 36 }, FONT.SemiBold]}>님,</Text>
-            <Text style={[styles.mainText, { lineHeight: 36 }, FONT.SemiBold]}>
-              뉴뉴에 오신 것을 환영해요!</Text>
-          </View>
-        </View>
-        <View style={styles.alertContainer}>
-          <Image source={handIcon} style={{ width: h2p(39), height: h2p(39) }} />
-          <Text style={[FONT.Bold, { color: theme.color.main, fontSize: 30, marginTop: h2p(5), marginBottom: h2p(10) }]}>
-            잠깐!</Text>
-          <View style={{ flexDirection: "row" }}>
-            <Text style={[FONT.Bold, { fontSize: 20 }]}>뉴뉴 시작 전,</Text>
-            <Text style={[FONT.Bold, { fontSize: 20, color: theme.color.main }]}> 꼭 </Text>
-            <Text style={[FONT.Bold, { fontSize: 20 }]}>읽어주세요!</Text>
-          </View>
-          <View style={{ marginVertical: h2p(40) }}>
-            <View style={{ flexDirection: "row", marginBottom: h2p(10) }}>
-              <Text style={FONT.Regular}>
-                뉴뉴는 오로지
-              </Text>
-              <Text style={FONT.Bold}> 찐소비자</Text>
-              <Text style={FONT.Regular}>들을 위한 공간입니다.</Text>
-            </View>
-            <View style={{ flexDirection: "row" }}>
-              <Text style={[FONT.Regular, { lineHeight: 20 }]}>광고, 협찬 등 홍보 목적의 활동은 </Text>
-              <Text style={[FONT.Bold, { lineHeight: 20 }]}>엄격히 금지</Text>
-              <Text style={[FONT.Regular, { lineHeight: 20 }]}>합니다.</Text>
-            </View>
-            <Text style={[FONT.Regular, { lineHeight: 20 }]}>특히 뒷광고는 표시광고법 제3조 제1항에 의거하여</Text>
-            <View style={{ flexDirection: "row" }}>
-              <Text style={[FONT.Bold, { lineHeight: 20 }]}>엄연한 불법행위</Text>
-              <Text style={[FONT.Regular, { lineHeight: 20 }]}>임을 알려드립니다.</Text>
-            </View>
-          </View>
-          <BasicButton
-            viewStyle={{ marginBottom: h2p(40), marginTop: "auto" }}
-            onPress={handleSignIn} text="후다닥 입장하기" bgColor={theme.color.main} textColor={theme.color.white} />
-        </View>
+      <View style={{
+        position: "absolute",
+        bottom: h2p(60),
+        flexDirection: "row",
+        alignSelf: "center",
+        zIndex: -1
+      }}>
+        {React.Children.toArray(routes.map((_, i) => (
+          <View style={{
+            width: d2p(6), height: d2p(6),
+            backgroundColor: i === index ? theme.color.main : theme.color.grayscale.eae7ec,
+            borderRadius: 6,
+            marginHorizontal: d2p(5)
+          }} />
+        )))}
       </View>
-    </>
+    </View>
   );
 };
 
+export default Welcome;
+
 const styles = StyleSheet.create({
   container: {
+    paddingTop: Platform.OS === "ios" ? h2p(30) + getStatusBarHeight() : h2p(30),
     paddingHorizontal: d2p(20),
   },
-  main: {
-    flexDirection: 'row',
-    marginTop: h2p(20),
-    flexWrap: "wrap",
+  header: {
+    flexDirection: "row", alignItems: "center",
+    justifyContent: "space-between"
   },
-  mainText: {
-    fontSize: 26
-  },
-  tag: {
-    color: theme.color.main,
-    fontSize: 16
-  },
-  subText: {
-    color: theme.color.grayscale.C_79737e,
-    fontSize: 14,
-    marginTop: h2p(10), marginBottom: "auto"
-  },
-  alertContainer: {
-    marginTop: "auto",
-    backgroundColor: theme.color.grayscale.f7f7fc,
-    paddingHorizontal: d2p(20),
-    paddingTop: h2p(20)
-  }
 });
-
-export default Welcome;

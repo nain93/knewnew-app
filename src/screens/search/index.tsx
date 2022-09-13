@@ -167,6 +167,11 @@ const Search = ({ navigation }: SearchProps) => {
         :
         <View style={styles.container}>
           <Text style={[{ fontSize: 12, color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>최근 검색어</Text>
+          {recentKeywords.length === 0 &&
+            <Text style={[FONT.Regular, { marginTop: h2p(25), color: theme.color.grayscale.C_79737e }]}>
+              최근 검색어가 없습니다.
+            </Text>
+          }
           <ScrollView style={{ marginTop: h2p(15) }}>
             {React.Children.toArray(recentKeywords.map((recentKeyword, filterIndex) =>
               <View style={styles.recentKeyword}>
