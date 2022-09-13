@@ -362,33 +362,37 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
 
   // * 딥링크 생성
   async function buildLink(reviewId?: number) {
-
-    // const link = await dynamicLinks().buildShortLink({
-    //   link: `https://knewnew.co.kr/link?id=${reviewId}`,
-    //   domainUriPrefix: 'https://knewnew.co.kr',
-    //   android: {
-    //     packageName: "com.mealing.knewnnew"
-    //   },
-    //   ios: {
-    //     appStoreId: "1626766280",
-    //     bundleId: "com.mealing.knewnnew"
-    //   }
-    // });
-
     try {
-      const link = await dynamicLinks().buildShortLink({
-        link: `https://dev.knewnew.co.kr/link?id=${reviewId}`,
-        domainUriPrefix: 'https://dev.knewnew.co.kr',
-        android: {
-          packageName: "com.mealing.knewnnew"
-        },
-        ios: {
-          appStoreId: "1626766280",
-          bundleId: "com.mealing.knewnnew"
-        }
-      }, dynamicLinks.ShortLinkType.DEFAULT
-      );
-      return link;
+      if (__DEV__) {
+        const link = await dynamicLinks().buildShortLink({
+          link: `https://dev.knewnew.co.kr/link?id=${reviewId}`,
+          domainUriPrefix: 'https://dev.knewnew.co.kr',
+          android: {
+            packageName: "com.mealing.knewnnew"
+          },
+          ios: {
+            appStoreId: "1626766280",
+            bundleId: "com.mealing.knewnnew"
+          }
+        }, dynamicLinks.ShortLinkType.DEFAULT
+        );
+        return link;
+      }
+      else {
+        const link = await dynamicLinks().buildShortLink({
+          link: `https://knewnew.co.kr/link?id=${reviewId}`,
+          domainUriPrefix: 'https://knewnew.co.kr',
+          android: {
+            packageName: "com.mealing.knewnnew"
+          },
+          ios: {
+            appStoreId: "1626766280",
+            bundleId: "com.mealing.knewnnew"
+          }
+        }, dynamicLinks.ShortLinkType.DEFAULT
+        );
+        return link;
+      }
     }
 
     catch (error) {
@@ -686,9 +690,10 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           <TouchableOpacity
             onPress={async () => {
               const getUrl = await buildLink(reviewDetailQuery.data?.id);
+              console.log(getUrl, 'getUrl');
               Share.open({
                 title: "뉴뉴",
-                url: getUrl
+                url: Platform.OS === "ios" ? `knewnnew://FeedDetail/${reviewDetailQuery.data?.id}` : getUrl
               })
                 .then((res) => {
                   if (reviewDetailQuery.data?.id) {

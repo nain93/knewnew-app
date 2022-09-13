@@ -30,10 +30,10 @@ const SearchTabView = ({ reviewCount, userCount, searchList, userList, keyword, 
   const navigation = useNavigation<StackNavigationProp>();
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    { key: "menu", title: "메뉴" },
-    { key: "user", title: "회원" }
+    { key: "menu", title: "푸드로그" },
+    { key: "user", title: "유저 닉네임" },
+    // { key: "product", title: "상품명" }
   ]);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const menuKey = useCallback((review) => String(review.id), []);
   const menuRenderItem = useCallback((review) => {
@@ -48,18 +48,17 @@ const SearchTabView = ({ reviewCount, userCount, searchList, userList, keyword, 
       >
         <FeedReview
           keyword={keyword}
-          clickBoxStyle={{ right: d2p(26), top: h2p(-10) }}
-          idx={review.index}
-          selectedIndex={selectedIndex}
-          setSelectedIndex={(selectIdx: number) => setSelectedIndex(selectIdx)}
           review={review.item} />
       </Pressable>
     );
-  }, [keyword, selectedIndex]);
+  }, [keyword]);
 
   const menuEmpty = useCallback(() =>
-    <Text style={[{ textAlign: "center", marginTop: h2p(115), color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
-      검색결과가 없습니다.
+    <Text style={[{
+      marginTop: h2p(25), marginLeft: d2p(20),
+      color: theme.color.grayscale.C_79737e
+    }, FONT.Regular]}>
+      {`검색결과가 없습니다.\n다른 검색어로 다시 시도해주세요!`}
     </Text>, []);
 
   if (!searchList) {
@@ -98,7 +97,7 @@ const SearchTabView = ({ reviewCount, userCount, searchList, userList, keyword, 
           case "user":
             return (
               <View style={styles.container}>
-                <Text style={[styles.searchResult, { marginBottom: h2p(30) }, FONT.Regular]}>검색결과 · {userCount}건</Text>
+                <Text style={[styles.searchResult, FONT.Regular]}>검색결과 · {userCount}건</Text>
                 <FlatList
                   onEndReached={userNext}
                   onEndReachedThreshold={0.5}
@@ -107,8 +106,12 @@ const SearchTabView = ({ reviewCount, userCount, searchList, userList, keyword, 
                   keyExtractor={(review) => String(review.id)}
                   data={userList}
                   ListEmptyComponent={() =>
-                    <Text style={[{ textAlign: "center", marginTop: h2p(115), color: theme.color.grayscale.C_79737e }, FONT.Regular]}>
-                      검색결과가 없습니다.</Text>}
+                    <Text style={[{
+                      marginTop: h2p(25),
+                      color: theme.color.grayscale.C_79737e
+                    }, FONT.Regular]}>
+                      {`검색결과가 없습니다.\n다른 검색어로 다시 시도해주세요!`}
+                    </Text>}
                   renderItem={(user) =>
                     <TouchableOpacity
                       onPress={() => navigation.navigate('Mypage', { id: user.item.id })}
@@ -132,6 +135,12 @@ const SearchTabView = ({ reviewCount, userCount, searchList, userList, keyword, 
                 />
               </View>
             );
+          // case "product":
+          //   return (
+          //     <View>
+          //       <Text>상품명</Text>
+          //     </View>
+          //   );
           default:
             return null;
         }
@@ -170,7 +179,6 @@ const styles = StyleSheet.create({
   searchResult: {
     marginTop: h2p(25),
     marginHorizontal: d2p(20),
-    marginBottom: h2p(5),
     color: theme.color.grayscale.a09ca4,
     fontSize: 12
   }

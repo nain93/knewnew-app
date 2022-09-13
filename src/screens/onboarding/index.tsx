@@ -182,22 +182,26 @@ const Onboarding = ({ navigation }: NavigationType) => {
     <View style={styles.container}>
       <View style={{ marginBottom: "auto" }}>
         <Text style={[{ fontSize: 20, textAlign: "center" }, FONT.SemiBold]}>
-          제대로 된 맛있는 발견</Text>
+          맛있는게 궁금할땐, 뉴뉴!</Text>
+        <Text style={[FONT.Regular, {
+          color: theme.color.grayscale.a09ca4,
+          marginTop: h2p(5)
+        }]}>온라인 식품 탐색을 위한 푸드 커뮤니티</Text>
         <Image source={mainLogo} resizeMode="contain" style={styles.logo} />
       </View>
       <View style={{ marginBottom: h2p(145) }}>
         <View style={{ flexDirection: "row", justifyContent: "center" }}>
           <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>매일매일 </Text>
           <Text style={[FONT.Bold, { color: theme.color.grayscale.C_443e49 }]}>
-            새로운 발견
+            맛있는 발견
           </Text>
           <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>
-            이 있는
+            이 있는 <Text
+              style={[FONT.Bold, { color: theme.color.grayscale.C_443e49 }]}
+            >뉴뉴</Text>를 시작하세요!
           </Text>
         </View>
-        <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49, textAlign: "center" }]}>
-          뉴뉴를 시작하세요</Text>
-        <View style={{ flexDirection: "row", marginTop: d2p(30), alignSelf: "center" }}>
+        <View style={{ flexDirection: "row", marginTop: d2p(20), alignSelf: "center" }}>
           <TouchableOpacity onPress={handleKakaoLogin}>
             <Image source={kakaoImg} style={styles.snsImg} />
           </TouchableOpacity>
@@ -215,7 +219,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
         <TouchableOpacity
           onPress={() => navigation.navigate("emailLogin")}
           style={{
-            marginTop: h2p(23),
+            marginTop: h2p(20),
             borderRadius: 5,
             borderWidth: 1, borderColor: theme.color.grayscale.d3d0d5,
             paddingVertical: h2p(14),
@@ -263,13 +267,14 @@ const Onboarding = ({ navigation }: NavigationType) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: getStatusBarHeight() + h2p(140),
+    paddingTop: isIphoneX() ? h2p(120) + getStatusBarHeight() : h2p(120),
     alignItems: "center"
   },
   logo: {
-    width: d2p(215),
-    height: d2p(35),
-    marginTop: d2p(10)
+    width: d2p(160),
+    height: d2p(100),
+    marginTop: h2p(40),
+    alignSelf: "center"
   },
   onboardingImg: {
     width: d2p(302),
