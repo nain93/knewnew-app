@@ -2,10 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-  <key>FirebaseDynamicLinksCustomDomains</key>
-  <array>
-    <string>https://knewnew.co.kr/link</string>
-  </array>
+	<key>FirebaseDynamicLinksCustomDomains</key>
+	<array>
+		<string>https://knewnew.co.kr/link</string>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -99,7 +99,7 @@
 		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>카메라 롤에서 사진 및 동영상을 선택하여 게시글을 작성할 수 있도록 됩니다.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
@@ -114,6 +114,8 @@
 		<string>SUIT-Regular.ttf</string>
 		<string>SUIT-SemiBold.ttf</string>
 		<string>SUIT-SemiBold.otf</string>
+		<string>SUIT-ExtraBold.otf</string>
+		<string>SUIT-ExtraBold.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

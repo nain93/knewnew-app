@@ -5,4 +5,5 @@ export const FONT = StyleSheet.create({
   SemiBold: { fontFamily: "SUIT-SemiBold" },
   Medium: { fontFamily: "SUIT-Medium" },
   Regular: { fontFamily: "SUIT-Regular" },
+  ExtraBold: { fontFamily: "SUIT-ExtraBold" },
 });

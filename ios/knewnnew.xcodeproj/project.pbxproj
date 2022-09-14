@@ -23,6 +23,8 @@
 		C287252BFFFE4163A95E70B0 /* SUIT-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 77AD43A301654D7596CEC4CB /* SUIT-Regular.otf */; };
 		F9486E84BDE2752EAD4E4CFE /* libPods-knewnnew-knewnnewTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E43CDF0FB2B3BB6809F5A0E2 /* libPods-knewnnew-knewnnewTests.a */; };
 		FDC62677C4DC4294A84C0786 /* SUIT-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = C9817AF0450B4302809FBBE7 /* SUIT-Bold.otf */; };
+		52C0D4554225440CA9A1771D /* SUIT-ExtraBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = F0FFF1FCF20B4343AFD1EC6D /* SUIT-ExtraBold.otf */; };
+		C772D15726764FBBA64AEFBB /* SUIT-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7EFBCE505CB447ADAC67E8B6 /* SUIT-ExtraBold.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -107,6 +109,8 @@
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F94044C591CF4B68BC26FFB4 /* SUIT-SemiBold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SUIT-SemiBold.otf"; path = "../src/assets/fonts/SUIT-SemiBold.otf"; sourceTree = "<group>"; };
 		FC861E7D2E5CDCF68F4F7DEE /* libPods-knewnnew.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-knewnnew.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F0FFF1FCF20B4343AFD1EC6D /* SUIT-ExtraBold.otf */ = {isa = PBXFileReference; name = "SUIT-ExtraBold.otf"; path = "../src/assets/fonts/SUIT-ExtraBold.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		7EFBCE505CB447ADAC67E8B6 /* SUIT-ExtraBold.ttf */ = {isa = PBXFileReference; name = "SUIT-ExtraBold.ttf"; path = "../src/assets/fonts/SUIT-ExtraBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -280,6 +284,8 @@
 				74E8A46D712A4575887E1968 /* SUIT-Regular.ttf */,
 				86C2EFC1BB21408DB2BB2F9D /* SUIT-SemiBold.ttf */,
 				F94044C591CF4B68BC26FFB4 /* SUIT-SemiBold.otf */,
+				F0FFF1FCF20B4343AFD1EC6D /* SUIT-ExtraBold.otf */,
+				7EFBCE505CB447ADAC67E8B6 /* SUIT-ExtraBold.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -405,6 +411,8 @@
 				3AFF09C2D19A4EF4800FBD34 /* SUIT-Regular.ttf in Resources */,
 				A4E99D4EB28B431F8931D219 /* SUIT-SemiBold.ttf in Resources */,
 				58C2868856C84EE194C9C7FC /* SUIT-SemiBold.otf in Resources */,
+				52C0D4554225440CA9A1771D /* SUIT-ExtraBold.otf in Resources */,
+				C772D15726764FBBA64AEFBB /* SUIT-ExtraBold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

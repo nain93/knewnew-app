@@ -22,8 +22,7 @@ const HomeStackNav = () => {
       <Stack.Screen
         name="Home"
         options={{
-          headerShown: false,
-          cardStyle: { backgroundColor: theme.color.grayscale.f7f7fc }
+          headerShown: false
         }}
         component={Home}
       />
