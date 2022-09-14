@@ -64,7 +64,7 @@ const Report = ({ navigation, route }: ReportProps) => {
         <View>
           <View style={{ flexDirection: "row" }}>
             <Text style={[FONT.Bold, { lineHeight: 20, color: theme.color.grayscale.C_443e49 }]}>‘{route.params?.review.author.nickname}’</Text>
-            <Text style={[FONT.Regular, { lineHeight: 20, color: theme.color.grayscale.C_443e49 }]}>님의 리뷰를</Text>
+            <Text style={[FONT.Regular, { lineHeight: 20, color: theme.color.grayscale.C_443e49 }]}>님의 푸드로그를</Text>
           </View>
           <Text style={[FONT.Regular, { lineHeight: 20, color: theme.color.grayscale.C_443e49 }]}>신고하는 이유를 입력해주세요.</Text>
         </View>

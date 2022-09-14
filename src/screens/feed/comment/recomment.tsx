@@ -91,7 +91,7 @@ const Recomment = ({ child, authorName,
                 alignItems: "center",
               }}>
                 <Image source={recommentIcon} style={{ width: d2p(8), height: d2p(8), marginRight: d2p(9), marginBottom: h2p(6) }} />
-                <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: item.author.id })}
+                <TouchableOpacity onPress={() => navigation.push("UserPage", { id: item.author.id })}
                   style={styles.commentProfileLine}>
                   <FastImage source={item.author.profileImage ? { uri: item.author.profileImage } : noProfile}
                     style={styles.commentImg} />
@@ -104,7 +104,7 @@ const Recomment = ({ child, authorName,
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <TouchableOpacity
                       style={{ flexDirection: "row" }}
-                      onPress={() => navigation.navigate("Mypage", { id: item.author.id })}>
+                      onPress={() => navigation.push("UserPage", { id: item.author.id })}>
                       <Text style={FONT.Medium}>{item.author.nickname}</Text>
                       {item.author.id === reviewId &&
                         <View style={{

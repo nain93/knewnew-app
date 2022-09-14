@@ -8,7 +8,6 @@ import { graylogo, graymypage, graywrite, mainmypage, mainlogoIcon, settingIcon,
 import { useRecoilValue } from 'recoil';
 import { isNotiReadState, myIdState } from '~/recoil/atoms';
 import Header from '~/components/header';
-import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import BeforeWrite from '~/screens/write/beforeWrite';
 import HomeStackNav from '~/navigators/homeStackNav';
@@ -140,25 +139,11 @@ const TabNavigator = () => {
             <>
               <StatusBarPlaceHolder />
               <Header
-                //@ts-ignore
-                title={params?.id === myId ? "마이뉴뉴" : "회원 프로필"}
+                title={"마이뉴뉴"}
                 bgColor={theme.color.white}
                 viewStyle={{
                 }}
-                headerLeft={
-                  //@ts-ignore
-                  (params?.id === myId || !params?.id) ? undefined :
-                    <LeftArrowIcon onBackClick={() => {
-                      navigation.goBack();
-                    }}
-                      imageStyle={{ width: d2p(11), height: d2p(25) }} />}
-                headerRight={
-                  //@ts-ignore
-                  (params?.id === myId || !params?.id) ?
-                    <Image source={settingIcon} style={{ width: d2p(16), height: d2p(16) }} />
-                    :
-                    undefined
-                }
+                headerRight={<Image source={settingIcon} style={{ width: d2p(16), height: d2p(16) }} />}
                 headerRightPress={() => navigation.navigate("setting")}
               />
             </>

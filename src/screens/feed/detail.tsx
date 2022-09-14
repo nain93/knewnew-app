@@ -443,7 +443,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             alignItems: "center"
           }}>
           <TouchableOpacity
-            onPress={() => navigation.navigate("Mypage", { id: reviewDetailQuery.data?.author.id })}
+            onPress={() => { navigation.push("UserPage", { id: reviewDetailQuery.data?.author.id }); }}
             style={{
               borderRadius: 40,
               height: d2p(40),
@@ -466,7 +466,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             paddingLeft: d2p(10)
           }}>
             <View style={{ alignItems: "center", flexWrap: "wrap" }}>
-              <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: reviewDetailQuery.data?.author.id })}>
+              <TouchableOpacity onPress={() => navigation.push("UserPage", { id: reviewDetailQuery.data?.author.id })}>
                 <Text style={[styles.writer, FONT.Medium]}>
                   {reviewDetailQuery.data?.author.nickname}
                 </Text>
@@ -504,7 +504,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                   isOpen: true,
                   topTitle: "푸드로그 신고",
                   topPress: () => navigation.navigate("report", { review: reviewDetailQuery.data }),
-                  middleTitle: "푸드로그 차단",
+                  middleTitle: "유저 차단",
                   middlePress: () => {
                     setModalOpen({
                       isOpen: true,
@@ -562,7 +562,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             <TouchableOpacity
               onPress={() => {
                 if (reviewDetailQuery.data.product?.isVerified) {
-                  navigation.navigate("ProductDetail", { id: reviewDetailQuery.data.product?.id });
+                  navigation.push("ProductDetail", { id: reviewDetailQuery.data.product?.id });
                 }
                 else {
                   setModalOpen({
@@ -640,7 +640,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                 review={{ ...reviewDetailQuery.data.parent }}
               />
               <TouchableOpacity
-                onPress={() => navigation.navigate("FeedDetail",
+                onPress={() => navigation.push("FeedDetail",
                   { id: reviewDetailQuery.data.parent?.id })}
                 style={{
                   marginTop: h2p(15),
@@ -732,7 +732,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                 flexDirection: "row",
                 alignItems: "center",
               }}>
-                <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: item.author.id })}
+                <TouchableOpacity onPress={() => navigation.push("UserPage", { id: item.author.id })}
                   style={styles.commentProfileLine}>
                   <FastImage source={item.author.profileImage ? { uri: item.author.profileImage } : noProfile}
                     style={styles.commentImg} />
@@ -745,7 +745,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
                       <TouchableOpacity
                         style={{ flexDirection: "row" }}
-                        onPress={() => navigation.navigate("Mypage", { id: item.author.id })}>
+                        onPress={() => navigation.push("UserPage", { id: item.author.id })}>
                         <Text style={[FONT.Medium, { fontSize: 14 }]}>{item.author.nickname}</Text>
                         {item.author.id === reviewDetailQuery.data?.author.id &&
                           <View style={{

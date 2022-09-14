@@ -352,11 +352,11 @@ const Home = ({ navigation }: HomeProps) => {
                     </Pressable>
                   )))}
                 </View>
-                <BasicButton
+                {/* <BasicButton
                   onPress={() => console.log("more")}
                   viewStyle={{ marginHorizontal: d2p(5), marginTop: h2p(30), marginBottom: h2p(10) }}
                   bgColor={theme.color.white}
-                  text="더보기" borderColor={theme.color.main} textColor={theme.color.main} />
+                  text="더보기" borderColor={theme.color.main} textColor={theme.color.main} /> */}
               </View>
             }
 

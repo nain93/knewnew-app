@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import { myIdState, tokenState } from '~/recoil/atoms';
-import { getMyProfile, getUserBookmarkList, getUserReviewList, userFollow } from '~/api/user';
+import { getMyProfile, getUserBookmarkList, getUserProfile, getUserReviewList, userFollow } from '~/api/user';
 import { useRecoilValue } from 'recoil';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from 'react-query';
 import { MyProfileType } from '~/types/user';
@@ -16,7 +16,7 @@ import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import BasicButton from '~/components/button/basicButton';
 import { ReviewListType } from '~/types/review';
-import { bookmark, graybookmark, graywrite } from '~/assets/icons';
+import { graywrite } from '~/assets/icons';
 import FastImage from 'react-native-fast-image';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import CustomBottomSheet from '~/components/popup/CustomBottomSheet';
@@ -26,14 +26,16 @@ import { productBookmark, productBookmarkList } from '~/api/product';
 import { ProductListType } from '~/types/product';
 import ProductBookmark from '~/screens/feed/productBookmark';
 
+
 interface MypageProps {
   navigation: NavigationStackProp;
   route: NavigationRoute<{
+    id?: number,
     refresh?: boolean
   }>;
 }
 
-const Mypage = ({ navigation, route }: MypageProps) => {
+const UserPage = ({ navigation, route }: MypageProps) => {
   const token = useRecoilValue(tokenState);
   const myId = useRecoilValue(myIdState);
   const [index, setIndex] = useState(0);
@@ -41,34 +43,50 @@ const Mypage = ({ navigation, route }: MypageProps) => {
   const [apiBlock, setApiBlock] = useState(false);
   const queryClient = useQueryClient();
   const followRef = useRef<RBSheet>(null);
-  const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", myId], async () => {
-    const queryData = await getMyProfile(token);
-    queryClient.setQueryData("myProfile", queryData);
-    return queryData;
+  const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", route.params?.id], async () => {
+    if (route.params?.id && (route.params.id !== myId)) {
+      const queryData = await getUserProfile(token, route.params?.id);
+      return queryData;
+    }
+    else {
+      const queryData = await getMyProfile(token);
+      queryClient.setQueryData("myProfile", queryData);
+      return queryData;
+    }
   }, {
+    enabled: !!route.params?.id,
     onSuccess: (data) => {
       queryClient.setQueryData("myProfile", data);
     },
   });
 
-  const userReviewListQuery = useInfiniteQuery<ReviewListType[], Error>(["userReviewList", myId], async ({ pageParam = 0 }) => {
-    const queryData = await getUserReviewList({ token, id: myId, offset: pageParam, limit: 5 });
-    return queryData;
+  const userReviewListQuery = useInfiniteQuery<ReviewListType[], Error>(["userReviewList", route.params?.id], async ({ pageParam = 0 }) => {
+    if (route.params?.id) {
+      const queryData = await getUserReviewList({ token, id: route.params?.id, offset: pageParam, limit: 5 });
+      return queryData;
+    }
   }, {
+    enabled: !!route.params?.id,
     getNextPageParam: (next, all) => all.flat().length
   });
 
-  const userBookmarkListQuery = useInfiniteQuery<ReviewListType[], Error>(["userBookmarkList"], async ({ pageParam = 0 }) => {
-    const queryData = await getUserBookmarkList({ token, id: myId, offset: pageParam, limit: 5 });
-    return queryData;
+  const userBookmarkListQuery = useInfiniteQuery<ReviewListType[], Error>(["userBookmarkList", route.params?.id], async ({ pageParam = 0 }) => {
+    if (route.params?.id) {
+      const queryData = await getUserBookmarkList({ token, id: route.params?.id, offset: pageParam, limit: 5 });
+      return queryData;
+    }
   }, {
+    enabled: !!route.params?.id,
     getNextPageParam: (next, all) => all.flat().length
   });
 
-  const userProductBookmarkQuery = useInfiniteQuery<ProductListType[], Error>(["userProductBookmark"], async ({ pageParam }) => {
-    const queryData = await productBookmarkList({ token, id: myId, offset: pageParam, limit: 5 });
-    return queryData;
+  const userProductBookmarkQuery = useInfiniteQuery<ProductListType[], Error>(["userProductBookmark", route.params?.id], async ({ pageParam }) => {
+    if (route.params?.id) {
+      const queryData = await productBookmarkList({ token, id: route.params?.id, offset: pageParam, limit: 5 });
+      return queryData;
+    }
   }, {
+    enabled: !!route.params?.id,
     getNextPageParam: (next, all) => all.flat().length
   });
 
@@ -126,23 +144,25 @@ const Mypage = ({ navigation, route }: MypageProps) => {
         <View style={styles.profileInfo}>
           <Pressable
             onPress={() => {
-              navigation.navigate("editProfile",
-                {
-                  profile:
+              if (route.params?.id === myId) {
+                navigation.navigate("editProfile",
                   {
-                    nickname: getMyProfileQuery?.data?.nickname,
-                    headline: getMyProfileQuery?.data?.headline,
-                    profileImage: getMyProfileQuery?.data?.profileImage,
-                    tags: {
-                      foodStyle: getMyProfileQuery?.data?.tags.foodStyle.map(v => ({ title: v, isClick: true })),
-                      household: getMyProfileQuery?.data?.tags.household.map(v => ({ title: v, isClick: true })),
-                      occupation: getMyProfileQuery?.data?.tags.occupation.map(v => ({ title: v, isClick: true })),
-                      taste: getMyProfileQuery.data?.tags.taste
-                    },
-                    representBadge: getMyProfileQuery?.data?.representBadge,
-                    remainingPeriod: getMyProfileQuery?.data?.remainingPeriod
-                  }
-                });
+                    profile:
+                    {
+                      nickname: getMyProfileQuery?.data?.nickname,
+                      headline: getMyProfileQuery?.data?.headline,
+                      profileImage: getMyProfileQuery?.data?.profileImage,
+                      tags: {
+                        foodStyle: getMyProfileQuery?.data?.tags.foodStyle.map(v => ({ title: v, isClick: true })),
+                        household: getMyProfileQuery?.data?.tags.household.map(v => ({ title: v, isClick: true })),
+                        occupation: getMyProfileQuery?.data?.tags.occupation.map(v => ({ title: v, isClick: true })),
+                        taste: getMyProfileQuery.data?.tags.taste
+                      },
+                      representBadge: getMyProfileQuery?.data?.representBadge,
+                      remainingPeriod: getMyProfileQuery?.data?.remainingPeriod
+                    }
+                  });
+              }
             }}
             style={styles.headline}>
             <Text style={[FONT.Medium, {
@@ -150,10 +170,12 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             }]}>
               {getMyProfileQuery.data?.headline ? getMyProfileQuery.data?.headline : "자기소개를 입력해주세요."}
             </Text>
-            <Image
-              style={{ width: d2p(10.5), height: d2p(10.5) }}
-              source={graywrite}
-            />
+            {route.params?.id === myId &&
+              <Image
+                style={{ width: d2p(10.5), height: d2p(10.5) }}
+                source={graywrite}
+              />
+            }
           </Pressable>
 
           {/* 팔로우 기능 추가후 주석해제 */}
@@ -260,11 +282,11 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             <View />
           </View>
           {/* 팔로우 바텀 시트 */}
-          {/* {route.params?.id &&
+          {route.params?.id &&
             <FollowBottomTab
               followIndex={followIndex}
               id={route.params.id} />
-          } */}
+          }
         </>
       </CustomBottomSheet>
     </>
@@ -284,15 +306,17 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             }]}>
               작성한 글이 없습니다.</Text>
           </View>
-          <BasicButton
-            viewStyle={{ marginHorizontal: d2p(20) }}
-            onPress={() => navigation.navigate('Write', { loading: false, isEdit: false })}
-            text="작성하기" textColor={theme.color.main} bgColor={theme.color.white} />
+          {(route.params?.id === myId) &&
+            <BasicButton
+              viewStyle={{ marginHorizontal: d2p(20) }}
+              onPress={() => navigation.navigate('Write', { loading: false, isEdit: false })}
+              text="작성하기" textColor={theme.color.main} bgColor={theme.color.white} />
+          }
         </View>
       );
     }
     return null;
-  }, [userReviewListQuery.isLoading]);
+  }, [userReviewListQuery.isLoading, route.params?.id]);
 
   const reviewHeader = useCallback(() => {
     if (userReviewListQuery.isLoading) {
@@ -351,15 +375,17 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             }]}>
               담은 글이 없습니다.</Text>
           </View>
-          <BasicButton
-            viewStyle={{ marginHorizontal: d2p(20) }}
-            onPress={() => navigation.navigate('Feed')}
-            text="담으러 가기" textColor={theme.color.main} bgColor={theme.color.white} />
+          {(route.params?.id === myId) &&
+            <BasicButton
+              viewStyle={{ marginHorizontal: d2p(20) }}
+              onPress={() => navigation.navigate('Feed')}
+              text="담으러 가기" textColor={theme.color.main} bgColor={theme.color.white} />
+          }
         </View>
       );
     }
     return null;
-  }, [userBookmarkListQuery.isLoading]);
+  }, [userBookmarkListQuery.isLoading, route.params?.id]);
 
   const bookmarkHeader = useCallback(() => {
     if (userBookmarkListQuery.isLoading) {
@@ -429,14 +455,16 @@ const Mypage = ({ navigation, route }: MypageProps) => {
             }]}>
               담은 상품이 없습니다.</Text>
           </View>
-          <BasicButton
-            onPress={() => navigation.navigate('Feed')}
-            text="담으러 가기" textColor={theme.color.main} bgColor={theme.color.white} />
+          {(route.params?.id === myId) &&
+            <BasicButton
+              onPress={() => navigation.navigate('Feed')}
+              text="담으러 가기" textColor={theme.color.main} bgColor={theme.color.white} />
+          }
         </View>
       );
     }
     return null;
-  }, [userProductBookmarkQuery.isLoading]);
+  }, [userProductBookmarkQuery.isLoading, route.params?.id]);
 
   const proudctRenderItem = useCallback((products) =>
     <ProductBookmark
@@ -559,11 +587,10 @@ const Mypage = ({ navigation, route }: MypageProps) => {
   );
 };
 
-export default Mypage;
+export default UserPage;
 
 const styles = StyleSheet.create({
   container: {
-    paddingBottom: h2p(20),
     paddingTop: h2p(5),
     backgroundColor: theme.color.grayscale.f7f7fc
   },

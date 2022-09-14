@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { Image, Platform, View } from 'react-native';
 import React from 'react';
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import Onboarding from '~/screens/onboarding';
@@ -27,10 +27,30 @@ import ProductDetailReady from '~/screens/feed/productDetailReady';
 import Search from '~/screens/search';
 import Welcome3 from '~/screens/onboarding/welcome3';
 import Welcome from '~/screens/onboarding/welcome';
+import UserPage from '~/screens/userPage';
+import Header from '~/components/header';
+import { settingIcon } from '~/assets/icons';
+import { useRecoilValue } from 'recoil';
+import { myIdState } from '~/recoil/atoms';
+import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 
 const Stack = createStackNavigator();
 
+function StatusBarPlaceHolder() {
+  return (
+    <View style={{
+      width: "100%",
+      position: "absolute",
+      top: 0,
+      height: getStatusBarHeight(),
+      backgroundColor: theme.color.white
+    }} />
+  );
+}
+
 const GlobalNav = ({ token }: { token: string }) => {
+  const myId = useRecoilValue(myIdState);
+
   return (
     <>
       <Stack.Navigator
@@ -79,10 +99,41 @@ const GlobalNav = ({ token }: { token: string }) => {
           }}
           component={Write} />
         <Stack.Screen
+          name="UserPage"
+          options={{
+            title: "",
+            header: ({ route: { params }, navigation }) => (
+              <>
+                <StatusBarPlaceHolder />
+                <Header
+                  //@ts-ignore
+                  title={params?.id === myId ? "마이뉴뉴" : "회원 프로필"}
+                  bgColor={theme.color.white}
+                  viewStyle={{
+                  }}
+                  headerLeft={
+                    <LeftArrowIcon onBackClick={() => {
+                      navigation.goBack();
+                    }}
+                      imageStyle={{ width: d2p(11), height: d2p(25) }} />}
+                  headerRight={
+                    //@ts-ignore
+                    (params?.id === myId || !params?.id) ?
+                      <Image source={settingIcon} style={{ width: d2p(16), height: d2p(16) }} />
+                      :
+                      undefined
+                  }
+                  headerRightPress={() => navigation.navigate("setting")}
+                />
+              </>
+            ),
+          }}
+          component={UserPage} />
+        <Stack.Screen
           name="FeedDetail"
           options={{
             title: "",
-            headerShown: false,
+            headerShown: false
           }}
           component={FeedDetail} />
         <Stack.Screen

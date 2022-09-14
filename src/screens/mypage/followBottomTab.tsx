@@ -65,7 +65,7 @@ const FollowBottomTab = ({ id, followIndex }: FollowBottomTabProps) => {
   const followingRenderItem = useCallback((list) => (
     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
       <TouchableOpacity
-        onPress={() => navigation.navigate("Mypage", { id: list.item.id })}
+        onPress={() => navigation.push("UserPage", { id: list.item.id })}
         style={{ flexDirection: "row", alignItems: "center" }}>
         <View style={{
           borderRadius: 40,
@@ -114,7 +114,7 @@ const FollowBottomTab = ({ id, followIndex }: FollowBottomTabProps) => {
   const followerRenderItem = useCallback((list) => (
     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
       <TouchableOpacity
-        onPress={() => navigation.navigate("Mypage", { id: list.item.id })}
+        onPress={() => navigation.push("UserPage", { id: list.item.id })}
         style={{ flexDirection: "row", alignItems: "center" }}>
         <View style={{
           borderRadius: 40,

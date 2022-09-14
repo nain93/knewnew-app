@@ -40,7 +40,7 @@ const ReactionIcon = ({ review, name, count, state, isState, mutation, id }: Rev
           setReactCount(prev => prev - 1);
         }
       } else if (name === "comment") {
-        navigation.navigate("FeedDetail", { id });
+        navigation.push("FeedDetail", { id });
       } else {
 
         if (name === "ReKnew") {

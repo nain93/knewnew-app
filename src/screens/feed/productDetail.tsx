@@ -113,7 +113,7 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
   const foodLogRenderItem = useCallback(({ item }: { item: ReviewsType }) => {
     return (
       <Pressable
-        onPress={() => navigation.navigate("FeedDetail", {
+        onPress={() => navigation.push("FeedDetail", {
           authorId: item.author.id,
           id: item.id,
         })}
@@ -276,7 +276,7 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
             Best 푸드로그
           </Text>
           {productDetailQuery.data?.reviewCount > 0 &&
-            <TouchableOpacity onPress={() => navigation.navigate("ProductList", { product: productDetailQuery.data?.name })}>
+            <TouchableOpacity onPress={() => navigation.push("ProductList", { product: productDetailQuery.data?.name })}>
               <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>
                 <Text style={[FONT.Regular, { color: theme.color.main }]}>
                   {productDetailQuery.data?.reviewCount}개

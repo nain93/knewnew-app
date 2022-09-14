@@ -15,6 +15,8 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 import { FONT } from '~/styles/fonts';
 import FastImage from 'react-native-fast-image';
+import { useRecoilValue } from 'recoil';
+import { myIdState } from '~/recoil/atoms';
 
 interface SearchTabViewProps {
   searchList?: ReviewListType[],
@@ -28,6 +30,7 @@ interface SearchTabViewProps {
 
 const SearchTabView = ({ reviewCount, userCount, searchList, userList, keyword, reviewNext, userNext }: SearchTabViewProps) => {
   const navigation = useNavigation<StackNavigationProp>();
+  const myId = useRecoilValue(myIdState);
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     { key: "menu", title: "푸드로그" },
@@ -101,7 +104,7 @@ const SearchTabView = ({ reviewCount, userCount, searchList, userList, keyword, 
                 <FlatList
                   onEndReached={userNext}
                   onEndReachedThreshold={0.5}
-                  style={{ marginBottom: h2p(80) }}
+                  style={{ marginBottom: h2p(80), marginTop: h2p(30) }}
                   contentContainerStyle={{ paddingBottom: d2p(40), paddingHorizontal: d2p(20) }}
                   keyExtractor={(review) => String(review.id)}
                   data={userList}
@@ -114,7 +117,7 @@ const SearchTabView = ({ reviewCount, userCount, searchList, userList, keyword, 
                     </Text>}
                   renderItem={(user) =>
                     <TouchableOpacity
-                      onPress={() => navigation.navigate('Mypage', { id: user.item.id })}
+                      onPress={() => navigation.push('UserPage', { id: user.item.id })}
                       style={{ marginBottom: h2p(30), flexDirection: "row", alignItems: "center" }}>
                       <View style={{ borderColor: theme.color.grayscale.e9e7ec, borderWidth: 1, overflow: "hidden", borderRadius: 24, width: d2p(24), height: d2p(24), marginRight: d2p(10) }}>
                         <FastImage resizeMode="cover" source={user.item.profileImage ? { uri: user.item.profileImage } : noProfile}

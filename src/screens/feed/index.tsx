@@ -219,7 +219,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
   const reviewRenderItem = useCallback(({ item, index }) =>
     <Pressable
       onPress={() => {
-        navigation.navigate("FeedDetail", {
+        navigation.push("FeedDetail", {
           authorId: item.author.id,
           id: item.id, badge: filterBadge,
           isLike: item.isLike, isBookmark: item.isBookmark

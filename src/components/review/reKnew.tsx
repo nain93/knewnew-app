@@ -10,6 +10,7 @@ import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/v
 import { useNavigation } from '@react-navigation/native';
 import { noProfile } from '~/assets/images';
 import FastImage from 'react-native-fast-image';
+import ReadMore from '@fawazahmed/react-native-read-more';
 
 interface FeedReviewProps {
   review: ReviewParentType,
@@ -69,7 +70,7 @@ const ReKnew = ({ review, filterBadge, type }: FeedReviewProps) => {
             marginTop: d2p(15),
           }}>
             <TouchableOpacity
-              onPress={() => navigation.navigate("Mypage", { id: review.author.id })}
+              onPress={() => navigation.push("UserPage", { id: review.author.id })}
               style={{
                 borderRadius: 40,
                 borderColor: theme.color.grayscale.e9e7ec,
@@ -91,7 +92,7 @@ const ReKnew = ({ review, filterBadge, type }: FeedReviewProps) => {
               paddingLeft: d2p(10),
             }}>
               <View style={{ alignItems: "center", flexWrap: "wrap" }}>
-                <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: review.author.id })}>
+                <TouchableOpacity onPress={() => navigation.push("UserPage", { id: review.author.id })}>
                   <Text style={[styles.title, FONT.Medium]}>
                     {review.author.nickname}
                   </Text>
@@ -238,7 +239,7 @@ const ReKnew = ({ review, filterBadge, type }: FeedReviewProps) => {
         }}>
           <View style={{ flexDirection: "row" }}>
             <TouchableOpacity
-              onPress={() => navigation.navigate("Mypage", { id: review.author.id })}
+              onPress={() => navigation.push("UserPage", { id: review.author.id })}
               style={{
                 borderRadius: 20,
                 borderColor: theme.color.grayscale.e9e7ec,
@@ -284,26 +285,28 @@ const ReKnew = ({ review, filterBadge, type }: FeedReviewProps) => {
               </TouchableOpacity>
             </View>
 
-            <Text
+            <ReadMore
+              seeMoreText="더보기 >"
+              expandOnly={true}
+              seeMoreStyle={[FONT.Medium, {
+                color: theme.color.grayscale.a09ca4, fontSize: 12
+              }]}
               numberOfLines={5}
+              onSeeMoreBlocked={() => navigation.navigate("FeedDetail",
+                { id: review.id })}
               style={[{
                 color: theme.color.grayscale.C_79737e,
                 lineHeight: 21,
                 marginTop: 0,
-                fontSize: 15
-              }, FONT.Regular]}>
+              }, FONT.Regular]}
+            >
               {review.content}
-            </Text>
-            <Text style={[FONT.Medium, {
-              color: theme.color.grayscale.a09ca4, fontSize: 12
-            }]}>
-              {"... 더보기>"}
-            </Text>
+            </ReadMore>
             {
               review.images &&
               (() => {
                 switch (review.images.length) {
-                  // * 사진 없음
+                  // * 사진 없음 
                   case 0: {
                     return null;
                   }

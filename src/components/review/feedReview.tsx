@@ -19,6 +19,7 @@ import { noProfile } from '~/assets/images';
 import ReKnew from '~/components/review/reKnew';
 import FastImage from 'react-native-fast-image';
 import { blockUser } from '~/api/user';
+import ReadMore from '@fawazahmed/react-native-read-more';
 
 interface FeedReviewProps {
   review: ReviewListType,
@@ -160,7 +161,7 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
         alignItems: "center"
       }}>
         <TouchableOpacity
-          onPress={() => navigation.navigate("Mypage", { id: review.author.id })}
+          onPress={() => navigation.push("UserPage", { id: review.author.id })}
           style={{
             borderRadius: 20,
             overflow: "hidden",
@@ -173,7 +174,9 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
 
         <View style={{ width: Dimensions.get('window').width - d2p(80) }}>
           <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap" }}>
-            <TouchableOpacity onPress={() => navigation.navigate("Mypage", { id: review.author.id })}>
+            <TouchableOpacity
+              onPress={() => navigation.push("UserPage", { id: review.author.id })}
+            >
               <Text style={[styles.title, FONT.Medium]}>{review.author?.nickname}</Text>
             </TouchableOpacity>
             {/* todo 뱃지 추가 */}
@@ -210,7 +213,7 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
                   isOpen: true,
                   topTitle: "푸드로그 신고",
                   topPress: () => navigation.navigate("report", { review }),
-                  middleTitle: "푸드로그 차단",
+                  middleTitle: "유저 차단",
                   middlePress: () => {
                     setModalOpen({
                       isOpen: true,
@@ -259,7 +262,7 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
           <TouchableOpacity
             onPress={() => {
               if (review.product?.isVerified) {
-                navigation.navigate("ProductDetail", { id: review.product?.id });
+                navigation.push("ProductDetail", { id: review.product?.id });
               }
               else {
                 setModalOpen({
@@ -296,22 +299,27 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
         />
         :
         <View style={{ marginLeft: d2p(30) }}>
-          <Text
+          <ReadMore
+            seeMoreText="더보기 >"
+            expandOnly={true}
+            seeMoreStyle={[FONT.Medium, {
+              color: theme.color.grayscale.a09ca4, fontSize: 12
+            }]}
             numberOfLines={5}
-            ellipsizeMode={"clip"}
+            onSeeMoreBlocked={() => navigation.push("FeedDetail", {
+              authorId: review.author.id,
+              id: review.id, badge: filterBadge,
+              isLike: review.isLike, isBookmark: review.isBookmark
+            })}
             style={[{
               color: theme.color.grayscale.C_79737e,
               lineHeight: 21,
               marginTop: 0,
               fontSize: 15
-            }, FONT.Regular]}>
+            }, FONT.Regular]}
+          >
             {review.content}
-          </Text>
-          <Text style={[FONT.Medium, {
-            color: theme.color.grayscale.a09ca4, fontSize: 12
-          }]}>
-            {"... 더보기>"}
-          </Text>
+          </ReadMore>
         </View>
       }
 
@@ -417,7 +425,7 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
           </View>
           <Pressable
             onPress={() => {
-              navigation.navigate("FeedDetail", {
+              navigation.push("FeedDetail", {
                 authorId: review.author.id,
                 id: review.id, badge: filterBadge,
                 isLike: review.isLike, isBookmark: review.isBookmark, toComment: true
