@@ -7,7 +7,7 @@ import theme from '~/styles/theme';
 import { d2p, dateCommentFormat, h2p, simpleDate } from '~/utils';
 import ReviewIcon from '~/components/icon/reviewIcon';
 import ReactionIcon from '~/components/icon/reactionIcon';
-import { commentMore, marketIcon, more, reKnew, shareIcon, tag } from '~/assets/icons';
+import { commentMore, lightHomeIcon, marketIcon, more, reKnew, shareIcon, tag, tagHome } from '~/assets/icons';
 import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { bottomDotSheetState, myIdState, okPopupState, popupState, refreshState, tokenState } from '~/recoil/atoms';
@@ -885,7 +885,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             }
           }}
             imageStyle={{ width: d2p(11), height: d2p(25) }} />}
-          title="게시글 상세"
+          title="푸드로그"
         />
         <Loading />
       </>
@@ -918,11 +918,16 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           }
           else {
             navigation.goBack();
-            // navigation.navigate("Feed");
           }
         }}
           imageStyle={{ width: d2p(11), height: d2p(25) }} />}
-        title="게시글 상세"
+        title="푸드로그"
+        headerRight={
+          <Pressable hitSlop={hitslop}
+            onPress={() => navigation.navigate("HomeStackNav")}
+          >
+            <Image source={lightHomeIcon} style={{ width: d2p(24), height: d2p(24) }} />
+          </Pressable>}
       />
       <KeyboardAvoidingView
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : -285}

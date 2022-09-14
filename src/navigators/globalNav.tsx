@@ -1,4 +1,4 @@
-import { Image, Platform, View } from 'react-native';
+import { Image, Platform, Pressable, Text, View } from 'react-native';
 import React from 'react';
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import Onboarding from '~/screens/onboarding';
@@ -29,10 +29,12 @@ import Welcome3 from '~/screens/onboarding/welcome3';
 import Welcome from '~/screens/onboarding/welcome';
 import UserPage from '~/screens/userPage';
 import Header from '~/components/header';
-import { settingIcon } from '~/assets/icons';
+import { lightHomeIcon, settingIcon, tagHome } from '~/assets/icons';
 import { useRecoilValue } from 'recoil';
 import { myIdState } from '~/recoil/atoms';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
+import { hitslop } from '~/utils/constant';
+import { FONT } from '~/styles/fonts';
 
 const Stack = createStackNavigator();
 
@@ -102,12 +104,11 @@ const GlobalNav = ({ token }: { token: string }) => {
           name="UserPage"
           options={{
             title: "",
-            header: ({ route: { params }, navigation }) => (
+            header: ({ route, navigation }) => (
               <>
                 <StatusBarPlaceHolder />
                 <Header
-                  //@ts-ignore
-                  title={params?.id === myId ? "마이뉴뉴" : "회원 프로필"}
+                  title={"회원 프로필"}
                   bgColor={theme.color.white}
                   viewStyle={{
                   }}
@@ -116,13 +117,14 @@ const GlobalNav = ({ token }: { token: string }) => {
                       navigation.goBack();
                     }}
                       imageStyle={{ width: d2p(11), height: d2p(25) }} />}
+
                   headerRight={
-                    //@ts-ignore
-                    (params?.id === myId || !params?.id) ?
-                      <Image source={settingIcon} style={{ width: d2p(16), height: d2p(16) }} />
-                      :
-                      undefined
-                  }
+                    <Pressable hitSlop={hitslop}
+                      onPress={() => navigation.navigate("HomeStackNav")}
+                    >
+                      <Image source={lightHomeIcon} style={{ width: d2p(24), height: d2p(24) }} />
+
+                    </Pressable>}
                   headerRightPress={() => navigation.navigate("setting")}
                 />
               </>

@@ -210,6 +210,7 @@ const Home = ({ navigation }: HomeProps) => {
                     )()}
                     <Text style={[FONT.Medium, {
                       color: v.title === "모두보기" ? theme.color.main : theme.color.black,
+                      fontSize: 12
                     }]}>{v.title}</Text>
                   </TouchableOpacity>
                 );
@@ -352,11 +353,15 @@ const Home = ({ navigation }: HomeProps) => {
                     </Pressable>
                   )))}
                 </View>
-                {/* <BasicButton
-                  onPress={() => console.log("more")}
+                <BasicButton
+
+                  onPress={() => {
+                    // todo 추천컨텐츠에 맞는 푸드로그 필터로 바꿔주기 (백에서 보내주는 데이터)
+                    navigation.navigate("Feed", { foodLog: "애주가" });
+                  }}
                   viewStyle={{ marginHorizontal: d2p(5), marginTop: h2p(30), marginBottom: h2p(10) }}
                   bgColor={theme.color.white}
-                  text="더보기" borderColor={theme.color.main} textColor={theme.color.main} /> */}
+                  text="더보기" borderColor={theme.color.main} textColor={theme.color.main} />
               </View>
             }
 
@@ -476,7 +481,8 @@ const Home = ({ navigation }: HomeProps) => {
                 )}
                 ListFooterComponent={() => (
                   <Pressable
-                    onPress={() => navigation.navigate("Feed", { sort: "2" })}
+                    // * 인기순 정렬
+                    onPress={() => navigation.navigate("Feed", { sort: "1" })}
                     style={{
                       justifyContent: "center",
                       alignItems: "center",

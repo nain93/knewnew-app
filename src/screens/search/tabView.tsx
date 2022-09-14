@@ -110,7 +110,6 @@ const SearchTabView = ({ reviewCount, userCount, searchList, userList, keyword, 
                   data={userList}
                   ListEmptyComponent={() =>
                     <Text style={[{
-                      marginTop: h2p(25),
                       color: theme.color.grayscale.C_79737e
                     }, FONT.Regular]}>
                       {`검색결과가 없습니다.\n다른 검색어로 다시 시도해주세요!`}
