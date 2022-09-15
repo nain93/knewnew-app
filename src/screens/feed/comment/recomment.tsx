@@ -52,6 +52,7 @@ const Recomment = ({ child, authorName,
     deleteReviewComment(token, id), {
     onSuccess: () => {
       queryClient.invalidateQueries('getCommentList');
+      queryClient.invalidateQueries('getInfiniteCommentList');
       queryClient.invalidateQueries("reviewList");
     },
     onSettled: () => setCommentLoading(false)
@@ -61,6 +62,7 @@ const Recomment = ({ child, authorName,
     likeComment({ token, commentId, isLike }), {
     onSuccess: async () => {
       await queryClient.invalidateQueries("getCommentList");
+      await queryClient.invalidateQueries("getInfiniteCommentList");
       setApiBlock(false);
     },
     onError: () => setApiBlock(false)

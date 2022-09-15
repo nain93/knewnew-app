@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, ViewStyle } from "react-native";
 import { like, reKnew, comment, colorLike, cart, colorCart, bookmark, graybookmark, shareIcon } from "~/assets/icons";
 import theme from "~/styles/theme";
 import { useNavigation } from "@react-navigation/native";
@@ -20,16 +20,17 @@ interface ReviewIconProp {
   }>;
   id?: number;
   review?: ReviewListType
+  viewStyle?: ViewStyle
 }
 
-const ReactionIcon = ({ review, name, count, state, isState, mutation, id }: ReviewIconProp) => {
+const ReactionIcon = ({ review, name, count, state, isState, mutation, id, viewStyle }: ReviewIconProp) => {
   const navigation = useNavigation<StackNavigationProp>();
   const [reactCount, setReactCount] = useState(count || 0);
 
   return (
-    <TouchableOpacity style={{
+    <TouchableOpacity style={[viewStyle, {
       flexDirection: "row", alignItems: 'center'
-    }} onPress={() => {
+    }]} onPress={() => {
       if (isState && id) {
         isState(!state);
         mutation?.mutate({ id, state: !state });

@@ -35,6 +35,7 @@ import { myIdState } from '~/recoil/atoms';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { hitslop } from '~/utils/constant';
 import { FONT } from '~/styles/fonts';
+import CommentAll from '~/screens/feed/comment/commentAll';
 
 const Stack = createStackNavigator();
 
@@ -138,6 +139,14 @@ const GlobalNav = ({ token }: { token: string }) => {
             headerShown: false
           }}
           component={FeedDetail} />
+        <Stack.Screen
+          name="CommentAll"
+          options={{
+            title: "",
+            headerShown: false
+          }}
+          component={CommentAll}
+        />
         <Stack.Screen
           name="ProductDetail"
           options={{

@@ -1,2 +1,3 @@
 const loading = require("./loading.gif");
-export { loading };
+const reactionGif = require("./reactionGif.gif");
+export { loading, reactionGif };

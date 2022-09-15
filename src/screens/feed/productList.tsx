@@ -129,7 +129,7 @@ const ProductList = ({ navigation, route }: ProductListProps) => {
   const foodLogRenderItem = useCallback(({ item, index }) =>
     <Pressable
       onPress={() =>
-        navigation.navigate("FeedDetail", {
+        navigation.push("FeedDetail", {
           authorId: item.author.id,
           id: item.id,
           isLike: item.isLike, isBookmark: item.isBookmark
@@ -141,14 +141,14 @@ const ProductList = ({ navigation, route }: ProductListProps) => {
     </Pressable>
     , []);
 
-    const foodLogEndReached = useCallback(() => {
-      if (reviewListQuery.data &&
-        reviewListQuery.data.pages.flat().length > 4 &&
-        reviewListQuery.hasNextPage
-      ) {
-        reviewListQuery.fetchNextPage();
-      }
-    }, [reviewListQuery]);
+  const foodLogEndReached = useCallback(() => {
+    if (reviewListQuery.data &&
+      reviewListQuery.data.pages.flat().length > 4 &&
+      reviewListQuery.hasNextPage
+    ) {
+      reviewListQuery.fetchNextPage();
+    }
+  }, [reviewListQuery]);
 
   if (reviewListQuery.isLoading) {
     return (
@@ -166,25 +166,25 @@ const ProductList = ({ navigation, route }: ProductListProps) => {
       <Header
         headerLeft={<LeftArrowIcon />}
         title="푸드로그 전체보기" />
-        <FlatList
-          ListHeaderComponent={foodLogHeader}
-          refreshing={reviewListQuery.isLoading}
-          onRefresh={reviewListQuery.refetch}
-          renderItem={foodLogRenderItem}
-          data={reviewListQuery.data?.pages.flat()}
-          keyExtractor={foodLogKey}
-          onEndReached={foodLogEndReached}
-          onEndReachedThreshold={0.5}
-          maxToRenderPerBatch={5}
-          windowSize={5}
-          removeClippedSubviews={true}
-          showsVerticalScrollIndicator={false}
-          ListFooterComponent={reviewListQuery.isFetchingNextPage ? footerLoading : reviewFooter}
-          style={{
-            marginTop: 0,
-            backgroundColor: theme.color.grayscale.f7f7fc
-          }}
-        />
+      <FlatList
+        ListHeaderComponent={foodLogHeader}
+        refreshing={reviewListQuery.isLoading}
+        onRefresh={reviewListQuery.refetch}
+        renderItem={foodLogRenderItem}
+        data={reviewListQuery.data?.pages.flat()}
+        keyExtractor={foodLogKey}
+        onEndReached={foodLogEndReached}
+        onEndReachedThreshold={0.5}
+        maxToRenderPerBatch={5}
+        windowSize={5}
+        removeClippedSubviews={true}
+        showsVerticalScrollIndicator={false}
+        ListFooterComponent={reviewListQuery.isFetchingNextPage ? footerLoading : reviewFooter}
+        style={{
+          marginTop: 0,
+          backgroundColor: theme.color.grayscale.f7f7fc
+        }}
+      />
       {/* 반응별 sheet */}
       <CustomBottomSheet
         height={Dimensions.get("window").height - h2p(480)}
