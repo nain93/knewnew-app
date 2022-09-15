@@ -708,11 +708,10 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           <TouchableOpacity
             onPress={async () => {
               const getUrl = await buildLink(reviewDetailQuery.data?.id);
-              console.log(getUrl, 'getUrl');
               Share.open({
                 title: "뉴뉴",
                 url: getUrl
-                // url: Platform.OS === "ios" ? `knewnnew://FeedDetail/${reviewDetailQuery.data?.id}` : getUrl
+                // url: `knewnnew://FeedDetail/${reviewDetailQuery.data?.id}`
               })
                 .then((res) => {
                   if (reviewDetailQuery.data?.id) {

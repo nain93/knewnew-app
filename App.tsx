@@ -159,11 +159,16 @@ const App = () => {
     config: {
       screens: {
         TabNav: {
-          initialRouteName: 'Feed',
+          initialRouteName: 'HomeStackNav',
           screens: {
-            Feed: "Feed",
-            Write: "Write",
-            Search: "Search",
+            HomeStackNav: {
+              path: "Feed",
+              screens: {
+                Feed: "/:foodLog"
+              }
+            },
+            BeforeWrite: "BeforeWrite",
+            Notification: "Notification",
             Mypage: "Mypage"
           }
         },

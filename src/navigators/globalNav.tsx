@@ -29,12 +29,11 @@ import Welcome3 from '~/screens/onboarding/welcome3';
 import Welcome from '~/screens/onboarding/welcome';
 import UserPage from '~/screens/userPage';
 import Header from '~/components/header';
-import { lightHomeIcon, settingIcon, tagHome } from '~/assets/icons';
+import { lightHomeIcon } from '~/assets/icons';
 import { useRecoilValue } from 'recoil';
 import { myIdState } from '~/recoil/atoms';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { hitslop } from '~/utils/constant';
-import { FONT } from '~/styles/fonts';
 import CommentAll from '~/screens/feed/comment/commentAll';
 
 const Stack = createStackNavigator();
