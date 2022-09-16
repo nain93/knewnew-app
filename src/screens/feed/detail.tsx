@@ -276,19 +276,17 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           alignItems: 'center',
           borderRadius: 11,
           height: '100%',
+          width: '100%',
           justifyContent: 'center',
           paddingHorizontal: d2p(24),
-          width: '100%',
         }}>
         <CachedImage
           resizeMode="cover"
           source={image.url}
           style={{
-            borderWidth: 1,
-            borderColor: theme.color.grayscale.e9e7ec,
             overflow: 'hidden',
             aspectRatio: 1,
-            width: Dimensions.get("window").width - d2p(30),
+            width: Dimensions.get("window").width,
           }}
           thumbnailSource={image.thumbUrl}
         />
@@ -566,6 +564,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           {reviewDetailQuery.data?.product &&
             <View style={{
               flexDirection: 'row',
+              marginTop: reviewDetailQuery.data.images.length === 0 ? h2p(10) : 0
             }}>
               <TouchableOpacity
                 onPress={() => {

@@ -77,7 +77,7 @@ index e634255..82b55f8 100644
 +  resizeMode?: ImageResizeMode;
  }
 diff --git a/node_modules/@georstat/react-native-image-gallery/src/ImageGallery.tsx b/node_modules/@georstat/react-native-image-gallery/src/ImageGallery.tsx
-index 2b1eb28..8b5925a 100644
+index 2b1eb28..e3a697b 100644
 --- a/node_modules/@georstat/react-native-image-gallery/src/ImageGallery.tsx
 +++ b/node_modules/@georstat/react-native-image-gallery/src/ImageGallery.tsx
 @@ -29,6 +29,7 @@ const ImageGallery = (props: IProps & typeof defaultProps) => {
@@ -109,9 +109,9 @@ index 2b1eb28..8b5925a 100644
 +                  styles.thumb,
 +                  styles.activeThumb,
 +                  { borderColor: thumbColor },
-+                  { width: 84, height: 56 },
++                  { width: 84, height: 84, borderRadius: 0 },
 +                ]
-+                : [styles.thumb, { width: 84, height: 56 }]
++                : [styles.thumb, { width: 84, height: 84, borderRadius: 0 }]
              }
              source={{ uri: item.thumbUrl ? item.thumbUrl : item.url }}
            />

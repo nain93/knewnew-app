@@ -42,30 +42,54 @@ const ImageFlatlist = ({ review, onPress }: ImageRenderItemProps) => {
         >
           <FastImage
             style={{
-              width: Dimensions.get("window").width - d2p(40),
               aspectRatio: 1,
               borderRadius: 10
             }}
             source={{ uri: item.image, priority: "high" }} />
         </Pressable>}
       />
-      <ReviewIcon
-        type="image"
-        viewStyle={{
-          position: "absolute",
-          left: d2p(30),
-          top: h2p(10),
-          backgroundColor: theme.color.white,
-          paddingHorizontal: d2p(10),
-          paddingVertical: h2p(2),
-          width: d2p(82),
-          height: h2p(22),
-          borderRadius: 12,
-          borderWidth: 1,
-          borderColor: theme.color.grayscale.eae7ec,
-          opacity: 0.9
-        }}
-        review={review.satisfaction} />
+      {review.images.length === 0 ?
+        <>
+          <ReviewIcon
+            type="image"
+            viewStyle={{
+              position: "absolute",
+              left: d2p(20),
+              top: h2p(-15),
+              backgroundColor: theme.color.white,
+              paddingHorizontal: d2p(10),
+              paddingVertical: h2p(2),
+              width: d2p(82),
+              height: h2p(22),
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: theme.color.grayscale.eae7ec,
+              opacity: 0.9,
+            }}
+            review={review.satisfaction} />
+        </>
+        :
+        <>
+          <ReviewIcon
+            type="image"
+            viewStyle={{
+              position: "absolute",
+              left: d2p(30),
+              top: h2p(10),
+              backgroundColor: theme.color.white,
+              paddingHorizontal: d2p(10),
+              paddingVertical: h2p(2),
+              width: d2p(82),
+              height: h2p(22),
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: theme.color.grayscale.eae7ec,
+              opacity: 0.9
+            }}
+            review={review.satisfaction} />
+        </>
+      }
+
       {(review.images.length || 0) > 1 &&
         <>
           <View style={{
@@ -106,7 +130,7 @@ const ImageFlatlist = ({ review, onPress }: ImageRenderItemProps) => {
                 <View style={{
                   width: d2p(6), height: d2p(6),
                   borderRadius: 6,
-                  backgroundColor: theme.color.white,
+                  backgroundColor: theme.color.grayscale.eae7ec,
                   marginRight: d2p(10)
                 }} />
               );

@@ -21,7 +21,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>$(IOS_APP_VERSION)</string>
+	<string>1.1.3</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -106,16 +106,11 @@
 	<string>카메라 롤에서 사진 및 동영상을 선택하여 게시글을 작성할 수 있도록 됩니다.</string>
 	<key>UIAppFonts</key>
 	<array>
-		<string>SUIT-Bold.otf</string>
-		<string>SUIT-Bold.ttf</string>
-		<string>SUIT-Medium.otf</string>
-		<string>SUIT-Medium.ttf</string>
-		<string>SUIT-Regular.otf</string>
-		<string>SUIT-Regular.ttf</string>
-		<string>SUIT-SemiBold.ttf</string>
-		<string>SUIT-SemiBold.otf</string>
-		<string>SUIT-ExtraBold.otf</string>
-		<string>SUIT-ExtraBold.ttf</string>
+		<string>Pretendard-Regular.otf</string>
+		<string>Pretendard-Medium.otf</string>
+		<string>Pretendard-Bold.otf</string>
+		<string>Pretendard-SemiBold.otf</string>
+		<string>Pretendard-ExtraBold.otf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

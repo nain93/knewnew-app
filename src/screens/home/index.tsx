@@ -306,7 +306,7 @@ const Home = ({ navigation }: HomeProps) => {
                         <View style={{
                           width: d2p(6), height: d2p(6),
                           borderRadius: 6,
-                          backgroundColor: theme.color.white,
+                          backgroundColor: theme.color.grayscale.eae7ec,
                           marginRight: d2p(10)
                         }} />
                       );
@@ -521,7 +521,6 @@ const styles = StyleSheet.create({
   banner: {
     width: Dimensions.get("window").width - d2p(20),
     marginHorizontal: d2p(10),
-    height: h2p(80),
     marginTop: h2p(30),
     borderRadius: 10,
     borderWidth: 1,
@@ -529,7 +528,7 @@ const styles = StyleSheet.create({
   },
   borderBar: {
     borderTopWidth: 4,
-    borderTopColor: theme.color.grayscale.eae7ec,
+    borderTopColor: theme.color.grayscale.f7f7fc,
   },
   foodlogWrap: {
     paddingHorizontal: d2p(15),
