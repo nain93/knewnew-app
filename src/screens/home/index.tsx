@@ -243,7 +243,7 @@ const Home = ({ navigation }: HomeProps) => {
 
           <View style={styles.borderBar}>
             {getBannerQuery.isLoading ?
-              <View style={styles.banner}>
+              <View style={[styles.banner, { height: h2p(80) }]}>
                 <Loading viewStyle={{ top: 0 }} />
               </View>
               :

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Image, FlatList, Dimensions, TouchableOpacity, Pressable } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { d2p, h2p } from '~/utils';
+import { convertFoodLogName, d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import Header from '~/components/header';
 import FeedReview from '~/components/review/feedReview';
@@ -248,7 +248,7 @@ const Feed = ({ navigation, route }: FeedProps) => {
         setFilterBadge("");
       }
       else {
-        setFilterBadge(route.params.foodLog);
+        setFilterBadge(convertFoodLogName(route.params.foodLog));
       }
     }
     if (route.params?.sort) {
