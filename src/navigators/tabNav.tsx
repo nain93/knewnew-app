@@ -35,7 +35,7 @@ const TabNavigator = () => {
     <Tabs.Navigator
       screenOptions={{
         tabBarLabelStyle: {
-          fontFamily: "SUIT-Regular",
+          fontFamily: "Pretendard-Regular",
           fontSize: 12,
           marginTop: h2p(10),
           backgroundColor: "transparent"
