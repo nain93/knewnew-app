@@ -1,4 +1,4 @@
-import { Dimensions, Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Image, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
@@ -16,7 +16,7 @@ import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import BasicButton from '~/components/button/basicButton';
 import { ReviewListType } from '~/types/review';
-import { bookmark, graybookmark, graywrite } from '~/assets/icons';
+import { bookmark, commentMore, graybookmark, graywrite, more, tasteMoreIcon } from '~/assets/icons';
 import FastImage from 'react-native-fast-image';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import CustomBottomSheet from '~/components/popup/CustomBottomSheet';
@@ -25,22 +25,24 @@ import CloseIcon from '~/components/icon/closeIcon';
 import { productBookmark, productBookmarkList } from '~/api/product';
 import { ProductListType } from '~/types/product';
 import ProductBookmark from '~/screens/feed/productBookmark';
+import { blogImage, instaImage, youtubeImage } from '~/assets/icons/sns';
 
 interface MypageProps {
   navigation: NavigationStackProp;
-  route: NavigationRoute<{
-    refresh?: boolean
-  }>;
+  route: NavigationRoute;
 }
 
-const Mypage = ({ navigation, route }: MypageProps) => {
+const Mypage = ({ navigation }: MypageProps) => {
   const token = useRecoilValue(tokenState);
   const myId = useRecoilValue(myIdState);
+  const queryClient = useQueryClient();
   const [index, setIndex] = useState(0);
   const [followIndex, setFollowIndex] = useState(0);
   const [apiBlock, setApiBlock] = useState(false);
-  const queryClient = useQueryClient();
   const followRef = useRef<RBSheet>(null);
+  const [isTasteMore, setIsTasteMore] = useState(false);
+  const [isTwoLine, setIsTwoLine] = useState(false);
+
   const getMyProfileQuery = useQuery<MyProfileType, Error>(["myProfile", myId], async () => {
     const queryData = await getMyProfile(token);
     queryClient.setQueryData("myProfile", queryData);
@@ -81,49 +83,43 @@ const Mypage = ({ navigation, route }: MypageProps) => {
 
   const tabHeader = useCallback(() => (
     <>
-      <View pointerEvents="box-none" style={{ paddingHorizontal: d2p(20) }} >
-        <View style={styles.profileImage} >
-          <View>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              {React.Children.toArray(getMyProfileQuery.data?.tags.taste?.map(v =>
-                <Text style={[FONT.Bold, { color: theme.color.main, marginBottom: h2p(5) }]}>
-                  {`${v} `}
-                </Text>
-              ))}
-            </View>
-            <View style={{
-              flexDirection: "row", alignItems: "center",
-              width: Dimensions.get("window").width - d2p(110),
-            }}>
-              <Text style={[FONT.Bold, { fontSize: 20 }]}>
-                {getMyProfileQuery.data?.nickname}
-              </Text>
-              {/* 뱃지 기능 추가후 주석해제 */}
-              {/* <View style={{
-              marginLeft: d2p(10),
-              borderWidth: 1,
-              borderRadius: 10, height: d2p(20),
-              backgroundColor: "#fff8db",
-              borderColor: "#ffd991",
-              alignItems: "center",
-              justifyContent: "center",
-              paddingHorizontal: d2p(10)
-            }}>
-              <Text style={[FONT.Medium, { fontSize: 10, color: "rgb(255,107,41)" }]}>{`다이어터 >`}</Text>
-            </View> */}
-            </View>
-            <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4, marginTop: h2p(10) }]}>
-              {`${getMyProfileQuery.data?.tags.foodStyle} ${getMyProfileQuery.data?.tags.household} ${getMyProfileQuery.data?.tags.occupation}`}
-            </Text>
+      <View pointerEvents="box-none" >
+        <View style={styles.profileImage}>
+          <View style={{ flexDirection: "row", width: d2p(80) }}>
+            <Image source={youtubeImage} style={{ width: d2p(24), height: d2p(24) }} />
+            <Image source={instaImage} style={{ width: d2p(24), height: d2p(24) }} />
+            <Image source={blogImage} style={{ width: d2p(24), height: d2p(24) }} />
           </View>
-          <FastImage style={{
-            width: d2p(70), height: d2p(70), borderRadius: 70,
-            borderWidth: 1,
-            borderColor: theme.color.grayscale.eae7ec
-          }}
-            source={getMyProfileQuery.data?.profileImage ? { uri: getMyProfileQuery.data?.profileImage } : noProfile} />
-        </View>
-        <View style={styles.profileInfo}>
+          <View style={{
+            alignItems: "center", position: "absolute",
+            width: Dimensions.get("window").width,
+            borderBottomWidth: 1,
+            borderColor: theme.color.grayscale.f7f7fc,
+            paddingBottom: h2p(14.5)
+          }}>
+            <FastImage style={{
+              width: d2p(70), height: d2p(70), borderRadius: 70,
+              borderWidth: 1,
+              borderColor: theme.color.grayscale.eae7ec
+            }}
+              source={getMyProfileQuery.data?.profileImage ? { uri: getMyProfileQuery.data?.profileImage } : noProfile} />
+            <Text style={[FONT.Bold, {
+              fontSize: 20, marginTop: h2p(10), marginHorizontal: d2p(20),
+              textAlign: "center"
+            }]}>
+              {getMyProfileQuery.data?.nickname}
+              <Text style={{ color: theme.color.grayscale.a09ca4 }}>님</Text>
+            </Text>
+            <View style={{ flexDirection: "row", marginTop: h2p(8) }}>
+              <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4, fontSize: 12 }]}>
+                팔로잉 <Text style={{ color: theme.color.black }}>193</Text>
+              </Text>
+              <Text> ・ </Text>
+              <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4, fontSize: 12 }]}>
+                팔로워 <Text style={{ color: theme.color.black }}>60</Text>
+              </Text>
+            </View>
+          </View>
           <Pressable
             onPress={() => {
               navigation.navigate("editProfile",
@@ -144,96 +140,79 @@ const Mypage = ({ navigation, route }: MypageProps) => {
                   }
                 });
             }}
-            style={styles.headline}>
-            <Text style={[FONT.Medium, {
-              color: getMyProfileQuery.data?.headline ? theme.color.black : theme.color.grayscale.a09ca4
-            }]}>
-              {getMyProfileQuery.data?.headline ? getMyProfileQuery.data?.headline : "자기소개를 입력해주세요."}
-            </Text>
-            <Image
-              style={{ width: d2p(10.5), height: d2p(10.5) }}
-              source={graywrite}
-            />
+            style={{
+              paddingHorizontal: d2p(8), paddingVertical: h2p(4),
+              flexDirection: "row",
+              borderWidth: 1,
+              borderRadius: 12,
+              borderColor: theme.color.grayscale.a09ca4,
+              marginLeft: "auto"
+            }}
+          >
+            <Image source={graywrite} style={{ width: d2p(12), height: d2p(12) }} />
+            <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4, fontSize: 12 }]}>
+              {` 프로필 수정`}</Text>
           </Pressable>
-
-          {/* 팔로우 기능 추가후 주석해제 */}
+          {/* 뱃지 기능 추가후 주석해제 */}
           {/* <View style={{
-            borderBottomWidth: 4, borderBottomColor: theme.color.grayscale.f7f7fc,
-            borderTopWidth: 4, borderTopColor: theme.color.grayscale.f7f7fc,
-            width: Dimensions.get("window").width,
-            // flexDirection: "row",
-          }}>
-            <View style={{ flexDirection: "row" }}>
-              <TouchableOpacity
-                onPress={() => {
-                  setFollowIndex(0);
-                  followRef.current?.open();
-                }}
-                style={{
-                  width: "50%",
-                  paddingLeft: d2p(10), paddingVertical: h2p(10)
-                }}>
-                <View style={{ alignItems: "center", marginVertical: h2p(10) }}>
-                  <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
-                    팔로잉
-                  </Text>
-                  <Text style={[FONT.SemiBold, { marginTop: h2p(5) }]}>192</Text>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  setFollowIndex(1);
-                  followRef.current?.open();
-                }}
-                style={{
-                  width: "50%",
-                  paddingRight: d2p(10), paddingVertical: h2p(10)
-                }}>
-                <View style={{
-                  alignItems: "center", marginVertical: h2p(10),
-                  borderLeftWidth: 1,
-                  borderLeftColor: theme.color.grayscale.f7f7fc
-                }}>
-                  <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
-                    팔로워
-                  </Text>
-                  <Text style={[FONT.SemiBold, { marginTop: h2p(5) }]}>60</Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-            {route.params?.id !== myId &&
-              <View style={{
-                marginHorizontal: d2p(20), marginBottom: h2p(20),
-                flexDirection: "row", alignItems: "center"
-              }}>
-                <BasicButton
-                  onPress={() => {
-                    // todo isFollow true면 false 반대면 true
-                    if (getMyProfileQuery.data) {
-                      followMutation.mutate({
-                        userId: getMyProfileQuery.data?.id,
-                        isFollow: true
-                      });
-                    }
-                  }}
-                  viewStyle={{ width: Dimensions.get("window").width - d2p(110), height: h2p(35) }}
-                  text="팔로우" bgColor={theme.color.main} textColor={theme.color.white} />
-                <TouchableOpacity style={{
-                  borderWidth: 1,
-                  borderColor: theme.color.grayscale.a09ca4,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderRadius: 5,
-                  width: d2p(60), height: h2p(35),
-                  marginLeft: d2p(10)
-                }}>
-                  <Text style={[FONT.Medium, { color: theme.color.grayscale.C_443e49 }]}>
-                    차단
-                  </Text>
-                </TouchableOpacity>
-              </View>
+              marginLeft: d2p(10),
+              borderWidth: 1,
+              borderRadius: 10, height: d2p(20),
+              backgroundColor: "#fff8db",
+              borderColor: "#ffd991",
+              alignItems: "center",
+              justifyContent: "center",
+              paddingHorizontal: d2p(10)
+            }}>
+              <Text style={[FONT.Medium, { fontSize: 10, color: "rgb(255,107,41)" }]}>{`다이어터 >`}</Text>
+            </View> */}
+        </View>
+
+        <View
+          onLayout={(e) => {
+            // todo 2줄 파악해서 더보기 버튼 나와야함 (높이가 고정되어있슴)
+            if (e.nativeEvent.layout.height > 30) {
+              setIsTwoLine(true);
             }
-          </View> */}
+            else {
+              setIsTwoLine(false);
+            }
+          }}
+          style={styles.profileInfo}>
+          {React.Children.toArray(getMyProfileQuery.data?.tags.taste?.map(v => (
+            <View style={{
+              borderWidth: 1,
+              borderColor: theme.color.grayscale.C_443e49,
+              paddingHorizontal: d2p(10),
+              paddingVertical: h2p(4),
+              borderRadius: 12,
+              marginRight: d2p(5)
+            }}>
+              <Text
+                style={[FONT.Medium, { fontSize: 10, color: theme.color.grayscale.C_443e49 }]}>
+                {v}
+              </Text>
+            </View>
+          )))}
+          <View style={{
+            borderWidth: 1,
+            borderColor: theme.color.grayscale.C_443e49,
+            paddingHorizontal: d2p(10),
+            paddingVertical: h2p(4),
+            borderRadius: 12,
+            marginRight: d2p(5)
+          }}>
+            <Text style={[FONT.Medium, { fontSize: 10, color: theme.color.grayscale.C_443e49 }]}>
+              zxzxcbzxcb
+            </Text>
+          </View>
+          {isTwoLine &&
+            <Pressable
+              onPress={() => setIsTasteMore(true)}
+              style={{ marginLeft: "auto" }}>
+              <Image source={tasteMoreIcon} style={{ width: d2p(32), height: d2p(20) }} />
+            </Pressable>
+          }
         </View>
       </View>
 
@@ -268,7 +247,7 @@ const Mypage = ({ navigation, route }: MypageProps) => {
         </>
       </CustomBottomSheet>
     </>
-  ), [getMyProfileQuery.data, followIndex]);
+  ), [getMyProfileQuery.data, followIndex, isTwoLine]);
 
   // * 작성글
   const reviewKey = useCallback((v) => String(v.id), []);
@@ -570,11 +549,17 @@ const styles = StyleSheet.create({
   profileImage: {
     marginVertical: h2p(30),
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center"
+    alignItems: "flex-start",
+    height: h2p(123),
+    paddingHorizontal: d2p(20)
   },
   profileInfo: {
-    alignItems: "center"
+    flexDirection: "row",
+    paddingHorizontal: d2p(20),
+    alignItems: "center",
+    flexWrap: "wrap",
+    height: h2p(20),
+    overflow: "hidden"
   },
   headline: {
     width: Dimensions.get("window").width - d2p(40),

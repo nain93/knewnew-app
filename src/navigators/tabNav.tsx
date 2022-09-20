@@ -134,12 +134,12 @@ const TabNavigator = () => {
           },
         })}
         options={{
-          tabBarLabel: "마이뉴뉴",
+          tabBarLabel: "마이 뉴뉴",
           header: ({ route: { params }, navigation }) => (
             <>
               <StatusBarPlaceHolder />
               <Header
-                title={"마이뉴뉴"}
+                title={"마이 뉴뉴"}
                 bgColor={theme.color.white}
                 viewStyle={{
                 }}
