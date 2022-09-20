@@ -72,6 +72,9 @@ export const convertFoodLogName = (name: string) => {
     case "vegan": {
       return "비건";
     }
+    case "drink": {
+      return "애주가";
+    }
     default: {
       return name;
     }
