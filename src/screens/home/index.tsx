@@ -1,5 +1,8 @@
-import { Dimensions, FlatList, Image, Linking, Platform, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { useEffect, useRef, useState } from 'react';
+import {
+  Dimensions, FlatList, Image, Linking, Platform, Pressable, RefreshControl,
+  ScrollView, StyleSheet, Text, TouchableOpacity, View
+} from 'react-native';
+import React, { useCallback, useEffect } from 'react';
 import Header from '~/components/header';
 import { d2p, h2p } from '~/utils';
 import { hitslop } from '~/utils/constant';
@@ -7,8 +10,8 @@ import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import theme from '~/styles/theme';
 import { eyesIcon, graysearch, mainPlusIcon } from '~/assets/icons';
-import { isNotiReadState, myIdState, tokenState } from '~/recoil/atoms';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { myIdState, tokenState } from '~/recoil/atoms';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { FONT } from '~/styles/fonts';
 import {
   beerFoodlog, begunFoodlog, breadFoodlog, cafeFoodlog, cakeFoodlog, campFoodlog,
@@ -26,6 +29,7 @@ import Loading from '~/components/loading';
 import SplashScreen from 'react-native-splash-screen';
 import { homeLogo } from '~/assets/logo';
 import BasicButton from '~/components/button/basicButton';
+import { useFocusEffect } from '@react-navigation/native';
 
 export interface HomeProps {
   navigation: NavigationStackProp;
@@ -67,12 +71,9 @@ interface RecommendType {
 }
 
 const Home = ({ navigation }: HomeProps) => {
-  const bannerListRef = useRef<FlatList>(null);
   const [token, setToken] = useRecoilState(tokenState);
   const setMyId = useSetRecoilState(myIdState);
-  const [scrollIdx, setScrollIdx] = useState(0);
-
-  const getBannerQuery = useQuery<BannerType[], Error>("banner", () => getBanner(token));
+  const getBannerQuery = useQuery<BannerType, Error>("banner", () => getBanner(token));
   const getFoodLogCountQuery = useQuery<{ count: number }, Error>("foodLogCount", () => getFoodLogCount(token));
   const getRecommendQuery = useQuery<RecommendType, Error>("recommend", () => getRecommend({ token }));
   const getRecommendFoodQuery = useQuery<RecommendFoodType, Error>("recommendFoodLog", () =>
@@ -93,28 +94,15 @@ const Home = ({ navigation }: HomeProps) => {
   });
 
   useEffect(() => {
-    // * 배너 자동 스크롤
-    const totalIndex = getBannerQuery.data?.length || 0;
-    let index = 0;
-    if (getBannerQuery.data && getBannerQuery.data?.length > 0) {
-      setInterval(() => {
-        index++;
-        if (index < totalIndex) {
-          bannerListRef.current?.scrollToIndex({ animated: true, index: index });
-        }
-        else {
-          index = 0;
-          bannerListRef.current?.scrollToIndex({ animated: true, index });
-        }
-      }, 3000);
-    }
-  }, [getBannerQuery.data?.length]);
-
-  useEffect(() => {
     if (getFoodLogCountQuery.data) {
       SplashScreen.hide();
     }
   }, [getFoodLogCountQuery.data]);
+
+  useFocusEffect(useCallback(() => {
+    // * 화면 들어올때마다 배너 새로고침
+    getBannerQuery.refetch();
+  }, []));
 
   return (
     <>
@@ -216,103 +204,32 @@ const Home = ({ navigation }: HomeProps) => {
                 );
               }
             }))}
-
-            {/* <TouchableOpacity
-              onPress={() => navigation.navigate("Feed", { foodLog: "all" })}
-              style={{
-                borderColor: theme.color.grayscale.ff5d5d,
-                borderWidth: 1,
-                borderRadius: 20,
-                paddingVertical: h2p(10),
-                alignItems: "center",
-                width: Dimensions.get("window").width - d2p(40),
-                shadowColor: "rgba(0, 0, 0, 0.16)",
-                backgroundColor: theme.color.white,
-                shadowOffset: {
-                  width: 0,
-                  height: 3
-                },
-                shadowRadius: 6,
-                shadowOpacity: 1,
-              }}>
-              <Text style={FONT.Bold}>실시간
-                <Text style={{ color: theme.color.main }}> {getFoodLogCountQuery.data?.count}개</Text>
-                의 모든 푸드로그 보기!</Text>
-            </TouchableOpacity> */}
           </View>
 
-          <View style={styles.borderBar}>
+          <View>
             {getBannerQuery.isLoading ?
               <View style={[styles.banner, { height: h2p(80) }]}>
                 <Loading viewStyle={{ top: 0 }} />
               </View>
               :
-              <>
-                <FlatList
-                  ref={bannerListRef}
-                  horizontal
-                  pagingEnabled
-                  bounces={false}
-                  onScroll={e => {
-                    setScrollIdx(Math.min(
-                      getBannerQuery.data?.length ?? 0,
-                      Math.max(0, Math.round(e.nativeEvent.contentOffset.x / (Dimensions.get("window").width - d2p(20))))));
-                  }}
-                  keyExtractor={(item) => item.id.toString()}
-                  showsHorizontalScrollIndicator={false}
-                  data={getBannerQuery.data}
-                  renderItem={({ item }) => (
-                    <Pressable
-                      onPress={() => {
-                        if (item.link) {
-                          Linking.canOpenURL(item.link).then(supported => {
-                            if (supported) {
-                              Linking.openURL(item.link);
-                            }
-                            else {
-                              // todo 경고 문구
-                            }
-                          });
-                        }
-                      }}
-                      style={styles.banner}>
-                      <Image
-                        style={{
-                          width: "100%", height: h2p(80),
-                          borderRadius: 10,
-                        }}
-                        source={{ uri: item.image }} />
-                    </Pressable>
-                  )}
-                />
-                {(getBannerQuery.data?.length || 0) > 1 &&
-                  <View style={{
-                    flexDirection: "row",
-                    alignSelf: "center",
-                    marginTop: h2p(10)
-                  }}>
-                    {React.Children.toArray(getBannerQuery.data?.map((_, i) => {
-                      if (i === scrollIdx) {
-                        return (
-                          <View style={{
-                            width: d2p(6), height: d2p(6),
-                            borderRadius: 6,
-                            backgroundColor: theme.color.main,
-                            marginRight: d2p(10)
-                          }} />
-                        );
+              <Pressable
+                onPress={() => {
+                  if (getBannerQuery.data?.link) {
+                    Linking.canOpenURL(getBannerQuery.data?.link).then(supported => {
+                      if (supported) {
+                        Linking.openURL(getBannerQuery.data?.link);
                       }
-                      return (
-                        <View style={{
-                          width: d2p(6), height: d2p(6),
-                          borderRadius: 6,
-                          backgroundColor: theme.color.grayscale.eae7ec,
-                          marginRight: d2p(10)
-                        }} />
-                      );
-                    }))}
-                  </View>}
-              </>
+                      else {
+                        // todo 경고 문구
+                      }
+                    });
+                  }
+                }}
+                style={[styles.banner, { height: h2p(120) }]}>
+                <FastImage
+                  style={{ width: "100%", height: h2p(120) }}
+                  source={{ uri: getBannerQuery.data?.image }} />
+              </Pressable>
             }
             {getRecommendQuery.data &&
               <View style={{ paddingVertical: h2p(30), paddingHorizontal: d2p(15) }}>
@@ -338,6 +255,8 @@ const Home = ({ navigation }: HomeProps) => {
                         <Image
                           source={{ uri: v.image }}
                           style={{
+                            borderWidth: 1,
+                            borderColor: theme.color.grayscale.eae7ec,
                             marginVertical: h2p(10),
                             marginHorizontal: d2p(5),
                             width: d2p(155), aspectRatio: 1, backgroundColor: theme.color.white, borderRadius: 5
@@ -354,7 +273,6 @@ const Home = ({ navigation }: HomeProps) => {
                   )))}
                 </View>
                 <BasicButton
-
                   onPress={() => {
                     // todo 추천컨텐츠에 맞는 푸드로그 필터로 바꿔주기 (백에서 보내주는 데이터)
                     navigation.navigate("Feed", { foodLog: "애주가" });
@@ -466,7 +384,9 @@ const Home = ({ navigation }: HomeProps) => {
                           borderRadius: 5,
                           marginVertical: h2p(10),
                           width: "100%",
-                          aspectRatio: 1
+                          aspectRatio: 1,
+                          borderWidth: 1,
+                          borderColor: theme.color.grayscale.eae7ec
                         }}
                           source={{ uri: item.image }}
                         />}
@@ -519,10 +439,8 @@ const styles = StyleSheet.create({
     marginRight: d2p(15),
   },
   banner: {
-    width: Dimensions.get("window").width - d2p(20),
-    marginHorizontal: d2p(10),
+    width: Dimensions.get("window").width,
     marginTop: h2p(30),
-    borderRadius: 10,
     borderWidth: 1,
     borderColor: theme.color.grayscale.eae7ec
   },
@@ -533,7 +451,6 @@ const styles = StyleSheet.create({
   foodlogWrap: {
     paddingHorizontal: d2p(15),
     paddingTop: h2p(25),
-    paddingBottom: h2p(15),
     flexDirection: "row",
     justifyContent: "space-between",
     flexWrap: "wrap"
