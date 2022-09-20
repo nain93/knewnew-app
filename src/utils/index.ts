@@ -63,3 +63,17 @@ export async function googleAnalytics(screen: string) {
     });
   }
 }
+
+export const convertFoodLogName = (name: string) => {
+  switch (name) {
+    case "dieter": {
+      return "다이어터";
+    }
+    case "vegan": {
+      return "비건";
+    }
+    default: {
+      return name;
+    }
+  }
+};
