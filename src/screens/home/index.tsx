@@ -225,7 +225,7 @@ const Home = ({ navigation }: HomeProps) => {
                     });
                   }
                 }}
-                style={[styles.banner, { height: h2p(120) }]}>
+                style={styles.banner}>
                 <FastImage
                   style={{ width: "100%", height: h2p(120) }}
                   source={{ uri: getBannerQuery.data?.image }} />
