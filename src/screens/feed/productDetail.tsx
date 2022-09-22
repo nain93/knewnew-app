@@ -2,12 +2,11 @@ import { Dimensions, FlatList, Image, Linking, Pressable, ScrollView, StyleSheet
 import React, { useCallback, useState } from 'react';
 import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
-import { d2p, dateNormalFormat, h2p } from '~/utils';
+import { d2p, h2p } from '~/utils';
 import { FONT } from '~/styles/fonts';
 import theme from '~/styles/theme';
 import { bookmark, circleQuestion, goldStarIcon, graybookmark, settingKnewnew, shareIcon, starIcon } from '~/assets/icons';
 import ReviewIcon from '~/components/icon/reviewIcon';
-import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
@@ -18,7 +17,7 @@ import Loading from '~/components/loading';
 import { noProfile } from '~/assets/images';
 import { ReviewListType, SatisfactionType } from '~/types/review';
 import { AuthorType } from '~/types';
-import QuestionPopup from '~/components/popup/QuestionPopup';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface ProductDetailProps {
   navigation: NavigationStackProp;
@@ -162,6 +161,10 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
     );
   }, []);
 
+  useFocusEffect(useCallback(() => {
+    setPriceInfoOpen(false);
+  }, []));
+
   if (productDetailQuery.isLoading) {
     return (
       <>
@@ -182,144 +185,142 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
       <Header
         headerLeft={<LeftArrowIcon />}
         title="상품 상세" />
+
       <ScrollView
         bounces={false}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           backgroundColor: theme.color.grayscale.f7f7fc
         }}>
-        <View style={[styles.mainImage, {}]}>
-          <FlatList
-            horizontal
-            data={productDetailQuery.data?.images}
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <Image source={{ uri: item.image }} style={{
+        <Pressable onPress={() => setPriceInfoOpen(false)}>
+          <View style={styles.mainImage}>
+            <FlatList
+              horizontal
+              data={productDetailQuery.data?.images}
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              renderItem={({ item }) => (
+                <Image source={{ uri: item.image }} style={{
+                  width: Dimensions.get("window").width,
+                  aspectRatio: 1
+                }} />
+              )}
+            />
+            <View
+              style={{
+                position: "absolute",
+                bottom: d2p(0),
+                flexDirection: "row", alignItems: "center",
                 width: Dimensions.get("window").width,
-                aspectRatio: 1
-              }} />
-            )}
-          />
-          <View
-            style={{
-              position: "absolute",
-              bottom: d2p(0),
-              flexDirection: "row", alignItems: "center",
-              width: Dimensions.get("window").width,
-              paddingHorizontal: d2p(20),
-              paddingVertical: h2p(5),
-              backgroundColor: "rgba(0,0,0,0.4)"
-            }}>
-            <Text style={[FONT.Regular, { color: theme.color.grayscale.eae7ec, marginRight: "auto" }]}>
-              출처 {productDetailQuery.data?.imageSource}
-            </Text>
-            {/* 상품 공유 기능후 주석 해제 */}
-            {/* <TouchableOpacity onPress={() => console.log("상품 공유하기")}>
+                paddingHorizontal: d2p(20),
+                paddingVertical: h2p(5),
+                backgroundColor: "rgba(0,0,0,0.4)"
+              }}>
+              <Text style={[FONT.Regular, { color: theme.color.grayscale.eae7ec, marginRight: "auto" }]}>
+                출처 {productDetailQuery.data?.imageSource}
+              </Text>
+              {/* 상품 공유 기능후 주석 해제 */}
+              {/* <TouchableOpacity onPress={() => console.log("상품 공유하기")}>
               <Image source={shareIcon} style={{ marginRight: d2p(10), width: d2p(26), height: d2p(26) }} />
             </TouchableOpacity> */}
-            <TouchableOpacity onPress={() => {
-              if (!apiBlock) {
-                setIsBookmark(!isBookmark);
-                setApiBlock(true);
-                productBookmarkMutation.mutate(!isBookmark);
-              }
-            }}>
-              <Image source={isBookmark ? graybookmark : bookmark} style={{ width: d2p(26), height: d2p(26) }} />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View style={styles.productContent}>
-          <Text style={[FONT.Bold, { color: theme.color.grayscale.a09ca4, marginBottom: h2p(5) }]}>
-            {productDetailQuery.data?.brand}
-          </Text>
-          <Text style={[FONT.Bold, { fontSize: 18 }]}>
-            {productDetailQuery.data?.name}
-          </Text>
-          <View style={{ flexDirection: "row", alignItems: "center", marginTop: h2p(10) }}>
-            <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>
-              예상가격 {productDetailQuery.data?.expectedPrice}원
-            </Text>
-            <Pressable onPress={() => setPriceInfoOpen(true)}
-              style={{ marginLeft: d2p(7), }}>
-              <Image source={circleQuestion} style={{ width: d2p(16), height: d2p(16) }} />
-            </Pressable>
-            <TouchableOpacity
-              onPress={() => {
-                if (productDetailQuery.data?.link) {
-                  Linking.openURL(productDetailQuery.data.link);
+              <TouchableOpacity onPress={() => {
+                if (!apiBlock) {
+                  setIsBookmark(!isBookmark);
+                  setApiBlock(true);
+                  productBookmarkMutation.mutate(!isBookmark);
                 }
-              }}
-              style={{ marginLeft: "auto", }}>
-              <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>
-                {`최저가로 이동하기 >`}
-              </Text>
-            </TouchableOpacity>
+              }}>
+                <Image source={isBookmark ? graybookmark : bookmark} style={{ width: d2p(26), height: d2p(26) }} />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-        <View style={{
-          paddingHorizontal: d2p(20),
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginTop: h2p(20)
-        }}>
-          <Text style={[FONT.Bold, { color: theme.color.grayscale.C_443e49, fontSize: 16 }]}>
-            Best 푸드로그
-          </Text>
-          {productDetailQuery.data?.reviewCount > 0 &&
-            <TouchableOpacity onPress={() => navigation.push("ProductList", { product: productDetailQuery.data?.name })}>
-              <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>
-                <Text style={[FONT.Regular, { color: theme.color.main }]}>
-                  {productDetailQuery.data?.reviewCount}개
-                </Text>
-                {` 전체 보기 >`}
-              </Text>
-            </TouchableOpacity>}
-        </View>
 
-        {priceInfoOpen &&
-          <QuestionPopup isPopupOpen={priceInfoOpen} setIsPopupOpen={(priceInfo: boolean) => setPriceInfoOpen(priceInfo)}>
-            <>
-              <View
-                style={{
-                  position: "absolute",
-                  top: h2p(-70),
-                  width: Dimensions.get("window").width - d2p(40),
-                  backgroundColor: "rgba(68,62,73,1)",
-                  alignSelf: "center",
-                  borderRadius: 15,
-                  paddingHorizontal: d2p(10),
-                  paddingVertical: h2p(10)
-                }}>
-                <Text style={[FONT.Regular, { fontSize: 13, color: theme.color.white }]}>
-                  <Text style={FONT.Bold}>예상가격</Text>은 해당 상품을 판매 중인 판매처에서 책정된 가격의 평균 가격입니다.
+          <View style={styles.productContent}>
+            <Text style={[FONT.Bold, { color: theme.color.grayscale.a09ca4, marginBottom: h2p(5) }]}>
+              {productDetailQuery.data?.brand}
+            </Text>
+            <Text style={[FONT.Bold, { fontSize: 18 }]}>
+              {productDetailQuery.data?.name}
+            </Text>
+            <View style={{ flexDirection: "row", alignItems: "center", marginTop: h2p(10) }}>
+              <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>
+                예상가격 {productDetailQuery.data?.expectedPrice}원
+              </Text>
+              <Pressable onPress={() => setPriceInfoOpen(!priceInfoOpen)}
+                style={{ marginLeft: d2p(7), }}>
+                <Image source={circleQuestion} style={{ width: d2p(16), height: d2p(16) }} />
+              </Pressable>
+              <TouchableOpacity
+                onPress={() => {
+                  if (productDetailQuery.data?.link) {
+                    Linking.openURL(productDetailQuery.data.link);
+                  }
+                }}
+                style={{ marginLeft: "auto", }}>
+                <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>
+                  {`최저가로 이동하기 >`}
                 </Text>
-                <Text style={[FONT.Regular, {
-                  fontSize: 13, color: theme.color.white,
-                  marginTop: h2p(20)
-                }]}>
-                  판매처의 상황 및 이벤트 등에 의하여 변경될 수 있습니다.
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={{
+            paddingHorizontal: d2p(20),
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginTop: h2p(20)
+          }}>
+            <Text style={[FONT.Bold, { color: theme.color.grayscale.C_443e49, fontSize: 16 }]}>
+              Best 푸드로그
+            </Text>
+            {productDetailQuery.data?.reviewCount > 0 &&
+              <TouchableOpacity onPress={() => navigation.push("ProductList", { product: productDetailQuery.data?.name })}>
+                <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>
+                  <Text style={[FONT.Regular, { color: theme.color.main }]}>
+                    {productDetailQuery.data?.reviewCount}개
+                  </Text>
+                  {` 전체 보기 >`}
                 </Text>
-              </View>
-            </>
-          </QuestionPopup>
-        }
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingLeft: d2p(20), paddingRight: d2p(10) }}
-          style={{
-            marginTop: h2p(20),
-            marginBottom: h2p(40)
-          }}
-          data={productDetailQuery.data?.reviews}
-          renderItem={foodLogRenderItem}
-          keyExtractor={foodLogKey}
-        />
-        {/* 포털 사이트 주석 */}
-        {/* <View style={{ paddingHorizontal: d2p(20) }}>
+              </TouchableOpacity>}
+          </View>
+
+          {priceInfoOpen &&
+            <View
+              style={{
+                position: "absolute",
+                top: h2p(445),
+                width: Dimensions.get("window").width - d2p(40),
+                backgroundColor: "rgba(68,62,73,1)",
+                alignSelf: "center",
+                borderRadius: 15,
+                paddingHorizontal: d2p(10),
+                paddingVertical: h2p(10),
+              }}>
+              <Text style={[FONT.Regular, { fontSize: 13, color: theme.color.white }]}>
+                <Text style={FONT.Bold}>예상가격</Text>은 해당 상품을 판매 중인 판매처에서 책정된 가격의 평균 가격입니다.
+              </Text>
+              <Text style={[FONT.Regular, {
+                fontSize: 13, color: theme.color.white,
+                marginTop: h2p(20)
+              }]}>
+                판매처의 상황 및 이벤트 등에 의하여 변경될 수 있습니다.
+              </Text>
+            </View>}
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingLeft: d2p(20), paddingRight: d2p(10) }}
+            style={{
+              marginTop: h2p(20),
+              marginBottom: h2p(40)
+            }}
+            data={productDetailQuery.data?.reviews}
+            renderItem={foodLogRenderItem}
+            keyExtractor={foodLogKey}
+          />
+          {/* 포털 사이트 주석 */}
+          {/* <View style={{ paddingHorizontal: d2p(20) }}>
           <View style={{
             alignItems: "center",
             flexDirection: "row"
@@ -375,6 +376,7 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
             marginTop: "auto", width: d2p(96), height: d2p(20)
           }} />
         </View> */}
+        </Pressable>
       </ScrollView>
     </>
   );
