@@ -1,7 +1,7 @@
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
-platform :ios, '11.0'
+platform :ios, '12.4'
 install! 'cocoapods', :deterministic_uuids => false
 
 target 'knewnnew' do
@@ -41,6 +41,5 @@ target 'knewnnew' do
   pod 'Firebase/Analytics'
   pod 'Permission-PhotoLibrary', :path => "#{permissions_path}/PhotoLibrary"
   pod 'Permission-PhotoLibraryAddOnly', :path => "#{permissions_path}/PhotoLibraryAddOnly"
-  # pod 'GoogleUtilities', :modular_headers => true
   
 end

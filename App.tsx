@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Animated, AppState, Linking, Platform } from 'react-native';
 import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import SplashScreen from 'react-native-splash-screen';
@@ -9,7 +9,6 @@ import messaging from '@react-native-firebase/messaging';
 import codePush from "react-native-code-push";
 import analytics from '@react-native-firebase/analytics';
 import dynamicLinks, { FirebaseDynamicLinksTypes } from '@react-native-firebase/dynamic-links';
-import { FileLogger } from "react-native-file-logger";
 
 import GlobalNav from './src/navigators/globalNav';
 import AlertPopup from '~/components/popup/AlertPopup';
@@ -45,33 +44,13 @@ const App = () => {
   const routeNameRef = React.useRef(null);
 
 
-  // const sendLoggedFiles = useCallback(() => {
-  //   FileLogger.sendLogFilesByEmail({
-  //     to: 'rnrb555@gmail.com',
-  //     subject: 'App logs',
-  //     body: 'Attached logs',
-  //   })
-  //     .then(() => {
-  //       setTimeout(() => {
-  //         FileLogger.deleteLogFiles();
-  //       }, 5000);
-  //     })
-  //     .catch((err) => {
-  //       if ('message' in err) {
-  //         FileLogger.error(err.message);
-  //       } else {
-  //         FileLogger.error(JSON.stringify(err));
-  //       }
-  //     });
-  // }, []);
-
   // * 최신버전 체크
   const versionCheck = () => {
     if (Platform.OS === "ios") {
       VersionCheck.getLatestVersion({
         provider: "appStore"
       }).then((latest: string) => {
-        // // * 특정 버전에서 강제 업데이트 (1.1.00 전버전)
+        // * 특정 버전에서 강제 업데이트
         // if (!__DEV__ && versioningIOS !== latest) {
         //   // * 강제 업데이트 팝업
         //   setVersionCheckModal(true);
@@ -88,7 +67,7 @@ const App = () => {
       VersionCheck.getLatestVersion({
         provider: "playStore"
       }).then((latest: string) => {
-        // // * 특정 버전에서 강제 업데이트 (1.1.00 전버전)
+        // * 특정 버전에서 강제 업데이트
         // if (!__DEV__ && versioningAOS !== latest) {
         //   // * 강제 업데이트 팝업
         //   setVersionCheckModal(true);

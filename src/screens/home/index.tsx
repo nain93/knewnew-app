@@ -2,7 +2,7 @@ import {
   Dimensions, FlatList, Image, Linking, Platform, Pressable, RefreshControl,
   ScrollView, StyleSheet, Text, TouchableOpacity, View
 } from 'react-native';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import Header from '~/components/header';
 import { d2p, h2p } from '~/utils';
 import { hitslop } from '~/utils/constant';
@@ -33,7 +33,9 @@ import { useFocusEffect } from '@react-navigation/native';
 
 export interface HomeProps {
   navigation: NavigationStackProp;
-  route: NavigationRoute;
+  route: NavigationRoute<{
+    scrollUp: boolean
+  }>;
 }
 
 interface BannerType {
@@ -70,9 +72,10 @@ interface RecommendType {
   }>
 }
 
-const Home = ({ navigation }: HomeProps) => {
+const Home = ({ navigation, route }: HomeProps) => {
   const [token, setToken] = useRecoilState(tokenState);
   const setMyId = useSetRecoilState(myIdState);
+  const homeRef = useRef<ScrollView>(null);
   const getBannerQuery = useQuery<BannerType, Error>("banner", () => getBanner(token));
   const getFoodLogCountQuery = useQuery<{ count: number }, Error>("foodLogCount", () => getFoodLogCount(token));
   const getRecommendQuery = useQuery<RecommendType, Error>("recommend", () => getRecommend({ token }));
@@ -99,6 +102,12 @@ const Home = ({ navigation }: HomeProps) => {
     }
   }, [getFoodLogCountQuery.data]);
 
+  useEffect(() => {
+    if (route.params?.scrollUp) {
+      homeRef.current?.scrollTo({ y: 0, animated: true });
+    }
+  }, [route.params]);
+
   useFocusEffect(useCallback(() => {
     // * 화면 들어올때마다 배너 새로고침
     getBannerQuery.refetch();
@@ -121,6 +130,7 @@ const Home = ({ navigation }: HomeProps) => {
         </View>} />
 
       <ScrollView
+        ref={homeRef}
         refreshControl={
           <RefreshControl
             refreshing={
@@ -131,6 +141,7 @@ const Home = ({ navigation }: HomeProps) => {
               getFoodLogCountQuery.refetch();
               getRecommendQuery.refetch();
               getRecommendFoodQuery.refetch();
+              getBannerQuery.refetch();
             }}
           />
         }
@@ -149,7 +160,7 @@ const Home = ({ navigation }: HomeProps) => {
           </Text>
 
           <View style={styles.foodlogWrap}>
-            {React.Children.toArray(interestTagData.interest.map((v) => {
+            {React.Children.toArray([{ title: "모두보기", isClick: false }, ...interestTagData.interest].map((v) => {
               if (!v.title.includes("기타")) {
                 return (
                   <TouchableOpacity
@@ -215,14 +226,7 @@ const Home = ({ navigation }: HomeProps) => {
               <Pressable
                 onPress={() => {
                   if (getBannerQuery.data?.link) {
-                    Linking.canOpenURL(getBannerQuery.data?.link).then(supported => {
-                      if (supported) {
-                        Linking.openURL(getBannerQuery.data?.link);
-                      }
-                      else {
-                        // todo 경고 문구
-                      }
-                    });
+                    Linking.openURL(getBannerQuery.data?.link);
                   }
                 }}
                 style={styles.banner}>
@@ -346,7 +350,7 @@ const Home = ({ navigation }: HomeProps) => {
                 data={getRecommendFoodQuery.data?.contents.slice(0, 5)}
                 renderItem={({ item }) => (
                   <Pressable
-                    style={{ paddingTop: h2p(10) }}
+                    style={{ backgroundColor: theme.color.white }}
                     onPress={() => navigation.navigate("FeedDetail", { id: item.review })}>
                     {item.countMessage &&
                       <View style={{
@@ -356,9 +360,7 @@ const Home = ({ navigation }: HomeProps) => {
                         borderRadius: 11.5,
                         justifyContent: "center",
                         alignItems: "center",
-                        position: "absolute",
                         alignSelf: "center",
-                        top: 0,
                         zIndex: 10,
                         flexDirection: "row"
                       }}>
@@ -371,22 +373,20 @@ const Home = ({ navigation }: HomeProps) => {
                       </View>
                     }
                     <View style={{
-                      width: d2p(180),
-                      marginHorizontal: d2p(5),
+                      width: d2p(160),
+                      marginHorizontal: d2p(10),
                       backgroundColor: theme.color.white,
                       borderRadius: 10,
-                      paddingHorizontal: d2p(12),
-                      paddingVertical: d2p(10),
                     }}>
                       {item.image &&
                         <FastImage style={{
                           backgroundColor: theme.color.grayscale.f7f7fc,
                           borderRadius: 5,
-                          marginVertical: h2p(10),
-                          width: "100%",
+                          marginTop: h2p(10),
+                          width: d2p(160),
                           aspectRatio: 1,
                           borderWidth: 1,
-                          borderColor: theme.color.grayscale.eae7ec
+                          borderColor: theme.color.grayscale.eae7ec,
                         }}
                           source={{ uri: item.image }}
                         />}

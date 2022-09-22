@@ -1,5 +1,5 @@
 import { Dimensions, FlatList, Image, ImageSourcePropType, Pressable, StyleSheet, Text, View } from 'react-native';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import Header from '~/components/header';
 import { NavigationStackProp } from 'react-navigation-stack';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
@@ -14,6 +14,7 @@ import { isNotiReadState, tokenState } from '~/recoil/atoms';
 import Loading from '~/components/loading';
 import { NotificationListType } from '~/types/setting';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 
@@ -60,7 +61,7 @@ const Notification = ({ navigation }: NotificationProps) => {
 
   const isReadNotification = useMutation("isReadNotification", () => allReadNotification({ token }));
 
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
     setIsNotiReadState(true);
     AsyncStorage.setItem("isNotiReadState", JSON.stringify(true));
     return () => {
@@ -72,7 +73,7 @@ const Notification = ({ navigation }: NotificationProps) => {
         }
       });
     };
-  }, []);
+  }, []));
 
   const renderItem = useCallback(({ item }: { item: NotificationListType, index: number }) => {
     return (
@@ -82,7 +83,7 @@ const Notification = ({ navigation }: NotificationProps) => {
             navigation.navigate("FeedDetail", { id: item.link.split("/")[1] });
           }
           else {
-            navigation.navigate("HomeStackNav");
+            navigation.navigate("Home");
           }
         }}
         style={{ flexDirection: "row" }}>
@@ -212,7 +213,8 @@ export default Notification;
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: d2p(20)
+    paddingHorizontal: d2p(20),
+    paddingBottom: h2p(80)
   },
   notiText: {
     fontSize: 12,

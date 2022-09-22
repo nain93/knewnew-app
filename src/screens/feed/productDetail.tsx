@@ -248,14 +248,7 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
             <TouchableOpacity
               onPress={() => {
                 if (productDetailQuery.data?.link) {
-                  Linking.canOpenURL(productDetailQuery.data.link).then(supported => {
-                    if (supported) {
-                      Linking.openURL(productDetailQuery.data.link);
-                    }
-                    else {
-                      // todo 경고 문구
-                    }
-                  });
+                  Linking.openURL(productDetailQuery.data.link);
                 }
               }}
               style={{ marginLeft: "auto", }}>

@@ -28,12 +28,10 @@ import ProductBookmark from '~/screens/feed/productBookmark';
 
 interface MypageProps {
   navigation: NavigationStackProp;
-  route: NavigationRoute<{
-    refresh?: boolean
-  }>;
+  route: NavigationRoute
 }
 
-const Mypage = ({ navigation, route }: MypageProps) => {
+const Mypage = ({ navigation }: MypageProps) => {
   const token = useRecoilValue(tokenState);
   const myId = useRecoilValue(myIdState);
   const [index, setIndex] = useState(0);

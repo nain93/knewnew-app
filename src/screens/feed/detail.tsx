@@ -956,8 +956,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
         title="푸드로그"
         headerRight={
           <Pressable hitSlop={hitslop}
-            onPress={() => navigation.navigate("HomeStackNav")}
-          >
+            onPress={() => navigation.navigate("Home")}>
             <Image source={lightHomeIcon} style={{ width: d2p(24), height: d2p(24) }} />
           </Pressable>}
       />

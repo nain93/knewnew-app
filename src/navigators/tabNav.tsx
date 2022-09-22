@@ -12,6 +12,7 @@ import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import BeforeWrite from '~/screens/write/beforeWrite';
 import HomeStackNav from '~/navigators/homeStackNav';
 import Notification from '~/screens/feed/notification';
+import { getFocusedRouteNameFromRoute, useRoute } from '@react-navigation/native';
 
 const Tabs = createBottomTabNavigator();
 
@@ -30,6 +31,9 @@ function StatusBarPlaceHolder() {
 const TabNavigator = () => {
   const myId = useRecoilValue(myIdState);
   const isNotiRead = useRecoilValue(isNotiReadState);
+  const screen = useRoute();
+  const routeName = getFocusedRouteNameFromRoute(screen);
+
 
   return (
     <Tabs.Navigator
@@ -66,6 +70,12 @@ const TabNavigator = () => {
       <Tabs.Screen
         name="HomeStackNav"
         component={HomeStackNav}
+        listeners={({ navigation }) => ({
+          tabPress: e => {
+            e.preventDefault();
+            navigation.navigate('Home', { scrollUp: routeName === "HomeStackNav" ? true : false });
+          }
+        })}
         options={{
           tabBarLabel: "홈",
           headerShown: false,
@@ -130,19 +140,17 @@ const TabNavigator = () => {
         listeners={({ navigation }) => ({
           tabPress: e => {
             e.preventDefault();
-            navigation.navigate('Mypage', { id: myId, refresh: true });
+            navigation.navigate('Mypage', { id: myId });
           },
         })}
         options={{
           tabBarLabel: "마이뉴뉴",
-          header: ({ route: { params }, navigation }) => (
+          header: ({ navigation }) => (
             <>
               <StatusBarPlaceHolder />
               <Header
                 title={"마이뉴뉴"}
                 bgColor={theme.color.white}
-                viewStyle={{
-                }}
                 headerRight={<Image source={settingIcon} style={{ width: d2p(16), height: d2p(16) }} />}
                 headerRightPress={() => navigation.navigate("setting")}
               />
