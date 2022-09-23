@@ -219,8 +219,8 @@ const Home = ({ navigation, route }: HomeProps) => {
 
           <View>
             {getBannerQuery.isLoading ?
-              <View style={[styles.banner, { height: h2p(80) }]}>
-                <Loading viewStyle={{ top: 0 }} />
+              <View style={[styles.banner, { height: h2p(120) }]}>
+                <Loading viewStyle={{ top: h2p(20) }} />
               </View>
               :
               <Pressable

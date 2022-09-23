@@ -82,7 +82,6 @@ const App = () => {
   };
 
   const getToken = async () => {
-    // TODO refresh api
     // * 토큰 저장
     const storageToken = await AsyncStorage.getItem("token");
     if (storageToken) {
@@ -122,7 +121,12 @@ const App = () => {
   useEffect(() => {
     dynamicLinks()
       .getInitialLink()
-      .then(link => {
+      .then(async (link) => {
+        const storageToken = await AsyncStorage.getItem("token");
+        if (!storageToken) {
+          // * 토큰 없을때 네비게이트 차단
+          return;
+        }
         if (link?.url.includes("knewnew")) {
           setTimeout(() => {
             //@ts-ignore
