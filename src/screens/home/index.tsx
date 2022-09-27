@@ -276,14 +276,14 @@ const Home = ({ navigation, route }: HomeProps) => {
                     </Pressable>
                   )))}
                 </View>
-                <BasicButton
+                {/*<BasicButton
                   onPress={() => {
                     // todo 추천컨텐츠에 맞는 푸드로그 필터로 바꿔주기 (백에서 보내주는 데이터)
                     navigation.navigate("Feed", { foodLog: "애주가" });
                   }}
                   viewStyle={{ marginHorizontal: d2p(5), marginTop: h2p(30), marginBottom: h2p(10) }}
                   bgColor={theme.color.white}
-                  text="더보기" borderColor={theme.color.main} textColor={theme.color.main} />
+                text="더보기" borderColor={theme.color.main} textColor={theme.color.main} />*/}
               </View>
             }
 
