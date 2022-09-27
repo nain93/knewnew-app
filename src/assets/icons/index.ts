@@ -72,6 +72,7 @@ import mainPlusIcon from "./mainPlusIcon.png";
 import lightHomeIcon from "./lightHomeIcon.png";
 import userIcon from "./userIcon.png";
 import tasteMoreIcon from "./tasteMoreIcon.png";
+import smallRightArrow from "./smallRightArrow.png";
 
 export {
   close, leftArrow, more, heart, like, reKnew, comment, commentMore, circle, maincart, maintag,
@@ -81,6 +82,6 @@ export {
   handIcon, tagFood, tagHome, tagLife, emailicon, noticeIcon, alertIcon, eyeIcon, colorEyeIcon, checkIcon, tagIcon,
   selectTagIcon, knewnewIcon, settingIcon, rightArrow, settingKnewnew, grayCheckIcon, question, grayquestion, smallClose, whiteClose,
   grayEyeIcon, grayKnewnew, grayCart, circleQuestion, marketIcon, goldStarIcon, starIcon, bookmark, graybookmark,
-  shareIcon, mainNotiIcon, notiIcon, eyesIcon, mainPlusIcon, lightHomeIcon, userIcon, tasteMoreIcon
+  shareIcon, mainNotiIcon, notiIcon, eyesIcon, mainPlusIcon, lightHomeIcon, userIcon, tasteMoreIcon, smallRightArrow
 };
 
