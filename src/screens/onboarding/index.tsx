@@ -120,8 +120,8 @@ const Onboarding = ({ navigation }: NavigationType) => {
   const handleGoogleLogin = async () => {
     handleApiBlock();
     GoogleSignin.configure({
-      iosClientId: Config.GOOGLE_CLIENT_ID,
-      webClientId: Config.GOOGLE_CLIENT_ID,
+      iosClientId: "19978958503-8i0hoibbfta64msltteflpdseev3ruv9.apps.googleusercontent.com",
+      webClientId: "19978958503-8i0hoibbfta64msltteflpdseev3ruv9.apps.googleusercontent.com",
     });
 
     await GoogleSignin.signIn();

@@ -363,8 +363,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     try {
       if (__DEV__) {
         const link = await dynamicLinks().buildShortLink({
-          link: `https://dev.knewnew.co.kr/link?id=${reviewId}`,
-          domainUriPrefix: 'https://dev.knewnew.co.kr',
+          link: `https://dlink.knewnew.co.kr/link?id=${reviewId}`,
+          domainUriPrefix: 'https://dlink.knewnew.co.kr',
           android: {
             packageName: "com.mealing.knewnnew"
           },
@@ -378,8 +378,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
       }
       else {
         const link = await dynamicLinks().buildShortLink({
-          link: `https://knewnew.co.kr/link?id=${reviewId}`,
-          domainUriPrefix: 'https://knewnew.co.kr',
+          link: `https://link.knewnew.co.kr/link?id=${reviewId}`,
+          domainUriPrefix: 'https://link.knewnew.co.kr',
           android: {
             packageName: "com.mealing.knewnnew"
           },
