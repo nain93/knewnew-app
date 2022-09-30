@@ -1,6 +1,17 @@
 import { AuthorType } from "~/types";
 import { FoodLogType } from "~/types/review";
 
+export interface ProfileEditType {
+  nickname: string,
+  headline: string,
+  profileImage: {
+    fields: {
+      key: string
+    }
+  } | null,
+  remainingPeriod?: number
+}
+
 export interface UserInfoTagType {
   foodStyle: Array<string>,
   household: Array<string>,
@@ -65,7 +76,11 @@ export interface UserInfoType {
   nickname: string,
   age?: number,
   headline?: string,
-  profileImage?: string,
+  profileImage: {
+    fields: {
+      key: string
+    }
+  } | null,
   occupation?: string,
   representBadge: string,
   tags: UserInfoTagType

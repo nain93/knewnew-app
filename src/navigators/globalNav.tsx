@@ -78,10 +78,7 @@ const GlobalNav = ({ token }: { token: string }) => {
             <Stack.Screen
               name="TagSelect"
               options={{
-                title: "",
-                headerLeft: () => <LeftArrowIcon />,
-                headerLeftContainerStyle: { paddingLeft: d2p(20) },
-                headerShadowVisible: false,
+                headerShown: false
               }}
               component={TagSelect} />
           </>

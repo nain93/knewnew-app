@@ -7,6 +7,7 @@ import { checkIcon } from '~/assets/icons';
 import SelectTag from '~/components/selectTag';
 import { BadgeType } from '~/types';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { noProfile } from '~/assets/images';
 
 interface UserTagLayoutProp {
   userBadge: BadgeType,
@@ -20,14 +21,16 @@ const UserTagLayout = ({ viewStyle, scrollRef, userBadge, setUserBadge }: UserTa
   const inputRef = useRef<TextInput>(null);
 
   return (
-    <View style={{ paddingTop: h2p(40), ...viewStyle }}>
-      <Text style={FONT.Bold}>
-        슬기로운 뉴뉴생활을 위해 나를 소개해주세요.
+    <View style={{ paddingTop: h2p(10), ...viewStyle }}>
+      <Text style={[FONT.Regular, {
+        textAlign: "center",
+        color: theme.color.grayscale.C_78737D
+      }]}>
+        맛있는 발견을 시작하기 전, 몇가지만 확인해주세요.
       </Text>
-      <Text style={[FONT.Regular, { marginTop: h2p(20) }]}>
-        {`작성하신 정보는 다른 유저들에게 보여지며,
-7일에 한 번 마이페이지에서 수정할 수 있습니다.`}
-      </Text>
+      <View style={{ marginTop: h2p(35) }}>
+        <Image source={noProfile} style={{ width: d2p(60), height: d2p(60) }} />
+      </View>
       <View
         onLayout={(event) => {
           const layout = event.nativeEvent.layout;

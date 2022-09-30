@@ -89,7 +89,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
-	<dict>
+  <dict>
+  <key>NSAllowsArbitraryLoads</key>
+  <true/>
+  </dict>
+	<!-- <dict>
 		<key>NSExceptionDomains</key>
 		<dict>
 			<key>localhost</key>
@@ -98,7 +102,7 @@
 				<true/>
 			</dict>
 		</dict>
-	</dict>
+	</dict> -->
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
