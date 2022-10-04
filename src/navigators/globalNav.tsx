@@ -10,7 +10,6 @@ import EditProfile from '~/screens/mypage/editProfile';
 import theme from '~/styles/theme';
 import FeedDetail from '~/screens/feed/detail';
 import Report from '~/screens/report';
-import EmailCheck from '~/screens/onboarding/email/emailCheck';
 import EmailLogin from '~/screens/onboarding/email/emailLogin';
 import EmailSignup from '~/screens/onboarding/email/emailSignup';
 import Setting from '~/screens/setting';
@@ -25,7 +24,6 @@ import ProductList from '~/screens/feed/productList';
 import BlockList from '~/screens/setting/blockList';
 import ProductDetailReady from '~/screens/feed/productDetailReady';
 import Search from '~/screens/search';
-import Welcome3 from '~/screens/onboarding/welcome3';
 import Welcome from '~/screens/onboarding/welcome';
 import UserPage from '~/screens/userPage';
 import Header from '~/components/header';
@@ -185,12 +183,6 @@ const GlobalNav = ({ token }: { token: string }) => {
           }}
           component={Welcome} />
         <Stack.Screen
-          name="Welcome3"
-          options={{
-            headerShown: false
-          }}
-          component={Welcome3} />
-        <Stack.Screen
           name="report"
           component={Report}
           options={{
@@ -235,13 +227,6 @@ const GlobalNav = ({ token }: { token: string }) => {
         <Stack.Screen
           name="privacy"
           component={Privacy}
-          options={{
-            headerShown: false
-          }}
-        />
-        <Stack.Screen
-          name="emailCheck"
-          component={EmailCheck}
           options={{
             headerShown: false
           }}

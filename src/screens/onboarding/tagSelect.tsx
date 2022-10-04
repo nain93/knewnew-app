@@ -82,19 +82,7 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
   });
 
   const handleNext = async () => {
-    // * 유효성 체크
-    if (userBadge.foodStyle.every(v => !v.isClick)) {
-      setIspopupOpen({ isOpen: true, content: "step1을 선택해주세요" });
-      return;
-    }
-    if (userBadge.household.every(v => !v.isClick)) {
-      setIspopupOpen({ isOpen: true, content: "step2을 선택해주세요" });
-      return;
-    }
-    if (userBadge.occupation.every(v => !v.isClick) && userBadge.occupation.every(v => !v.content)) {
-      setIspopupOpen({ isOpen: true, content: "step3을 선택해주세요" });
-      return;
-    }
+    // todo 유효성 체크
     if (route.params) {
       signupMutation.mutate({
         ...route.params,
@@ -106,9 +94,6 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
         }
       });
     }
-
-    // todo 유효성 체크, 회원가입, 토큰 설정 
-
   };
 
   const pickImage = () => {
@@ -156,6 +141,7 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
 
   return (
     <KeyboardAwareScrollView
+      bounces={false}
       ref={scrollRef}
       style={styles.container}
       showsVerticalScrollIndicator={false} >
@@ -308,8 +294,17 @@ const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
         />
       </View>
       <BasicButton
-        disabled={!buttonEnabled}
-        onPress={handleNext} text="다음으로" bgColor={buttonEnabled ? theme.color.white : theme.color.grayscale.f7f7fc}
+        // disabled={!buttonEnabled}
+        onPress={() => {
+          navigation.navigate("Welcome");
+          // navigation.navigate("Welcome", {
+          //   userBadge: {
+          //     foodLife: userBadge.foodStyle.filter(v => v.isClick)[0].title,
+          //     lifeStyle: userBadge.occupation.filter(v => v.isClick)[0].title,
+          //     household: userBadge.household.filter(v => v.isClick)[0].title
+          //   }, userInfo
+          // });
+        }} text="다음으로" bgColor={buttonEnabled ? theme.color.white : theme.color.grayscale.f7f7fc}
         textColor={buttonEnabled ? theme.color.main : theme.color.grayscale.d3d0d5}
         borderColor={buttonEnabled ? theme.color.main : theme.color.grayscale.e9e7ec}
         viewStyle={{ marginBottom: h2p(40), marginHorizontal: d2p(20) }} />

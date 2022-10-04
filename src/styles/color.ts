@@ -1,4 +1,5 @@
 const main = "#FF4B84";
+const mainRed = "#FF3E48";
 const white = "#ffffff";
 const black = "#000000";
 const yellow = "#ffc646";
@@ -21,6 +22,7 @@ const grayscale = {
 
 const color = {
   main,
+  mainRed,
   grayscale,
   white,
   black,
