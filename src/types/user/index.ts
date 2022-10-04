@@ -74,16 +74,15 @@ export interface UserInfoType {
   providerKey: number,
   email: string,
   nickname: string,
-  age?: number,
   headline?: string,
-  profileImage: {
-    fields: {
-      key: string
-    }
-  } | null,
+  profileImage?: string,
   occupation?: string,
   representBadge: string,
-  tags: UserInfoTagType
+  tags: UserInfoTagType,
+  password?: string,
+  birth: string,
+  gender: "male" | "female" | "",
+  markets: string[]
 }
 
 export interface postProfileType {

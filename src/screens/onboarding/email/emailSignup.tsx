@@ -218,7 +218,7 @@ const EmailSignup = ({ navigation, route }: EmailSignupType) => {
 
         <BasicButton
           disabled={Boolean(error) || Boolean(verify) || !userInput.password || !userInput.confirmPassword}
-          onPress={() => navigation.navigate("TagSelect")}
+          onPress={() => navigation.navigate("WriteProfile")}
           text="다음으로"
           bgColor={theme.color.white}
           textColor={theme.color.main}

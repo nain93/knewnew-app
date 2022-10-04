@@ -8,11 +8,12 @@ import { d2p, h2p } from "~/utils";
 interface SelectMarketButtonPropType {
   market: "마켓컬리" | "쿠팡" | "B마트" | "SSG" | "네이버쇼핑" | "기타",
   isClick: boolean,
-  viewStyle?: ViewStyle
+  viewStyle?: ViewStyle,
+  onPress: () => void
 }
 
 
-const SelectMarketButton = ({ market, isClick, viewStyle }: SelectMarketButtonPropType) => {
+const SelectMarketButton = ({ market, isClick, viewStyle, onPress }: SelectMarketButtonPropType) => {
   const [marketImg, setMarketImg] = useState<ImageSourcePropType>();
 
   useEffect(() => {
@@ -46,6 +47,7 @@ const SelectMarketButton = ({ market, isClick, viewStyle }: SelectMarketButtonPr
 
   return (
     <TouchableOpacity
+      onPress={onPress}
       style={[styles.container, viewStyle]}>
       <Text style={[FONT.SemiBold, {
         position: "absolute",

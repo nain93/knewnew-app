@@ -89,11 +89,13 @@ export const userLogin = async ({ token, providerType, userInput }: UserLoginTyp
 export const userSignup = async ({
   providerType,
   providerKey,
-  email,
   nickname,
-  age,
-  headline,
+  email,
+  password,
+  birth,
+  gender,
   profileImage,
+  headline,
   occupation,
   representBadge,
   tags

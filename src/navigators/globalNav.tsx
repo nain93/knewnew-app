@@ -2,7 +2,7 @@ import { Image, Platform, Pressable, Text, View } from 'react-native';
 import React from 'react';
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import Onboarding from '~/screens/onboarding';
-import TagSelect from '~/screens/onboarding/tagSelect';
+import WriteProfile from '~/screens/onboarding/writeProfile';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import TabNavigator from '~/navigators/tabNav';
 import { d2p } from '~/utils';
@@ -33,6 +33,7 @@ import { myIdState } from '~/recoil/atoms';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { hitslop } from '~/utils/constant';
 import CommentAll from '~/screens/feed/comment/commentAll';
+import TagSelect from '~/screens/onboarding/tagSelect';
 
 const Stack = createStackNavigator();
 
@@ -81,6 +82,12 @@ const GlobalNav = ({ token }: { token: string }) => {
               component={TagSelect} />
           </>
         }
+        <Stack.Screen
+          name="WriteProfile"
+          options={{
+            headerShown: false
+          }}
+          component={WriteProfile} />
         <Stack.Screen
           name="TabNav"
           component={TabNavigator}

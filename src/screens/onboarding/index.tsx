@@ -50,7 +50,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
     providerKey: number,
     providerType: "kakao" | "naver" | "google" | "apple"
   }) => {
-    navigation.navigate("TagSelect", userData);
+    navigation.navigate("WriteProfile", userData);
   };
 
   // * 버튼 연속클릭 방지

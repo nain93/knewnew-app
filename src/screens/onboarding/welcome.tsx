@@ -7,13 +7,17 @@ import { whiteCheckIcon } from '~/assets/icons/notificationIcon';
 import { hitslop } from '~/utils/constant';
 import BasicButton from '~/components/button/basicButton';
 import { NavigationStackProp } from 'react-navigation-stack';
+import { NavigationRoute } from 'react-navigation';
 
 export interface NavigationType {
   navigation: NavigationStackProp;
+  route: NavigationRoute<{
+    nickname: string
+  }>;
 }
 
 
-const Welcome = ({ navigation }: NavigationType) => {
+const Welcome = ({ navigation, route }: NavigationType) => {
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
 
   return (
@@ -71,10 +75,7 @@ const Welcome = ({ navigation }: NavigationType) => {
       </View>
       <BasicButton
         disabled={toggleCheckBox}
-        onPress={() => {
-          //@ts-ignore
-          navigation.reset({ routes: [{ name: "TabNav" }] });
-        }}
+        onPress={() => navigation.navigate("TagSelect", { nickname: route.params?.nickname })}
         text="후다닥 입장하기"
         textColor={theme.color.white}
         bgColor={theme.color.main}
