@@ -12,12 +12,7 @@ export interface ProfileEditType {
   remainingPeriod?: number
 }
 
-export interface UserInfoTagType {
-  foodStyle: Array<string>,
-  household: Array<string>,
-  occupation: Array<string>,
-  taste?: Array<string>
-}
+export type UserInfoTagType = Array<string>
 export interface BookmarkType {
   id: number,
   author: AuthorType,
@@ -86,10 +81,10 @@ export interface UserInfoType {
 }
 
 export interface postProfileType {
-  nickname: string,
-  headline: string,
-  profileImage: string | null,
+  nickname?: string,
+  headline?: string,
+  profileImage?: string | null,
   isNotifiable?: boolean,
   isMarketing?: boolean,
-  tags: UserInfoTagType
+  tags?: UserInfoTagType
 }

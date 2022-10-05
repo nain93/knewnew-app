@@ -30,14 +30,10 @@ interface EditPrfoileType {
   isNotifiable?: boolean,
   isMarketing?: boolean,
   profile: {
-    nickname: string,
-    profileImage: string | null,
-    headline: string,
-    tags: {
-      foodStyle: Array<string>,
-      household: Array<string>,
-      occupation: Array<string>
-    }
+    nickname?: string,
+    profileImage?: string | null,
+    headline?: string,
+    tags?: Array<string>
   }
 }
 

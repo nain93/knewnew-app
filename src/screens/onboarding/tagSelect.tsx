@@ -1,4 +1,4 @@
-import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useState } from 'react';
 import { dishImage } from '~/assets/images';
 import { d2p, h2p } from '~/utils';
@@ -31,9 +31,9 @@ const TagSelect = ({ navigation, route }: TagSelectPropType) => {
   const [taste, setTaste] = useState<InterestTagType[]>(interestTagData);
 
   const editProfileMutation = useMutation(["editprofile", token],
-    (profileprop: postProfileType) => editUserProfile({ token, id: myId, profile: profileprop }), {
-    onSuccess: async () => {
-      navigation.goBack();
+    (profileProp: postProfileType) => editUserProfile({ token, id: myId, profile: profileProp }), {
+    onSuccess: () => {
+      navigation.navigate("TagResult", { nickname: route.params?.nickname, tags: taste });
     }
   });
 
@@ -83,13 +83,28 @@ const TagSelect = ({ navigation, route }: TagSelectPropType) => {
       </View>
       <View style={{ marginTop: "auto" }}>
         <BasicButton
-          onPress={() => console.log("ss")}
+          loading={editProfileMutation.isLoading}
+          disabled={taste.every(v => !v.isClick)}
+          onPress={() => {
+            navigation.navigate("TagResult", {
+              nickname: route.params?.nickname, tags: taste.filter(v => v.isClick)
+            });
+            // editProfileMutation.mutate({
+            //   tags: taste && taste.filter(v => v.isClick).map(v => v.title)
+            // })
+          }
+          }
           text="선택 완료"
           bgColor={theme.color.white}
           textColor={theme.color.main}
         />
       </View>
-      <View style={{ flexDirection: "row", alignItems: "center", marginTop: h2p(20) }}>
+      <Pressable
+        onPress={() => {
+          //@ts-ignore
+          navigation.reset({ index: 0, routes: [{ name: "TabNav" }] });
+        }}
+        style={{ flexDirection: "row", alignItems: "center", marginTop: h2p(20) }}>
         <Text style={[FONT.ExtraBold, {
           marginRight: d2p(5),
           fontSize: 12, color: theme.color.grayscale.d2d0d5
@@ -97,7 +112,7 @@ const TagSelect = ({ navigation, route }: TagSelectPropType) => {
           나중에 할래요.
         </Text>
         <Image source={close} style={{ width: d2p(10), height: d2p(10) }} />
-      </View>
+      </Pressable>
     </View>
   );
 };

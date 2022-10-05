@@ -1,4 +1,4 @@
-import { Image, Platform, Pressable, Text, View } from 'react-native';
+import { Image, Platform, Pressable, View } from 'react-native';
 import React from 'react';
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import Onboarding from '~/screens/onboarding';
@@ -34,6 +34,7 @@ import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { hitslop } from '~/utils/constant';
 import CommentAll from '~/screens/feed/comment/commentAll';
 import TagSelect from '~/screens/onboarding/tagSelect';
+import TagResult from '~/screens/onboarding/tagResult';
 
 const Stack = createStackNavigator();
 
@@ -75,19 +76,45 @@ const GlobalNav = ({ token }: { token: string }) => {
               component={Onboarding}
             />
             <Stack.Screen
-              name="TagSelect"
+              name="emailLogin"
+              component={EmailLogin}
               options={{
                 headerShown: false
               }}
-              component={TagSelect} />
+            />
+            <Stack.Screen
+              name="emailSignup"
+              component={EmailSignup}
+              options={{
+                headerShown: false
+              }}
+            />
+            <Stack.Screen
+              name="WriteProfile"
+              options={{
+                headerShown: false
+              }}
+              component={WriteProfile} />
+            <Stack.Screen
+              name="TagResult"
+              options={{
+                headerShown: false
+              }}
+              component={TagResult} />
           </>
         }
         <Stack.Screen
-          name="WriteProfile"
+          name="Welcome"
           options={{
             headerShown: false
           }}
-          component={WriteProfile} />
+          component={Welcome} />
+        <Stack.Screen
+          name="TagSelect"
+          options={{
+            headerShown: false
+          }}
+          component={TagSelect} />
         <Stack.Screen
           name="TabNav"
           component={TabNavigator}
@@ -184,12 +211,6 @@ const GlobalNav = ({ token }: { token: string }) => {
           }}
         />
         <Stack.Screen
-          name="Welcome"
-          options={{
-            headerShown: false
-          }}
-          component={Welcome} />
-        <Stack.Screen
           name="report"
           component={Report}
           options={{
@@ -234,20 +255,6 @@ const GlobalNav = ({ token }: { token: string }) => {
         <Stack.Screen
           name="privacy"
           component={Privacy}
-          options={{
-            headerShown: false
-          }}
-        />
-        <Stack.Screen
-          name="emailLogin"
-          component={EmailLogin}
-          options={{
-            headerShown: false
-          }}
-        />
-        <Stack.Screen
-          name="emailSignup"
-          component={EmailSignup}
           options={{
             headerShown: false
           }}
