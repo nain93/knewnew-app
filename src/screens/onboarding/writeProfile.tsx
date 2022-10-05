@@ -90,19 +90,21 @@ const WriteProfile = ({ route, navigation }: BadgeSelectProps) => {
 
 
 
-  //  //@ts-ignore
-  //  navigation.reset({ index: 0, routes: [{ name: "Welcome", params: { nickname: userInfo.nickname } }] });
-
-  const handleNext = async () => {
-    if (userInfo.profileImage) {
-      // todo 사진있을경우 프리사인
-    }
-    else {
-      if (route.params) {
-        signupMutation.mutate({ ...route.params });
-      }
-    }
+  const handleNext = () => {
+    //@ts-ignore
+    navigation.reset({ index: 0, routes: [{ name: "Welcome", params: { nickname: userInfo.nickname } }] });
   };
+
+  // const handleNext =  () => {
+  //   if (userInfo.profileImage) {
+  //     // todo 사진있을경우 프리사인
+  //   }
+  //   else {
+  //     if (route.params) {
+  //       signupMutation.mutate({ ...route.params });
+  //     }
+  //   }
+  // };
 
   const pickImage = () => {
     ImageCropPicker.openPicker({
@@ -333,7 +335,7 @@ const WriteProfile = ({ route, navigation }: BadgeSelectProps) => {
       <View style={{ marginBottom: h2p(40) }}>
         <BasicButton
           loading={signupMutation.isLoading}
-          disabled={!userInfo.nickname || !userInfo.birth || !userInfo.gender}
+          // disabled={!userInfo.nickname || !userInfo.birth || !userInfo.gender}
           onPress={handleNext} text="다음으로" bgColor={theme.color.white}
           textColor={theme.color.main}
           viewStyle={{ marginHorizontal: d2p(20) }} />

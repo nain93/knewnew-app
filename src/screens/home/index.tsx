@@ -160,7 +160,7 @@ const Home = ({ navigation, route }: HomeProps) => {
           </Text>
 
           <View style={styles.foodlogWrap}>
-            {React.Children.toArray([{ title: "모두보기", isClick: false }, ...interestTagData.interest].map((v) => {
+            {React.Children.toArray([{ title: "모두보기", isClick: false }].concat(interestTagData).map((v) => {
               if (!v.title.includes("기타")) {
                 return (
                   <TouchableOpacity

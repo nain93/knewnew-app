@@ -60,7 +60,7 @@ const Write = ({ navigation, route }: WriteProp) => {
     }
   });
 
-  const [interestTag, setInterestTag] = useState<InterestTagType>(interestTagData);
+  const [interestTag, setInterestTag] = useState<InterestTagType[]>(interestTagData);
   const inputRef = useRef<TextInput>(null);
   const queryClient = useQueryClient();
   const token = useRecoilValue(tokenState);
@@ -185,14 +185,14 @@ const Write = ({ navigation, route }: WriteProp) => {
       setImageList(route.params.review.images?.map(v => v.image));
 
       if (Object.keys(route.params?.review?.tags).length !== 0) {
-        setInterestTag({
-          interest: interestTag.interest.map(v => {
+        setInterestTag(
+          interestTag.map(v => {
             if (route.params?.review?.tags.interest.includes(v.title)) {
               return { isClick: true, title: v.title };
             }
             return { isClick: false, title: v.title };
           })
-        });
+        );
       }
       setWriteData({
         ...writeData,

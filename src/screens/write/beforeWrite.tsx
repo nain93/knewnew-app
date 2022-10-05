@@ -46,7 +46,7 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
       interest: []
     }
   });
-  const [interestTag, setInterestTag] = useState<InterestTagType>(interestTagData);
+  const [interestTag, setInterestTag] = useState<InterestTagType[]>(interestTagData);
   const [etcInputOpen, setEtcInputOpen] = useState(false);
   const [etcMarket, setEtcMarket] = useState("");
   const etcInputRef = useRef<TextInput>(null);
@@ -68,7 +68,7 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
   }, [route.params]);
 
   useEffect(() => {
-    if (!interestTag.interest[interestTag.interest.length - 1].isClick) {
+    if (!interestTag[interestTag.length - 1].isClick) {
       setFoodTag("");
     }
   }, [interestTag]);
@@ -112,9 +112,9 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
           <Text style={[FONT.Bold, { fontSize: 20, marginBottom: h2p(10) }]}>추천 대상은,
             <Text style={[FONT.Regular, { color: theme.color.main, fontSize: 12 }]}> (필수)</Text>
           </Text>
-          <SelectLayout type="write" focusRef={foodTagRef} interestTag={interestTag} setInterestTag={setInterestTag} />
+          <SelectLayout type="write" focusRef={foodTagRef} interestTag={interestTag} setInterestTag={(tag: InterestTagType[]) => setInterestTag(tag)} />
         </View>
-        {interestTag.interest[interestTag.interest.length - 1].isClick &&
+        {interestTag[interestTag.length - 1].isClick &&
           <View style={{ marginTop: h2p(20), justifyContent: "center" }}>
             <TextInput
               ref={foodTagRef}
@@ -173,8 +173,8 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
         </TouchableOpacity>
         <BasicButton
           viewStyle={{ marginHorizontal: d2p(20), marginBottom: h2p(40) }}
-          disabled={interestTag.interest.every(v => !v.isClick) || clickedReact.every(v => !v.isClick)
-            || (interestTag.interest[interestTag.interest.length - 1].isClick && foodTag === "")
+          disabled={interestTag.every(v => !v.isClick) || clickedReact.every(v => !v.isClick)
+            || (interestTag[interestTag.length - 1].isClick && foodTag === "")
           }
           text="다음으로" bgColor={theme.color.white} textColor={theme.color.main}
           onPress={() => navigation.navigate("Write", {
@@ -182,14 +182,14 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
               ...writeData,
               satisfaction: clickedReact.filter(v => v.isClick).map(v => v.title)[0],
               tags: {
-                interest: foodTag ? interestTag.interest.filter(v => {
+                interest: foodTag ? interestTag.filter(v => {
                   if (v.title.includes("기타")) {
                     return false;
                   }
                   return v.isClick;
                 }).map(v => v.title).concat(foodTag)
                   :
-                  interestTag.interest.filter(v => {
+                  interestTag.filter(v => {
                     if (v.title.includes("기타")) {
                       return false;
                     }
