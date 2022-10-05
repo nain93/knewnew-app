@@ -52,8 +52,10 @@ const SelectMarketButton = ({ market, isClick, viewStyle, onPress }: SelectMarke
       <Text style={[FONT.SemiBold, {
         position: "absolute",
         color: isClick ? theme.color.white : theme.color.black,
-        zIndex: 1
-      }]}>{market}
+        zIndex: 1,
+        textAlign: "center"
+      }]}>
+        {market === "네이버쇼핑" ? `네이버\n쇼핑` : market}
       </Text>
       {(isClick && marketImg) ?
         <Image source={marketImg} style={styles.marketImg} />

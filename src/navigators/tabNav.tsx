@@ -4,7 +4,7 @@ import React from 'react';
 import Mypage from '~/screens/mypage';
 import theme from '~/styles/theme';
 import { d2p, h2p } from '~/utils';
-import { graylogo, graymypage, graywrite, mainmypage, mainlogoIcon, settingIcon, mainNotiIcon, notiIcon } from '~/assets/icons';
+import { settingIcon } from '~/assets/icons';
 import { useRecoilValue } from 'recoil';
 import { isNotiReadState, myIdState } from '~/recoil/atoms';
 import Header from '~/components/header';

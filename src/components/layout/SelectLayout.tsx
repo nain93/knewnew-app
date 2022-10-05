@@ -1,4 +1,4 @@
-import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import React, { RefObject } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';

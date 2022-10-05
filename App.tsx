@@ -96,6 +96,7 @@ const App = () => {
     // *스플래시 로딩중
     versionCheck();
     getToken();
+    SplashScreen.hide();
     // * 코드푸시 업데이트 체크
     if (!__DEV__) {
       installUpdateIfAvailable();

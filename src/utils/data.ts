@@ -21,20 +21,9 @@ export const interestTagData = [
   { title: `식재료\n수집가`, isClick: false, url: taste19 },
 ];
 
-export const initialBadgeData = {
-  foodStyle:
-    [{ title: "간단함파", isClick: false }, { title: "직접요리파", isClick: false }, { title: "건강추구파", isClick: false },
-    { title: "가성비좋아", isClick: false }, { title: "비싸도FLEX", isClick: false }, { title: "이색파", isClick: false }],
-  household:
-    [{ title: "1인가구", isClick: false }, { title: "2인가구", isClick: false }, { title: "3인이상가구", isClick: false }],
-  occupation:
-    [{ title: "학생", isClick: false }, { title: "직장인", isClick: false }, { title: "주부", isClick: false },
-    { title: "기타", isClick: false, content: "" }],
-  taste: [
-    { title: "느끼만렙", isClick: false },
-    { title: "맵찔이", isClick: false },
-    { title: "맵고수", isClick: false },
-    { title: "달달함파", isClick: false },
-    { title: "짭조름파", isClick: false }
-  ]
-};
+export const categoryData = [
+  { title: "전체", isClick: false }, { title: "국/반찬", isClick: false },
+  { title: "밥/면류", isClick: false }, { title: "밀키트", isClick: false },
+  { title: "식재료", isClick: false }, { title: "음료/주류", isClick: false },
+  { title: "빵/떡/과자", isClick: false }
+];

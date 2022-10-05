@@ -24,6 +24,7 @@ import ImageCropPicker from 'react-native-image-crop-picker';
 import SelectMarketButton from '~/components/badge';
 import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { preSiginedImages, uploadImage } from '~/api';
+import MarketLayout from '~/components/layout/MarketLayout';
 
 interface BadgeSelectProps {
   navigation: NavigationStackProp
@@ -42,12 +43,7 @@ const WriteProfile = ({ route, navigation }: BadgeSelectProps) => {
     profileImage: "",
     occupation: "",
     representBadge: "",
-    tags: {
-      foodStyle: [],
-      household: [],
-      occupation: [],
-      taste: []
-    },
+    tags: [],
     markets: []
   });
   const scrollRef = useRef<KeyboardAwareScrollView>(null);
@@ -296,21 +292,10 @@ const WriteProfile = ({ route, navigation }: BadgeSelectProps) => {
         flexDirection: "row", marginTop: h2p(20), marginBottom: h2p(48),
         flexWrap: "wrap"
       }}>
-        <SelectMarketButton
-          onPress={() => handleMarketClick("마켓컬리")}
-          market="마켓컬리" isClick={userInfo.markets?.includes("마켓컬리")} viewStyle={{ marginRight: d2p(5), marginLeft: d2p(20) }} />
-        <SelectMarketButton
-          onPress={() => handleMarketClick("쿠팡")}
-          market="쿠팡" isClick={userInfo.markets?.includes("쿠팡")} viewStyle={{ marginRight: d2p(5) }} />
-        <SelectMarketButton
-          onPress={() => handleMarketClick("B마트")}
-          market="B마트" isClick={userInfo.markets?.includes("B마트")} viewStyle={{ marginRight: d2p(5) }} />
-        <SelectMarketButton
-          onPress={() => handleMarketClick("SSG")}
-          market="SSG" isClick={userInfo.markets?.includes("SSG")} viewStyle={{ marginRight: d2p(5) }} />
-        <SelectMarketButton
-          onPress={() => handleMarketClick("네이버쇼핑")}
-          market="네이버쇼핑" isClick={userInfo.markets?.includes("네이버쇼핑")} />
+        <MarketLayout
+          viewStyle={{ paddingHorizontal: d2p(20) }}
+          markets={userInfo.markets}
+          setMarkets={(markets: string[]) => setUserInfo({ ...userInfo, markets })} />
         <SelectMarketButton
           onPress={() => setEtcMarketClick(!etcMarketClick)}
           market="기타" isClick={etcMarketClick} viewStyle={{ marginTop: h2p(10), marginLeft: d2p(20) }} />

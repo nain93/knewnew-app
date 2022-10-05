@@ -95,14 +95,14 @@ const GlobalNav = ({ token }: { token: string }) => {
                 headerShown: false
               }}
               component={WriteProfile} />
-            <Stack.Screen
-              name="TagResult"
-              options={{
-                headerShown: false
-              }}
-              component={TagResult} />
           </>
         }
+        <Stack.Screen
+          name="TagResult"
+          options={{
+            headerShown: false
+          }}
+          component={TagResult} />
         <Stack.Screen
           name="Welcome"
           options={{
