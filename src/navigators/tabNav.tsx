@@ -13,6 +13,7 @@ import BeforeWrite from '~/screens/write/beforeWrite';
 import HomeStackNav from '~/navigators/homeStackNav';
 import Notification from '~/screens/feed/notification';
 import { getFocusedRouteNameFromRoute, useRoute } from '@react-navigation/native';
+import { home, mainHome, mainMy, mainNotification, my, notification, write } from '~/assets/icons/tabBar';
 
 const Tabs = createBottomTabNavigator();
 
@@ -45,7 +46,7 @@ const TabNavigator = () => {
           backgroundColor: "transparent"
         },
         tabBarActiveTintColor: theme.color.main,
-        tabBarInactiveTintColor: theme.color.grayscale.a09ca4,
+        tabBarInactiveTintColor: "#343434",
         // tabBarHideOnKeyboard: true,
         tabBarStyle: {
           position: "absolute",
@@ -81,8 +82,8 @@ const TabNavigator = () => {
           headerShown: false,
           tabBarIcon: ({ focused }) => (
             <Image
-              style={{ width: d2p(25), height: d2p(16) }}
-              source={focused ? mainlogoIcon : graylogo}
+              style={{ width: d2p(16.67), height: d2p(16.67) }}
+              source={focused ? mainHome : home}
             />
           )
         }}
@@ -97,13 +98,13 @@ const TabNavigator = () => {
           },
         })}
         options={{
-          tabBarLabel: "글쓰기",
+          tabBarLabel: "작성",
           headerShown: false,
           tabBarStyle: { display: "none" },
           tabBarIcon: () => (
             <Image
-              style={{ width: d2p(20), height: d2p(20) }}
-              source={graywrite}
+              style={{ width: d2p(19), height: d2p(19) }}
+              source={write}
             />
           )
         }}
@@ -117,8 +118,8 @@ const TabNavigator = () => {
           tabBarIcon: ({ focused }) => (
             <View>
               <Image
-                style={{ width: d2p(20), height: d2p(20) }}
-                source={focused ? mainNotiIcon : notiIcon}
+                style={{ width: d2p(14), height: d2p(18) }}
+                source={focused ? mainNotification : notification}
               />
               {!isNotiRead &&
                 <View style={{
@@ -144,12 +145,12 @@ const TabNavigator = () => {
           },
         })}
         options={{
-          tabBarLabel: "마이뉴뉴",
+          tabBarLabel: "마이",
           header: ({ navigation }) => (
             <>
               <StatusBarPlaceHolder />
               <Header
-                title={"마이뉴뉴"}
+                title={"마이"}
                 bgColor={theme.color.white}
                 headerRight={<Image source={settingIcon} style={{ width: d2p(16), height: d2p(16) }} />}
                 headerRightPress={() => navigation.navigate("setting")}
@@ -158,8 +159,8 @@ const TabNavigator = () => {
           ),
           tabBarIcon: ({ focused }) => (
             <Image
-              style={{ width: d2p(20), height: d2p(20) }}
-              source={focused ? mainmypage : graymypage}
+              style={{ width: d2p(16), height: d2p(18) }}
+              source={focused ? mainMy : my}
             />
           )
         }}

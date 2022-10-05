@@ -15,6 +15,7 @@ import { hitslop } from '~/utils/constant';
 import { useFocusEffect } from '@react-navigation/native';
 import { useMutation } from 'react-query';
 import { emailCheck } from '~/api/auth';
+import axios from 'axios';
 
 interface EmailLoginProps {
   navigation: NavigationStackProp;
@@ -38,11 +39,15 @@ const EmailLogin = ({ navigation }: EmailLoginProps) => {
           email: userInput.email
         });
       }
-      else {
-        // * 이메일 존재하는 경우
-        setIsEmail(true);
-      }
     },
+    onError: (emailError) => {
+      if (axios.isAxiosError(emailError) && emailError.response) {
+        // * 이메일 존재하는 경우
+        if ((emailError.response.data === "Email already exists. Not available for signup")) {
+          setIsEmail(true);
+        }
+      }
+    }
   });
 
   const emailLogin = useMutation("emailLogin", () => userLogin({ token: "", providerType: "email", userInput }), {
