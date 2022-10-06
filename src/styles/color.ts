@@ -12,6 +12,7 @@ const grayscale = {
   C_79737e: '#79737e',
   C_443e49: '#443e49',
   C_78737D: "#78737d",
+  C_9F9CA3: "#9F9CA3",
   eae7ec: '#eae7ec',
   d2d0d5: '#d2d0d5',
   ff5d5d: "#ff5d5d",

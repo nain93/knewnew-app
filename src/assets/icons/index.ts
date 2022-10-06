@@ -71,6 +71,16 @@ import eyesIcon from "./eyesIcon.png";
 import mainPlusIcon from "./mainPlusIcon.png";
 import lightHomeIcon from "./lightHomeIcon.png";
 import userIcon from "./userIcon.png";
+import filterIcon from "./filterIcon.png";
+import blackRightArrow from "./blackRightArrow.png";
+import colorBookmark from "./colorBookmark.png";
+import whiteLeftArrow from "./whiteLeftArrow.png";
+import whiteMoreIcon from "./whiteMoreIcon.png";
+import mainBookmark from "./mainBookmark.png";
+import blackShare from "./blackShare.png";
+import blackComment from "./blackComment.png";
+import blackHeart from "./blackHeart.png";
+import linkIcon from "./linkIcon.png";
 
 export {
   close, leftArrow, more, heart, like, reKnew, comment, commentMore, circle, maincart, maintag,
@@ -80,6 +90,7 @@ export {
   handIcon, tagFood, tagHome, tagLife, emailicon, noticeIcon, alertIcon, eyeIcon, colorEyeIcon, checkIcon, tagIcon,
   selectTagIcon, knewnewIcon, settingIcon, rightArrow, settingKnewnew, grayCheckIcon, question, grayquestion, smallClose, whiteClose,
   grayEyeIcon, grayKnewnew, grayCart, circleQuestion, marketIcon, goldStarIcon, starIcon, bookmark, graybookmark,
-  shareIcon, mainNotiIcon, notiIcon, eyesIcon, mainPlusIcon, lightHomeIcon, userIcon
+  shareIcon, mainNotiIcon, notiIcon, eyesIcon, mainPlusIcon, lightHomeIcon, userIcon, filterIcon, blackRightArrow,
+  colorBookmark, whiteLeftArrow, whiteMoreIcon, mainBookmark, blackShare, blackComment, blackHeart, linkIcon
 };
 

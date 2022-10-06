@@ -3,6 +3,7 @@ import { NavigationRoute } from "react-navigation";
 import { UserInfoTagType } from "~/types/user";
 import { Source } from "react-native-fast-image";
 
+export type FilterType = "푸드로그" | "찾아보기"
 export interface NavigationType {
   navigation: NavigationStackProp;
   route?: NavigationRoute;
