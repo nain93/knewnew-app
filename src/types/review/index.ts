@@ -69,11 +69,7 @@ export interface ReviewListType {
     isVerified: boolean
   },
   satisfaction: SatisfactionType,
-  tags: {
-    interest: Array<string>,
-    household: Array<string>,
-    taste: Array<string>
-  },
+  tags: string[],
   isLike: boolean,
   isBookmark: boolean,
   isEdit: boolean,

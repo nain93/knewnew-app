@@ -1,4 +1,4 @@
-import { Platform, StyleSheet, View } from 'react-native';
+import { Dimensions, Platform, StyleSheet, View } from 'react-native';
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import React, { useState } from 'react';
 import theme from '~/styles/theme';
@@ -9,6 +9,7 @@ import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { h2p } from '~/utils';
 import FoodLog from '~/screens/feed/foodLog';
 import { FilterType } from '~/types';
+import Search from '~/screens/search';
 
 const Stack = createStackNavigator();
 
@@ -61,6 +62,13 @@ const HomeStackNav = () => {
           );
         }}
       </Stack.Screen>
+      <Stack.Screen
+        name="search"
+        component={Search}
+        options={{
+          headerShown: false
+        }}
+      />
     </Stack.Navigator>
   );
 };

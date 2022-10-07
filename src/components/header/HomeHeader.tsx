@@ -1,5 +1,5 @@
-import { Animated, Easing, Image, Pressable, StatusBar, StyleSheet, Text, View } from 'react-native';
-import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Easing, Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import { FONT } from '~/styles/fonts';
@@ -8,13 +8,10 @@ import { graysearch } from '~/assets/icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
-import { NavigationStackProp } from 'react-navigation-stack';
-import { NavigationRoute } from 'react-navigation';
 
 interface HomeHeaderPropType {
   filterScreen: "푸드로그" | "찾아보기",
   setFilterScreen: (screen: "푸드로그" | "찾아보기") => void
-
 }
 
 const HomeHeader = ({ filterScreen, setFilterScreen }: HomeHeaderPropType) => {
@@ -103,7 +100,7 @@ const HomeHeader = ({ filterScreen, setFilterScreen }: HomeHeaderPropType) => {
         </Pressable>
       </View>
       <Pressable
-        onPress={() => navigation.navigate("search")}
+        onPress={() => navigation.push("search")}
         style={{
           marginLeft: "auto",
           position: "absolute",

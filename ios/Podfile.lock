@@ -654,6 +654,8 @@ PODS:
     - Sentry (= 7.18.1)
   - RNShare (7.6.4):
     - React-Core
+  - RNSVG (13.3.0):
+    - React-Core
   - SDWebImage (5.11.1):
     - SDWebImage/Core (= 5.11.1)
   - SDWebImage/Core (5.11.1)
@@ -761,6 +763,7 @@ DEPENDENCIES:
   - RNScreens (from `../node_modules/react-native-screens`)
   - "RNSentry (from `../node_modules/@sentry/react-native`)"
   - RNShare (from `../node_modules/react-native-share`)
+  - RNSVG (from `../node_modules/react-native-svg`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -946,6 +949,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@sentry/react-native"
   RNShare:
     :path: "../node_modules/react-native-share"
+  RNSVG:
+    :path: "../node_modules/react-native-svg"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -1058,6 +1063,7 @@ SPEC CHECKSUMS:
   RNScreens: 4830eb40e0793b38849965cd27f4f3a7d7bc65c1
   RNSentry: d27112c8fcb77c52a42c3fffb796193c333ee562
   RNShare: 4406f61af043027b695c3a0b8f39e2c2bdacde12
+  RNSVG: 1869ad9534459f24caaa0416a4764548c2aeedad
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   Sentry: 2d70348d6247a29702a8317e710c5ba890672df5

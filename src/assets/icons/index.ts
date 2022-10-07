@@ -81,6 +81,9 @@ import blackShare from "./blackShare.png";
 import blackComment from "./blackComment.png";
 import blackHeart from "./blackHeart.png";
 import linkIcon from "./linkIcon.png";
+import blackLeftArrow from "./blackLeftArrow.png";
+import blackMoreIcon from "./blackMoreIcon.png";
+import blackRightSmallArrow from "./blackRightSmallArrow.png";
 
 export {
   close, leftArrow, more, heart, like, reKnew, comment, commentMore, circle, maincart, maintag,
@@ -91,6 +94,7 @@ export {
   selectTagIcon, knewnewIcon, settingIcon, rightArrow, settingKnewnew, grayCheckIcon, question, grayquestion, smallClose, whiteClose,
   grayEyeIcon, grayKnewnew, grayCart, circleQuestion, marketIcon, goldStarIcon, starIcon, bookmark, graybookmark,
   shareIcon, mainNotiIcon, notiIcon, eyesIcon, mainPlusIcon, lightHomeIcon, userIcon, filterIcon, blackRightArrow,
-  colorBookmark, whiteLeftArrow, whiteMoreIcon, mainBookmark, blackShare, blackComment, blackHeart, linkIcon
+  colorBookmark, whiteLeftArrow, whiteMoreIcon, mainBookmark, blackShare, blackComment, blackHeart, linkIcon,
+  blackLeftArrow, blackMoreIcon, blackRightSmallArrow
 };
 

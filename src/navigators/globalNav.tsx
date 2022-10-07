@@ -23,7 +23,6 @@ import ProductDetail from '~/screens/feed/productDetail';
 import ProductList from '~/screens/feed/productList';
 import BlockList from '~/screens/setting/blockList';
 import ProductDetailReady from '~/screens/feed/productDetailReady';
-import Search from '~/screens/search';
 import Welcome from '~/screens/onboarding/welcome';
 import UserPage from '~/screens/userPage';
 import Header from '~/components/header';
@@ -133,7 +132,7 @@ const GlobalNav = ({ token }: { token: string }) => {
           name="UserPage"
           options={{
             title: "",
-            header: ({ route, navigation }) => (
+            header: ({ navigation }) => (
               <>
                 <StatusBarPlaceHolder />
                 <Header
@@ -255,13 +254,6 @@ const GlobalNav = ({ token }: { token: string }) => {
         <Stack.Screen
           name="privacy"
           component={Privacy}
-          options={{
-            headerShown: false
-          }}
-        />
-        <Stack.Screen
-          name="search"
-          component={Search}
           options={{
             headerShown: false
           }}

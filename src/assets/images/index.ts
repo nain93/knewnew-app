@@ -8,9 +8,10 @@ import popupBackground3 from "./popupBackground3.png";
 import knewnewchar from "./knewnewchar.png";
 import fireImg from "./fireImg.png";
 import dishImage from "./dishImage.png";
+import topImage from "./topImage.png";
 
 
 export {
   photo, onboardingImg, photoClose, noProfile, popupBackground, knewnewchar,
-  popupBackground2, popupBackground3, fireImg, dishImage
+  popupBackground2, popupBackground3, fireImg, dishImage, topImage
 };

@@ -6,20 +6,13 @@ import theme from '~/styles/theme';
 import { ReviewListType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
 import LinearGradient from 'react-native-linear-gradient';
-import { whiteLeftArrow, whiteMoreIcon } from '~/assets/icons';
-import { hitslop } from '~/utils/constant';
-import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
-import { useNavigation } from '@react-navigation/native';
 
 interface ImageRenderItemProps {
   review: ReviewListType;
   onPress: (openIdx: number) => void;
-  morePress: () => void;
-  path: string
 }
 
-const ImageFlatlist = ({ review, onPress, morePress, path }: ImageRenderItemProps) => {
-  const navigation = useNavigation<StackNavigationProp>();
+const ImageFlatlist = ({ review, onPress }: ImageRenderItemProps) => {
   const [scrollIdx, setScrollIdx] = useState(0);
 
   return (
@@ -51,7 +44,7 @@ const ImageFlatlist = ({ review, onPress, morePress, path }: ImageRenderItemProp
                 aspectRatio: 2,
                 position: "absolute"
               }}
-              colors={['rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 0)']} />
+              colors={['rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0)']} />
             <FastImage
               style={{
                 aspectRatio: 1,
@@ -60,37 +53,6 @@ const ImageFlatlist = ({ review, onPress, morePress, path }: ImageRenderItemProp
           </Pressable>
         )}
       />
-
-      <View
-        style={{
-          position: "absolute",
-          alignItems: "center",
-          width: Dimensions.get("window").width,
-          paddingHorizontal: d2p(30),
-          marginTop: h2p(30),
-          flexDirection: "row", justifyContent: "space-between"
-        }}>
-        <Pressable
-          hitSlop={hitslop}
-          onPress={() => {
-            if (path) {
-              // * 공유하기로 들어와서 뒤로가기 눌렀을 경우 home으로 reset
-              //@ts-ignore
-              navigation.reset({ index: 0, routes: [{ name: "TabNav" }] });
-            }
-            else {
-              navigation.goBack();
-            }
-          }}>
-          <Image source={whiteLeftArrow} style={{ width: d2p(8), height: d2p(16) }} />
-        </Pressable>
-
-        <Pressable
-          hitSlop={hitslop}
-          onPress={morePress}>
-          <Image source={whiteMoreIcon} style={{ width: d2p(4), height: d2p(18) }} />
-        </Pressable>
-      </View>
 
       {(review.images.length || 0) > 1 &&
         <>
@@ -124,7 +86,7 @@ const ImageFlatlist = ({ review, onPress, morePress, path }: ImageRenderItemProp
                     width: d2p(6), height: d2p(6),
                     borderRadius: 6,
                     backgroundColor: theme.color.main,
-                    marginRight: d2p(10)
+                    marginRight: d2p(5)
                   }} />
                 );
               }
@@ -132,8 +94,8 @@ const ImageFlatlist = ({ review, onPress, morePress, path }: ImageRenderItemProp
                 <View style={{
                   width: d2p(6), height: d2p(6),
                   borderRadius: 6,
-                  backgroundColor: theme.color.grayscale.eae7ec,
-                  marginRight: d2p(10)
+                  backgroundColor: theme.color.white,
+                  marginRight: d2p(5)
                 }} />
               );
             }))}

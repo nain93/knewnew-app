@@ -16,6 +16,7 @@ import { loading } from '~/assets/gif';
 import { whiteClose } from '~/assets/icons';
 import { getRecommendFoodLog } from '~/api/home';
 import FastImage from 'react-native-fast-image';
+import TopScrollButton from '~/components/button/topScrollButton';
 
 interface FoodLogPropType {
   navigation: NavigationStackProp;
@@ -167,7 +168,11 @@ const FoodLog = ({ navigation, route }: FoodLogPropType) => {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: d2p(20) }}
+        contentContainerStyle={{
+          paddingHorizontal: d2p(20),
+          paddingTop: h2p(10),
+          paddingBottom: h2p(15)
+        }}
         style={styles.filterWrap}>
         {React.Children.toArray(category.map((v, i) => (
           <TouchableOpacity
@@ -184,7 +189,7 @@ const FoodLog = ({ navigation, route }: FoodLogPropType) => {
               backgroundColor: v.isClick ? theme.color.black : theme.color.white,
             }]}>
             <Text style={[FONT.Medium, {
-              color: v.isClick ? theme.color.white : theme.color.black
+              color: v.isClick ? theme.color.white : theme.color.black,
             }]}>{v.title}</Text>
           </TouchableOpacity>
         )))}
@@ -206,6 +211,7 @@ const FoodLog = ({ navigation, route }: FoodLogPropType) => {
         style={{ marginTop: 0, marginBottom: h2p(80) }}
         keyExtractor={reviewKey}
       />
+      <TopScrollButton scrollRef={flatListRef} />
     </>
   );
 };
@@ -224,10 +230,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderTopColor: theme.color.grayscale.e9e7ec,
     borderBottomColor: theme.color.grayscale.e9e7ec,
-    paddingTop: h2p(10),
-    paddingBottom: h2p(15),
     flexDirection: "row",
-    marginTop: h2p(15)
+    marginTop: h2p(15),
   },
   tagWrap: {
     borderWidth: 1,
@@ -235,6 +239,6 @@ const styles = StyleSheet.create({
     width: d2p(80),
     height: h2p(30),
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   }
 });
