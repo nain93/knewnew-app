@@ -365,12 +365,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   useEffect(() => {
     Keyboard.addListener("keyboardWillShow", (e) => {
       setKeyboardHeight(e.endCoordinates.height);
-      // if (Platform.OS === "android") {
-      //   setKeyboardHeight(e.endCoordinates.height);
-      // }
-      // else {
-      //   setKeyboardHeight(0);
-      // }
     });
     Keyboard.addListener("keyboardWillHide", (e) => {
       setKeyboardHeight(0);
@@ -795,7 +789,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           width: Dimensions.get("window").width,
           paddingHorizontal: d2p(30),
           top: 0,
-          paddingTop: getStatusBarHeight() + h2p(20),
+          paddingTop: getStatusBarHeight() + h2p(30),
           paddingBottom: h2p(15),
           flexDirection: "row", justifyContent: "space-between",
           backgroundColor: statusBarState() ? theme.color.white : "transparent",

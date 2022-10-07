@@ -10,7 +10,6 @@ import { popupState, tokenState } from '~/recoil/atoms';
 import { useSetRecoilState } from 'recoil';
 import { UserInfoType } from '~/types/user';
 import { FONT } from '~/styles/fonts';
-import { initialBadgeData } from '~/utils/data';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useMutation } from 'react-query';
 import { userSignup } from '~/api/user';
@@ -60,7 +59,7 @@ const WriteProfile = ({ route, navigation }: BadgeSelectProps) => {
   const setToken = useSetRecoilState(tokenState);
   const setIspopupOpen = useSetRecoilState(popupState);
 
-  const signupMutation = useMutation("signup", (signupData: UserInfoType) => userSignup(signupData), {
+  const signUpMutation = useMutation("signUp", (signupData: UserInfoType) => userSignup(signupData), {
     onSuccess: async (data) => {
       if (data) {
         navigation.navigate("Welcome", { userInfo });
@@ -86,21 +85,20 @@ const WriteProfile = ({ route, navigation }: BadgeSelectProps) => {
 
 
 
-  const handleNext = () => {
-    //@ts-ignore
-    navigation.reset({ index: 0, routes: [{ name: "Welcome", params: { nickname: userInfo.nickname } }] });
-  };
-
-  // const handleNext =  () => {
-  //   if (userInfo.profileImage) {
-  //     // todo 사진있을경우 프리사인
-  //   }
-  //   else {
-  //     if (route.params) {
-  //       signupMutation.mutate({ ...route.params });
-  //     }
-  //   }
+  // const handleNext = () => {
+  //   //@ts-ignore
+  //   navigation.reset({ index: 0, routes: [{ name: "Welcome", params: { nickname: userInfo.nickname } }] });
   // };
+
+  const handleNext = () => {
+    console.log(userInfo, 'userInfo');
+    if (userInfo.profileImage) {
+      // todo 사진있을경우 프리사인
+    }
+    else {
+      // signUpMutation.mutate(userInfo);
+    }
+  };
 
   const pickImage = () => {
     ImageCropPicker.openPicker({
@@ -121,24 +119,13 @@ const WriteProfile = ({ route, navigation }: BadgeSelectProps) => {
     });
   };
 
-  const handleMarketClick = (market: string) => {
-    if (userInfo.markets?.includes(market)) {
-      setUserInfo({
-        ...userInfo, markets: userInfo.markets?.filter(v => v !== market)
-      });
-    }
-    else {
-      setUserInfo({ ...userInfo, markets: userInfo.markets?.concat(market) });
-    }
-  };
-
   useEffect(() => {
     if (route.params) {
       setUserInfo({ ...userInfo, ...route.params });
     }
   }, [route.params]);
 
-  if (signupMutation.isLoading) {
+  if (signUpMutation.isLoading) {
     return (
       <Loading />
     );
@@ -319,7 +306,7 @@ const WriteProfile = ({ route, navigation }: BadgeSelectProps) => {
       </View>
       <View style={{ marginBottom: h2p(40) }}>
         <BasicButton
-          loading={signupMutation.isLoading}
+          loading={signUpMutation.isLoading}
           // disabled={!userInfo.nickname || !userInfo.birth || !userInfo.gender}
           onPress={handleNext} text="다음으로" bgColor={theme.color.white}
           textColor={theme.color.main}

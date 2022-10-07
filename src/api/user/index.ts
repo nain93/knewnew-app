@@ -107,7 +107,9 @@ export const userSignup = async ({
       profileImage,
       occupation,
       representBadge,
-      tags
+      tags,
+      birth,
+      gender,
     });
     if (res) {
       return res.data;

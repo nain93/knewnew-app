@@ -55,9 +55,7 @@ const Write = ({ navigation, route }: WriteProp) => {
     satisfaction: "",
     market: undefined,
     parent: parentId,
-    tags: {
-      interest: []
-    }
+    tags: []
   });
 
   const [interestTag, setInterestTag] = useState<InterestTagType[]>(interestTagData);
@@ -187,7 +185,7 @@ const Write = ({ navigation, route }: WriteProp) => {
       if (Object.keys(route.params?.review?.tags).length !== 0) {
         setInterestTag(
           interestTag.map(v => {
-            if (route.params?.review?.tags.interest.includes(v.title)) {
+            if (route.params?.review?.tags.includes(v.title)) {
               return { isClick: true, title: v.title };
             }
             return { isClick: false, title: v.title };
@@ -214,9 +212,7 @@ const Write = ({ navigation, route }: WriteProp) => {
         satisfaction: "",
         market: undefined,
         parent: parentId,
-        tags: {
-          interest: []
-        }
+        tags: []
       });
     }
   }, [route.params]);
@@ -251,7 +247,7 @@ const Write = ({ navigation, route }: WriteProp) => {
         || writeData.satisfaction
         || writeData.images && writeData.images.length > 0
         || writeData.market
-        || writeData.tags.interest.length > 0) {
+        || writeData.tags.length > 0) {
         setModalOpen({
           isOpen: true,
           content: "앗! 지금까지 작성하신 내용이 사라져요",
@@ -263,9 +259,7 @@ const Write = ({ navigation, route }: WriteProp) => {
               satisfaction: "",
               market: undefined,
               parent: parentId,
-              tags: {
-                interest: []
-              }
+              tags: []
             });
           }
         });
@@ -287,9 +281,7 @@ const Write = ({ navigation, route }: WriteProp) => {
               satisfaction: "",
               market: undefined,
               parent: parentId,
-              tags: {
-                interest: []
-              }
+              tags: []
             });
           }
         });
@@ -313,9 +305,8 @@ const Write = ({ navigation, route }: WriteProp) => {
     <>
       <Header
         isBorder={true}
-        headerLeft={<LeftArrowIcon onBackClick={goBack}
-          imageStyle={{ width: d2p(11), height: h2p(25) }} />}
-        title="글쓰기"
+        headerLeft={<LeftArrowIcon onBackClick={goBack} />}
+        title="푸드로그 작성하기"
         headerRightPress={() => {
           // todo 임시저장
 

@@ -24,7 +24,7 @@ type SearchProps = {
 }
 
 const Search = ({ navigation }: SearchProps) => {
-  const [textForRefresh, setTextForRefresh] = useState(""); // * 검색 할때마다 query 리프레시용
+  // const [textForRefresh, setTextForRefresh] = useState(""); // * 검색 할때마다 query 리프레시용
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [keyword, setKeyword] = useState("");
   const [searchWords, setSearchWords] = useState("");
@@ -33,21 +33,21 @@ const Search = ({ navigation }: SearchProps) => {
 
   const token = useRecoilValue(tokenState);
 
-  const searchListQuery = useInfiniteQuery<ReviewListType[], Error>(["searchList", token, textForRefresh], async ({ pageParam = 0 }) => {
+  const searchListQuery = useInfiniteQuery<ReviewListType[], Error>(["searchList", token, searchWords], async ({ pageParam = 0 }) => {
     const queryData: { result: ReviewListType[], totalLength: number } = await getSearchList({ token, keyword, offset: pageParam, limit: 5 });
     setReviewCount(queryData.totalLength);
     return queryData.result;
   }, {
-    enabled: !!textForRefresh,
+    enabled: !!searchWords,
     getNextPageParam: (next, all) => all.flat().length
   });
 
-  const userListQuery = useInfiniteQuery<userNormalType[], Error>(["userList", token, textForRefresh], async ({ pageParam = 0 }) => {
+  const userListQuery = useInfiniteQuery<userNormalType[], Error>(["userList", token, searchWords], async ({ pageParam = 0 }) => {
     const queryData: { result: userNormalType[], totalLength: number } = await getSearchUserList({ token, nickname: keyword, offset: pageParam });
     setUserCount(queryData.totalLength);
     return queryData.result;
   }, {
-    enabled: !!textForRefresh,
+    enabled: !!searchWords,
     getNextPageParam: (next, all) => all.flat().length
   });
 
@@ -56,7 +56,6 @@ const Search = ({ navigation }: SearchProps) => {
       return;
     }
     setSearchWords(searchKeyword);
-    setTextForRefresh(searchKeyword);
     setIsSearchMode(true);
   };
 
@@ -96,7 +95,7 @@ const Search = ({ navigation }: SearchProps) => {
             borderWidth: 1, borderColor: theme.color.grayscale.eae7ec,
             height: h2p(36),
             borderRadius: 20,
-            marginTop: h2p(20),
+            marginTop: h2p(15),
           }}>
             <TextInput
               autoFocus
@@ -108,11 +107,11 @@ const Search = ({ navigation }: SearchProps) => {
                 includeFontPadding: false, fontSize: 14,
               },
               Platform.OS === "ios" ? { paddingVertical: h2p(11) } : null,
-              FONT.Regular]}
+              FONT.Medium]}
               value={keyword}
               onChangeText={(text) => setKeyword(text)}
               onSubmitEditing={() => handleSearch(keyword)}
-              placeholderTextColor={theme.color.grayscale.d3d0d5}
+              placeholderTextColor={theme.color.grayscale.d2d0d5}
               placeholder="검색어를 입력하세요" />
             <TouchableOpacity
               onPress={() => handleSearch(keyword)}
@@ -147,17 +146,22 @@ const Search = ({ navigation }: SearchProps) => {
           }, FONT.Regular]}>🔥 인기검색어</Text>
           <View style={{ marginLeft: d2p(20), marginTop: h2p(5), flexDirection: "row", flexWrap: "wrap" }}>
             {React.Children.toArray(["떡볶이", "마라탕", "비건빵", "밀키트"].map((v, i) => (
-              <View style={{
-                width: (Dimensions.get("window").width - d2p(45)) / 2,
-                backgroundColor: theme.color.grayscale.f7f7fc,
-                paddingHorizontal: d2p(10),
-                paddingVertical: h2p(8),
-                borderRadius: 5,
-                marginRight: d2p(5),
-                marginTop: h2p(5)
-              }}>
+              <TouchableOpacity
+                onPress={() => {
+                  setKeyword(v);
+                  handleSearch(v);
+                }}
+                style={{
+                  width: (Dimensions.get("window").width - d2p(45)) / 2,
+                  backgroundColor: theme.color.grayscale.f7f7fc,
+                  paddingHorizontal: d2p(10),
+                  paddingVertical: h2p(8),
+                  borderRadius: 5,
+                  marginRight: d2p(5),
+                  marginTop: h2p(5)
+                }}>
                 <Text style={FONT.Regular}>{v}</Text>
-              </View>
+              </TouchableOpacity>
             )))}
           </View>
           <Text style={[FONT.Regular, {

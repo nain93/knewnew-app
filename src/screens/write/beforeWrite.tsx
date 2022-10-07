@@ -42,9 +42,7 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
     satisfaction: "",
     market: undefined,
     parent: undefined,
-    tags: {
-      interest: []
-    }
+    tags: []
   });
   const [interestTag, setInterestTag] = useState<InterestTagType[]>(interestTagData);
   const [etcInputOpen, setEtcInputOpen] = useState(false);
@@ -78,7 +76,7 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
       <Header
         headerLeft={<LeftArrowIcon
           onBackClick={() => navigation.goBack()}
-        />} title="글쓰기"
+        />} title="푸드로그 작성하기"
         headerRightPress={() => {
           // todo 임시저장
           // if (blockSubmit) {

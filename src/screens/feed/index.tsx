@@ -1,34 +1,22 @@
-import { StyleSheet, Text, View, Image, FlatList, Dimensions, TouchableOpacity, Pressable } from 'react-native';
+import { StyleSheet, Text, View, Image, FlatList, Dimensions, Pressable } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { convertFoodLogName, d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
-import Header from '~/components/header';
 import FeedReview from '~/components/review/feedReview';
-import { filterIcon, graysearch, leftArrow, whiteClose } from '~/assets/icons';
+import { filterIcon } from '~/assets/icons';
 
 import RBSheet from "react-native-raw-bottom-sheet";
-import { useInfiniteQuery, useQuery } from 'react-query';
+import { useInfiniteQuery } from 'react-query';
 import { getReviewList } from '~/api/review';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { bottomDotSheetState, tokenState } from '~/recoil/atoms';
 import Loading from '~/components/loading';
-import { getMyProfile } from '~/api/user';
-import { MyProfileType } from '~/types/user';
 import { FoodLogType, MarketType, ReviewListType, SatisfactionType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { loading } from '~/assets/gif';
-import { hitslop, markeForFiltertList, reactList } from '~/utils/constant';
-import CloseIcon from '~/components/icon/closeIcon';
-import ResetButton from '~/components/button/resetButton';
-import BasicButton from '~/components/button/basicButton';
-import MarketLayout from '~/components/layout/MarketLayout';
-import ReactionLayout from '~/components/layout/ReactionLayout';
-import CustomBottomSheet from '~/components/popup/CustomBottomSheet';
-import { useFocusEffect } from '@react-navigation/native';
-import LeftArrowIcon from '~/components/icon/leftArrowIcon';
+import { markeForFiltertList, reactList } from '~/utils/constant';
 import { FilterType } from '~/types';
 import FoodLog from '~/screens/feed/foodLog';
 

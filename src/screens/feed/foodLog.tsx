@@ -176,14 +176,31 @@ const FoodLog = ({ navigation, route }: FoodLogPropType) => {
         style={styles.filterWrap}>
         {React.Children.toArray(category.map((v, i) => (
           <TouchableOpacity
-            onPress={() => setCategory(category.map((clickValue, clickIdx) => {
-              if (clickIdx === i) {
-                return { ...clickValue, isClick: !clickValue.isClick };
+            onPress={() => {
+              if (v.title === "전체") {
+                setCategory(category.map((clickValue, clickIdx) => {
+                  if (clickIdx === i) {
+                    return { ...clickValue, isClick: !clickValue.isClick };
+                  }
+                  else {
+                    return { ...clickValue, isClick: false };
+                  }
+                }));
               }
               else {
-                return clickValue;
+                setCategory(category.map((clickValue, clickIdx) => {
+                  if (clickIdx === 0) {
+                    return { ...clickValue, isClick: false };
+                  }
+                  else if (clickIdx === i) {
+                    return { ...clickValue, isClick: !clickValue.isClick };
+                  }
+                  else {
+                    return clickValue;
+                  }
+                }));
               }
-            }))}
+            }}
             style={[styles.tagWrap, {
               marginRight: i !== category.length - 1 ? d2p(5) : 0,
               backgroundColor: v.isClick ? theme.color.black : theme.color.white,

@@ -20,25 +20,44 @@ const CategoryLayout = ({ category, setCategory, viewStyle }: CategoryLayoutProp
 
   return (
     <View style={[styles.container, viewStyle]}>
-      {React.Children.toArray(category.map((v, i) => (
-        <TouchableOpacity
-          onPress={() => setCategory(category.map((clickValue, clickIdx) => {
-            if (clickIdx === i) {
-              return { ...clickValue, isClick: !clickValue.isClick };
-            }
-            else {
-              return clickValue;
-            }
-          }))}
-          style={[styles.tagWrap, {
-            marginRight: i % 4 === 3 ? 0 : d2p(5),
-            backgroundColor: v.isClick ? theme.color.black : theme.color.white,
-          }]}>
-          <Text style={[FONT.Medium, {
-            color: v.isClick ? theme.color.white : theme.color.black
-          }]}>{v.title}</Text>
-        </TouchableOpacity>
-      )))}
+      {React.Children.toArray(category.map((v, i) => {
+        return (
+          <TouchableOpacity
+            onPress={() => {
+              if (v.title === "전체") {
+                setCategory(category.map((clickValue, clickIdx) => {
+                  if (clickIdx === i) {
+                    return { ...clickValue, isClick: !clickValue.isClick };
+                  }
+                  else {
+                    return { ...clickValue, isClick: false };
+                  }
+                }));
+              }
+              else {
+                setCategory(category.map((clickValue, clickIdx) => {
+                  if (clickIdx === 0) {
+                    return { ...clickValue, isClick: false };
+                  }
+                  else if (clickIdx === i) {
+                    return { ...clickValue, isClick: !clickValue.isClick };
+                  }
+                  else {
+                    return clickValue;
+                  }
+                }));
+              }
+            }}
+            style={[styles.tagWrap, {
+              marginRight: i % 4 === 3 ? 0 : d2p(5),
+              backgroundColor: v.isClick ? theme.color.black : theme.color.white,
+            }]}>
+            <Text style={[FONT.Medium, {
+              color: v.isClick ? theme.color.white : theme.color.black
+            }]}>{v.title}</Text>
+          </TouchableOpacity>
+        );
+      }))}
     </View>
   );
 };

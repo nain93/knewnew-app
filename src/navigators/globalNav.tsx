@@ -97,6 +97,13 @@ const GlobalNav = ({ token }: { token: string }) => {
           </>
         }
         <Stack.Screen
+          name="TabNav"
+          component={TabNavigator}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
           name="TagResult"
           options={{
             headerShown: false
@@ -114,13 +121,6 @@ const GlobalNav = ({ token }: { token: string }) => {
             headerShown: false
           }}
           component={TagSelect} />
-        <Stack.Screen
-          name="TabNav"
-          component={TabNavigator}
-          options={{
-            headerShown: false
-          }}
-        />
         <Stack.Screen
           name="Write"
           options={{

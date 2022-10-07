@@ -1,37 +1,22 @@
 import {
-  Animated,
-  Dimensions, Easing, FlatList, Image, Linking, Platform, Pressable, RefreshControl,
-  ScrollView, StyleSheet, Text, TouchableOpacity, View
+  Dimensions, Linking, Pressable,
+  ScrollView, StyleSheet, Text, View
 } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import Header from '~/components/header';
 import { d2p, h2p } from '~/utils';
-import { hitslop } from '~/utils/constant';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import theme from '~/styles/theme';
-import { eyesIcon, graysearch, mainPlusIcon } from '~/assets/icons';
-import { myIdState, tokenState } from '~/recoil/atoms';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { tokenState } from '~/recoil/atoms';
+import { useRecoilState } from 'recoil';
 import { FONT } from '~/styles/fonts';
-import {
-  beerFoodlog, begunFoodlog, breadFoodlog, cafeFoodlog, cakeFoodlog, campFoodlog,
-  coupangImage, dieterFoodlog, etcImage, kurlyImage, naverImage, newFoodlog, riceFoodlog, ssgImage
-} from '~/assets/images/home';
-import { categoryData, interestTagData } from '~/utils/data';
-import { fireImg } from '~/assets/images';
+import { categoryData } from '~/utils/data';
 import { useQuery } from 'react-query';
-import { getMyProfile } from '~/api/user';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MyProfileType } from '~/types/user';
 import FastImage from 'react-native-fast-image';
-import { getBanner, getFoodLogCount, getRecommend, getRecommendFoodLog } from '~/api/home';
+import { getBanner } from '~/api/home';
 import Loading from '~/components/loading';
-import SplashScreen from 'react-native-splash-screen';
-import { homeLogo } from '~/assets/logo';
 import BasicButton from '~/components/button/basicButton';
 import { useFocusEffect } from '@react-navigation/native';
-import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import MarketLayout from '~/components/layout/MarketLayout';
 import CategoryLayout from '~/components/layout/CategoryLayout';
 import { FilterType } from '~/types';
@@ -56,7 +41,6 @@ interface BannerType {
 
 const Home = ({ navigation, route, filterScreen }: HomeProps) => {
   const [token, setToken] = useRecoilState(tokenState);
-  const setMyId = useSetRecoilState(myIdState);
   const homeRef = useRef<ScrollView>(null);
 
   const [markets, setMarkets] = useState<string[]>([]);
@@ -106,13 +90,8 @@ const Home = ({ navigation, route, filterScreen }: HomeProps) => {
     return (
       <>
         <ScrollView
+          bounces={false}
           ref={homeRef}
-          refreshControl={
-            <RefreshControl
-              refreshing={getBannerQuery.isLoading}
-              onRefresh={() => getBannerQuery.refetch()}
-            />
-          }
           showsVerticalScrollIndicator={false}
           style={styles.container}
           contentContainerStyle={{ paddingBottom: h2p(143) }}
@@ -155,7 +134,7 @@ const Home = ({ navigation, route, filterScreen }: HomeProps) => {
               카테고리
             </Text>
             <CategoryLayout
-              viewStyle={{ marginTop: h2p(15), marginBottom: h2p(60) }}
+              viewStyle={{ marginTop: h2p(15), marginBottom: h2p(50) }}
               category={category}
               setCategory={(cate: {
                 title: string,
@@ -170,10 +149,10 @@ const Home = ({ navigation, route, filterScreen }: HomeProps) => {
                 }
                 else {
                   // * 찾아보기
-                  navigation.push("Feed", { foodLog: category.filter(v => v.isClick) });
+                  navigation.push("Feed", { markets, foodLog: category.filter(v => v.isClick) });
                 }
               }}
-              text={category.every(v => !v.isClick) ? "모두보기" : "찾아보기"} textColor={theme.color.main}
+              text={(!category.every(v => !v.isClick) || (!markets.every(v => !v))) ? "찾아보기" : "모두보기"} textColor={theme.color.main}
               bgColor={theme.color.white}
             />
           </View>
@@ -193,7 +172,7 @@ export default Home;
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: h2p(23)
+    paddingTop: h2p(20)
   },
   header: {
     flexDirection: "row", alignItems: "center",

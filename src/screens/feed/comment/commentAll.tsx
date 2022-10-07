@@ -347,10 +347,10 @@ const CommentAll = ({ navigation, route }: CommentAllType) => {
   return (
     <>
       <Header
-        viewStyle={{ paddingTop: Platform.OS === "android" ? getStatusBarHeight() + h2p(20) : h2p(20) }}
+        viewStyle={{ paddingTop: Platform.OS === "android" ? getStatusBarHeight() + h2p(20) : h2p(30) }}
         title="댓글 모두보기"
         headerLeft={<LeftArrowIcon
-          viewStyle={{ paddingTop: Platform.OS === "android" ? h2p(20) : 0 }}
+          viewStyle={{ paddingTop: Platform.OS === "android" ? h2p(20) : h2p(0) }}
           onBackClick={() => {
             setIsCommentFoucs(false);
             queryClient.invalidateQueries('getCommentList');

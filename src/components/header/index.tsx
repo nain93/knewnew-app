@@ -27,17 +27,17 @@ const Header = ({ type, headerRightPress, headerLeft, headerRight, customRight, 
         marginTop: Platform.OS === "ios" ? getStatusBarHeight() : 0
       }]}>
         <View
-          style={{ position: "absolute", left: d2p(30), top: d2p(30) }}>
+          style={{ position: "absolute", left: d2p(30), top: h2p(30) }}>
           {headerLeft}
         </View>
-        <Text style={[{ fontSize: 16, color: theme.color.black }, FONT.Regular]}>
+        <Text style={[{ fontSize: 16, color: theme.color.black, includeFontPadding: false }, FONT.Regular]}>
           {title}
         </Text>
         {headerRight ?
           <TouchableOpacity
             hitSlop={hitslop}
             onPress={headerRightPress}
-            style={{ position: "absolute", right: d2p(30) }}>
+            style={{ position: "absolute", right: d2p(30), top: h2p(30) }}>
             {headerRight}
           </TouchableOpacity>
           :
@@ -58,6 +58,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderBottomColor: theme.color.grayscale.e9e7ec,
-    paddingVertical: h2p(20)
+    paddingBottom: h2p(20),
+    paddingTop: h2p(30)
   }
 });
