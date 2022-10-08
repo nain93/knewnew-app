@@ -94,7 +94,8 @@ export const userSignup = async ({
   headline,
   occupation,
   representBadge,
-  tags
+  tags,
+  isAgreePolicy
 }: UserInfoType) => {
   try {
     const res = await axios.post(baseURL + "auth/signup/", {
@@ -102,14 +103,14 @@ export const userSignup = async ({
       providerKey,
       email,
       nickname,
-      age: 30,
-      headline,
       profileImage,
       occupation,
       representBadge,
+      headline,
       tags,
       birth,
       gender,
+      isAgreePolicy
     });
     if (res) {
       return res.data;

@@ -72,12 +72,13 @@ export interface UserInfoType {
   headline?: string,
   profileImage?: string,
   occupation?: string,
-  representBadge: string,
-  tags: UserInfoTagType,
+  representBadge?: string,
+  tags?: UserInfoTagType,
   password?: string,
   birth: string,
   gender: "male" | "female" | "",
-  markets: string[]
+  markets: string[],
+  isAgreePolicy: boolean
 }
 
 export interface postProfileType {

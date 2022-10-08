@@ -1,13 +1,12 @@
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import React, { useState } from 'react';
 import { d2p, h2p } from '~/utils';
 import { FONT } from '~/styles/fonts';
 import theme from '~/styles/theme';
-import { whiteCheckIcon } from '~/assets/icons/notificationIcon';
-import { hitslop } from '~/utils/constant';
 import BasicButton from '~/components/button/basicButton';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
+import CheckBoxButton from '~/components/button/checkBoxButton';
 
 export interface NavigationType {
   navigation: NavigationStackProp;
@@ -52,23 +51,8 @@ const Welcome = ({ navigation, route }: NavigationType) => {
         justifyContent: "space-between",
         marginTop: h2p(160)
       }}>
-        <Pressable
-          hitSlop={hitslop}
-          onPress={() => setToggleCheckBox(!toggleCheckBox)}
-          style={[{
-            width: d2p(16), height: d2p(16),
-            borderRadius: 2, marginLeft: d2p(5)
-          },
-          toggleCheckBox ? {
-            borderWidth: 1,
-            borderColor: theme.color.grayscale.C_79737e
-          } : {
-            backgroundColor: theme.color.main,
-            justifyContent: "center", alignItems: "center"
-          }]}
-        >
-          <Image source={whiteCheckIcon} style={{ width: d2p(9), height: d2p(7) }} />
-        </Pressable>
+        <CheckBoxButton toggleCheckBox={toggleCheckBox}
+          setToggleCheckBox={(check: boolean) => setToggleCheckBox(check)} />
         <Text style={[FONT.Regular, { lineHeight: 19.6, marginRight: d2p(12) }]}>
           {`뉴뉴의 광고 금지 정책을 확인하였으며,\n서비스 이용시 협찬 및 광고 글을 게시하지 않겠습니다.`}
         </Text>

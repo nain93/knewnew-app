@@ -36,7 +36,7 @@ const CategoryLayout = ({ category, setCategory, viewStyle }: CategoryLayoutProp
               }
               else {
                 setCategory(category.map((clickValue, clickIdx) => {
-                  if (clickIdx === 0) {
+                  if (clickIdx === 0 && clickValue.title === "전체") {
                     return { ...clickValue, isClick: false };
                   }
                   else if (clickIdx === i) {

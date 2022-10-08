@@ -84,6 +84,9 @@ import linkIcon from "./linkIcon.png";
 import blackLeftArrow from "./blackLeftArrow.png";
 import blackMoreIcon from "./blackMoreIcon.png";
 import blackRightSmallArrow from "./blackRightSmallArrow.png";
+import foodImage from "./foodImage.png";
+import marketImage from "./marketImage.png";
+import priceImage from "./priceImage.png";
 
 export {
   close, leftArrow, more, heart, like, reKnew, comment, commentMore, circle, maincart, maintag,
@@ -95,6 +98,6 @@ export {
   grayEyeIcon, grayKnewnew, grayCart, circleQuestion, marketIcon, goldStarIcon, starIcon, bookmark, graybookmark,
   shareIcon, mainNotiIcon, notiIcon, eyesIcon, mainPlusIcon, lightHomeIcon, userIcon, filterIcon, blackRightArrow,
   colorBookmark, whiteLeftArrow, whiteMoreIcon, mainBookmark, blackShare, blackComment, blackHeart, linkIcon,
-  blackLeftArrow, blackMoreIcon, blackRightSmallArrow
+  blackLeftArrow, blackMoreIcon, blackRightSmallArrow, foodImage, marketImage, priceImage
 };
 

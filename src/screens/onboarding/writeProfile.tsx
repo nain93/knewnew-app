@@ -38,12 +38,10 @@ const WriteProfile = ({ route, navigation }: BadgeSelectProps) => {
     nickname: "",
     birth: "",
     gender: "",
-    headline: "",
     profileImage: "",
     occupation: "",
-    representBadge: "",
-    tags: [],
-    markets: []
+    markets: [],
+    isAgreePolicy: false
   });
   const scrollRef = useRef<KeyboardAwareScrollView>(null);
   const nameInputRef = useRef<TextInput>(null);
@@ -121,6 +119,7 @@ const WriteProfile = ({ route, navigation }: BadgeSelectProps) => {
 
   useEffect(() => {
     if (route.params) {
+      console.log(route.params, 'route.params');
       setUserInfo({ ...userInfo, ...route.params });
     }
   }, [route.params]);
@@ -223,7 +222,7 @@ const WriteProfile = ({ route, navigation }: BadgeSelectProps) => {
       <View style={styles.textInput}>
         <TextInput
           onChangeText={(e) => setUserInfo({ ...userInfo, birth: e })}
-          keyboardType="numeric"
+          keyboardType="number-pad"
           maxLength={4}
           autoCapitalize="none"
           style={[FONT.Regular, {
