@@ -3,6 +3,7 @@ const mainRed = "#FF3E48";
 const white = "#ffffff";
 const black = "#000000";
 const yellow = "#ffc646";
+const gold = "#FF9C40";
 
 const grayscale = {
   f7f7fc: '#f7f7fc',
@@ -27,6 +28,7 @@ const color = {
   grayscale,
   white,
   black,
-  yellow
+  yellow,
+  gold
 };
 export default color;

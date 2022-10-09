@@ -16,7 +16,7 @@ const CheckBoxButton = ({ toggleCheckBox, setToggleCheckBox }: CheckBoxButtonPro
       hitSlop={hitslop}
       onPress={() => setToggleCheckBox(!toggleCheckBox)}
       style={[{
-        width: d2p(16), height: d2p(16),
+        width: d2p(14), height: d2p(14),
         borderRadius: 2, marginLeft: d2p(5)
       },
       toggleCheckBox ? {

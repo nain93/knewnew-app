@@ -21,7 +21,8 @@ export interface WriteReviewType {
   parentReview?: ReviewParentType,
   cart?: number,
   market?: MarketType,
-  tags: string[]
+  tags: string[],
+  price?: string
 }
 
 export interface ReviewParentType {

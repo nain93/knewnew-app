@@ -18,7 +18,6 @@ import retweetfrom from './retweetfrom.png';
 import initialize from './initialize.png';
 import colorCheck from './colorCheck.png';
 import grayclose from './grayclose.png';
-import graytriangle from './graytriangle.png';
 import grayheart from './grayheart.png';
 import graywrite from './graywrite.png';
 import graycircle from './graycircle.png';
@@ -87,17 +86,25 @@ import blackRightSmallArrow from "./blackRightSmallArrow.png";
 import foodImage from "./foodImage.png";
 import marketImage from "./marketImage.png";
 import priceImage from "./priceImage.png";
+import grayDownIcon from "./grayDownIcon.png";
+import triangle from "./triangle.png";
+import thumbUp from "./thumbUp.png";
+import thumbDown from "./thumbDown.png";
+import colorThumbDown from "./colorThumbDown.png";
+import colorThumbUp from "./colorThumbUp.png";
+import colorTriangle from "./colorTriangle.png";
 
 export {
   close, leftArrow, more, heart, like, reKnew, comment, commentMore, circle, maincart, maintag,
   searchIcon, mainSearchIcon, colorLike, tagfilter, tag, cart, colorCart, retweetfrom,
-  colorCheck, initialize, grayclose, graytriangle, grayheart, bad, graycircle, blackclose,
+  colorCheck, initialize, grayclose, grayheart, bad, graycircle, blackclose,
   graywrite, graylogo, graymypage, graysearch, mainmypage, mainlogoIcon, write, plusIcon, recommentIcon,
   handIcon, tagFood, tagHome, tagLife, emailicon, noticeIcon, alertIcon, eyeIcon, colorEyeIcon, checkIcon, tagIcon,
   selectTagIcon, knewnewIcon, settingIcon, rightArrow, settingKnewnew, grayCheckIcon, question, grayquestion, smallClose, whiteClose,
   grayEyeIcon, grayKnewnew, grayCart, circleQuestion, marketIcon, goldStarIcon, starIcon, bookmark, graybookmark,
   shareIcon, mainNotiIcon, notiIcon, eyesIcon, mainPlusIcon, lightHomeIcon, userIcon, filterIcon, blackRightArrow,
   colorBookmark, whiteLeftArrow, whiteMoreIcon, mainBookmark, blackShare, blackComment, blackHeart, linkIcon,
-  blackLeftArrow, blackMoreIcon, blackRightSmallArrow, foodImage, marketImage, priceImage
+  blackLeftArrow, blackMoreIcon, blackRightSmallArrow, foodImage, marketImage, priceImage, grayDownIcon,
+  triangle, thumbUp, thumbDown, colorTriangle, colorThumbDown, colorThumbUp
 };
 
