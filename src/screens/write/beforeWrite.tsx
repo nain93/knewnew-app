@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { FONT } from '~/styles/fonts';
 import theme from '~/styles/theme';
 import ReactionLayout from '~/components/layout/ReactionLayout';
-import { marketList, reactList } from '~/utils/constant';
+import { hitslop, marketList, reactList } from '~/utils/constant';
 import { SatisfactionType, WriteReviewType } from '~/types/review';
 import { d2p, h2p, inputPriceFormat } from '~/utils';
 import Header from '~/components/header';
@@ -14,7 +14,7 @@ import { NavigationRoute } from 'react-navigation';
 import SelectLayout from '~/components/layout/SelectLayout';
 import { InterestTagType } from '~/types';
 import { categoryData, interestTagData } from '~/utils/data';
-import { colorCart, foodImage, grayCart, grayDownIcon, marketImage, priceImage, rightArrow } from '~/assets/icons';
+import { close, colorCart, foodImage, grayCart, grayDownIcon, grayLinkIcon, linkIcon, marketImage, priceImage, rightArrow } from '~/assets/icons';
 import CustomBottomSheet from '~/components/popup/CustomBottomSheet';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import CloseIcon from '~/components/icon/closeIcon';
@@ -32,7 +32,8 @@ interface BeforeWriteProp {
 
 const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
   const marketRefRBSheet = useRef<RBSheet>(null);
-  const [foodTag, setFoodTag] = useState("");
+  const buyLinkRefRBSheet = useRef<RBSheet>(null);
+
   const [clickedReact, setClickReact] = useState<Array<{
     title: SatisfactionType,
     isClick: boolean
@@ -52,36 +53,33 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
     tags: [],
     price: ""
   });
-  const [interestTag, setInterestTag] = useState<InterestTagType[]>(interestTagData);
   const [toggleCheckBox, setToggleCheckBox] = useState<boolean>(false);
+  const [urlCheckBox, setUrlCheckBox] = useState<boolean>(false);
   const [etcInputOpen, setEtcInputOpen] = useState(false);
   const [etcMarket, setEtcMarket] = useState("");
   const etcInputRef = useRef<TextInput>(null);
   const bottomScrollRef = useRef<ScrollView>(null);
   const inputRef = useRef<TextInput>(null);
   const [inputFocus, setInputFocus] = useState(false);
-  const foodTagRef = useRef<TextInput>(null);
 
   useEffect(() => {
+    // * 구매링크 오픈
+    buyLinkRefRBSheet.current?.open();
+
     if (route.params?.stateReset) {
       //* 최초 진입시 상태 초기화
       setWriteData({
         ...writeData,
-        market: undefined
+        market: undefined,
+        price: "",
+        content: ""
       });
-      setInterestTag(interestTagData);
       setClickReact(reactList.map(v => {
         return { title: v, isClick: false };
       }));
       setCategory(categoryData.slice(1, categoryData.length));
     }
   }, [route.params]);
-
-  useEffect(() => {
-    if (!interestTag[interestTag.length - 1].isClick) {
-      setFoodTag("");
-    }
-  }, [interestTag]);
 
   useEffect(() => {
     if (etcMarket) {
@@ -357,6 +355,57 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
             }
           </ScrollView>
         </>
+      </CustomBottomSheet>
+
+      {/* 구매링크 바텀시트 */}
+      <CustomBottomSheet
+        sheetRef={buyLinkRefRBSheet}
+        height={Dimensions.get("window").height - h2p(385) + getBottomSpace()}
+      >
+        <View style={{
+          paddingVertical: h2p(5)
+        }}>
+          <Pressable hitSlop={hitslop} onPress={() => buyLinkRefRBSheet.current?.close()}>
+            <Image source={close} style={{ width: d2p(14), height: d2p(14) }} />
+          </Pressable>
+          <Text style={[FONT.SemiBold, { fontSize: 24, marginTop: h2p(35), marginBottom: h2p(15) }]}>
+            {`구매링크를 입력하시면\n뉴뉴가 상품 정보를 가져올게요!`}
+          </Text>
+          <Text style={FONT.Regular}>
+            {`URL을 몰라도 작성할 수 있지만,\nURL 붙여넣기시 좀 더 편리하게 작성할 수 있어요🥰`}
+          </Text>
+          <View style={{
+            width: Dimensions.get("window").width - d2p(40),
+            borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
+            paddingHorizontal: d2p(10),
+            flexDirection: "row", alignItems: "center",
+            borderRadius: 5,
+            marginTop: h2p(40), marginBottom: h2p(10)
+          }}>
+            <Image source={grayLinkIcon}
+              style={{ width: d2p(16), height: d2p(16), marginRight: d2p(10) }} />
+            <TextInput
+              style={[FONT.Regular, {
+                width: Dimensions.get("window").width - d2p(92),
+                paddingVertical: h2p(10), fontSize: 16, color: theme.color.black
+              }]}
+              placeholder="구매하신 상품의 URL을 붙여넣어주세요" placeholderTextColor={theme.color.grayscale.C_9F9CA3} />
+          </View>
+          <View style={{ flexDirection: "row", alignItems: "center", marginLeft: "auto", marginBottom: h2p(40) }}>
+            <CheckBoxButton toggleCheckBox={urlCheckBox} setToggleCheckBox={setUrlCheckBox} />
+            <Text style={[FONT.Regular, { marginLeft: d2p(8), fontSize: 12, color: theme.color.grayscale.C_9F9CA3 }]}>
+              URL 없이 작성하기
+            </Text>
+          </View>
+
+          <BasicButton
+            onPress={() => {
+              //todo url 작성
+              buyLinkRefRBSheet.current?.close();
+            }}
+            text="작성하기"
+            bgColor={theme.color.white} textColor={theme.color.main} />
+        </View>
       </CustomBottomSheet>
     </>
   );

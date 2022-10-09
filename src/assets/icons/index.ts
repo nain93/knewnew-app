@@ -93,6 +93,7 @@ import thumbDown from "./thumbDown.png";
 import colorThumbDown from "./colorThumbDown.png";
 import colorThumbUp from "./colorThumbUp.png";
 import colorTriangle from "./colorTriangle.png";
+import grayLinkIcon from "./grayLinkIcon.png";
 
 export {
   close, leftArrow, more, heart, like, reKnew, comment, commentMore, circle, maincart, maintag,
@@ -105,6 +106,6 @@ export {
   shareIcon, mainNotiIcon, notiIcon, eyesIcon, mainPlusIcon, lightHomeIcon, userIcon, filterIcon, blackRightArrow,
   colorBookmark, whiteLeftArrow, whiteMoreIcon, mainBookmark, blackShare, blackComment, blackHeart, linkIcon,
   blackLeftArrow, blackMoreIcon, blackRightSmallArrow, foodImage, marketImage, priceImage, grayDownIcon,
-  triangle, thumbUp, thumbDown, colorTriangle, colorThumbDown, colorThumbUp
+  triangle, thumbUp, thumbDown, colorTriangle, colorThumbDown, colorThumbUp, grayLinkIcon
 };
 
