@@ -51,9 +51,7 @@ const EditBeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
     satisfaction: "",
     market: undefined,
     parent: undefined,
-    tags: {
-      interest: []
-    }
+    tags: []
   });
   const [interestTag, setInterestTag] = useState<InterestTagType[]>(interestTagData);
   const [blockSubmit, setBlockSubmit] = useState(false);
@@ -92,21 +90,6 @@ const EditBeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
         {
           ...writeData,
           satisfaction: clickedReact.filter(v => v.isClick).map(v => v.title)[0],
-          tags: {
-            interest: foodTag ? interestTag.filter(v => {
-              if (v.title.includes("기타")) {
-                return false;
-              }
-              return v.isClick;
-            }).map(v => v.title).concat(foodTag)
-              :
-              interestTag.filter(v => {
-                if (v.title.includes("기타")) {
-                  return false;
-                }
-                return v.isClick;
-              }).map(v => v.title)
-          },
           parent: route.params.review.parent?.isActive ? writeData.parent : undefined
         },
         id: route.params.review?.id
@@ -124,7 +107,7 @@ const EditBeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
       }));
       setInterestTag(
         interestTag.map(v => {
-          if (route.params?.review.tags.interest.includes(v.title)) {
+          if (route.params?.review.tags.includes(v.title)) {
             return { ...v, isClick: true };
           }
           return v;

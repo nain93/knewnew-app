@@ -11,17 +11,15 @@ import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import BasicButton from '~/components/button/basicButton';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
-import SelectLayout from '~/components/layout/SelectLayout';
-import { InterestTagType } from '~/types';
-import { categoryData, interestTagData } from '~/utils/data';
-import { close, colorCart, foodImage, grayCart, grayDownIcon, grayLinkIcon, linkIcon, marketImage, priceImage, rightArrow } from '~/assets/icons';
+import { categoryData } from '~/utils/data';
+import { close, foodImage, grayDownIcon, grayLinkIcon, marketImage, priceImage } from '~/assets/icons';
 import CustomBottomSheet from '~/components/popup/CustomBottomSheet';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import CloseIcon from '~/components/icon/closeIcon';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import CheckBoxButton from '~/components/button/checkBoxButton';
 import CategoryLayout from '~/components/layout/CategoryLayout';
-import { getBottomSpace } from 'react-native-iphone-x-helper';
+import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 
 interface BeforeWriteProp {
   navigation: NavigationStackProp;
@@ -360,7 +358,7 @@ const BeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
       {/* 구매링크 바텀시트 */}
       <CustomBottomSheet
         sheetRef={buyLinkRefRBSheet}
-        height={Dimensions.get("window").height - h2p(385) + getBottomSpace()}
+        height={Dimensions.get("window").height - h2p(385) + (isIphoneX() ? getBottomSpace() : h2p(50))}
       >
         <View style={{
           paddingVertical: h2p(5)
