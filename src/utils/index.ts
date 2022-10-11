@@ -46,6 +46,17 @@ export function dateNormalFormat(date: string) {
   return date.slice(0, 4) + '-' + date.slice(5, 7) + '-' + date.slice(8, 10);
 }
 
+// * 천단위 , 찍어주는 함수
+export const inputPriceFormat = (str: string) => {
+  const comma = (strCom: string) => {
+    return strCom.replace(/(\d)(?=(?:\d{3})+(?!\d))/g, "$1,");
+  };
+  const unComma = (strUnCom: string) => {
+    return strUnCom.replace(/[^\d]+/g, "");
+  };
+  return comma(unComma(str));
+};
+
 export async function hasAndroidPermission() {
   const permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
   const hasPermission = await PermissionsAndroid.check(permission);

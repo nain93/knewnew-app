@@ -55,13 +55,13 @@ const EditBeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
       interest: []
     }
   });
-  const [interestTag, setInterestTag] = useState<InterestTagType>(interestTagData);
+  const [interestTag, setInterestTag] = useState<InterestTagType[]>(interestTagData);
   const [blockSubmit, setBlockSubmit] = useState(false);
   const [foodTag, setFoodTag] = useState("");
   const foodTagRef = useRef<TextInput>(null);
 
   useEffect(() => {
-    if (!interestTag.interest[interestTag.interest.length - 1].isClick) {
+    if (!interestTag[interestTag.length - 1].isClick) {
       setFoodTag("");
     }
   }, [interestTag]);
@@ -93,14 +93,14 @@ const EditBeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
           ...writeData,
           satisfaction: clickedReact.filter(v => v.isClick).map(v => v.title)[0],
           tags: {
-            interest: foodTag ? interestTag.interest.filter(v => {
+            interest: foodTag ? interestTag.filter(v => {
               if (v.title.includes("기타")) {
                 return false;
               }
               return v.isClick;
             }).map(v => v.title).concat(foodTag)
               :
-              interestTag.interest.filter(v => {
+              interestTag.filter(v => {
                 if (v.title.includes("기타")) {
                   return false;
                 }
@@ -122,14 +122,14 @@ const EditBeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
         }
         return v;
       }));
-      setInterestTag({
-        interest: interestTag.interest.map(v => {
+      setInterestTag(
+        interestTag.map(v => {
           if (route.params?.review.tags.interest.includes(v.title)) {
             return { ...v, isClick: true };
           }
           return v;
         })
-      });
+      );
       setWriteData({
         images: route.params?.images,
         content: route.params?.review.content,
@@ -183,7 +183,7 @@ const EditBeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
           </Text>
           <SelectLayout type="write" focusRef={foodTagRef} interestTag={interestTag} setInterestTag={setInterestTag} />
         </View>
-        {interestTag.interest[interestTag.interest.length - 1].isClick &&
+        {interestTag[interestTag.length - 1].isClick &&
           <View style={{ marginTop: h2p(20), justifyContent: "center" }}>
             <TextInput
               ref={foodTagRef}
@@ -242,8 +242,8 @@ const EditBeforeWrite = ({ navigation, route }: BeforeWriteProp) => {
         </TouchableOpacity>
         <BasicButton
           viewStyle={{ marginHorizontal: d2p(20), marginBottom: h2p(40) }}
-          disabled={interestTag.interest.every(v => !v.isClick) || clickedReact.every(v => !v.isClick)
-            || (interestTag.interest[interestTag.interest.length - 1].isClick && foodTag === "")
+          disabled={interestTag.every(v => !v.isClick) || clickedReact.every(v => !v.isClick)
+            || (interestTag[interestTag.length - 1].isClick && foodTag === "")
           }
           text="글쓰기 완료" bgColor={theme.color.white} textColor={theme.color.main}
           onPress={() => {

@@ -309,7 +309,7 @@ const UserPage = ({ navigation, route }: MypageProps) => {
           {(route.params?.id === myId) &&
             <BasicButton
               viewStyle={{ marginHorizontal: d2p(20) }}
-              onPress={() => navigation.navigate('BeforeWrite', { loading: false, isEdit: false })}
+              onPress={() => navigation.navigate('BeforeWrite', { loading: false, isEdit: false, stateReset: true })}
               text="작성하기" textColor={theme.color.main} bgColor={theme.color.white} />
           }
         </View>

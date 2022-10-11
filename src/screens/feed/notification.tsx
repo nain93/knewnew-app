@@ -1,8 +1,7 @@
 import { Dimensions, FlatList, Image, ImageSourcePropType, Pressable, StyleSheet, Text, View } from 'react-native';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useRef } from 'react';
 import Header from '~/components/header';
 import { NavigationStackProp } from 'react-navigation-stack';
-import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import { d2p, h2p, simpleDate } from '~/utils';
 import { FONT } from '~/styles/fonts';
 import theme from '~/styles/theme';
@@ -14,6 +13,8 @@ import { isNotiReadState, tokenState } from '~/recoil/atoms';
 import Loading from '~/components/loading';
 import { NotificationListType } from '~/types/setting';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
+import TopScrollButton from '~/components/button/topScrollButton';
 
 
 
@@ -26,7 +27,7 @@ interface NotiContainerProp {
 const NotiContainer = ({ source, title, isRead }: NotiContainerProp) => {
   return (
     <>
-      <Image source={source} resizeMode="contain" style={{ width: d2p(24), height: d2p(24) }} />
+      <Image source={source} resizeMode="contain" style={{ width: d2p(30), height: d2p(30) }} />
       <View>
         {!isRead &&
           <View style={{
@@ -50,6 +51,7 @@ interface NotificationProps {
 
 const Notification = ({ navigation }: NotificationProps) => {
   const token = useRecoilValue(tokenState);
+  const scrollRef = useRef<FlatList>(null);
   const setIsNotiReadState = useSetRecoilState(isNotiReadState);
   const queryClient = useQueryClient();
 
@@ -60,7 +62,7 @@ const Notification = ({ navigation }: NotificationProps) => {
 
   const isReadNotification = useMutation("isReadNotification", () => allReadNotification({ token }));
 
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
     setIsNotiReadState(true);
     AsyncStorage.setItem("isNotiReadState", JSON.stringify(true));
     return () => {
@@ -72,7 +74,7 @@ const Notification = ({ navigation }: NotificationProps) => {
         }
       });
     };
-  }, []);
+  }, []));
 
   const renderItem = useCallback(({ item }: { item: NotificationListType, index: number }) => {
     return (
@@ -82,7 +84,7 @@ const Notification = ({ navigation }: NotificationProps) => {
             navigation.navigate("FeedDetail", { id: item.link.split("/")[1] });
           }
           else {
-            navigation.navigate("HomeStackNav");
+            navigation.navigate("Home");
           }
         }}
         style={{ flexDirection: "row" }}>
@@ -154,7 +156,7 @@ const Notification = ({ navigation }: NotificationProps) => {
               <Text style={[FONT.Regular, { lineHeight: 20 }]}>
                 {item.message.split(":")[0]}
               </Text>
-              <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4, lineHeight: 20 }]}>
+              <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_78737D, lineHeight: 20 }]}>
                 {` : ${item.message.split(":")[1]}`}
               </Text>
             </View>
@@ -164,7 +166,7 @@ const Notification = ({ navigation }: NotificationProps) => {
             </Text>
           }
 
-          <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4, marginTop: h2p(7) }]}>
+          <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_9F9CA3, marginTop: h2p(7) }]}>
             {simpleDate(item.created, "전")}
           </Text>
         </View>
@@ -175,9 +177,7 @@ const Notification = ({ navigation }: NotificationProps) => {
   if (notificationQuery.isLoading) {
     return (
       <>
-        <Header
-          headerLeft={<LeftArrowIcon onBackClick={() => navigation.goBack()} />}
-          title="알림" />
+        <Header title="내 소식" />
         <Loading />
       </>
     );
@@ -185,10 +185,9 @@ const Notification = ({ navigation }: NotificationProps) => {
 
   return (
     <>
-      <Header
-        headerLeft={<LeftArrowIcon onBackClick={() => navigation.goBack()} />}
-        title="알림" />
+      <Header title="내 소식" />
       <FlatList
+        ref={scrollRef}
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
         onEndReachedThreshold={0.5}
@@ -204,6 +203,7 @@ const Notification = ({ navigation }: NotificationProps) => {
         renderItem={renderItem}
         keyExtractor={v => v.id.toString()}
       />
+      <TopScrollButton scrollRef={scrollRef} />
     </>
   );
 };
@@ -212,11 +212,12 @@ export default Notification;
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: d2p(20)
+    paddingHorizontal: d2p(20),
+    paddingBottom: h2p(80)
   },
   notiText: {
     fontSize: 12,
-    color: theme.color.grayscale.C_79737e,
+    color: theme.color.grayscale.C_9F9CA3,
     marginTop: h2p(5)
   }
 });

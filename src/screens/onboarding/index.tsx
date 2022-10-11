@@ -11,10 +11,10 @@ import {
 import Config from "react-native-config";
 import { NavigationType } from '~/types';
 import { login } from '@react-native-seoul/kakao-login';
-import { userLogin } from '~/api/user';
 import { NaverLogin } from '@react-native-seoul/naver-login';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import appleAuth from '@invertase/react-native-apple-authentication';
+import { userLogin } from '~/api/user';
 import { tokenState } from '~/recoil/atoms';
 import { useSetRecoilState } from 'recoil';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -24,7 +24,6 @@ import theme from '~/styles/theme';
 import { emailicon } from '~/assets/icons';
 import useNotification from '~/hooks/useNotification';
 import { mainLogo } from '~/assets/logo';
-import Loading from '~/components/loading';
 
 const iosKeys = {
   kConsumerKey: Config.NAVER_KEY,
@@ -43,7 +42,6 @@ const Onboarding = ({ navigation }: NavigationType) => {
   const setToken = useSetRecoilState(tokenState);
   const [apiBlock, setApiBlock] = useState(false);
   const usePermission = useNotification();
-  const [loading, setLoading] = useState(false);
 
   const goToBadgeSelect = (userData: {
     email: string,
@@ -52,7 +50,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
     providerKey: number,
     providerType: "kakao" | "naver" | "google" | "apple"
   }) => {
-    navigation.navigate("TagSelect", userData);
+    navigation.navigate("WriteProfile", userData);
   };
 
   // * 버튼 연속클릭 방지
@@ -123,8 +121,7 @@ const Onboarding = ({ navigation }: NavigationType) => {
     handleApiBlock();
     GoogleSignin.configure({
       iosClientId: "19978958503-8i0hoibbfta64msltteflpdseev3ruv9.apps.googleusercontent.com",
-      // webClientId: "381936778966-ed1p2hj7111sk00dtbvi3ma5lkk1g4kt.apps.googleusercontent.com"
-      webClientId: "19978958503-rta621e9q96sp6qqgdk13cuijt3nc4ju.apps.googleusercontent.com",
+      webClientId: "19978958503-8i0hoibbfta64msltteflpdseev3ruv9.apps.googleusercontent.com",
     });
 
     await GoogleSignin.signIn();
@@ -174,34 +171,23 @@ const Onboarding = ({ navigation }: NavigationType) => {
     }
   };
 
-  if (loading) {
-    return <Loading />;
-  }
-
   return (
     <View style={styles.container}>
       <View style={{ marginBottom: "auto" }}>
-        <Text style={[{ fontSize: 20, textAlign: "center" }, FONT.SemiBold]}>
+        <Text style={[{ fontSize: 28, textAlign: "center" }, FONT.Bold]}>
           맛있는게 궁금할땐, 뉴뉴!</Text>
         <Text style={[FONT.Regular, {
-          color: theme.color.grayscale.a09ca4,
-          marginTop: h2p(5)
+          marginTop: h2p(10),
+          textAlign: "center"
         }]}>온라인 식품 탐색을 위한 푸드 커뮤니티</Text>
         <Image source={mainLogo} resizeMode="contain" style={styles.logo} />
       </View>
-      <View style={{ marginBottom: h2p(145) }}>
+      <View style={{ marginBottom: h2p(150) }}>
         <View style={{ flexDirection: "row", justifyContent: "center" }}>
-          <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>매일매일 </Text>
-          <Text style={[FONT.Bold, { color: theme.color.grayscale.C_443e49 }]}>
-            맛있는 발견
-          </Text>
-          <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>
-            이 있는 <Text
-              style={[FONT.Bold, { color: theme.color.grayscale.C_443e49 }]}
-            >뉴뉴</Text>를 시작하세요!
-          </Text>
+          <Text style={[FONT.Regular, { fontSize: 16 }]}>매일 매일 맛있는 발견이 있는 </Text>
+          <Text style={[FONT.Bold, { fontSize: 16 }]}>뉴뉴를 시작하세요!</Text>
         </View>
-        <View style={{ flexDirection: "row", marginTop: d2p(20), alignSelf: "center" }}>
+        <View style={{ flexDirection: "row", marginTop: d2p(30), alignSelf: "center" }}>
           <TouchableOpacity onPress={handleKakaoLogin}>
             <Image source={kakaoImg} style={styles.snsImg} />
           </TouchableOpacity>
@@ -221,46 +207,46 @@ const Onboarding = ({ navigation }: NavigationType) => {
           style={{
             marginTop: h2p(20),
             borderRadius: 5,
-            borderWidth: 1, borderColor: theme.color.grayscale.d3d0d5,
             paddingVertical: h2p(14),
             width: Dimensions.get("window").width - d2p(40),
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: "center"
+            justifyContent: "center",
+            backgroundColor: theme.color.grayscale.f7f7fc
           }}>
-          <Image source={emailicon} style={{ marginRight: d2p(10), width: d2p(13), height: d2p(10) }} />
-          <Text style={[FONT.Bold, {
-            textAlign: "center",
-            color: theme.color.grayscale.a09ca4
+          <Text style={[FONT.Regular, {
+            textAlign: "center"
           }]}>이메일로 시작하기</Text>
         </TouchableOpacity>
       </View>
       <View style={{
         width: Dimensions.get("window").width - d2p(40),
         position: "absolute",
-        bottom: isIphoneX() ? getBottomSpace() + h2p(20) : h2p(40)
+        bottom: isIphoneX() ? getBottomSpace() + h2p(20) : h2p(40),
       }}>
-        <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4 }]}>
-          회원가입 시 뉴뉴 서비스 필수 동의 항목</Text>
-        <View style={{ flexDirection: "row" }}>
+        <Text style={[FONT.Regular, { color: theme.color.grayscale.C_78737D, textAlign: "center", lineHeight: 20 }]}>
+          회원가입 시 뉴뉴 서비스 필수 동의 항목인</Text>
+        <View style={{ flexDirection: "row", justifyContent: "center" }}>
           <TouchableOpacity onPress={() => navigation.navigate("privacy")}>
             <Text style={[FONT.Bold, {
               color: theme.color.grayscale.C_443e49,
               textDecorationLine: "underline"
             }]}>개인정보처리방침</Text>
           </TouchableOpacity>
-          <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4 }]}>과 </Text>
+          <Text style={[FONT.Regular, { color: theme.color.grayscale.C_78737D }]}>과 </Text>
           <TouchableOpacity onPress={() => navigation.navigate("term")}>
             <Text style={[FONT.Bold, {
               color: theme.color.grayscale.C_443e49,
               textDecorationLine: "underline"
             }]}>서비스 이용약관</Text>
           </TouchableOpacity>
-          <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4, textAlign: "center" }]}>
-            에 동의하게 됩니다.</Text>
+          <Text style={[FONT.Regular, { color: theme.color.grayscale.C_78737D }]}>
+            에</Text>
         </View>
+        <Text style={[FONT.Regular, { color: theme.color.grayscale.C_78737D, textAlign: "center", lineHeight: 20 }]}>
+          동의한 것으로 간주합니다.</Text>
       </View>
-    </View>
+    </View >
   );
 };
 
@@ -283,9 +269,9 @@ const styles = StyleSheet.create({
     marginLeft: d2p(58),
   },
   snsImg: {
-    width: d2p(50),
-    height: d2p(50),
-    marginHorizontal: d2p(10)
+    width: d2p(60),
+    height: d2p(60),
+    marginHorizontal: d2p(7.5)
   }
 });
 

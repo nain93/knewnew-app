@@ -2,6 +2,9 @@
 
 ## Code push
 
+yarn global add appcenter-cli
+yarn add appcenter appcenter-analytics appcenter-crashes --save-exact
+
 appcenter 로그인 후
 
 appcenter login

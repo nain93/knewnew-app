@@ -9,18 +9,17 @@ interface ReviewIconProp {
   review: "best" | "good" | "bad" | "question" | "";
   imageStyle?: ImageStyle;
   viewStyle?: ViewStyle
-  type?: "image"
 }
 
-const ReviewIcon = ({ review, imageStyle, viewStyle, type }: ReviewIconProp) => {
+const ReviewIcon = ({ review, imageStyle, viewStyle }: ReviewIconProp) => {
   return (
     <View style={[{ flexDirection: 'row', alignItems: 'center' }, viewStyle]}>
       <Image
         source={reviewItem(review)?.image}
         resizeMode="contain"
-        style={[{ width: d2p(17), height: d2p(18) }, imageStyle]}
+        style={[{ width: d2p(16), height: d2p(16) }, imageStyle]}
       />
-      <Text style={[{ marginLeft: d2p(4), fontSize: type === "image" ? 12 : 14 }, FONT.Bold, review === 'best' ? styles.best : (review === 'good' ? styles.good : styles.bad)]}>
+      <Text style={[{ marginLeft: d2p(5), fontSize: 14 }, FONT.SemiBold, review === 'best' ? styles.best : (review === 'good' ? styles.good : styles.bad)]}>
         {reviewItem(review)?.text}</Text>
     </View >
   );

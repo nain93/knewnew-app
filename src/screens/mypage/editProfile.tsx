@@ -12,7 +12,6 @@ import { NavigationRoute } from 'react-navigation';
 import { noProfile } from '~/assets/images';
 import { FONT } from '~/styles/fonts';
 import { BadgeType } from '~/types';
-import { initialBadgeData } from '~/utils/data';
 import { useMutation, useQueryClient } from 'react-query';
 import { editUserProfile } from '~/api/user';
 import { useRecoilValue } from 'recoil';
@@ -22,20 +21,10 @@ import Loading from '~/components/loading';
 import { preSiginedImages, uploadImage } from '~/api';
 import { hitslop } from '~/utils/constant';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import UserTagLayout from '~/components/layout/UserTagLayout';
+import UserTagLayout from '~/components/layout/CategoryLayout';
 import SelectTag from '~/components/selectTag';
-import { postProfileType } from '~/types/user';
-
-interface ProfileEditType {
-  nickname: string,
-  headline: string,
-  profileImage: {
-    fields: {
-      key: string
-    }
-  } | null,
-  remainingPeriod?: number
-}
+import { postProfileType, ProfileEditType } from '~/types/user';
+import FastImage from 'react-native-fast-image';
 
 interface ProfileType {
   nickname: string,
@@ -197,7 +186,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.container}>
         <TouchableOpacity onPress={pickImage} style={styles.profileImage}>
-          <Image source={profile ? { uri: profile } : noProfile}
+          <FastImage source={profile ? { uri: profile } : noProfile}
             style={{
               width: d2p(60), height: d2p(60),
               borderRadius: 60, borderWidth: 1, borderColor: theme.color.grayscale.eae7ec

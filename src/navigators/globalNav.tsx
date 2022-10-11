@@ -1,8 +1,8 @@
-import { Image, Platform, Pressable, Text, View } from 'react-native';
+import { Image, Platform, Pressable, View } from 'react-native';
 import React from 'react';
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import Onboarding from '~/screens/onboarding';
-import TagSelect from '~/screens/onboarding/tagSelect';
+import WriteProfile from '~/screens/onboarding/writeProfile';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import TabNavigator from '~/navigators/tabNav';
 import { d2p } from '~/utils';
@@ -10,7 +10,6 @@ import EditProfile from '~/screens/mypage/editProfile';
 import theme from '~/styles/theme';
 import FeedDetail from '~/screens/feed/detail';
 import Report from '~/screens/report';
-import EmailCheck from '~/screens/onboarding/email/emailCheck';
 import EmailLogin from '~/screens/onboarding/email/emailLogin';
 import EmailSignup from '~/screens/onboarding/email/emailSignup';
 import Setting from '~/screens/setting';
@@ -24,8 +23,6 @@ import ProductDetail from '~/screens/feed/productDetail';
 import ProductList from '~/screens/feed/productList';
 import BlockList from '~/screens/setting/blockList';
 import ProductDetailReady from '~/screens/feed/productDetailReady';
-import Search from '~/screens/search';
-import Welcome3 from '~/screens/onboarding/welcome3';
 import Welcome from '~/screens/onboarding/welcome';
 import UserPage from '~/screens/userPage';
 import Header from '~/components/header';
@@ -35,6 +32,8 @@ import { myIdState } from '~/recoil/atoms';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { hitslop } from '~/utils/constant';
 import CommentAll from '~/screens/feed/comment/commentAll';
+import TagSelect from '~/screens/onboarding/tagSelect';
+import TagResult from '~/screens/onboarding/tagResult';
 
 const Stack = createStackNavigator();
 
@@ -76,14 +75,25 @@ const GlobalNav = ({ token }: { token: string }) => {
               component={Onboarding}
             />
             <Stack.Screen
-              name="TagSelect"
+              name="emailLogin"
+              component={EmailLogin}
               options={{
-                title: "",
-                headerLeft: () => <LeftArrowIcon />,
-                headerLeftContainerStyle: { paddingLeft: d2p(20) },
-                headerShadowVisible: false,
+                headerShown: false
               }}
-              component={TagSelect} />
+            />
+            <Stack.Screen
+              name="emailSignup"
+              component={EmailSignup}
+              options={{
+                headerShown: false
+              }}
+            />
+            <Stack.Screen
+              name="WriteProfile"
+              options={{
+                headerShown: false
+              }}
+              component={WriteProfile} />
           </>
         }
         <Stack.Screen
@@ -93,6 +103,24 @@ const GlobalNav = ({ token }: { token: string }) => {
             headerShown: false
           }}
         />
+        <Stack.Screen
+          name="TagResult"
+          options={{
+            headerShown: false
+          }}
+          component={TagResult} />
+        <Stack.Screen
+          name="Welcome"
+          options={{
+            headerShown: false
+          }}
+          component={Welcome} />
+        <Stack.Screen
+          name="TagSelect"
+          options={{
+            headerShown: false
+          }}
+          component={TagSelect} />
         <Stack.Screen
           name="Write"
           options={{
@@ -104,7 +132,7 @@ const GlobalNav = ({ token }: { token: string }) => {
           name="UserPage"
           options={{
             title: "",
-            header: ({ route, navigation }) => (
+            header: ({ navigation }) => (
               <>
                 <StatusBarPlaceHolder />
                 <Header
@@ -120,7 +148,7 @@ const GlobalNav = ({ token }: { token: string }) => {
 
                   headerRight={
                     <Pressable hitSlop={hitslop}
-                      onPress={() => navigation.navigate("HomeStackNav")}
+                      onPress={() => navigation.navigate("Home")}
                     >
                       <Image source={lightHomeIcon} style={{ width: d2p(24), height: d2p(24) }} />
 
@@ -182,18 +210,6 @@ const GlobalNav = ({ token }: { token: string }) => {
           }}
         />
         <Stack.Screen
-          name="Welcome"
-          options={{
-            headerShown: false
-          }}
-          component={Welcome} />
-        <Stack.Screen
-          name="Welcome3"
-          options={{
-            headerShown: false
-          }}
-          component={Welcome3} />
-        <Stack.Screen
           name="report"
           component={Report}
           options={{
@@ -238,34 +254,6 @@ const GlobalNav = ({ token }: { token: string }) => {
         <Stack.Screen
           name="privacy"
           component={Privacy}
-          options={{
-            headerShown: false
-          }}
-        />
-        <Stack.Screen
-          name="emailCheck"
-          component={EmailCheck}
-          options={{
-            headerShown: false
-          }}
-        />
-        <Stack.Screen
-          name="emailLogin"
-          component={EmailLogin}
-          options={{
-            headerShown: false
-          }}
-        />
-        <Stack.Screen
-          name="emailSignup"
-          component={EmailSignup}
-          options={{
-            headerShown: false
-          }}
-        />
-        <Stack.Screen
-          name="search"
-          component={Search}
           options={{
             headerShown: false
           }}

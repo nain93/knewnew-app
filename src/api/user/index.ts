@@ -30,14 +30,10 @@ interface EditPrfoileType {
   isNotifiable?: boolean,
   isMarketing?: boolean,
   profile: {
-    nickname: string,
-    profileImage: string | null,
-    headline: string,
-    tags: {
-      foodStyle: Array<string>,
-      household: Array<string>,
-      occupation: Array<string>
-    }
+    nickname?: string,
+    profileImage?: string | null,
+    headline?: string,
+    tags?: Array<string>
   }
 }
 
@@ -89,14 +85,17 @@ export const userLogin = async ({ token, providerType, userInput }: UserLoginTyp
 export const userSignup = async ({
   providerType,
   providerKey,
-  email,
   nickname,
-  age,
-  headline,
+  email,
+  password,
+  birth,
+  gender,
   profileImage,
+  headline,
   occupation,
   representBadge,
-  tags
+  tags,
+  isAgreePolicy
 }: UserInfoType) => {
   try {
     const res = await axios.post(baseURL + "auth/signup/", {
@@ -104,12 +103,14 @@ export const userSignup = async ({
       providerKey,
       email,
       nickname,
-      age: 30,
-      headline,
       profileImage,
       occupation,
       representBadge,
-      tags
+      headline,
+      tags,
+      birth,
+      gender,
+      isAgreePolicy
     });
     if (res) {
       return res.data;

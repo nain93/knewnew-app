@@ -1,12 +1,18 @@
 import { AuthorType } from "~/types";
 import { FoodLogType } from "~/types/review";
 
-export interface UserInfoTagType {
-  foodStyle: Array<string>,
-  household: Array<string>,
-  occupation: Array<string>,
-  taste?: Array<string>
+export interface ProfileEditType {
+  nickname: string,
+  headline: string,
+  profileImage: {
+    fields: {
+      key: string
+    }
+  } | null,
+  remainingPeriod?: number
 }
+
+export type UserInfoTagType = Array<string>
 export interface BookmarkType {
   id: number,
   author: AuthorType,
@@ -63,19 +69,23 @@ export interface UserInfoType {
   providerKey: number,
   email: string,
   nickname: string,
-  age?: number,
   headline?: string,
   profileImage?: string,
   occupation?: string,
-  representBadge: string,
-  tags: UserInfoTagType
+  representBadge?: string,
+  tags?: UserInfoTagType,
+  password?: string,
+  birth: string,
+  gender: "male" | "female" | "",
+  markets: string[],
+  isAgreePolicy: boolean
 }
 
 export interface postProfileType {
-  nickname: string,
-  headline: string,
-  profileImage: string | null,
+  nickname?: string,
+  headline?: string,
+  profileImage?: string | null,
   isNotifiable?: boolean,
   isMarketing?: boolean,
-  tags: UserInfoTagType
+  tags?: UserInfoTagType
 }
