@@ -24,13 +24,16 @@ const Header = ({ type, headerRightPress, headerLeft, headerRight, customRight, 
       <View style={[styles.container, viewStyle, { borderBottomWidth: isBorder ? 1 : 0 },
       {
         backgroundColor: bgColor ? bgColor : theme.color.white,
-        marginTop: Platform.OS === "ios" ? getStatusBarHeight() : 0
+        marginTop: Platform.OS === "ios" ? getStatusBarHeight() : 0,
       }]}>
         <View
           style={{ position: "absolute", left: d2p(30), top: h2p(30) }}>
           {headerLeft}
         </View>
-        <Text style={[{ fontSize: 16, color: theme.color.black, includeFontPadding: false }, FONT.Regular]}>
+        <Text style={[{
+          fontSize: 16,
+          color: theme.color.black, includeFontPadding: false
+        }, FONT.Regular]}>
           {title}
         </Text>
         {headerRight ?

@@ -25,6 +25,8 @@ interface TagSelectPropType {
   }>;
 }
 
+const sequence = [5, 14, 23, 32];
+
 const TagSelect = ({ navigation, route }: TagSelectPropType) => {
   const token = useRecoilValue(tokenState);
   const myId = useRecoilValue(myIdState);
@@ -65,7 +67,7 @@ const TagSelect = ({ navigation, route }: TagSelectPropType) => {
               }));
             }}
             style={[styles.tagButton, {
-              marginLeft: i === (5 + 9 * (Math.floor(i / 5) - 1)) ? d2p(36.5) : 0
+              marginLeft: sequence.includes(i) ? d2p(36.5) : 0
             }]}>
             <Text style={[FONT.Medium, {
               color: v.isClick ? theme.color.white : theme.color.black,

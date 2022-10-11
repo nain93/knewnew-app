@@ -4,14 +4,14 @@ import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import Header from '~/components/header';
 import theme from '~/styles/theme';
 import { d2p, h2p } from '~/utils';
-import { knewnewIcon, plusIcon } from '~/assets/icons';
+import { knewnewIcon, plusIcon, settingIcon, whiteSettingIcon } from '~/assets/icons';
 import { TextInput } from 'react-native-gesture-handler';
 import BasicButton from '~/components/button/basicButton';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import { noProfile } from '~/assets/images';
 import { FONT } from '~/styles/fonts';
-import { BadgeType } from '~/types';
+import { BadgeType, InterestTagType } from '~/types';
 import { useMutation, useQueryClient } from 'react-query';
 import { editUserProfile } from '~/api/user';
 import { useRecoilValue } from 'recoil';
@@ -25,27 +25,14 @@ import UserTagLayout from '~/components/layout/CategoryLayout';
 import SelectTag from '~/components/selectTag';
 import { postProfileType, ProfileEditType } from '~/types/user';
 import FastImage from 'react-native-fast-image';
+import { interestTagData } from '~/utils/data';
+import { blogImage, instaImage, youtubeImage } from '~/assets/icons/sns';
 
 interface ProfileType {
   nickname: string,
   headline: string,
   profileImage: string | null,
-  tags: {
-    foodStyle: Array<{
-      title: string;
-      isClick: boolean;
-    }>,
-    household: Array<{
-      title: string;
-      isClick: boolean;
-    }>,
-    occupation: Array<{
-      title: string;
-      isClick: boolean;
-      content?: string
-    }>,
-    taste?: Array<string>
-  }
+  tags: Array<string>
 }
 interface EditProfileProps {
   navigation: NavigationStackProp;
@@ -57,6 +44,9 @@ interface EditProfileProps {
 const EditProfile = ({ navigation, route }: EditProfileProps) => {
   const nameInputRef = useRef<TextInput>(null);
   const selfInputRef = useRef<TextInput>(null);
+  const youtubeRef = useRef<TextInput>(null);
+  const instaRef = useRef<TextInput>(null);
+  const blogRef = useRef<TextInput>(null);
   const scrollRef = useRef<KeyboardAwareScrollView>(null);
   const [profileInfo, setProfileInfo] = useState<ProfileEditType>({
     nickname: "",
@@ -65,7 +55,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
     remainingPeriod: 0
   });
 
-  const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
+  const [taste, setTaste] = useState<string[]>([]);
   const token = useRecoilValue(tokenState);
   const myId = useRecoilValue(myIdState);
   const queryClient = useQueryClient();
@@ -96,12 +86,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
           profileImage: profile.includes("https") ? profile.split("com/")[1] : data[0].fields.key,
           nickname: profileInfo.nickname,
           headline: profileInfo.headline,
-          tags: {
-            foodStyle: [userBadge.foodStyle.filter(v => v.isClick)[0].title],
-            household: [userBadge.household.filter(v => v.isClick)[0].title],
-            occupation: [userBadge.occupation.filter(v => v.content || v.isClick)[0].title],
-            taste: userBadge.taste && userBadge.taste.filter(v => v.isClick).map(v => v.title),
-          }
+          tags: taste
         });
       }
     });
@@ -137,34 +122,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
         } : null
       });
 
-      setUserBadge({
-        foodStyle: userBadge.foodStyle.map(v => {
-          if ((v.title === route.params?.profile.tags.foodStyle[0].title)) {
-            return { ...v, isClick: true };
-          }
-          return { ...v, isClick: false };
-        }),
-        household: userBadge.household.map(v => {
-          if ((v.title === route.params?.profile.tags.household[0].title)) {
-            return { ...v, isClick: true };
-          }
-          return { ...v, isClick: false };
-        }),
-        occupation: userBadge.occupation.map(v => {
-          if ((v.title === route.params?.profile.tags.occupation[0].title)) {
-            return { ...v, isClick: true };
-          }
-          return { ...v, isClick: false };
-        }),
-        taste: userBadge.taste?.map(v => {
-          if (route.params?.profile.tags.taste) {
-            if (route.params?.profile.tags.taste.includes(v.title)) {
-              return { ...v, isClick: true };
-            }
-          }
-          return { ...v, isClick: false };
-        })
-      });
+      setTaste(route.params.profile.tags);
 
     }
   }, [route.params]);
@@ -177,7 +135,7 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
     <>
       <Header
         isBorder={true}
-        headerLeft={<LeftArrowIcon onBackClick={() => navigation.goBack()} imageStyle={{ width: d2p(11), height: d2p(25) }} />}
+        headerLeft={<LeftArrowIcon onBackClick={() => navigation.goBack()} />}
         title="프로필 수정"
       />
       <KeyboardAwareScrollView
@@ -200,15 +158,15 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
             setProfile("");
             setProfileInfo({ ...profileInfo, profileImage: null });
           }}
-          style={{ marginBottom: h2p(40), marginTop: h2p(20), alignSelf: "center" }}>
-          <Text style={[FONT.Regular, { color: theme.color.grayscale.a09ca4 }]}>삭제</Text>
+          style={{ marginTop: h2p(10), alignSelf: "center" }}>
+          <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.d2d0d5 }]}>삭제</Text>
         </TouchableOpacity>
         <View>
-          <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: d2p(20), marginBottom: d2p(10) }}>
+          <View style={styles.profileWrap}>
             <Text style={[styles.inputTitle, FONT.Bold]}>닉네임</Text>
-            <Text style={[styles.inputText, FONT.Regular, {
-              color: profileInfo.nickname.length >= 40 ? theme.color.main : theme.color.grayscale.d3d0d5
-            }]}>{`(${profileInfo.nickname.length}/40자)`}</Text>
+            {/* <Text style={[styles.inputText, FONT.Regular, {
+              color: profileInfo.nickname.length >= 40 ? theme.color.main : theme.color.grayscale.d2d0d5
+            }]}>{`(${profileInfo.nickname.length}/40자) `}</Text> */}
           </View>
           <Pressable onPress={() => nameInputRef.current?.focus()} style={styles.textInput}>
             <TextInput
@@ -230,126 +188,168 @@ const EditProfile = ({ navigation, route }: EditProfileProps) => {
                 minWidth: d2p(135),
                 fontSize: 16, padding: 0, includeFontPadding: false, paddingTop: 0
               }]}
-              placeholder="닉네임을 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
+              placeholder="닉네임을 입력해주세요." placeholderTextColor={theme.color.grayscale.d2d0d5} />
             {!profileInfo.nickname &&
-              <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.ff5d5d }]}> (필수)</Text>
+              <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.mainRed }]}> (필수)</Text>
             }
           </Pressable>
         </View>
 
-        <View style={{ marginTop: h2p(40) }}>
-          <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: d2p(20), marginBottom: d2p(10) }}>
-            <Text style={[styles.inputTitle, FONT.Bold]}>자기소개</Text>
-            <Text style={[styles.inputText, FONT.Regular,
-            { color: profileInfo.headline.length >= 140 ? theme.color.main : theme.color.grayscale.d3d0d5 }]}>
-              {`(${profileInfo.headline.length}/140자)`}</Text>
-          </View>
-          <Pressable onPress={() => selfInputRef.current?.focus()} style={styles.textInput}>
-            <TextInput
-              multiline
-              maxLength={141}
-              value={profileInfo.headline}
-              onChangeText={e => {
-                if (e.length > 140) {
-                  setProfileInfo({ ...profileInfo, headline: e.slice(0, e.length - 1) });
-                }
-                else {
-                  setProfileInfo({ ...profileInfo, headline: e });
-                }
-              }}
-              ref={selfInputRef}
-              autoCapitalize="none"
-              style={[FONT.Regular, {
-                color: theme.color.black,
-                minWidth: d2p(145),
-                fontSize: 16, padding: 0, paddingTop: 0, includeFontPadding: false,
-              }]}
-              placeholder="자기소개를 입력해주세요." placeholderTextColor={theme.color.grayscale.a09ca4} />
-            {!profileInfo.headline &&
-              <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}> (선택)</Text>
-            }
-          </Pressable>
+        <View style={[styles.profileWrap, { flexDirection: "row", alignItems: "center" }]}>
+          <Text style={[styles.inputTitle, FONT.Bold]}>입맛 태그</Text>
+          <Image source={whiteSettingIcon} style={{ width: d2p(16), height: d2p(16) }} />
         </View>
-        <View style={{ marginTop: h2p(40) }}>
-          <Text style={[styles.inputTitle, { marginHorizontal: d2p(20), marginBottom: h2p(10) }, FONT.Bold]}>
-            소개 태그
-          </Text>
-          <View style={{ borderWidth: 1, borderColor: theme.color.grayscale.eae7ec }}>
-            <UserTagLayout
-              viewStyle={{ paddingVertical: h2p(20), paddingHorizontal: d2p(20) }}
-              scrollRef={scrollRef}
-              userBadge={userBadge} setUserBadge={(badge: BadgeType) => setUserBadge(badge)} />
-          </View>
-        </View>
-
-        {/* 보너스 입맛 */}
-        <View style={{ marginTop: h2p(40) }}>
-          <View style={{ marginHorizontal: d2p(20), marginBottom: h2p(10), flexDirection: "row", alignItems: "center" }}>
-            <Image source={knewnewIcon} style={{ width: d2p(20), height: d2p(20), marginRight: d2p(5) }} />
-            <Text style={[FONT.Bold, styles.inputTitle]}>보너스 입맛 태그</Text>
-          </View>
-          <View style={styles.textInput}>
-            <View>
-              <Text style={FONT.Bold}>팔로워에게 보여질 입맛 태그를 선택하세요.</Text>
-              <Text style={[FONT.Regular, { marginTop: h2p(20) }]}>내 입맛을 보다 자세하게 설명할 수 있습니다.</Text>
-              <Text style={FONT.Regular}>입맛 태그는 점점 더 다양해질 예정이니, 기대해주세요!</Text>
-              <View style={{
-                borderWidth: 1,
-                borderRadius: 10,
-                borderColor: theme.color.grayscale.f7f7fc,
-                flexDirection: "row",
-                alignItems: "flex-start",
-                marginTop: h2p(30),
-                paddingHorizontal: d2p(20),
-                paddingVertical: h2p(15),
-                width: Dimensions.get("window").width - d2p(40)
-              }}>
-                <Text style={[FONT.Bold, { fontSize: 12, marginRight: d2p(18), marginTop: h2p(2) }]}>Bonus</Text>
-                <View>
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Text style={[FONT.Bold, { fontSize: 16 }]}>내 입맛을 알려주세요!</Text>
-                    <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.main }]}> (중복가능)</Text>
-                  </View>
-                  {React.Children.toArray(userBadge.taste?.map((bonus, bonusIdx) => (
-                    <Pressable onPress={() => {
-                      setUserBadge({
-                        ...userBadge,
-                        taste: userBadge.taste?.map((v, i) => {
-                          if (i === bonusIdx) {
-                            return { ...v, isClick: !v.isClick };
-                          }
-                          return v;
-                        })
-                      });
-                    }}>
-                      <SelectTag viewStyle={{ paddingTop: h2p(15) }} name={bonus.title} isSelected={bonus.isClick} />
-                    </Pressable>
-                  )))}
-                </View>
-              </View>
-            </View>
-          </View>
-        </View>
-        <BasicButton viewStyle={{ alignSelf: "center", marginTop: h2p(40) }}
-          onPress={() => {
-            if (!profileInfo.profileImage && !profile) {
-              editProfileMutation.mutate({
-                profileImage: null,
-                nickname: profileInfo.nickname,
-                headline: profileInfo.headline,
-                tags: {
-                  foodStyle: [userBadge.foodStyle.filter(v => v.isClick)[0].title],
-                  household: [userBadge.household.filter(v => v.isClick)[0].title],
-                  occupation: [userBadge.occupation.filter(v => v.content || v.isClick)[0].title],
-                  taste: userBadge.taste && userBadge.taste.filter(v => v.isClick).map(v => v.title),
-                }
-              });
-            }
-            else {
-              presignMutation.mutate([profile]);
-            }
+        <Pressable
+          style={{
+            flexDirection: "row",
+            paddingTop: h2p(5),
+            paddingBottom: h2p(10),
+            borderTopWidth: 1,
+            borderBottomWidth: 1,
+            borderColor: theme.color.grayscale.f7f7fc,
+            paddingHorizontal: d2p(20),
+            flexWrap: "wrap"
           }}
-          text="수정 완료" textColor={theme.color.main} bgColor={theme.color.white} />
+        >
+          {React.Children.toArray(["빵식가", "달달", "할매입맛", "해산물매니아", "식재료수집가"].map(v => (
+            <View style={{
+              borderWidth: 1,
+              borderColor: theme.color.black,
+              marginRight: d2p(5),
+              paddingHorizontal: d2p(10), paddingVertical: h2p(4),
+              borderRadius: 12,
+              marginTop: h2p(5)
+            }}>
+              <Text style={[FONT.Medium, { fontSize: 10 }]}>{v}</Text>
+            </View>
+          )))}
+        </Pressable>
+
+        <View style={styles.profileWrap}>
+          <Text style={[styles.inputTitle, FONT.Bold]}>자기소개</Text>
+          <Text style={[styles.inputText, FONT.Regular,
+          { color: profileInfo.headline.length >= 140 ? theme.color.main : theme.color.grayscale.d3d0d5 }]}>
+            {`(${profileInfo.headline.length}/140자)`}</Text>
+        </View>
+        <Pressable onPress={() => selfInputRef.current?.focus()}
+          style={styles.textInput}>
+          <TextInput
+            multiline
+            onFocus={() => {
+              setTimeout(() => {
+                scrollRef.current?.scrollToPosition(0, 100, true);
+              }, 300);
+            }}
+            maxLength={141}
+            value={profileInfo.headline}
+            onChangeText={e => {
+              if (e.length > 140) {
+                setProfileInfo({ ...profileInfo, headline: e.slice(0, e.length - 1) });
+              }
+              else {
+                setProfileInfo({ ...profileInfo, headline: e });
+              }
+            }}
+            ref={selfInputRef}
+            autoCapitalize="none"
+            style={[FONT.Regular, {
+              color: theme.color.black,
+              minWidth: d2p(145),
+              fontSize: 16,
+              includeFontPadding: false,
+              paddingTop: 0,
+            }]}
+            placeholder="자기소개를 입력해주세요." placeholderTextColor={theme.color.grayscale.d2d0d5} />
+          {!profileInfo.headline &&
+            <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_443e49 }]}> (선택)</Text>
+          }
+        </Pressable>
+
+        <View style={styles.profileWrap}>
+          <Text style={[styles.inputTitle, FONT.Bold]}>SNS 연동</Text>
+        </View>
+
+        <Pressable onPress={() => youtubeRef.current?.focus()} style={styles.textInput}>
+          <Image source={youtubeImage} style={{ width: d2p(23), height: d2p(23), marginRight: d2p(10.5) }} />
+          <TextInput
+            value={profileInfo.headline}
+            onChangeText={e => {
+              if (e.length > 140) {
+                setProfileInfo({ ...profileInfo, headline: e.slice(0, e.length - 1) });
+              }
+              else {
+                setProfileInfo({ ...profileInfo, headline: e });
+              }
+            }}
+            ref={youtubeRef}
+            autoCapitalize="none"
+            style={[FONT.Regular, {
+              color: theme.color.black,
+              minWidth: d2p(145),
+              padding: 0, paddingTop: 0, includeFontPadding: false,
+            }]}
+            placeholder="URL을 입력해주세요." placeholderTextColor={theme.color.grayscale.d2d0d5} />
+        </Pressable>
+        <Pressable onPress={() => instaRef.current?.focus()} style={[styles.textInput, { borderTopWidth: 0 }]}>
+          <Image source={instaImage} style={{ width: d2p(23), height: d2p(23), marginRight: d2p(10.5) }} />
+          <TextInput
+            value={profileInfo.headline}
+            onChangeText={e => {
+              if (e.length > 140) {
+                setProfileInfo({ ...profileInfo, headline: e.slice(0, e.length - 1) });
+              }
+              else {
+                setProfileInfo({ ...profileInfo, headline: e });
+              }
+            }}
+            ref={instaRef}
+            autoCapitalize="none"
+            style={[FONT.Regular, {
+              color: theme.color.black,
+              minWidth: d2p(145),
+              padding: 0, paddingTop: 0, includeFontPadding: false,
+            }]}
+            placeholder="URL을 입력해주세요." placeholderTextColor={theme.color.grayscale.d2d0d5} />
+        </Pressable>
+        <Pressable onPress={() => blogRef.current?.focus()} style={[styles.textInput, { borderTopWidth: 0 }]}>
+          <Image source={blogImage} style={{ width: d2p(23), height: d2p(23), marginRight: d2p(10.5) }} />
+          <TextInput
+            value={profileInfo.headline}
+            onChangeText={e => {
+              if (e.length > 140) {
+                setProfileInfo({ ...profileInfo, headline: e.slice(0, e.length - 1) });
+              }
+              else {
+                setProfileInfo({ ...profileInfo, headline: e });
+              }
+            }}
+            ref={blogRef}
+            autoCapitalize="none"
+            style={[FONT.Regular, {
+              color: theme.color.black,
+              minWidth: d2p(145),
+              padding: 0, paddingTop: 0, includeFontPadding: false,
+            }]}
+            placeholder="URL을 입력해주세요." placeholderTextColor={theme.color.grayscale.d2d0d5} />
+        </Pressable>
+
+        <View style={{ marginTop: h2p(40) }}>
+          <BasicButton viewStyle={{ alignSelf: "center" }}
+            onPress={() => {
+              if (!profileInfo.profileImage && !profile) {
+                editProfileMutation.mutate({
+                  profileImage: null,
+                  nickname: profileInfo.nickname,
+                  headline: profileInfo.headline,
+                  tags: taste
+                });
+              }
+              else {
+                presignMutation.mutate([profile]);
+              }
+            }}
+            text="수정 완료" textColor={theme.color.main} bgColor={theme.color.white} />
+        </View>
       </KeyboardAwareScrollView>
     </>
   );
@@ -368,10 +368,16 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     alignSelf: "center"
   },
-
+  profileWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: d2p(20),
+    marginBottom: d2p(10),
+    marginTop: h2p(40)
+  },
   inputTitle: {
     fontSize: 16,
-    marginRight: d2p(10)
+    marginRight: d2p(5)
   },
   inputText: {
     fontSize: 12,
@@ -381,7 +387,7 @@ const styles = StyleSheet.create({
     paddingVertical: h2p(15),
     flexDirection: "row", alignItems: "center",
     borderWidth: 1,
-    borderColor: theme.color.grayscale.eae7ec
+    borderColor: theme.color.grayscale.f7f7fc
   },
   badgeGuide: {
     color: theme.color.main,

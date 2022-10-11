@@ -96,6 +96,7 @@ import colorThumbDown from "./colorThumbDown.png";
 import colorThumbUp from "./colorThumbUp.png";
 import colorTriangle from "./colorTriangle.png";
 import grayLinkIcon from "./grayLinkIcon.png";
+import whiteSettingIcon from "./whiteSettingIcon.png";
 
 
 export {
@@ -105,10 +106,10 @@ export {
   graywrite, graylogo, graymypage, graysearch, mainmypage, mainlogoIcon, write, plusIcon, recommentIcon,
   handIcon, tagFood, tagHome, tagLife, emailicon, noticeIcon, alertIcon, eyeIcon, colorEyeIcon, checkIcon, tagIcon,
   selectTagIcon, knewnewIcon, settingIcon, rightArrow, settingKnewnew, grayCheckIcon, question, grayquestion, smallClose, whiteClose,
-  grayEyeIcon, grayKnewnew, grayCart, circleQuestion, marketIcon, goldStarIcon, starIcon, bookmark, graybookmark,tasteMoreIcon, smallRightArrow,
+  grayEyeIcon, grayKnewnew, grayCart, circleQuestion, marketIcon, goldStarIcon, starIcon, bookmark, graybookmark, tasteMoreIcon, smallRightArrow,
   shareIcon, mainNotiIcon, notiIcon, eyesIcon, mainPlusIcon, lightHomeIcon, userIcon, filterIcon, blackRightArrow,
   colorBookmark, whiteLeftArrow, whiteMoreIcon, mainBookmark, blackShare, blackComment, blackHeart, linkIcon,
   blackLeftArrow, blackMoreIcon, blackRightSmallArrow, foodImage, marketImage, priceImage, grayDownIcon,
-  triangle, thumbUp, thumbDown, colorTriangle, colorThumbDown, colorThumbUp, grayLinkIcon
+  triangle, thumbUp, thumbDown, colorTriangle, colorThumbDown, colorThumbUp, grayLinkIcon, whiteSettingIcon
 };
 

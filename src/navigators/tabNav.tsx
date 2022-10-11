@@ -150,14 +150,19 @@ const TabNavigator = () => {
             },
           })}
           options={{
-            tabBarLabel: "마이",
+            tabBarLabel: "마이 뉴뉴",
             header: ({ navigation }) => (
               <>
                 <StatusBarPlaceHolder />
                 <Header
-                  title={"마이"}
+                  title={"마이 뉴뉴"}
                   bgColor={theme.color.white}
-                  headerRight={<Image source={settingIcon} style={{ width: d2p(16), height: d2p(16) }} />}
+                  headerRight={
+                    <Image source={settingIcon} style={{
+                      width: d2p(20), height: d2p(20),
+                      top: h2p(-2)
+                    }} />
+                  }
                   headerRightPress={() => navigation.navigate("setting")}
                 />
               </>

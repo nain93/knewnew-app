@@ -97,6 +97,16 @@ export const userSignup = async ({
   tags,
   isAgreePolicy
 }: UserInfoType) => {
+  // console.log(providerType, 'providerType');
+  // console.log(providerKey, 'providerKey');
+  // console.log(email, 'email');
+  // console.log(nickname, 'nickname');
+  // console.log(age, 'age');
+  // console.log(headline, 'headline');
+  // console.log(profileImage, 'profileImage');
+  // console.log(occupation, 'occupation');
+  // console.log(representBadge, 'representBadge');
+  // console.log(tags, 'tags');
   try {
     const res = await axios.post(baseURL + "auth/signup/", {
       providerType,
