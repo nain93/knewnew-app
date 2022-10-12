@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Dimensions, ViewStyle, Pressable } from "react-native";
+import { View, Text, StyleSheet, Dimensions, ViewStyle, TouchableOpacity, ActivityIndicator } from "react-native";
 import { FONT } from "~/styles/fonts";
 import theme from "~/styles/theme";
 import { d2p } from "~/utils";
@@ -9,21 +9,31 @@ interface BasicButtonProp {
   bgColor: string;
   textColor: string;
   viewStyle?: ViewStyle;
+  boxStyle?: ViewStyle
   onPress: () => void;
   borderColor?: string;
-  disabled?: boolean
+  disabled?: boolean;
+  loading?: boolean
 }
 
-const BasicButton = ({ disabled, text, bgColor, textColor, borderColor, viewStyle, onPress }: BasicButtonProp) => {
+const BasicButton = ({ loading = false, disabled, text, bgColor, textColor, borderColor, boxStyle, viewStyle, onPress }: BasicButtonProp) => {
   return (
-    <Pressable
+    <TouchableOpacity
+      style={boxStyle}
       disabled={disabled}
-      onPress={onPress}>
+      onPress={() => {
+        if (!loading) {
+          onPress();
+        }
+      }}>
       <View style={[styles.container, viewStyle, { backgroundColor: disabled ? theme.color.grayscale.f7f7fc : bgColor },
       { borderColor: disabled ? theme.color.grayscale.e9e7ec : (borderColor ? borderColor : textColor) }]}>
-        <Text style={[styles.text, { color: disabled ? theme.color.grayscale.d3d0d5 : textColor }, FONT.Bold]}>{text}</Text>
+        {loading ? <ActivityIndicator color={bgColor === "#ffffff" ? theme.color.main : "white"} />
+          :
+          <Text style={[styles.text, { color: disabled ? theme.color.grayscale.d3d0d5 : textColor }, FONT.Bold]}>{text}</Text>
+        }
       </View>
-    </Pressable>
+    </TouchableOpacity>
   );
 };
 

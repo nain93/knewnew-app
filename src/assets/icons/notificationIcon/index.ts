@@ -12,9 +12,11 @@ import notiComment from "./notiComment.png";
 import notiRecomment from "./notiRecomment.png";
 import notiHeart from "./notiHeart.png";
 import notiMention from "./notiMention.png";
+import whiteCheckIcon from "./whiteCheckIcon.png";
+
 
 export {
   cart, comment, likeComment, likeReview, mention, reComment, reknewRenewal,
   notiView, notiLike, notiBookmark, notiComment, notiRecomment, notiHeart,
-  notiMention
+  notiMention, whiteCheckIcon
 };

@@ -35,6 +35,7 @@ import { myIdState } from '~/recoil/atoms';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { hitslop } from '~/utils/constant';
 import CommentAll from '~/screens/feed/comment/commentAll';
+import EventPage from '~/screens/event';
 
 const Stack = createStackNavigator();
 
@@ -92,6 +93,13 @@ const GlobalNav = ({ token }: { token: string }) => {
           options={{
             headerShown: false
           }}
+        />
+        <Stack.Screen
+          name="EventPage"
+          options={{
+            headerShown: false
+          }}
+          component={EventPage}
         />
         <Stack.Screen
           name="Write"

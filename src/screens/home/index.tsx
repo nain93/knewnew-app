@@ -9,7 +9,7 @@ import { hitslop } from '~/utils/constant';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import theme from '~/styles/theme';
-import { eyesIcon, graysearch, mainPlusIcon } from '~/assets/icons';
+import { graysearch, mainPlusIcon } from '~/assets/icons';
 import { myIdState, tokenState } from '~/recoil/atoms';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { FONT } from '~/styles/fonts';
@@ -17,7 +17,6 @@ import {
   beerFoodlog, begunFoodlog, breadFoodlog, cafeFoodlog, cakeFoodlog, campFoodlog,
   coupangImage, dieterFoodlog, etcImage, kurlyImage, naverImage, newFoodlog, riceFoodlog, ssgImage
 } from '~/assets/images/home';
-import { interestTagData } from '~/utils/data';
 import { fireImg } from '~/assets/images';
 import { useQuery } from 'react-query';
 import { getMyProfile } from '~/api/user';
@@ -62,7 +61,7 @@ interface RecommendFoodType {
 
 interface RecommendType {
   id: number,
-  subtitle: string,
+  priority: number,
   title: string,
   contents: Array<{
     id: number,
@@ -78,7 +77,7 @@ const Home = ({ navigation, route }: HomeProps) => {
   const homeRef = useRef<ScrollView>(null);
   const getBannerQuery = useQuery<BannerType, Error>("banner", () => getBanner(token));
   const getFoodLogCountQuery = useQuery<{ count: number }, Error>("foodLogCount", () => getFoodLogCount(token));
-  const getRecommendQuery = useQuery<RecommendType, Error>("recommend", () => getRecommend({ token }));
+  const getRecommendQuery = useQuery<RecommendType[], Error>("recommend", () => getRecommend({ token }));
   const getRecommendFoodQuery = useQuery<RecommendFoodType, Error>("recommendFoodLog", () =>
     getRecommendFoodLog({ token, sort: "0" }));
   useQuery<MyProfileType, Error>(["myProfile", token], () => getMyProfile(token), {
@@ -148,7 +147,7 @@ const Home = ({ navigation, route }: HomeProps) => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.container}>
-          <Text style={[FONT.ExtraBold, { textAlign: "center", fontSize: 18 }]}>
+          {/* <Text style={[FONT.ExtraBold, { textAlign: "center", fontSize: 18 }]}>
             FOODLOG ROOM
           </Text>
           <Text style={[FONT.Regular, {
@@ -215,11 +214,11 @@ const Home = ({ navigation, route }: HomeProps) => {
                 );
               }
             }))}
-          </View>
+          </View> */}
 
           <View>
             {getBannerQuery.isLoading ?
-              <View style={[styles.banner, { height: h2p(120) }]}>
+              <View style={[styles.banner, { height: h2p(160) }]}>
                 <Loading viewStyle={{ top: h2p(20) }} />
               </View>
               :
@@ -231,63 +230,15 @@ const Home = ({ navigation, route }: HomeProps) => {
                 }}
                 style={styles.banner}>
                 <FastImage
-                  style={{ width: "100%", height: h2p(120) }}
+                  style={{ width: "100%", height: h2p(160) }}
                   source={{ uri: getBannerQuery.data?.image }} />
               </Pressable>
             }
-            {getRecommendQuery.data &&
-              <View style={{ paddingVertical: h2p(30), paddingHorizontal: d2p(15) }}>
-                <View style={[styles.title, { marginBottom: h2p(10), marginHorizontal: d2p(5) }]}>
-                  <Text style={[FONT.Bold, { fontSize: 18 }]}>
-                    {/* {`추천컨텐츠\n제목(어드민에서 입력)`} */}
-                    {getRecommendQuery.data.title}
-                  </Text>
-                  <Text style={[FONT.Regular, {
-                    fontSize: 12,
-                    color: theme.color.grayscale.C_443e49
-                  }]}>
-                    {getRecommendQuery.data.subtitle}
-                  </Text>
-                </View>
 
-                <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-                  {React.Children.toArray(getRecommendQuery.data.contents.map(v => (
-                    <Pressable
-                      onPress={() => navigation.navigate("FeedDetail", { id: v.review })}
-                    >
-                      {v.image &&
-                        <Image
-                          source={{ uri: v.image }}
-                          style={{
-                            borderWidth: 1,
-                            borderColor: theme.color.grayscale.eae7ec,
-                            marginVertical: h2p(10),
-                            marginHorizontal: d2p(5),
-                            width: d2p(155), aspectRatio: 1, backgroundColor: theme.color.white, borderRadius: 5
-                          }} />
-                      }
-                      <Text style={[FONT.Medium, {
-                        fontSize: 12,
-                        width: d2p(155),
-                        marginLeft: d2p(5)
-                      }]}>
-                        {v.comment}
-                      </Text>
-                    </Pressable>
-                  )))}
-                </View>
-                {/*<BasicButton
-                  onPress={() => {
-                    // todo 추천컨텐츠에 맞는 푸드로그 필터로 바꿔주기 (백에서 보내주는 데이터)
-                    navigation.navigate("Feed", { foodLog: "애주가" });
-                  }}
-                  viewStyle={{ marginHorizontal: d2p(5), marginTop: h2p(30), marginBottom: h2p(10) }}
-                  bgColor={theme.color.white}
-                text="더보기" borderColor={theme.color.main} textColor={theme.color.main} />*/}
-              </View>
-            }
-
-            <View style={[styles.borderBar, { paddingVertical: h2p(40), paddingHorizontal: d2p(20) }]}>
+            <View style={[styles.borderBar, {
+              paddingVertical: h2p(40),
+              paddingHorizontal: d2p(20)
+            }]}>
               <Text style={[FONT.Medium, { fontSize: 12 }]}>
                 무료 배송 금액이 남는다면?
               </Text>
@@ -295,11 +246,17 @@ const Home = ({ navigation, route }: HomeProps) => {
                 구매처별 인생템 구경하기
               </Text>
               <View style={{
-                flexDirection: "row", marginTop: h2p(20),
+                flexDirection: "row", marginTop: h2p(30),
                 width: Dimensions.get("window").width - d2p(40),
                 alignSelf: "center",
                 justifyContent: "space-between"
               }}>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("Feed", { foodLog: "all" })}
+                  style={styles.ImageWrap}>
+                  <Image source={etcImage} style={[styles.marketImage, { marginRight: 0 }]} />
+                  <Text style={[FONT.Regular, { fontSize: 12 }]}>모두보기</Text>
+                </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => navigation.navigate("Feed", { market: "네이버 쇼핑" })}
                   style={styles.ImageWrap}>
@@ -324,14 +281,64 @@ const Home = ({ navigation, route }: HomeProps) => {
                   <Image source={coupangImage} style={styles.marketImage} />
                   <Text style={[FONT.Regular, { fontSize: 12 }]}>쿠팡</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate("Feed", { market: "기타" })}
-                  style={styles.ImageWrap}>
-                  <Image source={etcImage} style={[styles.marketImage, { marginRight: 0 }]} />
-                  <Text style={[FONT.Regular, { fontSize: 12 }]}>기타</Text>
-                </TouchableOpacity>
               </View>
             </View>
+
+            {getRecommendQuery.data &&
+              React.Children.toArray(getRecommendQuery.data.map(v => {
+                return (
+                  <>
+                    <View style={{ paddingVertical: h2p(30), paddingHorizontal: d2p(15) }}>
+                      <View style={[styles.title, { marginBottom: h2p(10), marginHorizontal: d2p(5) }]}>
+                        <Text style={[FONT.Bold, { fontSize: 18 }]}>
+                          {/* {`추천컨텐츠\n제목(어드민에서 입력)`} */}
+                          {v.title}
+                        </Text>
+                      </View>
+
+                      <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                        {
+                          React.Children.toArray(v.contents.map(content => (
+                            <>
+                              <Pressable
+                                onPress={() => navigation.navigate("FeedDetail", { id: content.review })}
+                              >
+                                {content.image &&
+                                  <FastImage
+                                    source={{ uri: content.image }}
+                                    style={{
+                                      borderWidth: 1,
+                                      borderColor: theme.color.grayscale.eae7ec,
+                                      marginVertical: h2p(10),
+                                      marginHorizontal: d2p(5),
+                                      width: d2p(155), aspectRatio: 1, backgroundColor: theme.color.white, borderRadius: 5
+                                    }} />
+                                }
+                                <Text style={[FONT.Medium, {
+                                  fontSize: 14,
+                                  width: d2p(155),
+                                  marginLeft: d2p(5)
+                                }]}>
+                                  {content.comment}
+                                </Text>
+                              </Pressable>
+
+                              {/* <BasicButton
+                              onPress={() => {
+                                // todo 추천컨텐츠에 맞는 푸드로그 필터로 바꿔주기 (백에서 보내주는 데이터)
+                                navigation.navigate("Feed", { foodLog: "애주가" });
+                              }}
+                              viewStyle={{ marginHorizontal: d2p(5), marginTop: h2p(30), marginBottom: h2p(10) }}
+                              bgColor={theme.color.white}
+                            text="더보기" borderColor={theme.color.main} textColor={theme.color.main} /> */}
+                            </>
+                          )))
+                        }
+                      </View>
+                    </View>
+                  </>
+                );
+              }))}
 
             <View style={[styles.borderBar, { paddingVertical: h2p(40) }]}>
               <View style={[styles.title, { marginHorizontal: d2p(20) }]}>
@@ -341,7 +348,7 @@ const Home = ({ navigation, route }: HomeProps) => {
                 </Text>
               </View>
 
-              <FlatList
+              {/* <FlatList
                 horizontal
                 contentContainerStyle={{ paddingHorizontal: d2p(15) }}
                 style={{ marginTop: h2p(20) }}
@@ -412,7 +419,7 @@ const Home = ({ navigation, route }: HomeProps) => {
                     <Text style={[FONT.Bold, { color: theme.color.main }]}>더보기</Text>
                   </Pressable>
                 )}
-              />
+              /> */}
             </View>
           </View>
 
@@ -427,7 +434,7 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     marginBottom: h2p(80),
-    paddingTop: h2p(20)
+    paddingTop: h2p(10)
   },
   marketImage: {
     width: d2p(52),
@@ -440,7 +447,6 @@ const styles = StyleSheet.create({
   },
   banner: {
     width: Dimensions.get("window").width,
-    marginTop: h2p(30),
     borderWidth: 1,
     borderColor: theme.color.grayscale.eae7ec
   },
