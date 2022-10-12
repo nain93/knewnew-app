@@ -2,14 +2,15 @@ import {
   Dimensions, FlatList, Image, Linking, Platform, Pressable, RefreshControl,
   ScrollView, StyleSheet, Text, TouchableOpacity, View
 } from 'react-native';
-import React, { useCallback, useEffect, useRef } from 'react';
+import Modal from "react-native-modal";
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
 import { d2p, h2p } from '~/utils';
 import { hitslop } from '~/utils/constant';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import theme from '~/styles/theme';
-import { eyesIcon, graysearch, mainPlusIcon } from '~/assets/icons';
+import { close, eyesIcon, graysearch, mainPlusIcon, whiteClose } from '~/assets/icons';
 import { myIdState, tokenState } from '~/recoil/atoms';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { FONT } from '~/styles/fonts';
@@ -18,7 +19,7 @@ import {
   coupangImage, dieterFoodlog, etcImage, kurlyImage, naverImage, newFoodlog, riceFoodlog, ssgImage
 } from '~/assets/images/home';
 import { interestTagData } from '~/utils/data';
-import { fireImg } from '~/assets/images';
+import { eventImage, fireImg } from '~/assets/images';
 import { useQuery } from 'react-query';
 import { getMyProfile } from '~/api/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -30,6 +31,7 @@ import SplashScreen from 'react-native-splash-screen';
 import { homeLogo } from '~/assets/logo';
 import BasicButton from '~/components/button/basicButton';
 import { useFocusEffect } from '@react-navigation/native';
+import { isIphoneX } from 'react-native-iphone-x-helper';
 
 export interface HomeProps {
   navigation: NavigationStackProp;
@@ -76,6 +78,7 @@ const Home = ({ navigation, route }: HomeProps) => {
   const [token, setToken] = useRecoilState(tokenState);
   const setMyId = useSetRecoilState(myIdState);
   const homeRef = useRef<ScrollView>(null);
+  const [eventModalOpen, setEventModalOpen] = useState(false);
   const getBannerQuery = useQuery<BannerType, Error>("banner", () => getBanner(token));
   const getFoodLogCountQuery = useQuery<{ count: number }, Error>("foodLogCount", () => getFoodLogCount(token));
   const getRecommendQuery = useQuery<RecommendType, Error>("recommend", () => getRecommend({ token }));
@@ -219,19 +222,24 @@ const Home = ({ navigation, route }: HomeProps) => {
 
           <View>
             {getBannerQuery.isLoading ?
-              <View style={[styles.banner, { height: h2p(120) }]}>
+              <View style={[styles.banner, { height: h2p(160) }]}>
                 <Loading viewStyle={{ top: h2p(20) }} />
               </View>
               :
               <Pressable
                 onPress={() => {
                   if (getBannerQuery.data?.link) {
-                    Linking.openURL(getBannerQuery.data?.link);
+                    if (getBannerQuery.data.link.includes("event")) {
+                      setEventModalOpen(true);
+                    }
+                    else {
+                      Linking.openURL(getBannerQuery.data?.link);
+                    }
                   }
                 }}
                 style={styles.banner}>
                 <FastImage
-                  style={{ width: "100%", height: h2p(120) }}
+                  style={{ width: "100%", height: h2p(160) }}
                   source={{ uri: getBannerQuery.data?.image }} />
               </Pressable>
             }
@@ -418,6 +426,42 @@ const Home = ({ navigation, route }: HomeProps) => {
 
         </View>
       </ScrollView >
+
+      {/* 이벤트 이미지 팝업 */}
+      <Modal
+        isVisible={eventModalOpen}
+        style={{ alignItems: "center" }}
+        hideModalContentWhileAnimating={true}
+        animationIn="fadeIn"
+        animationOut="fadeOut"
+        onBackdropPress={() => setEventModalOpen(false)}
+        backdropTransitionOutTiming={0}
+        onBackButtonPress={() => setEventModalOpen(false)}
+      >
+        <Pressable style={{
+          width: Dimensions.get("window").width - d2p(40),
+          borderRadius: 10,
+        }}
+          onPress={() => setEventModalOpen(false)}
+        >
+          <Image source={whiteClose} style={{
+            position: "absolute",
+            right: d2p(20),
+            top: h2p(15),
+            zIndex: 10,
+            width: d2p(20), height: d2p(20)
+          }} />
+          <FastImage
+            source={eventImage}
+            style={{
+              width: Dimensions.get("window").width - d2p(60),
+              alignSelf: "center",
+              height: isIphoneX() ? h2p(600) : h2p(650),
+              borderRadius: 10,
+            }}
+          />
+        </Pressable>
+      </Modal>
     </>
   );
 };
