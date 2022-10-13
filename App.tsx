@@ -100,14 +100,24 @@ const App = () => {
     if (!__DEV__) {
       installUpdateIfAvailable();
     }
+    SplashScreen.hide();
   }, []);
 
   // * 포어그라운드에서 딥링크 들어올때
-  const handleDynamicLink = (link: FirebaseDynamicLinksTypes.DynamicLink) => {
+  const handleDynamicLink = async (link: FirebaseDynamicLinksTypes.DynamicLink) => {
+    const storageToken = await AsyncStorage.getItem("token");
+    if (!storageToken) {
+      // * 토큰 없을때 네비게이트 차단
+      return;
+    }
     // Handle dynamic link inside your own application
-    if (link?.url.includes("knewnew")) {
+    if (link?.url.includes("id")) {
       //@ts-ignore
       navigationRef.navigate("FeedDetail", { id: link.url.split("id=")[1] });
+    }
+    else if (link?.url.includes("event")) {
+      //@ts-ignore
+      navigationRef.navigate("EventPage");
     }
   };
 
@@ -127,12 +137,15 @@ const App = () => {
           // * 토큰 없을때 네비게이트 차단
           return;
         }
-        if (link?.url.includes("knewnew")) {
+        if (link?.url.includes("id")) {
           setTimeout(() => {
             //@ts-ignore
             navigationRef.navigate("FeedDetail", { id: link.url.split("id=")[1] });
           }, 1000);
-
+        }
+        else if (link?.url.includes("event")) {
+          //@ts-ignore
+          navigationRef.navigate("EventPage");
         }
       });
   }, []);
@@ -334,7 +347,7 @@ const App = () => {
             // * 구글 애널리틱스 추적
             await analytics().logScreenView({
               screen_name: currentRouteName,
-              screen_class: currentRouteName,
+              screen_class: currentRouteName
             });
           }
           //@ts-ignore 

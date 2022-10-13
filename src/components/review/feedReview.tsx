@@ -4,7 +4,7 @@ import React, { memo, useEffect, useState } from 'react';
 import theme from '~/styles/theme';
 import { d2p, h2p, simpleDate } from '~/utils';
 import ReviewIcon from '../icon/reviewIcon';
-import { bookmark, cart, colorCart, colorLike, comment, graybookmark, grayEyeIcon, like, more } from '~/assets/icons';
+import { blackRightArrow, bookmark, cart, colorCart, colorLike, comment, graybookmark, grayEyeIcon, like, more } from '~/assets/icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 //@ts-ignore
@@ -257,7 +257,8 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
         <View style={{
           marginLeft: d2p(30),
           flexDirection: 'row',
-          marginBottom: h2p(10)
+          marginBottom: h2p(10),
+          width: Dimensions.get("window").width - d2p(70),
         }}>
           <TouchableOpacity
             onPress={() => {
@@ -274,16 +275,32 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
               }
             }}
             style={{
-              backgroundColor: "rgba(234,231,236,0.4)",
-              paddingHorizontal: d2p(5),
-              paddingVertical: h2p(4),
-              borderRadius: 4
+              borderWidth: 1,
+              borderColor: theme.color.grayscale.eae7ec,
+              paddingHorizontal: d2p(10),
+              paddingVertical: h2p(10),
+              borderRadius: 5
             }}>
+            {review.market &&
+              <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
+                {review.market}
+              </Text>
+            }
             <Text style={[FONT.Medium, {
-              color: review.product.isVerified ? "#5193f6" : theme.color.grayscale.C_79737e,
+              marginTop: h2p(5),
+              color: theme.color.black
             }]}>
-              {`${review.product.name} >`}
+              {review.product.name}
             </Text>
+            {review.product.isVerified &&
+              <Image source={blackRightArrow}
+                style={{
+                  position: "absolute",
+                  right: d2p(10),
+                  bottom: h2p(10),
+                  width: d2p(8), height: d2p(14)
+                }} />
+            }
           </TouchableOpacity>
         </View>
       }

@@ -1,4 +1,4 @@
-import { View, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, Keyboard, FlatList } from 'react-native';
+import { View, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, Keyboard, FlatList, Linking } from 'react-native';
 import Text from '~/components/style/CustomText';
 import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import Header from '~/components/header';
@@ -6,7 +6,7 @@ import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import theme from '~/styles/theme';
 import { d2p, dateCommentFormat, h2p, simpleDate } from '~/utils';
 import ReactionIcon from '~/components/icon/reactionIcon';
-import { commentMore, lightHomeIcon, marketIcon, more, reKnew, shareIcon, tag, tagHome, userIcon } from '~/assets/icons';
+import { blackRightArrow, blackRightSmallArrow, commentMore, lightHomeIcon, marketIcon, more, reKnew, rightTopArrowIcon, shareIcon, tag, tagHome, userIcon } from '~/assets/icons';
 import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { bottomDotSheetState, myIdState, okPopupState, popupState, refreshState, tokenState } from '~/recoil/atoms';
@@ -16,6 +16,7 @@ import { NavigationRoute } from 'react-navigation';
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 import FastImage from 'react-native-fast-image';
 import Share from 'react-native-share';
+import analytics from '@react-native-firebase/analytics';
 
 import { bookmarkReview, deleteReview, getReviewDetail, likeReview, shareReview } from '~/api/review';
 import { ReviewListType } from '~/types/review';
@@ -562,10 +563,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           alignItems: "center"
         }}>
           {reviewDetailQuery.data?.product &&
-            <View style={{
-              flexDirection: 'row',
-              marginTop: reviewDetailQuery.data.images.length === 0 ? h2p(10) : 0
-            }}>
+            <View>
               <TouchableOpacity
                 onPress={() => {
                   if (reviewDetailQuery.data.product?.isVerified) {
@@ -581,23 +579,58 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                   }
                 }}
                 style={{
-                  backgroundColor: "rgba(234,231,236,0.4)",
-                  paddingHorizontal: d2p(5),
-                  paddingVertical: h2p(4),
-                  borderRadius: 4
+                  borderWidth: 1,
+                  borderColor: theme.color.grayscale.eae7ec,
+                  paddingHorizontal: d2p(10),
+                  paddingVertical: h2p(10),
+                  borderRadius: 5
                 }}>
-                <Text style={[FONT.Medium, { color: reviewDetailQuery.data.product.isVerified ? "#5193f6" : theme.color.grayscale.C_79737e, }]}>
-                  {`${reviewDetailQuery.data?.product.name} >`}
+                {reviewDetailQuery.data?.market &&
+                  <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
+                    {reviewDetailQuery.data?.market}
+                  </Text>
+                }
+                <Text style={[FONT.Medium, {
+                  width: Dimensions.get("window").width - d2p(80),
+                  marginTop: h2p(5),
+                  color: theme.color.black
+                }]}>
+                  {reviewDetailQuery.data?.product.name}
                 </Text>
+                {reviewDetailQuery.data.product.isVerified &&
+                  <Image source={blackRightArrow}
+                    style={{
+                      position: "absolute",
+                      right: d2p(10),
+                      bottom: h2p(10),
+                      width: d2p(8), height: d2p(14)
+                    }} />
+                }
               </TouchableOpacity>
-            </View>
-          }
-          {reviewDetailQuery.data?.market &&
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Image source={marketIcon} style={{ width: d2p(16), height: d2p(16), marginRight: d2p(5) }} />
-              <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
-                {reviewDetailQuery.data?.market}
-              </Text>
+
+              {reviewDetailQuery.data.product.link &&
+                <TouchableOpacity
+                  onPress={() => {
+                    if (reviewDetailQuery.data.product) {
+                      // * 구매처이동 버튼 구글 추적
+                      analytics().logSelectContent({
+                        content_type: "구매처 이동",
+                        item_id: reviewDetailQuery.data.id.toString()
+                      });
+                      Linking.openURL(reviewDetailQuery.data.product?.link);
+                    }
+                  }}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center", borderWidth: 1,
+                    borderRadius: 5, marginTop: h2p(5),
+                    paddingVertical: h2p(10),
+                    justifyContent: "center"
+                  }}>
+                  <Text style={[FONT.Regular, { fontSize: 12, marginRight: d2p(5) }]}>구매처로 이동하기</Text>
+                  <Image source={rightTopArrowIcon} style={{ width: d2p(7), height: d2p(7) }} />
+                </TouchableOpacity>
+              }
             </View>
           }
         </View>

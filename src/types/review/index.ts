@@ -66,7 +66,8 @@ export interface ReviewListType {
   product?: {
     id: number,
     name: string,
-    isVerified: boolean
+    isVerified: boolean,
+    link: string
   },
   satisfaction: SatisfactionType,
   tags: {

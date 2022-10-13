@@ -78,3 +78,16 @@ export const preSiginedProfile = async ({ token, path, id }: preSiginedProfileTy
     return res.data;
   }
 };
+
+export const phoneEvent = async ({ token, phone }: { token: string, phone: string }) => {
+  const res = await axios.post(baseURL + `event/`, {
+    phone
+  }, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+  if (res) {
+    return res.data;
+  }
+};
