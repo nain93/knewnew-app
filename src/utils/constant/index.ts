@@ -11,4 +11,4 @@ export const hitslop = { top: d2p(20), left: d2p(20), right: d2p(20), bottom: d2
 
 export const versioningIOS = Config.IOS_APP_VERSION;
 export const versioningAOS = Config.AOS_APP_VERSION;
-export const S3_URL = Config.S3_URL; 
+export const S3_URL = Config.S3_URL;

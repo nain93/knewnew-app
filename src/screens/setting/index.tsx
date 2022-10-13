@@ -12,14 +12,13 @@ import { versioningAOS, versioningIOS } from '~/utils/constant';
 import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { latestVerionsState, myIdState, okPopupState, tokenState } from '~/recoil/atoms';
+import { latestVersionsState, myIdState, okPopupState, tokenState } from '~/recoil/atoms';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { deleteUser, getMyProfile } from '~/api/user';
 import ToggleButton from '~/components/button/toggleButton';
 import Loading from '~/components/loading';
 import messaging from '@react-native-firebase/messaging';
 //@ts-ignore
-import VersionCheck from 'react-native-version-check';
 import { MyProfileType } from '~/types/user';
 import { loading } from '~/assets/gif';
 
@@ -32,7 +31,7 @@ const Setting = ({ navigation }: SettingProps) => {
   const [token, setToken] = useRecoilState(tokenState);
   const myId = useRecoilValue(myIdState);
   const setModalOpen = useSetRecoilState(okPopupState);
-  const isLatestVersion = useRecoilValue(latestVerionsState);
+  const isLatestVersion = useRecoilValue(latestVersionsState);
   const queryClient = useQueryClient();
   const [isOn, setIsOn] = useState(true);
 

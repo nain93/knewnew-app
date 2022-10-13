@@ -22,7 +22,7 @@ export const isNotiReadState = atom<boolean>({
   default: true
 });
 
-export const latestVerionsState = atom<string>({
+export const latestVersionsState = atom<string>({
   key: "latestVerionsState",
   default: ""
 });

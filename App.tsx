@@ -12,7 +12,7 @@ import dynamicLinks, { FirebaseDynamicLinksTypes } from '@react-native-firebase/
 
 import GlobalNav from './src/navigators/globalNav';
 import AlertPopup from '~/components/popup/AlertPopup';
-import { bottomDotSheetState, isNotiReadState, latestVerionsState, notificationPopup, okPopupState, popupState, tokenState } from '~/recoil/atoms';
+import { bottomDotSheetState, isNotiReadState, latestVersionsState, notificationPopup, okPopupState, popupState, tokenState } from '~/recoil/atoms';
 import OkPopup from '~/components/popup/OkPopup';
 import Loading from '~/components/loading';
 import FadeInOut from '~/hooks/useFadeInOut';
@@ -29,6 +29,9 @@ import BottomDotSheet from '~/components/popup/BottomDotSheet';
 
 export const navigationRef = createNavigationContainerRef();
 
+// * 강제 업데이트시 true 변경후 코드푸시
+const shouldUpdate: boolean = false;
+
 const App = () => {
   const [isPopupOpen, setIsPopupOpen] = useRecoilState(popupState);
   const [modalOpen, setModalOpen] = useRecoilState(okPopupState);
@@ -38,45 +41,57 @@ const App = () => {
   const [isVisible, setIsVisible] = useState(false);
   const setIsNotiReadState = useSetRecoilState(isNotiReadState);
   const [isBottomDotSheet, setIsBottomDotSheet] = useRecoilState(bottomDotSheetState);
-  const setLatestVerions = useSetRecoilState(latestVerionsState);
+  const setLatestVersions = useSetRecoilState(latestVersionsState);
   const [versionCheckModal, setVersionCheckModal] = useState(false);
+  const [preLoading, setPreLoading] = useState(false);
 
   const routeNameRef = React.useRef(null);
 
 
   // * 최신버전 체크
   const versionCheck = () => {
-    if (Platform.OS === "ios") {
-      VersionCheck.getLatestVersion({
-        provider: "appStore"
-      }).then((latest: string) => {
-        // * 특정 버전에서 강제 업데이트
-        // if (!__DEV__ && versioningIOS !== latest) {
-        //   // * 강제 업데이트 팝업
-        //   setVersionCheckModal(true);
-        // }
-        // else {
-        //   setVersionCheckModal(false);
-        // }
+    if (shouldUpdate) {
+      setPreLoading(true);
+      if (Platform.OS === "ios") {
+        VersionCheck.getLatestVersion({
+          provider: "appStore"
+        }).then((latest: string) => {
+          // * 특정 버전에서 강제 업데이트
+          if (!__DEV__ && versioningIOS !== latest) {
+            // * 강제 업데이트 팝업
+            setVersionCheckModal(true);
+          }
+          else {
+            setVersionCheckModal(false);
+          }
+          setPreLoading(false);
+          setLatestVersions(latest);
+        });
+      }
 
-        setLatestVerions(latest);
-      });
+      if (Platform.OS === "android") {
+        VersionCheck.getLatestVersion({
+          provider: "playStore"
+        }).then((latest: string) => {
+          // * 특정 버전에서 강제 업데이트
+          if (!__DEV__ && versioningAOS !== latest) {
+            // * 강제 업데이트 팝업
+            setVersionCheckModal(true);
+          }
+          else {
+            setVersionCheckModal(false);
+          }
+          setPreLoading(false);
+          setLatestVersions(latest);
+        });
+      }
     }
 
-    if (Platform.OS === "android") {
+    else {
       VersionCheck.getLatestVersion({
-        provider: "playStore"
+        provider: Platform.OS === "ios" ? "appStore" : "playStore"
       }).then((latest: string) => {
-        // * 특정 버전에서 강제 업데이트
-        // if (!__DEV__ && versioningAOS !== latest) {
-        //   // * 강제 업데이트 팝업
-        //   setVersionCheckModal(true);
-        // }
-        // else {
-        //   setVersionCheckModal(false);
-        // }
-
-        setLatestVerions(latest);
+        setLatestVersions(latest);
       });
     }
   };
@@ -330,6 +345,12 @@ const App = () => {
     }
   }, [notiOpen.isOpen]);
 
+  if (preLoading) {
+    return (
+      <Loading />
+    );
+  }
+
   return (
     <SafeAreaProvider>
       {/*@ts-ignore*/}
@@ -356,9 +377,7 @@ const App = () => {
           }
         }}
       >
-        {versionCheckModal ? null :
-          <GlobalNav token={token} />
-        }
+        <GlobalNav versionCheckModal={versionCheckModal} token={token} />
       </NavigationContainer>
       {/* 위에서 내려오는 알림 팝업 */}
       {isVisible &&

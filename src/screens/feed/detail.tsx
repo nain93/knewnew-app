@@ -968,6 +968,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           close={closeGallery}
           images={reviewDetailQuery.data?.images.map(v => ({ id: v.id, url: v.image, thumbUrl: v.image })) || []}
           isOpen={isOpen}
+          //@ts-ignore
           setIsOpen={(open: boolean) => setIsOpen(open)}
           renderCustomImage={renderCustomImage}
           renderHeaderComponent={renderHeaderComponent}
