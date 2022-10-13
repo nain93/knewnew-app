@@ -16,6 +16,7 @@ import { NavigationRoute } from 'react-navigation';
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 import FastImage from 'react-native-fast-image';
 import Share from 'react-native-share';
+import analytics from '@react-native-firebase/analytics';
 
 import { bookmarkReview, deleteReview, getReviewDetail, likeReview, shareReview } from '~/api/review';
 import { ReviewListType } from '~/types/review';
@@ -597,19 +598,25 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                   {reviewDetailQuery.data?.product.name}
                 </Text>
                 {reviewDetailQuery.data.product.isVerified &&
-                  <Image source={blackRightArrow} style={{
-                    position: "absolute",
-                    right: d2p(10),
-                    bottom: h2p(10),
-                    width: d2p(8), height: d2p(14)
-                  }} />
+                  <Image source={blackRightArrow}
+                    style={{
+                      position: "absolute",
+                      right: d2p(10),
+                      bottom: h2p(10),
+                      width: d2p(8), height: d2p(14)
+                    }} />
                 }
               </TouchableOpacity>
 
-              {reviewDetailQuery.data.product.isVerified &&
+              {reviewDetailQuery.data.product.link &&
                 <TouchableOpacity
                   onPress={() => {
                     if (reviewDetailQuery.data.product) {
+                      // * 구매처이동 버튼 구글 추적
+                      analytics().logSelectContent({
+                        content_type: "구매처 이동",
+                        item_id: reviewDetailQuery.data.id.toString()
+                      });
                       Linking.openURL(reviewDetailQuery.data.product?.link);
                     }
                   }}

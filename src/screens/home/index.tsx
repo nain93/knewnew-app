@@ -82,7 +82,7 @@ const Home = ({ navigation, route }: HomeProps) => {
   const getBannerQuery = useQuery<BannerType, Error>("banner", () => getBanner(token));
   const getFoodLogCountQuery = useQuery<{ count: number }, Error>("foodLogCount", () => getFoodLogCount(token));
   const getRecommendQuery = useQuery<RecommendType[], Error>("recommend", () => getRecommend({ token }));
-  const getRecommendFoodQuery = useQuery<RecommendFoodType, Error>("recommendFoodLog", () =>
+  const getRecommendFoodQuery = useQuery<RecommendFoodType[], Error>("recommendFoodLog", () =>
     getRecommendFoodLog({ token, sort: "0" }));
   useQuery<MyProfileType, Error>(["myProfile", token], () => getMyProfile(token), {
     enabled: !!token,
@@ -223,7 +223,7 @@ const Home = ({ navigation, route }: HomeProps) => {
           <View>
             {getBannerQuery.isLoading ?
               <View style={[styles.banner, { height: h2p(160) }]}>
-                <Loading viewStyle={{ top: h2p(20) }} />
+                <Loading viewStyle={{ top: h2p(40) }} />
               </View>
               :
               <Pressable
@@ -297,7 +297,10 @@ const Home = ({ navigation, route }: HomeProps) => {
               React.Children.toArray(getRecommendQuery.data.map(v => {
                 return (
                   <>
-                    <View style={{ paddingVertical: h2p(30), paddingHorizontal: d2p(15) }}>
+                    <View style={{
+                      paddingBottom: h2p(50), paddingTop: h2p(10),
+                      paddingHorizontal: d2p(15)
+                    }}>
                       <View style={[styles.title, { marginBottom: h2p(10), marginHorizontal: d2p(5) }]}>
                         <Text style={[FONT.Bold, { fontSize: 18 }]}>
                           {/* {`추천컨텐츠\n제목(어드민에서 입력)`} */}
@@ -349,88 +352,94 @@ const Home = ({ navigation, route }: HomeProps) => {
                 );
               }))}
 
-
-            <View style={[styles.borderBar, { paddingVertical: h2p(40) }]} >
-              <View style={[styles.title, { marginHorizontal: d2p(20) }]}>
-                <Text style={[FONT.Bold, { fontSize: 18 }]}>
-                  {/* {`지금 뉴뉴에서\n가장 많이 담긴 푸드로그는?!`} */}
-                  {getRecommendFoodQuery.data?.title}
-                </Text>
-              </View>
-              {/* <FlatList
-                horizontal
-                contentContainerStyle={{ paddingHorizontal: d2p(15) }}
-                style={{ marginTop: h2p(20) }}
-                showsHorizontalScrollIndicator={false}
-                keyExtractor={(item) => item.id.toString()}
-                data={getRecommendFoodQuery.data?.contents.slice(0, 5)}
-                renderItem={({ item }) => (
-                  <Pressable
-                    style={{ backgroundColor: theme.color.white }}
-                    onPress={() => navigation.navigate("FeedDetail", { id: item.review })}>
-                    {item.countMessage &&
-                      <View style={{
-                        width: d2p(130), height: d2p(23), backgroundColor: theme.color.white,
-                        borderWidth: 1,
-                        borderColor: theme.color.grayscale.e9e7ec,
-                        borderRadius: 11.5,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        alignSelf: "center",
-                        zIndex: 10,
-                        flexDirection: "row"
-                      }}>
-                        <Image source={fireImg} style={{ width: d2p(15), height: d2p(15) }} />
-                        <Text style={[FONT.Medium, { fontSize: 13 }]}><Text style={{ color: theme.color.main }}>
-                          {`${item.countMessage.split("명")[0]}명`}
-                        </Text>
-                          {`${item.countMessage.split("명")[1]}`}
-                        </Text>
-                      </View>
-                    }
-                    <View style={{
-                      width: d2p(160),
-                      marginHorizontal: d2p(10),
-                      backgroundColor: theme.color.white,
-                      borderRadius: 10,
-                    }}>
-                      {item.image &&
-                        <FastImage style={{
-                          backgroundColor: theme.color.grayscale.f7f7fc,
-                          borderRadius: 5,
-                          marginTop: h2p(10),
-                          width: d2p(160),
-                          aspectRatio: 1,
-                          borderWidth: 1,
-                          borderColor: theme.color.grayscale.eae7ec,
-                        }}
-                          source={{ uri: item.image }}
-                        />}
-                      <Text style={[FONT.Regular, { lineHeight: 20 }]}>
-                        <Text style={[FONT.Bold, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
-                          {item.author}
-                        </Text><Text style={[FONT.Regular, { fontSize: 12 }]}>{`님의\n`}</Text>
-                        {item.comment}
+            {
+              getRecommendFoodQuery.data &&
+              React.Children.toArray(getRecommendFoodQuery.data.map(v => (
+                <>
+                  <View style={[styles.borderBar, { paddingVertical: h2p(40) }]} >
+                    <View style={[styles.title, { marginHorizontal: d2p(20) }]}>
+                      <Text style={[FONT.Bold, { fontSize: 18 }]}>
+                        {/* {`지금 뉴뉴에서\n가장 많이 담긴 푸드로그는?!`} */}
+                        {v.title}
                       </Text>
                     </View>
-                  </Pressable>
-                )}
-                ListFooterComponent={() => (
-                  <Pressable
-                    // * 인기순 정렬
-                    onPress={() => navigation.navigate("Feed", { sort: "1" })}
-                    style={{
-                      justifyContent: "center",
-                      alignItems: "center",
-                      width: d2p(100), height: h2p(237)
-                    }}>
-                    <Image source={mainPlusIcon} style={{ width: d2p(20), height: d2p(20), marginBottom: h2p(5) }} />
-                    <Text style={[FONT.Bold, { color: theme.color.main }]}>더보기</Text>
-                  </Pressable>
-                )}
-              /> */}
-
-            </View >
+                    {v.contents &&
+                      <FlatList
+                        horizontal
+                        contentContainerStyle={{ paddingHorizontal: d2p(15) }}
+                        style={{ marginTop: h2p(20) }}
+                        showsHorizontalScrollIndicator={false}
+                        keyExtractor={(item) => item.id.toString()}
+                        data={v.contents.slice(0, 5)}
+                        renderItem={({ item }) => (
+                          <Pressable
+                            style={{ backgroundColor: theme.color.white }}
+                            onPress={() => navigation.navigate("FeedDetail", { id: item.review })}>
+                            {item.countMessage &&
+                              <View style={{
+                                width: d2p(130), height: d2p(23), backgroundColor: theme.color.white,
+                                borderWidth: 1,
+                                borderColor: theme.color.grayscale.e9e7ec,
+                                borderRadius: 11.5,
+                                justifyContent: "center",
+                                alignItems: "center",
+                                alignSelf: "center",
+                                zIndex: 10,
+                                flexDirection: "row"
+                              }}>
+                                <Image source={fireImg} style={{ width: d2p(15), height: d2p(15) }} />
+                                <Text style={[FONT.Medium, { fontSize: 13 }]}><Text style={{ color: theme.color.main }}>
+                                  {`${item.countMessage.split("명")[0]}명`}
+                                </Text>
+                                  {`${item.countMessage.split("명")[1]}`}
+                                </Text>
+                              </View>
+                            }
+                            <View style={{
+                              width: d2p(160),
+                              marginHorizontal: d2p(10),
+                              backgroundColor: theme.color.white,
+                              borderRadius: 10,
+                            }}>
+                              {item.image &&
+                                <FastImage style={{
+                                  backgroundColor: theme.color.grayscale.f7f7fc,
+                                  borderRadius: 5,
+                                  marginTop: h2p(10),
+                                  width: d2p(160),
+                                  aspectRatio: 1,
+                                  borderWidth: 1,
+                                  borderColor: theme.color.grayscale.eae7ec,
+                                }}
+                                  source={{ uri: item.image }}
+                                />}
+                              <Text style={[FONT.Regular, { lineHeight: 20 }]}>
+                                <Text style={[FONT.Bold, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
+                                  {item.author}
+                                </Text><Text style={[FONT.Regular, { fontSize: 12 }]}>{`님의\n`}</Text>
+                                {item.comment}
+                              </Text>
+                            </View>
+                          </Pressable>
+                        )}
+                        ListFooterComponent={() => (
+                          <Pressable
+                            // * 인기순 정렬
+                            onPress={() => navigation.navigate("Feed", { sort: "1" })}
+                            style={{
+                              justifyContent: "center",
+                              alignItems: "center",
+                              width: d2p(100), height: h2p(237)
+                            }}>
+                            <Image source={mainPlusIcon} style={{ width: d2p(20), height: d2p(20), marginBottom: h2p(5) }} />
+                            <Text style={[FONT.Bold, { color: theme.color.main }]}>더보기</Text>
+                          </Pressable>
+                        )}
+                      />}
+                  </View >
+                </>
+              )))
+            }
           </View >
         </View >
       </ScrollView >

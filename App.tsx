@@ -347,7 +347,7 @@ const App = () => {
             // * 구글 애널리틱스 추적
             await analytics().logScreenView({
               screen_name: currentRouteName,
-              screen_class: currentRouteName,
+              screen_class: currentRouteName
             });
           }
           //@ts-ignore 
