@@ -339,19 +339,21 @@ const App = () => {
           routeNameRef.current = navigationRef.current.getCurrentRoute().name;
         }}
         onStateChange={async () => {
-          const previousRouteName = routeNameRef.current;
-          //@ts-ignore 
-          const currentRouteName = navigationRef.current.getCurrentRoute().name;
+          if (!__DEV__) {
+            const previousRouteName = routeNameRef.current;
+            //@ts-ignore 
+            const currentRouteName = navigationRef.current.getCurrentRoute().name;
 
-          if (previousRouteName !== currentRouteName) {
-            // * 구글 애널리틱스 추적
-            await analytics().logScreenView({
-              screen_name: currentRouteName,
-              screen_class: currentRouteName
-            });
+            if (previousRouteName !== currentRouteName) {
+              // * 구글 애널리틱스 추적
+              await analytics().logScreenView({
+                screen_name: currentRouteName,
+                screen_class: currentRouteName
+              });
+            }
+            //@ts-ignore 
+            routeNameRef.current = currentRouteName;
           }
-          //@ts-ignore 
-          routeNameRef.current = currentRouteName;
         }}
       >
         {versionCheckModal ? null :

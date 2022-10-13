@@ -6,7 +6,7 @@ import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import theme from '~/styles/theme';
 import { d2p, dateCommentFormat, h2p, simpleDate } from '~/utils';
 import ReactionIcon from '~/components/icon/reactionIcon';
-import { blackRightArrow, blackRightSmallArrow, commentMore, lightHomeIcon, marketIcon, more, reKnew, rightTopArrowIcon, shareIcon, tag, tagHome, userIcon } from '~/assets/icons';
+import { blackRightArrow, commentMore, lightHomeIcon, more, reKnew, rightTopArrowIcon, shareIcon, tag, tagHome, userIcon } from '~/assets/icons';
 import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { bottomDotSheetState, myIdState, okPopupState, popupState, refreshState, tokenState } from '~/recoil/atoms';
@@ -612,11 +612,13 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                 <TouchableOpacity
                   onPress={() => {
                     if (reviewDetailQuery.data.product) {
-                      // * 구매처이동 버튼 구글 추적
-                      analytics().logSelectContent({
-                        content_type: "구매처 이동",
-                        item_id: reviewDetailQuery.data.id.toString()
-                      });
+                      if (!__DEV__) {
+                        // * 구매처이동 버튼 구글 추적
+                        analytics().logSelectContent({
+                          content_type: "구매처 이동",
+                          item_id: reviewDetailQuery.data.id.toString()
+                        });
+                      }
                       Linking.openURL(reviewDetailQuery.data.product?.link);
                     }
                   }}

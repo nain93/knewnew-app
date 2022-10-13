@@ -281,12 +281,14 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
                 <TouchableOpacity
                   onPress={() => {
                     if (productDetailQuery.data?.link) {
-                      // * 구매처이동 버튼 구글 추적
-                      if (route.params?.id) {
-                        analytics().logSelectContent({
-                          content_type: "구매처 이동",
-                          item_id: route.params?.id.toString()
-                        });
+                      if (!__DEV__) {
+                        // * 구매처이동 버튼 구글 추적
+                        if (route.params?.id) {
+                          analytics().logSelectContent({
+                            content_type: "구매처 이동",
+                            item_id: route.params?.id.toString()
+                          });
+                        }
                       }
                       Linking.openURL(productDetailQuery.data.link);
                     }
