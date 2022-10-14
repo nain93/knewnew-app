@@ -310,8 +310,9 @@ const Home = ({ navigation, route }: HomeProps) => {
             }
 
             <View style={[styles.borderBar, {
-              paddingVertical: h2p(40),
-              paddingHorizontal: d2p(20)
+              paddingTop: h2p(40),
+              paddingBottom: h2p(50),
+              paddingHorizontal: d2p(20),
             }]}>
               <Text style={[FONT.Medium, { fontSize: 12 }]}>
                 무료 배송 금액이 남는다면?
@@ -363,7 +364,7 @@ const Home = ({ navigation, route }: HomeProps) => {
                 return (
                   <>
                     <View style={{
-                      paddingBottom: h2p(50), paddingTop: h2p(10),
+                      paddingBottom: h2p(50),
                       paddingHorizontal: d2p(15)
                     }}>
                       <View style={[styles.title, { marginBottom: h2p(10), marginHorizontal: d2p(5) }]}>
@@ -394,7 +395,8 @@ const Home = ({ navigation, route }: HomeProps) => {
                                 <Text style={[FONT.Medium, {
                                   fontSize: 14,
                                   width: d2p(155),
-                                  marginLeft: d2p(5)
+                                  marginLeft: d2p(5),
+                                  marginBottom: h2p(10)
                                 }]}>
                                   {content.comment}
                                 </Text>

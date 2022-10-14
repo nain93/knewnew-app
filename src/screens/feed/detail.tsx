@@ -409,7 +409,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
       else {
         setKeyboardHeight(e.endCoordinates.height);
       }
-      // setInputHeight(0);
     });
     Keyboard.addListener("keyboardWillHide", (e) => {
       setKeyboardHeight(0);
@@ -998,10 +997,9 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           </Pressable>}
       />
       <KeyboardAvoidingView
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : -225}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : h2p(20)}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1, backgroundColor: "rgba(0,0,0,0)" }}
-      >
+        style={{ flex: 1, backgroundColor: "rgba(0,0,0,0)" }}>
         {commentLoading &&
           <View style={{
             position: "absolute",

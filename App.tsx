@@ -25,6 +25,7 @@ import Config from 'react-native-config';
 import { versioningAOS, versioningIOS } from '~/utils/constant';
 import ShouldUpdatePopup from '~/components/popup/ShouldUpdatePopup';
 import BottomDotSheet from '~/components/popup/BottomDotSheet';
+import useNotification from '~/hooks/useNotification';
 
 
 export const navigationRef = createNavigationContainerRef();
@@ -36,6 +37,7 @@ const App = () => {
   const [isPopupOpen, setIsPopupOpen] = useRecoilState(popupState);
   const [modalOpen, setModalOpen] = useRecoilState(okPopupState);
   const [notiOpen, setNotiOpen] = useRecoilState(notificationPopup);
+  const usePermission = useNotification();
   const { fadeAnim } = FadeInOut({ isPopupOpen: isPopupOpen.isOpen, setIsPopupOpen: (isOpen: boolean) => setIsPopupOpen({ ...isPopupOpen, isOpen }) });
   const [token, setToken] = useRecoilState(tokenState);
   const [isVisible, setIsVisible] = useState(false);
@@ -101,6 +103,7 @@ const App = () => {
     const storageToken = await AsyncStorage.getItem("token");
     if (storageToken) {
       setToken(storageToken);
+      usePermission.notificationPermission({ token: storageToken });
     }
     else {
       SplashScreen.hide();
@@ -127,12 +130,16 @@ const App = () => {
     }
     // Handle dynamic link inside your own application
     if (link?.url.includes("id")) {
-      //@ts-ignore
-      navigationRef.navigate("FeedDetail", { id: link.url.split("id=")[1] });
+      setTimeout(() => {
+        //@ts-ignore
+        navigationRef.navigate("FeedDetail", { id: link.url.split("id=")[1] });
+      }, 1000);
     }
     else if (link?.url.includes("event")) {
-      //@ts-ignore
-      navigationRef.navigate("EventPage");
+      setTimeout(() => {
+        //@ts-ignore
+        navigationRef.navigate("EventPage");
+      }, 1000);
     }
   };
 
@@ -159,8 +166,10 @@ const App = () => {
           }, 1000);
         }
         else if (link?.url.includes("event")) {
-          //@ts-ignore
-          navigationRef.navigate("EventPage");
+          setTimeout(() => {
+            //@ts-ignore
+            navigationRef.navigate("EventPage");
+          }, 1000);
         }
       });
   }, []);

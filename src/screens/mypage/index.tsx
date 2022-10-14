@@ -485,7 +485,7 @@ const Mypage = ({ navigation }: MypageProps) => {
           }} TabItemComponent={(tabs) => (
             <Pressable
               onPress={() => props.onTabPress(tabs.label)}
-              style={{ width: Dimensions.get("window").width / 3 }}>
+              style={{ width: Dimensions.get("window").width / 2 }}>
               <Text style={[{
                 fontSize: 16,
                 textAlign: "center"
@@ -533,7 +533,7 @@ const Mypage = ({ navigation }: MypageProps) => {
             keyExtractor={bookmarkKey}
           />
         </Tabs.Tab>
-        <Tabs.Tab name={`담은 상품 ${getMyProfileQuery.data?.productBookmarkCount}`}>
+        {/* <Tabs.Tab name={`담은 상품 ${getMyProfileQuery.data?.productBookmarkCount}`}>
           <Tabs.FlatList
             ListHeaderComponent={Platform.OS === "android" ? productHeader : null}
             ListEmptyComponent={productEmpty}
@@ -551,7 +551,7 @@ const Mypage = ({ navigation }: MypageProps) => {
             keyExtractor={bookmarkKey}
             renderItem={proudctRenderItem}
           />
-        </Tabs.Tab>
+        </Tabs.Tab> */}
       </Tabs.Container>
     </>
   );

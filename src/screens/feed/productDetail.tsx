@@ -207,7 +207,8 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
                 }} />
               )}
             />
-            <View
+
+            {/* <View
               style={{
                 position: "absolute",
                 bottom: d2p(0),
@@ -220,10 +221,12 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
               <Text style={[FONT.Regular, { color: theme.color.grayscale.eae7ec, marginRight: "auto" }]}>
                 출처 {productDetailQuery.data?.imageSource}
               </Text>
-              {/* 상품 공유 기능후 주석 해제 */}
-              {/* <TouchableOpacity onPress={() => console.log("상품 공유하기")}>
+
+              // 상품 공유 기능후 주석 해제
+              <TouchableOpacity onPress={() => console.log("상품 공유하기")}>
               <Image source={shareIcon} style={{ marginRight: d2p(10), width: d2p(26), height: d2p(26) }} />
-            </TouchableOpacity> */}
+
+            </TouchableOpacity>
               <TouchableOpacity onPress={() => {
                 if (!apiBlock) {
                   setIsBookmark(!isBookmark);
@@ -233,7 +236,8 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
               }}>
                 <Image source={isBookmark ? graybookmark : bookmark} style={{ width: d2p(26), height: d2p(26) }} />
               </TouchableOpacity>
-            </View>
+            </View> */}
+
           </View>
 
           <View style={styles.productContent}>
