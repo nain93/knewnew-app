@@ -165,75 +165,6 @@ const Home = ({ navigation, route }: HomeProps) => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.container}>
-          {/* <Text style={[FONT.ExtraBold, { textAlign: "center", fontSize: 18 }]}>
-            FOODLOG ROOM
-          </Text>
-          <Text style={[FONT.Regular, {
-            textAlign: "center",
-            marginTop: h2p(5),
-            color: theme.color.grayscale.C_79737e
-          }]}>
-            관심사별 방에 모여 같이 얘기 나눠요!
-          </Text>
-
-          <View style={styles.foodlogWrap}>
-            {React.Children.toArray([{ title: "모두보기", isClick: false }, ...interestTagData.interest].map((v) => {
-              if (!v.title.includes("기타")) {
-                return (
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate("Feed",
-                      { foodLog: v.title === "모두보기" ? "all" : v.title })}
-                    style={[styles.foodlog, {
-                      borderColor: v.title === "모두보기" ? theme.color.main : theme.color.grayscale.eae7ec,
-                    }]}>
-                    {(
-                      () => {
-                        switch (v.title) {
-                          case "모두보기": {
-                            return <Image source={eyesIcon} style={styles.foodlogImg} />;
-                          }
-                          case "빵식가": {
-                            return <Image source={breadFoodlog} style={styles.foodlogImg} />;
-                          }
-                          case "애주가": {
-                            return <Image source={beerFoodlog} style={styles.foodlogImg} />;
-                          }
-                          case "디저트러버": {
-                            return <Image source={cakeFoodlog} style={styles.foodlogImg} />;
-                          }
-                          case "캠퍼": {
-                            return <Image source={campFoodlog} style={styles.foodlogImg} />;
-                          }
-                          case "오늘한끼": {
-                            return <Image source={riceFoodlog} style={styles.foodlogImg} />;
-                          }
-                          case "다이어터": {
-                            return <Image source={dieterFoodlog} style={styles.foodlogImg} />;
-                          }
-                          case "비건": {
-                            return <Image source={begunFoodlog} style={styles.foodlogImg} />;
-                          }
-                          case "홈카페": {
-                            return <Image source={cafeFoodlog} style={styles.foodlogImg} />;
-                          }
-                          case "신상탐험대": {
-                            return <Image source={newFoodlog} style={styles.foodlogImg} />;
-                          }
-                          default:
-                            return null;
-                        }
-                      }
-                    )()}
-                    <Text style={[FONT.Medium, {
-                      color: v.title === "모두보기" ? theme.color.main : theme.color.black,
-                      fontSize: 12
-                    }]}>{v.title}</Text>
-                  </TouchableOpacity>
-                );
-              }
-            }))}
-          </View> */}
-
           <View>
             {getBannerQuery.isLoading ?
               <View style={[styles.banner, { height: h2p(160) }]}>
@@ -260,10 +191,12 @@ const Home = ({ navigation, route }: HomeProps) => {
                         if (item.link) {
                           if (item.link.includes("event")) {
                             // * 이벤트 배너 버튼 구글 추적
-                            analytics().logSelectContent({
-                              content_type: "이벤트 배너 클릭",
-                              item_id: item.id.toString()
-                            });
+                            if (!__DEV__) {
+                              analytics().logSelectContent({
+                                content_type: "이벤트 배너 클릭",
+                                item_id: item.id.toString()
+                              });
+                            }
                             setEventModalOpen(true);
                           }
                           else {
@@ -360,7 +293,7 @@ const Home = ({ navigation, route }: HomeProps) => {
             </View>
 
             {getRecommendQuery.data &&
-              React.Children.toArray(getRecommendQuery.data.map(v => {
+              React.Children.toArray(getRecommendQuery.data.map((v, recommendIdx) => {
                 return (
                   <>
                     <View style={{
@@ -415,98 +348,177 @@ const Home = ({ navigation, route }: HomeProps) => {
                         }
                       </View>
                     </View>
+
+                    {recommendIdx === 1 &&
+                      getRecommendFoodQuery.data &&
+                      React.Children.toArray(getRecommendFoodQuery.data.map(foodItem => (
+                        <>
+                          <View style={{ paddingBottom: h2p(60) }} >
+                            <View style={[styles.title, { marginHorizontal: d2p(20) }]}>
+                              <Text style={[FONT.Bold, { fontSize: 18 }]}>
+                                {/* {`지금 뉴뉴에서\n가장 많이 담긴 푸드로그는?!`} */}
+                                {foodItem.title}
+                              </Text>
+                            </View>
+                            {foodItem.contents &&
+                              <FlatList
+                                horizontal
+                                contentContainerStyle={{ paddingHorizontal: d2p(15) }}
+                                style={{ marginTop: h2p(20) }}
+                                showsHorizontalScrollIndicator={false}
+                                keyExtractor={(item) => item.id.toString()}
+                                data={foodItem.contents.slice(0, 5)}
+                                renderItem={({ item }) => (
+                                  <Pressable
+                                    style={{ backgroundColor: theme.color.white }}
+                                    onPress={() => navigation.navigate("FeedDetail", { id: item.review })}>
+                                    {item.countMessage &&
+                                      <View style={{
+                                        width: d2p(130), height: d2p(23), backgroundColor: theme.color.white,
+                                        borderWidth: 1,
+                                        borderColor: theme.color.grayscale.e9e7ec,
+                                        borderRadius: 11.5,
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        alignSelf: "center",
+                                        zIndex: 10,
+                                        flexDirection: "row"
+                                      }}>
+                                        <Image source={fireImg} style={{ width: d2p(15), height: d2p(15) }} />
+                                        <Text style={[FONT.Medium, { fontSize: 13 }]}><Text style={{ color: theme.color.main }}>
+                                          {`${item.countMessage.split("명")[0]}명`}
+                                        </Text>
+                                          {`${item.countMessage.split("명")[1]}`}
+                                        </Text>
+                                      </View>
+                                    }
+                                    <View style={{
+                                      width: d2p(160),
+                                      marginHorizontal: d2p(10),
+                                      backgroundColor: theme.color.white,
+                                      borderRadius: 10,
+                                    }}>
+                                      {item.image &&
+                                        <FastImage style={{
+                                          backgroundColor: theme.color.grayscale.f7f7fc,
+                                          borderRadius: 5,
+                                          marginTop: h2p(10),
+                                          width: d2p(160),
+                                          aspectRatio: 1,
+                                          borderWidth: 1,
+                                          borderColor: theme.color.grayscale.eae7ec,
+                                        }}
+                                          source={{ uri: item.image }}
+                                        />}
+                                      <Text style={[FONT.Regular, { lineHeight: 20 }]}>
+                                        <Text style={[FONT.Bold, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
+                                          {item.author}
+                                        </Text><Text style={[FONT.Regular, { fontSize: 12 }]}>{`님의\n`}</Text>
+                                        {item.comment}
+                                      </Text>
+                                    </View>
+                                  </Pressable>
+                                )}
+                                ListFooterComponent={() => (
+                                  <Pressable
+                                    // * 인기순 정렬
+                                    onPress={() => navigation.navigate("Feed", { sort: "1" })}
+                                    style={{
+                                      justifyContent: "center",
+                                      alignItems: "center",
+                                      width: d2p(100), height: h2p(237)
+                                    }}>
+                                    <Image source={mainPlusIcon} style={{ width: d2p(20), height: d2p(20), marginBottom: h2p(5) }} />
+                                    <Text style={[FONT.Bold, { color: theme.color.main }]}>더보기</Text>
+                                  </Pressable>
+                                )}
+                              />}
+                          </View >
+                        </>
+                      )))
+                    }
                   </>
                 );
               }))}
 
-            {
-              getRecommendFoodQuery.data &&
-              React.Children.toArray(getRecommendFoodQuery.data.map(v => (
-                <>
-                  <View style={[styles.borderBar, { paddingVertical: h2p(40) }]} >
-                    <View style={[styles.title, { marginHorizontal: d2p(20) }]}>
-                      <Text style={[FONT.Bold, { fontSize: 18 }]}>
-                        {/* {`지금 뉴뉴에서\n가장 많이 담긴 푸드로그는?!`} */}
-                        {v.title}
-                      </Text>
-                    </View>
-                    {v.contents &&
-                      <FlatList
-                        horizontal
-                        contentContainerStyle={{ paddingHorizontal: d2p(15) }}
-                        style={{ marginTop: h2p(20) }}
-                        showsHorizontalScrollIndicator={false}
-                        keyExtractor={(item) => item.id.toString()}
-                        data={v.contents.slice(0, 5)}
-                        renderItem={({ item }) => (
-                          <Pressable
-                            style={{ backgroundColor: theme.color.white }}
-                            onPress={() => navigation.navigate("FeedDetail", { id: item.review })}>
-                            {item.countMessage &&
-                              <View style={{
-                                width: d2p(130), height: d2p(23), backgroundColor: theme.color.white,
-                                borderWidth: 1,
-                                borderColor: theme.color.grayscale.e9e7ec,
-                                borderRadius: 11.5,
-                                justifyContent: "center",
-                                alignItems: "center",
-                                alignSelf: "center",
-                                zIndex: 10,
-                                flexDirection: "row"
-                              }}>
-                                <Image source={fireImg} style={{ width: d2p(15), height: d2p(15) }} />
-                                <Text style={[FONT.Medium, { fontSize: 13 }]}><Text style={{ color: theme.color.main }}>
-                                  {`${item.countMessage.split("명")[0]}명`}
-                                </Text>
-                                  {`${item.countMessage.split("명")[1]}`}
-                                </Text>
-                              </View>
+            <Text style={[FONT.ExtraBold, { textAlign: "center", fontSize: 18 }]}>
+              FOODLOG ROOM
+            </Text>
+            <Text style={[FONT.Regular, {
+              textAlign: "center",
+              marginTop: h2p(5),
+              color: theme.color.grayscale.C_79737e
+            }]}>
+              관심사별 방에 모여 같이 얘기 나눠요!
+            </Text>
+
+            <View style={styles.foodlogWrap}>
+              {React.Children.toArray([{ title: "모두보기", isClick: false }, ...interestTagData.interest].map((v) => {
+                if (!v.title.includes("기타")) {
+                  return (
+                    <TouchableOpacity
+                      onPress={() => {
+                        // * 푸드로그 버튼 구글 추적
+                        if (!__DEV__) {
+                          analytics().logSelectContent({
+                            content_type: v.title,
+                            item_id: v.title
+                          });
+                        }
+                        navigation.navigate("Feed",
+                          { foodLog: v.title === "모두보기" ? "all" : v.title });
+                      }}
+                      style={[styles.foodlog, {
+                        borderColor: v.title === "모두보기" ? theme.color.main : theme.color.grayscale.eae7ec,
+                      }]}>
+                      {(
+                        () => {
+                          switch (v.title) {
+                            case "모두보기": {
+                              return <Image source={eyesIcon} style={styles.foodlogImg} />;
                             }
-                            <View style={{
-                              width: d2p(160),
-                              marginHorizontal: d2p(10),
-                              backgroundColor: theme.color.white,
-                              borderRadius: 10,
-                            }}>
-                              {item.image &&
-                                <FastImage style={{
-                                  backgroundColor: theme.color.grayscale.f7f7fc,
-                                  borderRadius: 5,
-                                  marginTop: h2p(10),
-                                  width: d2p(160),
-                                  aspectRatio: 1,
-                                  borderWidth: 1,
-                                  borderColor: theme.color.grayscale.eae7ec,
-                                }}
-                                  source={{ uri: item.image }}
-                                />}
-                              <Text style={[FONT.Regular, { lineHeight: 20 }]}>
-                                <Text style={[FONT.Bold, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
-                                  {item.author}
-                                </Text><Text style={[FONT.Regular, { fontSize: 12 }]}>{`님의\n`}</Text>
-                                {item.comment}
-                              </Text>
-                            </View>
-                          </Pressable>
-                        )}
-                        ListFooterComponent={() => (
-                          <Pressable
-                            // * 인기순 정렬
-                            onPress={() => navigation.navigate("Feed", { sort: "1" })}
-                            style={{
-                              justifyContent: "center",
-                              alignItems: "center",
-                              width: d2p(100), height: h2p(237)
-                            }}>
-                            <Image source={mainPlusIcon} style={{ width: d2p(20), height: d2p(20), marginBottom: h2p(5) }} />
-                            <Text style={[FONT.Bold, { color: theme.color.main }]}>더보기</Text>
-                          </Pressable>
-                        )}
-                      />}
-                  </View >
-                </>
-              )))
-            }
+                            case "빵식가": {
+                              return <Image source={breadFoodlog} style={styles.foodlogImg} />;
+                            }
+                            case "애주가": {
+                              return <Image source={beerFoodlog} style={styles.foodlogImg} />;
+                            }
+                            case "디저트러버": {
+                              return <Image source={cakeFoodlog} style={styles.foodlogImg} />;
+                            }
+                            case "캠퍼": {
+                              return <Image source={campFoodlog} style={styles.foodlogImg} />;
+                            }
+                            case "오늘한끼": {
+                              return <Image source={riceFoodlog} style={styles.foodlogImg} />;
+                            }
+                            case "다이어터": {
+                              return <Image source={dieterFoodlog} style={styles.foodlogImg} />;
+                            }
+                            case "비건": {
+                              return <Image source={begunFoodlog} style={styles.foodlogImg} />;
+                            }
+                            case "홈카페": {
+                              return <Image source={cafeFoodlog} style={styles.foodlogImg} />;
+                            }
+                            case "신상탐험대": {
+                              return <Image source={newFoodlog} style={styles.foodlogImg} />;
+                            }
+                            default:
+                              return null;
+                          }
+                        }
+                      )()}
+                      <Text style={[FONT.Medium, {
+                        color: v.title === "모두보기" ? theme.color.main : theme.color.black,
+                        fontSize: 12
+                      }]}>{v.title}</Text>
+                    </TouchableOpacity>
+                  );
+                }
+              }))}
+            </View>
+
           </View >
         </View >
       </ScrollView >
@@ -554,7 +566,7 @@ export default Home;
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: h2p(80),
+    marginBottom: h2p(100),
     paddingTop: h2p(10)
   },
   marketImage: {

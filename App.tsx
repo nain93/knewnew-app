@@ -133,13 +133,13 @@ const App = () => {
       setTimeout(() => {
         //@ts-ignore
         navigationRef.navigate("FeedDetail", { id: link.url.split("id=")[1] });
-      }, 1000);
+      }, 500);
     }
     else if (link?.url.includes("event")) {
       setTimeout(() => {
         //@ts-ignore
         navigationRef.navigate("EventPage");
-      }, 1000);
+      }, 500);
     }
   };
 
@@ -163,13 +163,13 @@ const App = () => {
           setTimeout(() => {
             //@ts-ignore
             navigationRef.navigate("FeedDetail", { id: link.url.split("id=")[1] });
-          }, 1000);
+          }, 500);
         }
         else if (link?.url.includes("event")) {
           setTimeout(() => {
             //@ts-ignore
             navigationRef.navigate("EventPage");
-          }, 1000);
+          }, 500);
         }
       });
   }, []);
