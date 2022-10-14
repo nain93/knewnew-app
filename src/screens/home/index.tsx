@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import Modal from "react-native-modal";
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import analytics from '@react-native-firebase/analytics';
 import Header from '~/components/header';
 import { d2p, h2p } from '~/utils';
 import { hitslop } from '~/utils/constant';
@@ -19,7 +20,7 @@ import {
   coupangImage, dieterFoodlog, etcImage, kurlyImage, naverImage, newFoodlog, riceFoodlog, ssgImage
 } from '~/assets/images/home';
 import { interestTagData } from '~/utils/data';
-import { eventImage, fireImg } from '~/assets/images';
+import { eventBannerImage, fireImg } from '~/assets/images';
 import { useQuery } from 'react-query';
 import { getMyProfile } from '~/api/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -78,8 +79,10 @@ const Home = ({ navigation, route }: HomeProps) => {
   const [token, setToken] = useRecoilState(tokenState);
   const setMyId = useSetRecoilState(myIdState);
   const homeRef = useRef<ScrollView>(null);
+  const bannerListRef = useRef<FlatList>(null);
+  const [scrollIdx, setScrollIdx] = useState(0);
   const [eventModalOpen, setEventModalOpen] = useState(false);
-  const getBannerQuery = useQuery<BannerType, Error>("banner", () => getBanner(token));
+  const getBannerQuery = useQuery<BannerType[], Error>("banner", () => getBanner(token));
   const getFoodLogCountQuery = useQuery<{ count: number }, Error>("foodLogCount", () => getFoodLogCount(token));
   const getRecommendQuery = useQuery<RecommendType[], Error>("recommend", () => getRecommend({ token }));
   const getRecommendFoodQuery = useQuery<RecommendFoodType[], Error>("recommendFoodLog", () =>
@@ -111,10 +114,21 @@ const Home = ({ navigation, route }: HomeProps) => {
     }
   }, [route.params]);
 
-  useFocusEffect(useCallback(() => {
-    // * 화면 들어올때마다 배너 새로고침
-    getBannerQuery.refetch();
-  }, []));
+  useEffect(() => {
+    // * 배너 자동 스크롤
+    const totalIndex = getBannerQuery.data?.length || 0;
+    let index = 0;
+    setInterval(() => {
+      index++;
+      if (index < totalIndex) {
+        bannerListRef.current?.scrollToIndex({ animated: true, index: index });
+      }
+      else {
+        index = 0;
+        bannerListRef.current?.scrollToIndex({ animated: true, index });
+      }
+    }, 3000);
+  }, []);
 
   return (
     <>
@@ -226,22 +240,73 @@ const Home = ({ navigation, route }: HomeProps) => {
                 <Loading viewStyle={{ top: h2p(40) }} />
               </View>
               :
-              <Pressable
-                onPress={() => {
-                  if (getBannerQuery.data?.link) {
-                    if (getBannerQuery.data.link.includes("event")) {
-                      setEventModalOpen(true);
-                    }
-                    else {
-                      Linking.openURL(getBannerQuery.data?.link);
-                    }
-                  }
-                }}
-                style={styles.banner}>
-                <FastImage
-                  style={{ width: "100%", height: h2p(160) }}
-                  source={{ uri: getBannerQuery.data?.image }} />
-              </Pressable>
+              <>
+                <FlatList
+                  ref={bannerListRef}
+                  horizontal
+                  pagingEnabled
+                  bounces={false}
+                  onScroll={e => {
+                    setScrollIdx(Math.min(
+                      getBannerQuery.data?.length ?? 0,
+                      Math.max(0, Math.round(e.nativeEvent.contentOffset.x / (Dimensions.get("window").width - d2p(20))))));
+                  }}
+                  keyExtractor={(item) => item.id.toString()}
+                  showsHorizontalScrollIndicator={false}
+                  data={getBannerQuery.data}
+                  renderItem={({ item }) => (
+                    <Pressable
+                      onPress={() => {
+                        if (item.link) {
+                          if (item.link.includes("event")) {
+                            // * 이벤트 배너 버튼 구글 추적
+                            analytics().logSelectContent({
+                              content_type: "이벤트 배너 클릭",
+                              item_id: item.id.toString()
+                            });
+                            setEventModalOpen(true);
+                          }
+                          else {
+                            Linking.openURL(item.link);
+                          }
+                        }
+                      }}
+                      style={styles.banner}>
+                      <FastImage
+                        style={{ width: "100%", height: h2p(160) }}
+                        source={{ uri: item.image }} />
+                    </Pressable>
+                  )}
+                />
+                {(getBannerQuery.data?.length || 0) > 1 &&
+                  <View style={{
+                    position: "absolute", bottom: h2p(10),
+                    flexDirection: "row",
+                    alignSelf: "center"
+                  }}>
+                    {React.Children.toArray(getBannerQuery.data?.map((_, i) => {
+                      if (i === scrollIdx) {
+                        return (
+                          <View style={{
+                            width: d2p(6), height: d2p(6),
+                            borderRadius: 6,
+                            backgroundColor: theme.color.main,
+                            marginRight: d2p(10)
+                          }} />
+                        );
+                      }
+                      return (
+                        <View style={{
+                          width: d2p(6), height: d2p(6),
+                          borderRadius: 6,
+                          backgroundColor: theme.color.white,
+                          marginRight: d2p(10)
+                        }} />
+                      );
+                    }))}
+                  </View>
+                }
+              </>
             }
 
             <View style={[styles.borderBar, {
@@ -469,7 +534,7 @@ const Home = ({ navigation, route }: HomeProps) => {
             width: d2p(20), height: d2p(20)
           }} />
           <FastImage
-            source={eventImage}
+            source={eventBannerImage}
             style={{
               width: Dimensions.get("window").width - d2p(60),
               alignSelf: "center",

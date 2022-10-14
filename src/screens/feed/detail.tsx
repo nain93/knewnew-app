@@ -583,7 +583,8 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                   borderColor: theme.color.grayscale.eae7ec,
                   paddingHorizontal: d2p(10),
                   paddingVertical: h2p(10),
-                  borderRadius: 5
+                  borderRadius: 5,
+                  width: Dimensions.get("window").width - d2p(40)
                 }}>
                 {reviewDetailQuery.data?.market &&
                   <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
@@ -601,9 +602,9 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                   <Image source={blackRightArrow}
                     style={{
                       position: "absolute",
+                      width: d2p(6), height: d2p(10),
                       right: d2p(10),
-                      bottom: h2p(10),
-                      width: d2p(8), height: d2p(14)
+                      bottom: h2p(12.5),
                     }} />
                 }
               </TouchableOpacity>

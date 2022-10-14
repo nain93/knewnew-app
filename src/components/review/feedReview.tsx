@@ -158,7 +158,7 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
     <>
       <View style={{
         flexDirection: 'row',
-        alignItems: "center"
+        alignItems: "center",
       }}>
         <TouchableOpacity
           onPress={() => navigation.push("UserPage", { id: review.author.id })}
@@ -257,8 +257,7 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
         <View style={{
           marginLeft: d2p(30),
           flexDirection: 'row',
-          marginBottom: h2p(10),
-          width: Dimensions.get("window").width - d2p(70),
+          marginBottom: h2p(10)
         }}>
           <TouchableOpacity
             onPress={() => {
@@ -277,9 +276,11 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
             style={{
               borderWidth: 1,
               borderColor: theme.color.grayscale.eae7ec,
-              paddingHorizontal: d2p(10),
+              paddingLeft: d2p(10),
+              paddingRight: review.product.isVerified ? d2p(20) : d2p(10),
               paddingVertical: h2p(10),
-              borderRadius: 5
+              borderRadius: 5,
+              width: Dimensions.get("window").width - d2p(70)
             }}>
             {review.market &&
               <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
@@ -296,9 +297,9 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
               <Image source={blackRightArrow}
                 style={{
                   position: "absolute",
+                  width: d2p(6), height: d2p(10),
                   right: d2p(10),
-                  bottom: h2p(10),
-                  width: d2p(8), height: d2p(14)
+                  bottom: h2p(12.5),
                 }} />
             }
           </TouchableOpacity>
