@@ -297,7 +297,7 @@ const Home = ({ navigation, route }: HomeProps) => {
                 return (
                   <>
                     <View style={{
-                      paddingBottom: h2p(50),
+                      paddingBottom: recommendIdx === getRecommendQuery.data.length - 1 ? h2p(25) : h2p(50),
                       paddingHorizontal: d2p(15)
                     }}>
                       <View style={[styles.title, { marginBottom: h2p(10), marginHorizontal: d2p(5) }]}>
@@ -441,16 +441,21 @@ const Home = ({ navigation, route }: HomeProps) => {
                 );
               }))}
 
-            <Text style={[FONT.ExtraBold, { textAlign: "center", fontSize: 18 }]}>
-              FOODLOG ROOM
-            </Text>
-            <Text style={[FONT.Regular, {
-              textAlign: "center",
-              marginTop: h2p(5),
-              color: theme.color.grayscale.C_79737e
-            }]}>
-              관심사별 방에 모여 같이 얘기 나눠요!
-            </Text>
+            <View style={{
+              backgroundColor: theme.color.grayscale.f7f7fc,
+              paddingTop: h2p(25)
+            }}>
+              <Text style={[FONT.ExtraBold, { textAlign: "center", fontSize: 18 }]}>
+                FOODLOG ROOM
+              </Text>
+              <Text style={[FONT.Regular, {
+                textAlign: "center",
+                marginTop: h2p(5),
+                color: theme.color.grayscale.C_79737e
+              }]}>
+                관심사별 방에 모여 같이 얘기 나눠요!
+              </Text>
+            </View>
 
             <View style={styles.foodlogWrap}>
               {React.Children.toArray([{ title: "모두보기", isClick: false }, ...interestTagData.interest].map((v) => {
@@ -566,7 +571,7 @@ export default Home;
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: h2p(100),
+    marginBottom: h2p(80),
     paddingTop: h2p(10)
   },
   marketImage: {
@@ -590,9 +595,11 @@ const styles = StyleSheet.create({
   foodlogWrap: {
     paddingHorizontal: d2p(15),
     paddingTop: h2p(25),
+    paddingBottom: h2p(20),
     flexDirection: "row",
     justifyContent: "space-between",
-    flexWrap: "wrap"
+    flexWrap: "wrap",
+    backgroundColor: theme.color.grayscale.f7f7fc
   },
   foodlog: {
     width: d2p(62),

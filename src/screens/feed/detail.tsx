@@ -997,7 +997,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           </Pressable>}
       />
       <KeyboardAvoidingView
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : h2p(20)}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : h2p(-225)}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1, backgroundColor: "rgba(0,0,0,0)" }}>
         {commentLoading &&
