@@ -1,4 +1,4 @@
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, ImageStyle, Pressable, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import { hitslop } from '~/utils/constant';
 import { d2p } from '~/utils';
@@ -7,10 +7,11 @@ import { whiteCheckIcon } from '~/assets/icons/notificationIcon';
 
 interface CheckBoxButtonPropType {
   toggleCheckBox: boolean,
-  setToggleCheckBox: (check: boolean) => void
+  setToggleCheckBox: (check: boolean) => void,
+  imageStyle?: ImageStyle
 }
 
-const CheckBoxButton = ({ toggleCheckBox, setToggleCheckBox }: CheckBoxButtonPropType) => {
+const CheckBoxButton = ({ toggleCheckBox, setToggleCheckBox, imageStyle }: CheckBoxButtonPropType) => {
   return (
     <Pressable
       hitSlop={hitslop}
@@ -25,7 +26,7 @@ const CheckBoxButton = ({ toggleCheckBox, setToggleCheckBox }: CheckBoxButtonPro
       } : {
         borderWidth: 1,
         borderColor: theme.color.grayscale.C_79737e
-      }]}
+      }, imageStyle]}
     >
       <Image source={whiteCheckIcon} style={{ width: d2p(9), height: d2p(7) }} />
     </Pressable>

@@ -73,8 +73,12 @@
 	<string>$(CODEPUSH_KEY)</string>
 	<key>FirebaseDynamicLinksCustomDomains</key>
 	<array>
+    <string>https://link.knewnew.co.kr</string>
 		<string>https://link.knewnew.co.kr/link</string>
+    <string>https://link.knewnew.co.kr/event</string>
+    <string>https://dlink.knewnew.co.kr</string>
 		<string>https://dlink.knewnew.co.kr/link</string>
+		<string>https://dlink.knewnew.co.kr/event</string>
 	</array>
 	<key>KAKAO_APP_KEY</key>
 	<string>7637c35cfedcb6c01b1f17ce7cd42f05</string>

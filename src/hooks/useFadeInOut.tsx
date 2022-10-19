@@ -7,7 +7,7 @@ interface FadeInOutProp {
   openTime?: number
 }
 
-const useFadeInOut = ({ isPopupOpen, setIsPopupOpen, openTime = 1500 }: FadeInOutProp) => {
+const useFadeInOut = ({ isPopupOpen, setIsPopupOpen, openTime = 2000 }: FadeInOutProp) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const fadeIn = () => {

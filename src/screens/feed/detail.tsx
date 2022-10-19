@@ -1,11 +1,21 @@
+<<<<<<< HEAD
 import { View, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, Keyboard, FlatList, StatusBar } from 'react-native';
+=======
+import { View, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, Keyboard, FlatList, Linking } from 'react-native';
+>>>>>>> dev
 import Text from '~/components/style/CustomText';
 import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import theme from '~/styles/theme';
 import { d2p, dateCommentFormat, h2p, simpleDate } from '~/utils';
+<<<<<<< HEAD
 import { blackComment, blackHeart, blackLeftArrow, blackMoreIcon, blackRightArrow, blackShare, colorBookmark, colorLike, commentMore, heart, lightHomeIcon, linkIcon, mainBookmark, marketIcon, more, reKnew, rightArrow, shareIcon, tag, tagHome, userIcon, whiteLeftArrow, whiteMoreIcon } from '~/assets/icons';
 import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
+=======
+import ReactionIcon from '~/components/icon/reactionIcon';
+import { blackRightArrow, commentMore, lightHomeIcon, more, reKnew, rightTopArrowIcon, shareIcon, tag, tagHome, userIcon } from '~/assets/icons';
+import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
+>>>>>>> dev
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { bottomDotSheetState, myIdState, okPopupState, popupState, refreshState, tokenState } from '~/recoil/atoms';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
@@ -14,6 +24,7 @@ import { NavigationRoute } from 'react-navigation';
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 import FastImage from 'react-native-fast-image';
 import Share from 'react-native-share';
+import analytics from '@react-native-firebase/analytics';
 
 import { bookmarkReview, deleteReview, getReviewDetail, likeReview, shareReview } from '~/api/review';
 import { ReviewListType } from '~/types/review';
@@ -364,7 +375,12 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   // * 키보드 높이 컨트롤
   useEffect(() => {
     Keyboard.addListener("keyboardWillShow", (e) => {
-      setKeyboardHeight(e.endCoordinates.height);
+      if (Platform.OS === "android") {
+        setKeyboardHeight(e.endCoordinates.height);
+      }
+      else {
+        setKeyboardHeight(e.endCoordinates.height);
+      }
     });
     Keyboard.addListener("keyboardWillHide", (e) => {
       setKeyboardHeight(0);
@@ -456,18 +472,94 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             <Text style={[FONT.Medium, { fontSize: 12 }]}>구독하기</Text>
           </TouchableOpacity>
         </View>
-        {
-          reviewDetailQuery.data?.satisfaction &&
-          <ReviewIcon
-            viewStyle={{ marginLeft: d2p(20) }}
-            review={reviewDetailQuery.data?.satisfaction} />
-        }
-        <Text style={[FONT.Bold, {
-          marginLeft: d2p(20),
-          marginVertical: h2p(20),
-        }]}>
-          사놓으면 활용도 좋은템이에요!
-        </Text>
+
+        {/* 이미지 스크롤 ui */}
+        {reviewDetailQuery.data?.images &&
+          <ImageFlatlist
+            onPress={(openIdx: number) => openGallery(openIdx)}
+            review={reviewDetailQuery.data}
+          />}
+
+        <View style={{
+          marginTop: h2p(15), paddingHorizontal: d2p(20),
+          flexDirection: "row", justifyContent: "space-between",
+          alignItems: "center"
+        }}>
+          {reviewDetailQuery.data?.product &&
+            <View>
+              <TouchableOpacity
+                onPress={() => {
+                  if (reviewDetailQuery.data.product?.isVerified) {
+                    navigation.push("ProductDetail", { id: reviewDetailQuery.data.product?.id });
+                  }
+                  else {
+                    setModalOpen({
+                      isOpen: true,
+                      content: "아직 등록되지 않은 상품입니다.",
+                      okButton: () => setModalOpen({ ...modalOpen, isOpen: false }),
+                      isCancleButton: false
+                    });
+                  }
+                }}
+                style={{
+                  borderWidth: 1,
+                  borderColor: theme.color.grayscale.eae7ec,
+                  paddingHorizontal: d2p(10),
+                  paddingVertical: h2p(10),
+                  borderRadius: 5,
+                  width: Dimensions.get("window").width - d2p(40)
+                }}>
+                {reviewDetailQuery.data?.market &&
+                  <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
+                    {reviewDetailQuery.data?.market}
+                  </Text>
+                }
+                <Text style={[FONT.Medium, {
+                  width: Dimensions.get("window").width - d2p(80),
+                  marginTop: h2p(5),
+                  color: theme.color.black
+                }]}>
+                  {reviewDetailQuery.data?.product.name}
+                </Text>
+                {reviewDetailQuery.data.product.isVerified &&
+                  <Image source={blackRightArrow}
+                    style={{
+                      position: "absolute",
+                      width: d2p(6), height: d2p(10),
+                      right: d2p(10),
+                      bottom: h2p(12.5),
+                    }} />
+                }
+              </TouchableOpacity>
+
+              {reviewDetailQuery.data.product.link &&
+                <TouchableOpacity
+                  onPress={() => {
+                    if (reviewDetailQuery.data.product) {
+                      if (!__DEV__) {
+                        // * 구매처이동 버튼 구글 추적
+                        analytics().logSelectContent({
+                          content_type: "구매처 이동",
+                          item_id: reviewDetailQuery.data.id.toString()
+                        });
+                      }
+                      Linking.openURL(reviewDetailQuery.data.product?.link);
+                    }
+                  }}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center", borderWidth: 1,
+                    borderRadius: 5, marginTop: h2p(5),
+                    paddingVertical: h2p(10),
+                    justifyContent: "center"
+                  }}>
+                  <Text style={[FONT.Regular, { fontSize: 12, marginRight: d2p(5) }]}>구매처로 이동하기</Text>
+                  <Image source={rightTopArrowIcon} style={{ width: d2p(7), height: d2p(7) }} />
+                </TouchableOpacity>
+              }
+            </View>
+          }
+        </View>
 
         <Text style={[styles.content,
         { marginHorizontal: d2p(20), lineHeight: 21 }, FONT.Regular]}>
@@ -780,87 +872,43 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
 
   return (
     <Fragment>
-      <StatusBar translucent={true} backgroundColor="transparent"
-        barStyle={statusBarState() ? "dark-content" : "light-content"} />
-      <View
-        style={{
-          position: "absolute",
-          alignItems: "center",
-          width: Dimensions.get("window").width,
-          paddingHorizontal: d2p(30),
-          top: 0,
-          paddingTop: getStatusBarHeight() + h2p(30),
-          paddingBottom: h2p(15),
-          flexDirection: "row", justifyContent: "space-between",
-          backgroundColor: statusBarState() ? theme.color.white : "transparent",
-          zIndex: 10
-        }}>
-        <Pressable
-          hitSlop={hitslop}
-          onPress={() => {
-            if (route.path) {
-              // * 공유하기로 들어와서 뒤로가기 눌렀을 경우 home으로 reset
-              //@ts-ignore
-              navigation.reset({ index: 0, routes: [{ name: "TabNav" }] });
-            }
-            else {
-              navigation.goBack();
-            }
-          }}>
-          <Image source={statusBarState() ? blackLeftArrow : whiteLeftArrow} style={{ width: d2p(8), height: d2p(16) }} />
-        </Pressable>
-
-        <Pressable
-          hitSlop={hitslop}
-          onPress={() => {
-            if (reviewDetailQuery.data?.author.id === myId) {
-              setIsBottomDotSheet({
-                isOpen: true,
-                topTitle: "푸드로그 수정",
-                topPress: () => handleEditPress(),
-                middleTitle: "푸드로그 삭제",
-                middlePress: () => {
-                  setModalOpen({
-                    isOpen: true,
-                    content: "글을 삭제할까요?",
-                    okButton: () => {
-                      handleDeletePress();
-                      navigation.goBack();
-                    }
-                  });
-                },
-                middleTextStyle: { color: theme.color.main },
-                bottomTitle: "취소하기"
-              });
-            }
-            else {
-              setIsBottomDotSheet({
-                isOpen: true,
-                topTitle: "푸드로그 신고",
-                topPress: () => navigation.navigate("report", { review: reviewDetailQuery.data }),
-                middleTitle: "유저 차단",
-                middlePress: () => {
-                  setModalOpen({
-                    isOpen: true,
-                    content: "차단 하시겠습니까?",
-                    okButton: () => {
-                      if (reviewDetailQuery.data) {
-                        blockMutation.mutate({ id: reviewDetailQuery.data?.author.id, isBlock: true });
-                        navigation.goBack();
-                      }
-                    }
-                  });
-                },
-                middleTextStyle: { color: theme.color.main },
-                bottomTitle: "취소하기"
-              });
-            }
-          }}>
-          <Image source={statusBarState() ? blackMoreIcon : whiteMoreIcon} style={{ width: d2p(4), height: d2p(18) }} />
-        </Pressable>
-      </View>
-
+      {/* 이미지 확대 */}
+      {reviewDetailQuery.data?.images &&
+        <ImageGallery
+          initialIndex={initialIndex}
+          close={closeGallery}
+          images={reviewDetailQuery.data?.images.map(v => ({ id: v.id, url: v.image, thumbUrl: v.image })) || []}
+          isOpen={isOpen}
+          //@ts-ignore
+          setIsOpen={(open: boolean) => setIsOpen(open)}
+          renderCustomImage={renderCustomImage}
+          renderHeaderComponent={renderHeaderComponent}
+          resizeMode="contain"
+          thumbSize={84}
+        />
+      }
+      <Header
+        isBorder={true}
+        headerLeft={<LeftArrowIcon onBackClick={() => {
+          if (route.path) {
+            // * 공유하기로 들어와서 뒤로가기 눌렀을 경우 home으로 reset
+            //@ts-ignore
+            navigation.reset({ index: 0, routes: [{ name: "TabNav" }] });
+          }
+          else {
+            navigation.goBack();
+          }
+        }}
+          imageStyle={{ width: d2p(11), height: d2p(25) }} />}
+        title="푸드로그"
+        headerRight={
+          <Pressable hitSlop={hitslop}
+            onPress={() => navigation.navigate("Home")}>
+            <Image source={lightHomeIcon} style={{ width: d2p(24), height: d2p(24) }} />
+          </Pressable>}
+      />
       <KeyboardAvoidingView
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : h2p(-225)}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1, backgroundColor: "rgba(0,0,0,0)" }}>
         {commentLoading &&

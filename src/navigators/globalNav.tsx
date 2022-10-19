@@ -27,13 +27,10 @@ import Welcome from '~/screens/onboarding/welcome';
 import UserPage from '~/screens/userPage';
 import Header from '~/components/header';
 import { lightHomeIcon } from '~/assets/icons';
-import { useRecoilValue } from 'recoil';
-import { myIdState } from '~/recoil/atoms';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { hitslop } from '~/utils/constant';
 import CommentAll from '~/screens/feed/comment/commentAll';
-import TagSelect from '~/screens/onboarding/tagSelect';
-import TagResult from '~/screens/onboarding/tagResult';
+import EventPage from '~/screens/event';
 
 const Stack = createStackNavigator();
 
@@ -49,8 +46,11 @@ function StatusBarPlaceHolder() {
   );
 }
 
-const GlobalNav = ({ token }: { token: string }) => {
-  const myId = useRecoilValue(myIdState);
+const EmptyScreen = () => (
+  <View />
+);
+
+const GlobalNav = ({ token, versionCheckModal }: { token: string, versionCheckModal: boolean }) => {
 
   return (
     <>
@@ -96,12 +96,29 @@ const GlobalNav = ({ token }: { token: string }) => {
               component={WriteProfile} />
           </>
         }
+        {versionCheckModal ?
+          <Stack.Screen
+            name="Empty"
+            component={EmptyScreen}
+            options={{
+              headerShown: false
+            }}
+          />
+          :
+          <Stack.Screen
+            name="TabNav"
+            component={TabNavigator}
+            options={{
+              headerShown: false
+            }}
+          />
+        }
         <Stack.Screen
-          name="TabNav"
-          component={TabNavigator}
+          name="EventPage"
           options={{
             headerShown: false
           }}
+          component={EventPage}
         />
         <Stack.Screen
           name="TagResult"

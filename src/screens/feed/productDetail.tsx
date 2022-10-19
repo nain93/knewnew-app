@@ -5,7 +5,8 @@ import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import { d2p, h2p } from '~/utils';
 import { FONT } from '~/styles/fonts';
 import theme from '~/styles/theme';
-import { bookmark, circleQuestion, goldStarIcon, graybookmark, settingKnewnew, shareIcon, starIcon } from '~/assets/icons';
+import analytics from '@react-native-firebase/analytics';
+import { blackRightSmallArrow, bookmark, circleQuestion, goldStarIcon, graybookmark, settingKnewnew, shareIcon, starIcon } from '~/assets/icons';
 import ReviewIcon from '~/components/icon/reviewIcon';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
@@ -206,7 +207,8 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
                 }} />
               )}
             />
-            <View
+
+            {/* <View
               style={{
                 position: "absolute",
                 bottom: d2p(0),
@@ -219,10 +221,12 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
               <Text style={[FONT.Regular, { color: theme.color.grayscale.eae7ec, marginRight: "auto" }]}>
                 출처 {productDetailQuery.data?.imageSource}
               </Text>
-              {/* 상품 공유 기능후 주석 해제 */}
-              {/* <TouchableOpacity onPress={() => console.log("상품 공유하기")}>
+
+              // 상품 공유 기능후 주석 해제
+              <TouchableOpacity onPress={() => console.log("상품 공유하기")}>
               <Image source={shareIcon} style={{ marginRight: d2p(10), width: d2p(26), height: d2p(26) }} />
-            </TouchableOpacity> */}
+
+            </TouchableOpacity>
               <TouchableOpacity onPress={() => {
                 if (!apiBlock) {
                   setIsBookmark(!isBookmark);
@@ -232,7 +236,8 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
               }}>
                 <Image source={isBookmark ? graybookmark : bookmark} style={{ width: d2p(26), height: d2p(26) }} />
               </TouchableOpacity>
-            </View>
+            </View> */}
+
           </View>
 
           <View style={styles.productContent}>
@@ -242,7 +247,10 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
             <Text style={[FONT.Bold, { fontSize: 18 }]}>
               {productDetailQuery.data?.name}
             </Text>
-            <View style={{ flexDirection: "row", alignItems: "center", marginTop: h2p(10) }}>
+
+            <View style={{
+              flexDirection: "row", alignItems: "center", marginTop: h2p(10)
+            }}>
               <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>
                 예상가격 {productDetailQuery.data?.expectedPrice}원
               </Text>
@@ -250,17 +258,58 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
                 style={{ marginLeft: d2p(7), }}>
                 <Image source={circleQuestion} style={{ width: d2p(16), height: d2p(16) }} />
               </Pressable>
-              <TouchableOpacity
-                onPress={() => {
-                  if (productDetailQuery.data?.link) {
-                    Linking.openURL(productDetailQuery.data.link);
-                  }
-                }}
-                style={{ marginLeft: "auto", }}>
-                <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>
-                  {`최저가로 이동하기 >`}
-                </Text>
-              </TouchableOpacity>
+              {priceInfoOpen &&
+                <View
+                  style={{
+                    position: "absolute",
+                    width: Dimensions.get("window").width - d2p(40),
+                    backgroundColor: "rgba(68,62,73,1)",
+                    alignSelf: "center",
+                    borderRadius: 15,
+                    paddingHorizontal: d2p(10),
+                    paddingVertical: h2p(10),
+                    top: h2p(20),
+                    zIndex: 20
+                  }}>
+                  <Text style={[FONT.Regular, { fontSize: 13, color: theme.color.white }]}>
+                    <Text style={FONT.Bold}>예상가격</Text>은 해당 상품을 판매 중인 판매처에서 책정된 가격의 평균 가격입니다.
+                  </Text>
+                  <Text style={[FONT.Regular, {
+                    fontSize: 13, color: theme.color.white,
+                    marginTop: h2p(20)
+                  }]}>
+                    판매처의 상황 및 이벤트 등에 의하여 변경될 수 있습니다.
+                  </Text>
+                </View>}
+              {productDetailQuery.data.link &&
+                <TouchableOpacity
+                  onPress={() => {
+                    if (productDetailQuery.data?.link) {
+                      if (!__DEV__) {
+                        // * 구매처이동 버튼 구글 추적
+                        if (route.params?.id) {
+                          analytics().logSelectContent({
+                            content_type: "구매처 이동",
+                            item_id: route.params?.id.toString()
+                          });
+                        }
+                      }
+                      Linking.openURL(productDetailQuery.data.link);
+                    }
+                  }}
+                  style={{ marginLeft: "auto", }}>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Text style={[FONT.Regular, { color: theme.color.grayscale.C_443e49 }]}>
+                      {`최저가로 이동하기`}
+                    </Text>
+                    <Image source={blackRightSmallArrow}
+                      style={{
+                        marginLeft: d2p(5),
+                        width: d2p(8), height: d2p(12)
+                      }} />
+                  </View>
+                </TouchableOpacity>
+              }
             </View>
           </View>
 
@@ -269,7 +318,8 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
-            marginTop: h2p(20)
+            marginTop: h2p(20),
+            opacity: priceInfoOpen ? 0 : 1
           }}>
             <Text style={[FONT.Bold, { color: theme.color.grayscale.C_443e49, fontSize: 16 }]}>
               Best 푸드로그
@@ -285,28 +335,6 @@ const ProductDetail = ({ navigation, route }: ProductDetailProps) => {
               </TouchableOpacity>}
           </View>
 
-          {priceInfoOpen &&
-            <View
-              style={{
-                position: "absolute",
-                top: h2p(445),
-                width: Dimensions.get("window").width - d2p(40),
-                backgroundColor: "rgba(68,62,73,1)",
-                alignSelf: "center",
-                borderRadius: 15,
-                paddingHorizontal: d2p(10),
-                paddingVertical: h2p(10),
-              }}>
-              <Text style={[FONT.Regular, { fontSize: 13, color: theme.color.white }]}>
-                <Text style={FONT.Bold}>예상가격</Text>은 해당 상품을 판매 중인 판매처에서 책정된 가격의 평균 가격입니다.
-              </Text>
-              <Text style={[FONT.Regular, {
-                fontSize: 13, color: theme.color.white,
-                marginTop: h2p(20)
-              }]}>
-                판매처의 상황 및 이벤트 등에 의하여 변경될 수 있습니다.
-              </Text>
-            </View>}
           <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}

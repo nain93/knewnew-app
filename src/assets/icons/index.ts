@@ -70,34 +70,9 @@ import eyesIcon from "./eyesIcon.png";
 import mainPlusIcon from "./mainPlusIcon.png";
 import lightHomeIcon from "./lightHomeIcon.png";
 import userIcon from "./userIcon.png";
-import tasteMoreIcon from "./tasteMoreIcon.png";
-import smallRightArrow from "./smallRightArrow.png";
-import filterIcon from "./filterIcon.png";
 import blackRightArrow from "./blackRightArrow.png";
-import colorBookmark from "./colorBookmark.png";
-import whiteLeftArrow from "./whiteLeftArrow.png";
-import whiteMoreIcon from "./whiteMoreIcon.png";
-import mainBookmark from "./mainBookmark.png";
-import blackShare from "./blackShare.png";
-import blackComment from "./blackComment.png";
-import blackHeart from "./blackHeart.png";
-import linkIcon from "./linkIcon.png";
-import blackLeftArrow from "./blackLeftArrow.png";
-import blackMoreIcon from "./blackMoreIcon.png";
 import blackRightSmallArrow from "./blackRightSmallArrow.png";
-import foodImage from "./foodImage.png";
-import marketImage from "./marketImage.png";
-import priceImage from "./priceImage.png";
-import grayDownIcon from "./grayDownIcon.png";
-import triangle from "./triangle.png";
-import thumbUp from "./thumbUp.png";
-import thumbDown from "./thumbDown.png";
-import colorThumbDown from "./colorThumbDown.png";
-import colorThumbUp from "./colorThumbUp.png";
-import colorTriangle from "./colorTriangle.png";
-import grayLinkIcon from "./grayLinkIcon.png";
-import whiteSettingIcon from "./whiteSettingIcon.png";
-
+import rightTopArrowIcon from "./rightTopArrowIcon.png";
 
 export {
   close, leftArrow, more, heart, like, reKnew, comment, commentMore, circle, maincart, maintag,
@@ -106,10 +81,8 @@ export {
   graywrite, graylogo, graymypage, graysearch, mainmypage, mainlogoIcon, write, plusIcon, recommentIcon,
   handIcon, tagFood, tagHome, tagLife, emailicon, noticeIcon, alertIcon, eyeIcon, colorEyeIcon, checkIcon, tagIcon,
   selectTagIcon, knewnewIcon, settingIcon, rightArrow, settingKnewnew, grayCheckIcon, question, grayquestion, smallClose, whiteClose,
-  grayEyeIcon, grayKnewnew, grayCart, circleQuestion, marketIcon, goldStarIcon, starIcon, bookmark, graybookmark, tasteMoreIcon, smallRightArrow,
-  shareIcon, mainNotiIcon, notiIcon, eyesIcon, mainPlusIcon, lightHomeIcon, userIcon, filterIcon, blackRightArrow,
-  colorBookmark, whiteLeftArrow, whiteMoreIcon, mainBookmark, blackShare, blackComment, blackHeart, linkIcon,
-  blackLeftArrow, blackMoreIcon, blackRightSmallArrow, foodImage, marketImage, priceImage, grayDownIcon,
-  triangle, thumbUp, thumbDown, colorTriangle, colorThumbDown, colorThumbUp, grayLinkIcon, whiteSettingIcon
+  grayEyeIcon, grayKnewnew, grayCart, circleQuestion, marketIcon, goldStarIcon, starIcon, bookmark, graybookmark,
+  shareIcon, mainNotiIcon, notiIcon, eyesIcon, mainPlusIcon, lightHomeIcon, userIcon, blackRightArrow, blackRightSmallArrow,
+  rightTopArrowIcon
 };
 

@@ -1,6 +1,6 @@
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
-import { d2p, h2p } from '~/utils';
+import { d2p } from '~/utils';
 import Modal from "react-native-modal";
 import theme from '~/styles/theme';
 import { FONT } from '~/styles/fonts';
@@ -51,7 +51,10 @@ const OkPopup = ({ modalOpen, setModalOpen, title, handleOkayButton, children,
             handleOkayButton();
             setModalOpen(false);
           }}
-            style={{ width: "50%", paddingVertical: d2p(15) }}>
+            style={{
+              width: isCancleButton ? "50%" : "100%",
+              paddingVertical: d2p(18),
+            }}>
             <Text style={[FONT.Regular, {
               textAlign: "center",
               color: theme.color.main
@@ -70,7 +73,6 @@ const styles = StyleSheet.create({
   modal: {
     backgroundColor: theme.color.white,
     width: d2p(285),
-    minHeight: d2p(164),
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
@@ -82,6 +84,5 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     justifyContent: "center",
     alignItems: "center",
-    minHeight: d2p(56),
   }
 });

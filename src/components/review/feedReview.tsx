@@ -4,7 +4,7 @@ import React, { memo, useEffect, useState } from 'react';
 import theme from '~/styles/theme';
 import { d2p, h2p, simpleDate } from '~/utils';
 import ReviewIcon from '../icon/reviewIcon';
-import { blackRightArrow, bookmark, cart, colorBookmark, colorCart, colorLike, comment, grayEyeIcon, like, more, rightArrow } from '~/assets/icons';
+import { blackRightArrow, bookmark, cart, colorCart, colorLike, comment, graybookmark, grayEyeIcon, like, more } from '~/assets/icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 //@ts-ignore
@@ -150,7 +150,7 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
     <>
       <View style={{
         flexDirection: 'row',
-        alignItems: "center"
+        alignItems: "center",
       }}>
         <TouchableOpacity
           onPress={() => navigation.push("UserPage", { id: review.author.id })}
@@ -177,39 +177,56 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
           review={review.satisfaction} />
       </View>
       {review.product &&
-        <TouchableOpacity
-          onPress={() => {
-            if (review.product?.isVerified) {
-              navigation.push("ProductDetail", { id: review.product?.id });
+        <View style={{
+          marginLeft: d2p(30),
+          flexDirection: 'row',
+          marginBottom: h2p(10)
+        }}>
+          <TouchableOpacity
+            onPress={() => {
+              if (review.product?.isVerified) {
+                navigation.push("ProductDetail", { id: review.product?.id });
+              }
+              else {
+                setModalOpen({
+                  isOpen: true,
+                  content: "아직 등록되지 않은 상품입니다.",
+                  okButton: () => setModalOpen({ ...modalOpen, isOpen: false }),
+                  isCancleButton: false
+                });
+              }
+            }}
+            style={{
+              borderWidth: 1,
+              borderColor: theme.color.grayscale.eae7ec,
+              paddingLeft: d2p(10),
+              paddingRight: review.product.isVerified ? d2p(20) : d2p(10),
+              paddingVertical: h2p(10),
+              borderRadius: 5,
+              width: Dimensions.get("window").width - d2p(70)
+            }}>
+            {review.market &&
+              <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
+                {review.market}
+              </Text>
             }
-            else {
-              setModalOpen({
-                isOpen: true,
-                content: "아직 등록되지 않은 상품입니다.",
-                okButton: () => setModalOpen({ ...modalOpen, isOpen: false }),
-                isCancleButton: false
-              });
+            <Text style={[FONT.Medium, {
+              marginTop: h2p(5),
+              color: theme.color.black
+            }]}>
+              {review.product.name}
+            </Text>
+            {review.product.isVerified &&
+              <Image source={blackRightArrow}
+                style={{
+                  position: "absolute",
+                  width: d2p(6), height: d2p(10),
+                  right: d2p(10),
+                  bottom: h2p(12.5),
+                }} />
             }
-          }}
-          style={{
-            borderWidth: 1,
-            borderColor: theme.color.grayscale.e9e7ec,
-            paddingHorizontal: d2p(10),
-            paddingVertical: h2p(10),
-            borderRadius: 4,
-            marginLeft: d2p(30),
-            marginTop: h2p(15),
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between"
-          }}>
-          <Text style={[FONT.Medium, {
-            color: review.product.isVerified ? "#5193f6" : theme.color.black,
-          }]}>
-            {`${review.product.name} `}
-          </Text>
-          <Image source={blackRightArrow} style={{ width: d2p(7), height: d2p(12) }} />
-        </TouchableOpacity>
+          </TouchableOpacity>
+        </View>
       }
       <Text style={[FONT.Bold, {
         marginLeft: d2p(30),

@@ -12,7 +12,7 @@ import dynamicLinks, { FirebaseDynamicLinksTypes } from '@react-native-firebase/
 
 import GlobalNav from './src/navigators/globalNav';
 import AlertPopup from '~/components/popup/AlertPopup';
-import { bottomDotSheetState, isNotiReadState, latestVerionsState, notificationPopup, okPopupState, popupState, tokenState } from '~/recoil/atoms';
+import { bottomDotSheetState, isNotiReadState, latestVersionsState, notificationPopup, okPopupState, popupState, tokenState } from '~/recoil/atoms';
 import OkPopup from '~/components/popup/OkPopup';
 import Loading from '~/components/loading';
 import FadeInOut from '~/hooks/useFadeInOut';
@@ -25,58 +25,75 @@ import Config from 'react-native-config';
 import { versioningAOS, versioningIOS } from '~/utils/constant';
 import ShouldUpdatePopup from '~/components/popup/ShouldUpdatePopup';
 import BottomDotSheet from '~/components/popup/BottomDotSheet';
+import useNotification from '~/hooks/useNotification';
 
 
 export const navigationRef = createNavigationContainerRef();
+
+// * 강제 업데이트시 true 변경후 코드푸시
+const shouldUpdate: boolean = false;
 
 const App = () => {
   const [isPopupOpen, setIsPopupOpen] = useRecoilState(popupState);
   const [modalOpen, setModalOpen] = useRecoilState(okPopupState);
   const [notiOpen, setNotiOpen] = useRecoilState(notificationPopup);
+  const usePermission = useNotification();
   const { fadeAnim } = FadeInOut({ isPopupOpen: isPopupOpen.isOpen, setIsPopupOpen: (isOpen: boolean) => setIsPopupOpen({ ...isPopupOpen, isOpen }) });
   const [token, setToken] = useRecoilState(tokenState);
   const [isVisible, setIsVisible] = useState(false);
   const setIsNotiReadState = useSetRecoilState(isNotiReadState);
   const [isBottomDotSheet, setIsBottomDotSheet] = useRecoilState(bottomDotSheetState);
-  const setLatestVerions = useSetRecoilState(latestVerionsState);
+  const setLatestVersions = useSetRecoilState(latestVersionsState);
   const [versionCheckModal, setVersionCheckModal] = useState(false);
+  const [preLoading, setPreLoading] = useState(false);
 
   const routeNameRef = React.useRef(null);
 
 
   // * 최신버전 체크
   const versionCheck = () => {
-    if (Platform.OS === "ios") {
-      VersionCheck.getLatestVersion({
-        provider: "appStore"
-      }).then((latest: string) => {
-        // * 특정 버전에서 강제 업데이트
-        // if (!__DEV__ && versioningIOS !== latest) {
-        //   // * 강제 업데이트 팝업
-        //   setVersionCheckModal(true);
-        // }
-        // else {
-        //   setVersionCheckModal(false);
-        // }
+    if (shouldUpdate) {
+      setPreLoading(true);
+      if (Platform.OS === "ios") {
+        VersionCheck.getLatestVersion({
+          provider: "appStore"
+        }).then((latest: string) => {
+          // * 특정 버전에서 강제 업데이트
+          if (!__DEV__ && versioningIOS !== latest) {
+            // * 강제 업데이트 팝업
+            setVersionCheckModal(true);
+          }
+          else {
+            setVersionCheckModal(false);
+          }
+          setPreLoading(false);
+          setLatestVersions(latest);
+        });
+      }
 
-        setLatestVerions(latest);
-      });
+      if (Platform.OS === "android") {
+        VersionCheck.getLatestVersion({
+          provider: "playStore"
+        }).then((latest: string) => {
+          // * 특정 버전에서 강제 업데이트
+          if (!__DEV__ && versioningAOS !== latest) {
+            // * 강제 업데이트 팝업
+            setVersionCheckModal(true);
+          }
+          else {
+            setVersionCheckModal(false);
+          }
+          setPreLoading(false);
+          setLatestVersions(latest);
+        });
+      }
     }
 
-    if (Platform.OS === "android") {
+    else {
       VersionCheck.getLatestVersion({
-        provider: "playStore"
+        provider: Platform.OS === "ios" ? "appStore" : "playStore"
       }).then((latest: string) => {
-        // * 특정 버전에서 강제 업데이트
-        // if (!__DEV__ && versioningAOS !== latest) {
-        //   // * 강제 업데이트 팝업
-        //   setVersionCheckModal(true);
-        // }
-        // else {
-        //   setVersionCheckModal(false);
-        // }
-
-        setLatestVerions(latest);
+        setLatestVersions(latest);
       });
     }
   };
@@ -86,6 +103,7 @@ const App = () => {
     const storageToken = await AsyncStorage.getItem("token");
     if (storageToken) {
       setToken(storageToken);
+      usePermission.notificationPermission({ token: storageToken });
     }
     else {
       SplashScreen.hide();
@@ -101,14 +119,28 @@ const App = () => {
     if (!__DEV__) {
       installUpdateIfAvailable();
     }
+    SplashScreen.hide();
   }, []);
 
   // * 포어그라운드에서 딥링크 들어올때
-  const handleDynamicLink = (link: FirebaseDynamicLinksTypes.DynamicLink) => {
+  const handleDynamicLink = async (link: FirebaseDynamicLinksTypes.DynamicLink) => {
+    const storageToken = await AsyncStorage.getItem("token");
+    if (!storageToken) {
+      // * 토큰 없을때 네비게이트 차단
+      return;
+    }
     // Handle dynamic link inside your own application
-    if (link?.url.includes("knewnew")) {
-      //@ts-ignore
-      navigationRef.navigate("FeedDetail", { id: link.url.split("id=")[1] });
+    if (link?.url.includes("id")) {
+      setTimeout(() => {
+        //@ts-ignore
+        navigationRef.navigate("FeedDetail", { id: link.url.split("id=")[1] });
+      }, 500);
+    }
+    else if (link?.url.includes("event")) {
+      setTimeout(() => {
+        //@ts-ignore
+        navigationRef.navigate("EventPage");
+      }, 500);
     }
   };
 
@@ -128,12 +160,17 @@ const App = () => {
           // * 토큰 없을때 네비게이트 차단
           return;
         }
-        if (link?.url.includes("knewnew")) {
+        if (link?.url.includes("id")) {
           setTimeout(() => {
             //@ts-ignore
             navigationRef.navigate("FeedDetail", { id: link.url.split("id=")[1] });
-          }, 1000);
-
+          }, 500);
+        }
+        else if (link?.url.includes("event")) {
+          setTimeout(() => {
+            //@ts-ignore
+            navigationRef.navigate("EventPage");
+          }, 500);
         }
       });
   }, []);
@@ -318,6 +355,12 @@ const App = () => {
     }
   }, [notiOpen.isOpen]);
 
+  if (preLoading) {
+    return (
+      <Loading />
+    );
+  }
+
   return (
     <SafeAreaProvider>
       {/*@ts-ignore*/}
@@ -327,24 +370,24 @@ const App = () => {
           routeNameRef.current = navigationRef.current.getCurrentRoute().name;
         }}
         onStateChange={async () => {
-          const previousRouteName = routeNameRef.current;
-          //@ts-ignore 
-          const currentRouteName = navigationRef.current.getCurrentRoute().name;
+          if (!__DEV__) {
+            const previousRouteName = routeNameRef.current;
+            //@ts-ignore 
+            const currentRouteName = navigationRef.current.getCurrentRoute().name;
 
-          if (previousRouteName !== currentRouteName) {
-            // * 구글 애널리틱스 추적
-            await analytics().logScreenView({
-              screen_name: currentRouteName,
-              screen_class: currentRouteName,
-            });
+            if (previousRouteName !== currentRouteName) {
+              // * 구글 애널리틱스 추적
+              await analytics().logScreenView({
+                screen_name: currentRouteName,
+                screen_class: currentRouteName
+              });
+            }
+            //@ts-ignore 
+            routeNameRef.current = currentRouteName;
           }
-          //@ts-ignore 
-          routeNameRef.current = currentRouteName;
         }}
       >
-        {versionCheckModal ? null :
-          <GlobalNav token={token} />
-        }
+        <GlobalNav versionCheckModal={versionCheckModal} token={token} />
       </NavigationContainer>
       {/* 위에서 내려오는 알림 팝업 */}
       {isVisible &&

@@ -9,26 +9,28 @@ interface BasicButtonProp {
   bgColor: string;
   textColor: string;
   viewStyle?: ViewStyle;
+  boxStyle?: ViewStyle
   onPress: () => void;
   borderColor?: string;
   disabled?: boolean;
   loading?: boolean
 }
 
-const BasicButton = ({ loading = false, disabled, text, bgColor, textColor, borderColor, viewStyle, onPress }: BasicButtonProp) => {
+const BasicButton = ({ loading = false, disabled, text, bgColor, textColor, borderColor, boxStyle, viewStyle, onPress }: BasicButtonProp) => {
   return (
     <TouchableOpacity
+      style={boxStyle}
       disabled={disabled}
       onPress={() => {
         if (!loading) {
           onPress();
         }
       }}>
-      <View style={[styles.container, viewStyle, { backgroundColor: disabled ? theme.color.grayscale.e9e7ec : bgColor },
+      <View style={[styles.container, viewStyle, { backgroundColor: disabled ? theme.color.grayscale.f7f7fc : bgColor },
       { borderColor: disabled ? theme.color.grayscale.e9e7ec : (borderColor ? borderColor : textColor) }]}>
         {loading ? <ActivityIndicator color={bgColor === "#ffffff" ? theme.color.main : "white"} />
           :
-          <Text style={[styles.text, { color: disabled ? theme.color.white : textColor }, FONT.Bold]}>{text}</Text>
+          <Text style={[styles.text, { color: disabled ? theme.color.grayscale.d3d0d5 : textColor }, FONT.Bold]}>{text}</Text>
         }
       </View>
     </TouchableOpacity>

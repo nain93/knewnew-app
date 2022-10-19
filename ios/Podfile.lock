@@ -193,70 +193,47 @@ PODS:
     - AppAuth (~> 1.4)
     - GTMAppAuth (~> 1.0)
     - GTMSessionFetcher/Core (~> 1.1)
-  - GoogleUtilities/AppDelegateSwizzler (7.7.0):
+  - GoogleUtilities/AppDelegateSwizzler (7.8.0):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
     - GoogleUtilities/Network
-  - GoogleUtilities/Environment (7.7.0):
+  - GoogleUtilities/Environment (7.8.0):
     - PromisesObjC (< 3.0, >= 1.2)
-  - GoogleUtilities/Logger (7.7.0):
+  - GoogleUtilities/Logger (7.8.0):
     - GoogleUtilities/Environment
-  - GoogleUtilities/MethodSwizzler (7.7.0):
+  - GoogleUtilities/MethodSwizzler (7.8.0):
     - GoogleUtilities/Logger
-  - GoogleUtilities/Network (7.7.0):
+  - GoogleUtilities/Network (7.8.0):
     - GoogleUtilities/Logger
     - "GoogleUtilities/NSData+zlib"
     - GoogleUtilities/Reachability
-  - "GoogleUtilities/NSData+zlib (7.7.0)"
-  - GoogleUtilities/Reachability (7.7.0):
+  - "GoogleUtilities/NSData+zlib (7.8.0)"
+  - GoogleUtilities/Reachability (7.8.0):
     - GoogleUtilities/Logger
-  - GoogleUtilities/UserDefaults (7.7.0):
+  - GoogleUtilities/UserDefaults (7.8.0):
     - GoogleUtilities/Logger
-  - GTMAppAuth (1.3.0):
-    - AppAuth/Core (~> 1.4)
-    - GTMSessionFetcher/Core (~> 1.5)
+  - GTMAppAuth (1.3.1):
+    - AppAuth/Core (~> 1.6)
+    - GTMSessionFetcher/Core (< 3.0, >= 1.5)
   - GTMSessionFetcher/Core (1.7.2)
   - JWT (3.0.0-beta.14):
     - Base64 (~> 1.1.2)
-  - kakao-login (5.1.1):
-    - KakaoSDK (= 2.9.0)
-    - KakaoSDKAuth (= 2.9.0)
-    - KakaoSDKCommon (= 2.9.0)
-    - KakaoSDKTalk (= 2.9.0)
-    - KakaoSDKUser (= 2.9.0)
+  - kakao-login (5.2.3):
+    - KakaoSDKAuth (= 2.11.1)
+    - KakaoSDKCommon (= 2.11.1)
+    - KakaoSDKUser (= 2.11.1)
     - React
-  - KakaoSDK (2.9.0):
-    - KakaoSDKAuth (= 2.9.0)
-    - KakaoSDKCommon (= 2.9.0)
-    - KakaoSDKLink (= 2.9.0)
-    - KakaoSDKNavi (= 2.9.0)
-    - KakaoSDKStory (= 2.9.0)
-    - KakaoSDKTalk (= 2.9.0)
-    - KakaoSDKTemplate (= 2.9.0)
-    - KakaoSDKUser (= 2.9.0)
-  - KakaoSDKAuth (2.9.0):
-    - KakaoSDKCommon (= 2.9.0)
-  - KakaoSDKCommon (2.9.0):
-    - KakaoSDKCommon/Common (= 2.9.0)
-    - KakaoSDKCommon/Network (= 2.9.0)
-  - KakaoSDKCommon/Common (2.9.0)
-  - KakaoSDKCommon/Network (2.9.0):
+  - KakaoSDKAuth (2.11.1):
+    - KakaoSDKCommon (= 2.11.1)
+  - KakaoSDKCommon (2.11.1):
+    - KakaoSDKCommon/Common (= 2.11.1)
+    - KakaoSDKCommon/Network (= 2.11.1)
+  - KakaoSDKCommon/Common (2.11.1)
+  - KakaoSDKCommon/Network (2.11.1):
     - Alamofire (~> 5.1)
-    - KakaoSDKCommon/Common (= 2.9.0)
-  - KakaoSDKLink (2.9.0):
-    - KakaoSDKCommon (= 2.9.0)
-    - KakaoSDKTemplate (= 2.9.0)
-  - KakaoSDKNavi (2.9.0):
-    - KakaoSDKCommon/Common (= 2.9.0)
-  - KakaoSDKStory (2.9.0):
-    - KakaoSDKUser (= 2.9.0)
-  - KakaoSDKTalk (2.9.0):
-    - KakaoSDKTemplate (= 2.9.0)
-    - KakaoSDKUser (= 2.9.0)
-  - KakaoSDKTemplate (2.9.0):
-    - KakaoSDKCommon/Common (= 2.9.0)
-  - KakaoSDKUser (2.9.0):
-    - KakaoSDKAuth (= 2.9.0)
+    - KakaoSDKCommon/Common (= 2.11.1)
+  - KakaoSDKUser (2.11.1):
+    - KakaoSDKAuth (= 2.11.1)
   - libevent (2.1.12)
   - libwebp (1.2.3):
     - libwebp/demux (= 1.2.3)
@@ -799,14 +776,8 @@ SPEC REPOS:
     - GTMAppAuth
     - GTMSessionFetcher
     - JWT
-    - KakaoSDK
     - KakaoSDKAuth
     - KakaoSDKCommon
-    - KakaoSDKLink
-    - KakaoSDKNavi
-    - KakaoSDKStory
-    - KakaoSDKTalk
-    - KakaoSDKTemplate
     - KakaoSDKUser
     - libevent
     - libwebp
@@ -968,7 +939,7 @@ SPEC CHECKSUMS:
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   CocoaLumberjack: 543c79c114dadc3b1aba95641d8738b06b05b646
   CodePush: b51b7ac64c07d4eacfc8cc5750a1dd28adbf2528
-  DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
+  DoubleConversion: 831926d9b8bf8166fd87886c4abab286c2422662
   FBLazyVector: 2c76493a346ef8cacf1f442926a39f805fffec1f
   FBReactNativeSpec: 371350f24afa87b6aba606972ec959dcd4a95c9a
   Firebase: 5f8193dff4b5b7c5d5ef72ae54bb76c08e2b841d
@@ -988,24 +959,18 @@ SPEC CHECKSUMS:
   Flipper-RSocket: d9d9ade67cbecf6ac10730304bf5607266dd2541
   FlipperKit: cbdee19bdd4e7f05472a66ce290f1b729ba3cb86
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
-  glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
+  glog: 476ee3e89abb49e07f822b48323c51c57124b572
   GoogleAppMeasurement: 4c19f031220c72464d460c9daa1fb5d1acce958e
   GoogleDataTransport: 1c8145da7117bd68bbbed00cf304edb6a24de00f
   GoogleSignIn: c90b5bec45e780f54c6a8e1e3c182a86e3dda69d
-  GoogleUtilities: e0913149f6b0625b553d70dae12b49fc62914fd1
-  GTMAppAuth: 4d8f864896f3646f0c33baf38a28362f4c601e15
+  GoogleUtilities: 1d20a6ad97ef46f67bbdec158ce00563a671ebb7
+  GTMAppAuth: 0ff230db599948a9ad7470ca667337803b3fc4dd
   GTMSessionFetcher: 5595ec75acf5be50814f81e9189490412bad82ba
   JWT: ef71dfb03e1f842081e64dc42eef0e164f35d251
-  kakao-login: f846c2a8b1fe24cf1a1c4607d147fcbfc6b77f11
-  KakaoSDK: d5a5a38ebf4da97beeecf100ac3dc9a020e19648
-  KakaoSDKAuth: 5d9eec3317320dc60015ba8d597b2ad32fc70b1a
-  KakaoSDKCommon: aaed06bb779b92cd6f5c35e94160d4ecfaaac511
-  KakaoSDKLink: 575d1119427a7b278eb49da656f8d648a0a94411
-  KakaoSDKNavi: 8b767610d59fc044f1f5df3f29c89688a446a1fc
-  KakaoSDKStory: a494a364a3539601289d01aadd117f165f39d7b2
-  KakaoSDKTalk: b0ac197fd7fce4afc9af3f012c1abee7f053c910
-  KakaoSDKTemplate: eaf03ad5e44d374cbfff85588552a5627cd0519c
-  KakaoSDKUser: 37e92bfc1d36b339420952080a8d31c217a38a63
+  kakao-login: d506fe760be606181e206f89bf42fd082720a068
+  KakaoSDKAuth: bb2dfa7be30daa8403c9cfc8001aa6fde7a5b779
+  KakaoSDKCommon: 555e1bb46595b842ded01cf7888cc17bbae4e113
+  KakaoSDKUser: 08c0a4f40bebdebdf948a9e3d0e44ed5c2754f99
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   libwebp: 60305b2e989864154bd9be3d772730f08fc6a59c
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96

@@ -16,6 +16,7 @@ const useNotification = () => {
     if (Platform.OS === "ios") {
       messaging().requestPermission().then(isPermission => {
         if (isPermission === 1) {
+          // todo token refresh
           messaging().getToken().then(FCMToken => {
             AsyncStorage.setItem("isNotification", JSON.stringify(true));
             notificationMutation.mutate({ token, FCMToken, type: Platform.OS });
