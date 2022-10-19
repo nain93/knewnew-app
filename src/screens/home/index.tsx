@@ -594,10 +594,6 @@ const styles = StyleSheet.create({
     marginBottom: h2p(80),
     paddingTop: h2p(10)
   },
-  header: {
-    flexDirection: "row", alignItems: "center",
-    paddingHorizontal: d2p(20),
-  },
   filterWrap: {
     flexDirection: "row",
     borderRadius: 50,
