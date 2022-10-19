@@ -1,146 +1,141 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { Dimensions, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { dishImage } from '~/assets/images';
 import { d2p, h2p } from '~/utils';
-import theme from '~/styles/theme';
-import BasicButton from '~/components/button/basicButton';
-import { NavigationStackProp } from "react-navigation-stack";
-import { NavigationRoute } from "react-navigation";
-import { BadgeType } from '~/types';
-import { popupState, tokenState } from '~/recoil/atoms';
-import { useSetRecoilState } from 'recoil';
-import { UserInfoType } from '~/types/user';
+import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { FONT } from '~/styles/fonts';
-import { initialBadgeData } from '~/utils/data';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import BasicButton from '~/components/button/basicButton';
+import theme from '~/styles/theme';
+import { close } from '~/assets/icons';
 import { useMutation } from 'react-query';
-import { userSignup } from '~/api/user';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import UserTagLayout from '~/components/layout/UserTagLayout';
-import useNotification from '~/hooks/useNotification';
-import Loading from '~/components/loading';
+import { useRecoilValue } from 'recoil';
+import { myIdState, tokenState } from '~/recoil/atoms';
+import { NavigationStackProp } from 'react-navigation-stack';
+import { NavigationRoute } from 'react-navigation';
+import { editUserProfile } from '~/api/user';
+import { postProfileType } from '~/types/user';
+import { interestTagData } from '~/utils/data';
+import FastImage from 'react-native-fast-image';
+import { InterestTagType } from '~/types';
 
-interface BadgeSelectProps {
-  navigation: NavigationStackProp
-  route: NavigationRoute<UserInfoType>;
+interface TagSelectPropType {
+  navigation: NavigationStackProp;
+  route: NavigationRoute<{
+    nickname: string
+  }>;
 }
 
-const TagSelect = ({ route, navigation }: BadgeSelectProps) => {
-  const [userInfo, setUserInfo] = useState<UserInfoType>();
-  const [userBadge, setUserBadge] = useState<BadgeType>(initialBadgeData);
-  const scrollRef = useRef<KeyboardAwareScrollView>(null);
-  const [buttonEnabled, setButtonEnabled] = useState(false);
-  const usePermission = useNotification();
+const sequence = [5, 14, 23, 32];
 
-  const setToken = useSetRecoilState(tokenState);
-  const setIspopupOpen = useSetRecoilState(popupState);
+const TagSelect = ({ navigation, route }: TagSelectPropType) => {
+  const token = useRecoilValue(tokenState);
+  const myId = useRecoilValue(myIdState);
+  const [taste, setTaste] = useState<InterestTagType[]>(interestTagData);
 
-  const signupMutation = useMutation("signup", (signupData: UserInfoType) => userSignup(signupData), {
-    onSuccess: async (data) => {
-      if (data) {
-        navigation.navigate("Welcome", {
-          userBadge: {
-            foodLife: userBadge.foodStyle.filter(v => v.isClick)[0].title,
-            lifeStyle: userBadge.occupation.filter(v => v.isClick)[0].title,
-            household: userBadge.household.filter(v => v.isClick)[0].title
-          }, userInfo
-        });
-        setToken(data.accessToken);
-        await AsyncStorage.setItem("token", data.accessToken);
-        await AsyncStorage.setItem("refreshToken", data.refreshToken);
-        usePermission.notificationPermission({ token: data.accessToken });
-      }
+  const editProfileMutation = useMutation(["editprofile", token],
+    (profileProp: postProfileType) => editUserProfile({ token, id: myId, profile: profileProp }), {
+    onSuccess: () => {
+      navigation.navigate("TagResult", { nickname: route.params?.nickname, tags: taste });
     }
   });
 
-  const handleNext = async () => {
-    // * 유효성 체크
-    if (userBadge.foodStyle.every(v => !v.isClick)) {
-      setIspopupOpen({ isOpen: true, content: "step1을 선택해주세요" });
-      return;
-    }
-    if (userBadge.household.every(v => !v.isClick)) {
-      setIspopupOpen({ isOpen: true, content: "step2을 선택해주세요" });
-      return;
-    }
-    if (userBadge.occupation.every(v => !v.isClick) && userBadge.occupation.every(v => !v.content)) {
-      setIspopupOpen({ isOpen: true, content: "step3을 선택해주세요" });
-      return;
-    }
-    if (route.params) {
-      signupMutation.mutate({
-        ...route.params,
-        tags:
-        {
-          foodStyle: [userBadge.foodStyle.filter(v => v.isClick)[0].title],
-          household: [userBadge.household.filter(v => v.isClick)[0].title],
-          occupation: [userBadge.occupation.filter(v => v.isClick)[0].title]
-        }
-      });
-    }
-
-    // todo 유효성 체크, 회원가입, 토큰 설정 
-
-  };
-
-  useEffect(() => {
-    setUserInfo(route.params);
-  }, [route.params]);
-
-  useEffect(() => {
-    if (userBadge.foodStyle.every(v => !v.isClick) ||
-      userBadge.occupation.every(v => !v.isClick) ||
-      (userBadge.household.every(v => !v.isClick) && userBadge.occupation.every(v => !v.content))
-    ) {
-      setButtonEnabled(false);
-    }
-    else {
-      setButtonEnabled(true);
-    }
-  }, [userBadge]);
-
-  if (signupMutation.isLoading) {
-    return (
-      <Loading />
-    );
-  }
-
   return (
-    <KeyboardAwareScrollView
-      ref={scrollRef}
-      style={styles.container}
-      // contentContainerStyle={{ flex: 1 }}
-      showsVerticalScrollIndicator={false} >
-      {/* <View style={{ backgroundColor: "rgba(0,0,0,0.5)" }} /> */}
-      <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: h2p(30) }}>
-        <Text style={[FONT.SemiBold, { fontSize: 26, color: theme.color.main }]}>
-          {userInfo?.nickname}</Text>
-        <Text style={[FONT.SemiBold, { fontSize: 26 }]}>님</Text>
-        <Text style={[FONT.SemiBold, { fontSize: 26 }]}> 반가워요!</Text>
+    <View style={styles.container}>
+      <Image source={dishImage} style={{ width: d2p(36), height: d2p(36) }} />
+      <Text style={[FONT.SemiBold, {
+        fontSize: 22,
+        lineHeight: 30.8,
+        marginTop: h2p(10),
+        textAlign: "center"
+      }]}>
+        {`${route.params?.nickname}님을 나타내는\n입맛 태그를 마음껏 선택해주세요.`}
+      </Text>
+      <View style={{
+        marginTop: h2p(40),
+        flexDirection: "row", flexWrap: "wrap"
+      }}>
+        {React.Children.toArray(taste.map((v, i) => (
+          <TouchableOpacity
+            onPress={() => {
+              setTaste(taste.map((click, clickIdx) => {
+                if (clickIdx === i) {
+                  return { ...click, isClick: !click.isClick };
+                }
+                else {
+                  return click;
+                }
+              }));
+            }}
+            style={[styles.tagButton, {
+              marginLeft: sequence.includes(i) ? d2p(36.5) : 0
+            }]}>
+            <Text style={[FONT.Medium, {
+              color: v.isClick ? theme.color.white : theme.color.black,
+              fontSize: 13, textAlign: "center"
+            }]}>{v.title}</Text>
+            {(v.isClick && v.url) &&
+              <FastImage source={v.url} style={[styles.tagButton, {
+                position: "absolute",
+                zIndex: -1,
+                borderWidth: 0
+              }]} />
+            }
+          </TouchableOpacity>
+        )))}
       </View>
-      <UserTagLayout
-        scrollRef={scrollRef}
-        viewStyle={{ marginBottom: h2p(40) }}
-        userBadge={userBadge} setUserBadge={(badge: BadgeType) => setUserBadge(badge)} />
-      <BasicButton
-        disabled={!buttonEnabled}
-        onPress={handleNext} text="다음으로" bgColor={buttonEnabled ? theme.color.white : theme.color.grayscale.f7f7fc}
-        textColor={buttonEnabled ? theme.color.main : theme.color.grayscale.d3d0d5}
-        borderColor={buttonEnabled ? theme.color.main : theme.color.grayscale.e9e7ec}
-        viewStyle={{ marginBottom: h2p(40) }} />
-    </KeyboardAwareScrollView>
+      <View style={{ marginTop: "auto" }}>
+        <BasicButton
+          loading={editProfileMutation.isLoading}
+          disabled={taste.every(v => !v.isClick)}
+          onPress={() => {
+            navigation.navigate("TagResult", {
+              nickname: route.params?.nickname, tags: taste.filter(v => v.isClick)
+            });
+            // editProfileMutation.mutate({
+            //   tags: taste && taste.filter(v => v.isClick).map(v => v.title)
+            // })
+          }
+          }
+          text="선택 완료"
+          bgColor={theme.color.white}
+          textColor={theme.color.main}
+        />
+      </View>
+      <Pressable
+        onPress={() => {
+          //@ts-ignore
+          navigation.reset({ index: 0, routes: [{ name: "TabNav" }] });
+        }}
+        style={{ flexDirection: "row", alignItems: "center", marginTop: h2p(20) }}>
+        <Text style={[FONT.ExtraBold, {
+          marginRight: d2p(5),
+          fontSize: 12, color: theme.color.grayscale.d2d0d5
+        }]}>
+          나중에 할래요.
+        </Text>
+        <Image source={close} style={{ width: d2p(10), height: d2p(10) }} />
+      </Pressable>
+    </View>
   );
 };
 
+export default TagSelect;
+
 const styles = StyleSheet.create({
   container: {
+    paddingTop: isIphoneX() ? getStatusBarHeight() + h2p(68) : h2p(68),
+    paddingBottom: getBottomSpace() + h2p(40),
     flex: 1,
-    paddingHorizontal: d2p(20)
+    paddingHorizontal: d2p(17.5),
+    alignItems: "center"
   },
-  title: {
-    color: theme.color.black,
-    fontSize: 26,
-    includeFontPadding: false,
+  tagButton: {
+    borderWidth: 1,
+    width: (Dimensions.get("window").width - d2p(60)) / 5,
+    height: (Dimensions.get("window").width - d2p(60)) / 5,
+    borderRadius: 63,
+    justifyContent: "center", alignItems: "center",
+    marginHorizontal: d2p(5),
+    marginTop: h2p(10)
   }
 });
-
-export default TagSelect;

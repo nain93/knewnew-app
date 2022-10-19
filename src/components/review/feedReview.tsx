@@ -122,15 +122,7 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
   };
 
   const handleEditPress = () => {
-    if (review.parent) {
-      navigation.navigate("Write", {
-        loading: true, isEdit: true, type: "reknew",
-        nickname: review.author.nickname, review, filterBadge
-      });
-    }
-    else {
-      navigation.navigate("Write", { loading: true, isEdit: true, review, filterBadge });
-    }
+    navigation.navigate("Write", { loading: true, isEdit: true, review, filterBadge });
   };
 
   useEffect(() => {
@@ -172,86 +164,17 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
             style={{ width: d2p(20), height: d2p(20) }} />
         </TouchableOpacity>
 
-        <View style={{ width: Dimensions.get('window').width - d2p(80) }}>
-          <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap" }}>
-            <TouchableOpacity
-              onPress={() => navigation.push("UserPage", { id: review.author.id })}
-            >
-              <Text style={[styles.title, FONT.Medium]}>{review.author?.nickname}</Text>
-            </TouchableOpacity>
-            {/* todo 뱃지 추가 */}
-            <Text style={[FONT.Regular, { fontSize: 13, color: theme.color.grayscale.a09ca4 }]}>
-              · {review.author?.tags?.foodStyle}
-            </Text>
-          </View>
-        </View>
-
-        {
-          type === "normal" &&
+        <View style={{ width: Dimensions.get('window').width - d2p(100), flexWrap: "wrap" }}>
           <TouchableOpacity
-            style={{ position: "absolute", right: 0, top: 0 }}
-            onPress={() => {
-              if (review.author.id === myId) {
-                setIsBottomDotSheet({
-                  isOpen: true,
-                  topTitle: "푸드로그 수정",
-                  topPress: () => handleEditPress(),
-                  middleTitle: "푸드로그 삭제",
-                  middlePress: () => {
-                    setModalOpen({
-                      isOpen: true,
-                      content: "글을 삭제할까요?",
-                      okButton: handleDeletePress
-                    });
-                  },
-                  middleTextStyle: { color: theme.color.main },
-                  bottomTitle: "취소하기"
-                });
-              }
-              else {
-                setIsBottomDotSheet({
-                  isOpen: true,
-                  topTitle: "푸드로그 신고",
-                  topPress: () => navigation.navigate("report", { review }),
-                  middleTitle: "유저 차단",
-                  middlePress: () => {
-                    setModalOpen({
-                      isOpen: true,
-                      content: "차단 하시겠습니까?",
-                      okButton: () => blockMutation.mutate({ id: review.author.id, isBlock: true })
-                    });
-                  },
-                  middleTextStyle: { color: theme.color.main },
-                  bottomTitle: "취소하기"
-                });
-              }
-            }}>
-            <Image
-              source={more}
-              resizeMode="contain"
-              style={{ width: d2p(26), height: d2p(16) }}
-            />
+            onPress={() => navigation.push("UserPage", { id: review.author.id })}>
+            <Text style={[styles.title, FONT.SemiBold]}>{review.author?.nickname}</Text>
           </TouchableOpacity>
-        }
-        <View style={{
-          right: 0, top: h2p(15),
-          position: "absolute",
-        }}>
-          {review.isEdit &&
-            <Text style={[FONT.Regular,
-            {
-              fontSize: 12, color: theme.color.grayscale.d3d0d5,
-              textAlign: "right",
-              marginTop: h2p(5)
-            }]}>
-              수정됨
-            </Text>
-          }
         </View>
       </View>
 
       <View style={styles.titleContainer}>
-        <ReviewIcon viewStyle={{ marginTop: h2p(15), marginBottom: h2p(15) }} review={review.satisfaction} />
+        <ReviewIcon viewStyle={{ marginTop: h2p(15) }}
+          review={review.satisfaction} />
       </View>
       {review.product &&
         <View style={{
@@ -305,6 +228,13 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
           </TouchableOpacity>
         </View>
       }
+      <Text style={[FONT.Bold, {
+        marginLeft: d2p(30),
+        marginTop: h2p(20),
+        marginBottom: h2p(15)
+      }]}>
+        사놓으면 활용도 좋은템이에요!
+      </Text>
       {keyword ?
         <Highlighter
           highlightStyle={[FONT.Bold, { fontSize: 15, color: theme.color.main }]}
@@ -357,7 +287,8 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
                     width: type === "reKnewWrite" ?
                       d2p(80)
                       :
-                      d2p(90), aspectRatio: 1
+                      (Dimensions.get("window").width - d2p(90)) / 3
+                    , aspectRatio: 1
                   }]} />
               );
             }
@@ -375,7 +306,7 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
                         type === "reKnewWrite" ?
                           d2p(80)
                           :
-                          d2p(90),
+                          (Dimensions.get("window").width - d2p(90)) / 3,
                       aspectRatio: 1,
                     }} />
                   )))}
@@ -391,7 +322,7 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
                     <View>
                       <FastImage
                         source={{ uri: v.image, priority: FastImage.priority.high }} style={{
-                          marginRight: i !== 2 ? d2p(5) : 0,
+                          marginRight: i !== 2 ? d2p(10) : 0,
                           borderRadius: 10,
                           borderWidth: 1,
                           borderColor: theme.color.grayscale.d3d0d5,
@@ -399,7 +330,7 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
                             type === "reKnewWrite" ?
                               d2p(72.5)
                               :
-                              d2p(90),
+                              (Dimensions.get("window").width - d2p(90)) / 3,
                           aspectRatio: 1,
                         }} />
                       {i === 2 &&
@@ -421,25 +352,15 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
           }
         })()
       }
-      {review.parent &&
-        <ReKnew review={{ ...review.parent }} filterBadge={filterBadge ? filterBadge : ""} />
-      }
+
       {type === "normal" &&
         <View style={styles.reactionContainer}>
-          {/* 인용글에서는 리트윗 아이콘 삭제 */}
-          {/* {!review.parent &&
-            <TouchableOpacity
-              onPress={() => navigation.navigate("Write",
-                { loading: false, isEdit: false, type: "reKnewWrite", review, nickname: getMyProfileQuery.data?.nickname, filterBadge })}
-              style={styles.reviewIcon}>
-              <Image source={reKnew} style={styles.reviewImg} />
-              <Text style={[FONT.Regular, styles.reviewCount]}>{review.childCount}</Text>
-            </TouchableOpacity>
-          } */}
           <View
             style={styles.reviewIcon}>
-            <Image source={grayEyeIcon} style={styles.reviewImg} />
-            <Text style={[FONT.Regular, styles.reviewCount]}>{review.viewCount}</Text>
+            <Image source={grayEyeIcon} style={[styles.reviewImg, {
+              width: d2p(20), height: d2p(15)
+            }]} />
+            <Text style={[FONT.Medium, styles.reviewCount]}>{review.viewCount}</Text>
           </View>
           <Pressable
             onPress={() => {
@@ -451,7 +372,7 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
             }}
             style={styles.reviewIcon}>
             <Image source={comment} style={styles.reviewImg} />
-            <Text style={[FONT.Regular, styles.reviewCount]}>{review.commentCount}</Text>
+            <Text style={[FONT.Medium, styles.reviewCount]}>{review.commentCount}</Text>
           </Pressable>
           <TouchableOpacity
             onPress={() => {
@@ -469,8 +390,10 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
               }
             }}
             style={styles.reviewIcon}>
-            <Image source={isLike ? colorLike : like} style={styles.reviewImg} />
-            <Text style={[FONT.Regular, styles.reviewCount]}>{likeCount}</Text>
+            <Image source={isLike ? colorLike : like} style={[styles.reviewImg, {
+              width: d2p(18), height: d2p(17)
+            }]} />
+            <Text style={[FONT.Medium, styles.reviewCount]}>{likeCount}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -488,8 +411,10 @@ const FeedReview = ({ keyword, type = "normal", filterBadge, review }: FeedRevie
               }
             }}
             style={styles.reviewIcon}>
-            <Image source={isBookmarkState ? graybookmark : bookmark} style={styles.reviewImg} />
-            <Text style={[FONT.Regular, styles.reviewCount]}>{bookmarkCount}</Text>
+            <Image source={isBookmarkState ? colorBookmark : bookmark} style={[styles.reviewImg, {
+              width: d2p(14), height: d2p(18)
+            }]} />
+            <Text style={[FONT.Medium, styles.reviewCount]}>{bookmarkCount}</Text>
           </TouchableOpacity>
         </View>
       }
@@ -540,13 +465,12 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   reviewImg: {
-    width: d2p(24),
-    height: d2p(24),
+    width: d2p(16),
+    height: d2p(16),
     marginRight: d2p(10)
   },
   reviewCount: {
-    fontSize: 12,
-    color: theme.color.grayscale.C_79737e
+    color: theme.color.grayscale.C_9F9CA3
   },
   imageWrap: {
     borderWidth: 1,

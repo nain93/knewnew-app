@@ -1,4 +1,4 @@
-import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import React, { RefObject } from 'react';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
@@ -9,8 +9,8 @@ import { getBottomSpace, isIphoneX } from 'react-native-iphone-x-helper';
 import ResetButton from '~/components/button/resetButton';
 
 interface SelectLayoutProps {
-  interestTag: InterestTagType;
-  setInterestTag: (badgeProp: InterestTagType) => void;
+  interestTag: InterestTagType[];
+  setInterestTag: (badgeProp: InterestTagType[]) => void;
   isInitial?: boolean;
   type?: "filter" | "write" | "normal",
   headerComponent?: JSX.Element,
@@ -19,9 +19,7 @@ interface SelectLayoutProps {
 
 const SelectLayout = ({ focusRef, headerComponent, isInitial, interestTag, setInterestTag, type = "normal" }: SelectLayoutProps) => {
   const resetIsClick = () => {
-    setInterestTag({
-      interest: interestTag.interest.map(v => ({ title: v.title, isClick: false }))
-    });
+    setInterestTag(interestTag.map(v => ({ title: v.title, isClick: false })));
   };
 
   return (
@@ -31,34 +29,32 @@ const SelectLayout = ({ focusRef, headerComponent, isInitial, interestTag, setIn
         {headerComponent}
         <View
           style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-          {React.Children.toArray(interestTag.interest.map((item, idx) => {
+          {React.Children.toArray(interestTag.map((item, idx) => {
             return (
               <TouchableOpacity
                 onPress={() => {
                   if (type === "write") {
-                    setInterestTag({
-                      interest: interestTag.interest.map((v, i) => {
-                        if (idx === i) {
-                          if (v.title.includes("기타") && !v.isClick) {
-                            setTimeout(() => {
-                              focusRef.current?.focus();
-                            }, 100);
-                          }
-                          return { ...v, isClick: !v.isClick };
+                    setInterestTag(interestTag.map((v, i) => {
+                      if (idx === i) {
+                        if (v.title.includes("기타") && !v.isClick) {
+                          setTimeout(() => {
+                            focusRef.current?.focus();
+                          }, 100);
                         }
-                        return v;
-                      })
-                    });
+                        return { ...v, isClick: !v.isClick };
+                      }
+                      return v;
+                    }));
                   }
                   else {
-                    setInterestTag({
-                      interest: interestTag.interest.map((v, i) => {
+                    setInterestTag(
+                      interestTag.map((v, i) => {
                         if (idx === i) {
                           return { ...v, isClick: true };
                         }
                         return { ...v, isClick: false };
                       })
-                    });
+                    );
                   }
                 }}
                 style={[styles.tags,

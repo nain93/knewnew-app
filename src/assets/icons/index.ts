@@ -18,7 +18,6 @@ import retweetfrom from './retweetfrom.png';
 import initialize from './initialize.png';
 import colorCheck from './colorCheck.png';
 import grayclose from './grayclose.png';
-import graytriangle from './graytriangle.png';
 import grayheart from './grayheart.png';
 import graywrite from './graywrite.png';
 import graycircle from './graycircle.png';
@@ -78,7 +77,7 @@ import rightTopArrowIcon from "./rightTopArrowIcon.png";
 export {
   close, leftArrow, more, heart, like, reKnew, comment, commentMore, circle, maincart, maintag,
   searchIcon, mainSearchIcon, colorLike, tagfilter, tag, cart, colorCart, retweetfrom,
-  colorCheck, initialize, grayclose, graytriangle, grayheart, bad, graycircle, blackclose,
+  colorCheck, initialize, grayclose, grayheart, bad, graycircle, blackclose,
   graywrite, graylogo, graymypage, graysearch, mainmypage, mainlogoIcon, write, plusIcon, recommentIcon,
   handIcon, tagFood, tagHome, tagLife, emailicon, noticeIcon, alertIcon, eyeIcon, colorEyeIcon, checkIcon, tagIcon,
   selectTagIcon, knewnewIcon, settingIcon, rightArrow, settingKnewnew, grayCheckIcon, question, grayquestion, smallClose, whiteClose,

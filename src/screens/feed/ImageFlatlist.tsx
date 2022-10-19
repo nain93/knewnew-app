@@ -1,14 +1,14 @@
-import { Dimensions, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { memo, useState } from 'react';
 import FastImage from 'react-native-fast-image';
 import { d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import { ReviewListType } from '~/types/review';
 import { FONT } from '~/styles/fonts';
-import ReviewIcon from '~/components/icon/reviewIcon';
+import LinearGradient from 'react-native-linear-gradient';
 
 interface ImageRenderItemProps {
-  review: ReviewListType,
+  review: ReviewListType;
   onPress: (openIdx: number) => void;
 }
 
@@ -29,66 +29,30 @@ const ImageFlatlist = ({ review, onPress }: ImageRenderItemProps) => {
         }}
         showsHorizontalScrollIndicator={false}
         keyExtractor={(v) => String(v.id)}
-        renderItem={({ item, index }) => <Pressable
-          onPress={() => onPress(index)}
-          style={{
-            borderRadius: 10,
-            marginHorizontal: d2p(20),
-            borderWidth: 1,
-            borderColor: theme.color.grayscale.e9e7ec,
-            width: Dimensions.get("window").width - d2p(40),
-            aspectRatio: 1,
-          }}
-        >
-          <FastImage
+        renderItem={({ item, index }) => (
+          <Pressable
+            onPress={() => onPress(index)}
             style={{
+              width: Dimensions.get("window").width,
               aspectRatio: 1,
-              borderRadius: 10
             }}
-            source={{ uri: item.image, priority: "high" }} />
-        </Pressable>}
+          >
+            <LinearGradient
+              style={{
+                zIndex: 1,
+                width: Dimensions.get("window").width,
+                aspectRatio: 2,
+                position: "absolute"
+              }}
+              colors={['rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0)']} />
+            <FastImage
+              style={{
+                aspectRatio: 1,
+              }}
+              source={{ uri: item.image, priority: "high" }} />
+          </Pressable>
+        )}
       />
-      {review.images.length === 0 ?
-        <>
-          <ReviewIcon
-            type="image"
-            viewStyle={{
-              position: "absolute",
-              left: d2p(20),
-              top: h2p(-15),
-              backgroundColor: theme.color.white,
-              paddingHorizontal: d2p(10),
-              paddingVertical: h2p(2),
-              width: d2p(82),
-              height: h2p(22),
-              borderRadius: 12,
-              borderWidth: 1,
-              borderColor: theme.color.grayscale.eae7ec,
-              opacity: 0.9,
-            }}
-            review={review.satisfaction} />
-        </>
-        :
-        <>
-          <ReviewIcon
-            type="image"
-            viewStyle={{
-              position: "absolute",
-              left: d2p(30),
-              top: h2p(10),
-              backgroundColor: theme.color.white,
-              paddingHorizontal: d2p(10),
-              paddingVertical: h2p(2),
-              width: d2p(82),
-              height: h2p(22),
-              borderRadius: 12,
-              borderWidth: 1,
-              borderColor: theme.color.grayscale.eae7ec,
-              opacity: 0.9
-            }}
-            review={review.satisfaction} />
-        </>
-      }
 
       {(review.images.length || 0) > 1 &&
         <>
@@ -98,8 +62,8 @@ const ImageFlatlist = ({ review, onPress }: ImageRenderItemProps) => {
             borderRadius: 10.5,
             paddingHorizontal: d2p(5),
             paddingVertical: h2p(2),
-            right: d2p(30),
-            top: h2p(10),
+            right: d2p(20),
+            bottom: h2p(15),
             width: d2p(40),
             height: d2p(20),
             alignItems: "center",
@@ -122,7 +86,7 @@ const ImageFlatlist = ({ review, onPress }: ImageRenderItemProps) => {
                     width: d2p(6), height: d2p(6),
                     borderRadius: 6,
                     backgroundColor: theme.color.main,
-                    marginRight: d2p(10)
+                    marginRight: d2p(5)
                   }} />
                 );
               }
@@ -130,8 +94,8 @@ const ImageFlatlist = ({ review, onPress }: ImageRenderItemProps) => {
                 <View style={{
                   width: d2p(6), height: d2p(6),
                   borderRadius: 6,
-                  backgroundColor: theme.color.grayscale.eae7ec,
-                  marginRight: d2p(10)
+                  backgroundColor: theme.color.white,
+                  marginRight: d2p(5)
                 }} />
               );
             }))}

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Animated, AppState, Linking, Platform } from 'react-native';
 import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import SplashScreen from 'react-native-splash-screen';
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
@@ -114,6 +114,7 @@ const App = () => {
     // *스플래시 로딩중
     versionCheck();
     getToken();
+    SplashScreen.hide();
     // * 코드푸시 업데이트 체크
     if (!__DEV__) {
       installUpdateIfAvailable();

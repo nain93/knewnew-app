@@ -1,10 +1,11 @@
-import { View, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, Keyboard, FlatList, Linking } from 'react-native';
+import { View, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, Keyboard, FlatList, StatusBar } from 'react-native';
 import Text from '~/components/style/CustomText';
 import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
-import Header from '~/components/header';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import theme from '~/styles/theme';
 import { d2p, dateCommentFormat, h2p, simpleDate } from '~/utils';
+import { blackComment, blackHeart, blackLeftArrow, blackMoreIcon, blackRightArrow, blackShare, colorBookmark, colorLike, commentMore, heart, lightHomeIcon, linkIcon, mainBookmark, marketIcon, more, reKnew, rightArrow, shareIcon, tag, tagHome, userIcon, whiteLeftArrow, whiteMoreIcon } from '~/assets/icons';
+import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import ReactionIcon from '~/components/icon/reactionIcon';
 import { blackRightArrow, commentMore, lightHomeIcon, more, reKnew, rightTopArrowIcon, shareIcon, tag, tagHome, userIcon } from '~/assets/icons';
 import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
@@ -24,14 +25,9 @@ import Loading from '~/components/loading';
 import { FONT } from '~/styles/fonts';
 import { noProfile } from '~/assets/images';
 import { addReviewComment, deleteReviewComment, editReviewComment, getReviewComment, likeComment } from '~/api/comment';
-import ReKnew from '~/components/review/reKnew';
 import { hitslop } from '~/utils/constant';
 import { CacheManager, CachedImage } from '@georstat/react-native-image-cache';
 import { Dirs } from 'react-native-file-access';
-import {
-  ImageGallery,
-  ImageObject,
-} from '@georstat/react-native-image-gallery';
 import axios from 'axios';
 import Recomment from '~/screens/feed/comment/recomment';
 import { CommentListType } from '~/types/comment';
@@ -40,6 +36,8 @@ import ImageFlatlist from '~/screens/feed/ImageFlatlist';
 import { MyProfileType } from '~/types/user';
 import { blockUser, getMyProfile } from '~/api/user';
 import { addReport } from '~/api/report';
+import ReviewIcon from '~/components/icon/reviewIcon';
+import TopScrollButton from '~/components/button/topScrollButton';
 
 interface FeedDetailProps {
   navigation: NavigationStackProp
@@ -70,10 +68,10 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const [commentIsEdit, setCommentIsEdit] = useState<boolean>(false);
   const [modifyingIdx, setModifyingIdx] = useState(-1);
   const [editCommentId, setEditCommentId] = useState<number>(-1);
-  const [tags, setTags] = useState<Array<string>>([]);
   const [content, setContent] = useState<string>("");
   const [like, setLike] = useState<boolean>(false);
   const [cart, setCart] = useState<boolean>(false);
+  const [likeCount, setLikeCount] = useState(0);
   const [numberLine, setNumberLine] = useState(1);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [isCommentFoucs, setIsCommentFoucs] = useState(false);
@@ -91,6 +89,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   const setIsBottomDotSheet = useSetRecoilState(bottomDotSheetState);
 
   const detailScrollRef = useRef<FlatList>(null);
+  const [scrollPosition, setScrollPosition] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [initialIndex, setInitialIndex] = useState(0);
   const openGallery = (idx: number) => {
@@ -112,6 +111,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     enabled: !!route.params?.id,
     onSuccess: (data) => {
       if (data) {
+        setLikeCount(data.likeCount);
         setLike(data.isLike);
         setCart(data.isBookmark);
       }
@@ -141,7 +141,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     }
   });
 
-  const boomarkMutation = useMutation("bookmark",
+  const bookmarkMutation = useMutation("bookmark",
     ({ id, state }: { id: number, state: boolean }) => bookmarkReview(token, id, state), {
     onSuccess: () => {
       queryClient.invalidateQueries("reviewList");
@@ -269,48 +269,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     setContent("");
   };
 
-  const renderCustomImage = (image: ImageObject, currentIndex: number) => {
-    return (
-      <Pressable
-        onPress={closeGallery}
-        style={{
-          alignItems: 'center',
-          borderRadius: 11,
-          height: '100%',
-          width: '100%',
-          justifyContent: 'center',
-          paddingHorizontal: d2p(24),
-        }}>
-        <CachedImage
-          resizeMode="cover"
-          source={image.url}
-          style={{
-            overflow: 'hidden',
-            aspectRatio: 1,
-            width: Dimensions.get("window").width,
-          }}
-          thumbnailSource={image.thumbUrl}
-        />
-      </Pressable>
-    );
-  };
-
-  const renderHeaderComponent = () => {
-    return (
-      <View
-        style={{
-          paddingHorizontal: d2p(20),
-          marginTop: isIphoneX() ? getStatusBarHeight() : 0,
-          paddingVertical: h2p(20),
-        }}>
-        <LeftArrowIcon
-          onBackClick={closeGallery}
-          imageStyle={{ width: d2p(11), height: d2p(25), tintColor: theme.color.white }}
-        />
-      </View>
-    );
-  };
-
   const handleDeletePress = () => {
     queryClient.setQueriesData("myProfile", (profileQuery: any) => {
       return {
@@ -400,6 +358,13 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   }
 
 
+  const statusBarState = () => {
+    if (scrollPosition >= Dimensions.get("window").width / 2) {
+      return true;
+    }
+    return false;
+  };
+
   // * 키보드 높이 컨트롤
   useEffect(() => {
     Keyboard.addListener("keyboardWillShow", (e) => {
@@ -422,12 +387,6 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     }
   }, [commentIsEdit]);
 
-  useEffect(() => {
-    if (reviewDetailQuery.data?.tags.interest) {
-      setTags(reviewDetailQuery?.data.tags.interest);
-    }
-  }, [reviewDetailQuery.data]);
-
   // * 댓글위치로 스크롤
   useEffect(() => {
     if (route.params?.toComment) {
@@ -441,11 +400,20 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
         const layout = event.nativeEvent.layout;
         setCommentLayoutHeight(layout.height - 20);
       }}>
+        {/* 이미지 스크롤 ui */}
+        {reviewDetailQuery.data?.images &&
+          <ImageFlatlist
+            onPress={(openIdx: number) => openGallery(openIdx)}
+            review={reviewDetailQuery.data}
+          />}
         <View
           style={{
-            paddingHorizontal: d2p(20), flexDirection: 'row', justifyContent: 'space-between',
+            paddingHorizontal: d2p(20), flexDirection: 'row',
             alignItems: "center",
-            marginBottom: h2p(25)
+            marginBottom: h2p(30),
+            paddingVertical: h2p(16),
+            borderBottomWidth: 1,
+            borderBottomColor: theme.color.grayscale.f7f7fc
           }}>
           <TouchableOpacity
             onPress={() => { navigation.push("UserPage", { id: reviewDetailQuery.data?.author.id }); }}
@@ -465,87 +433,36 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
               }}
             />
           </TouchableOpacity>
-          <View style={{
-            width: Dimensions.get('window').width - d2p(115),
-            marginLeft: d2p(5),
-          }}>
+
+          <View style={{ marginLeft: d2p(10) }}>
             <View style={{ alignItems: "center", flexWrap: "wrap" }}>
               <TouchableOpacity
                 onPress={() => navigation.push("UserPage", { id: reviewDetailQuery.data?.author.id })}
-                style={{ flexDirection: "row", alignItems: "center" }}
-              >
+                style={{ flexDirection: "row", alignItems: "center" }}>
                 <Text style={[styles.writer, FONT.Medium]}>
                   {reviewDetailQuery.data?.author.nickname}
                 </Text>
-                <Image source={userIcon} style={{ width: d2p(12), height: d2p(12) }} />
               </TouchableOpacity>
             </View>
-            <Text style={[{
-              marginTop: h2p(5),
-              fontSize: 10, color: theme.color.grayscale.a09ca4
-            }, FONT.Regular]}>
-              {(reviewDetailQuery.data) && simpleDate(reviewDetailQuery.data?.created, ' 전')}
+            <Text style={[FONT.Regular, {
+              fontSize: 12,
+              color: theme.color.grayscale.C_9F9CA3,
+              marginTop: h2p(5)
+            }]}>
+              팔로워 60
             </Text>
-            {/* 푸드태그 */}
-            {/* <Text style={[FONT.Regular, { marginTop: h2p(5), fontSize: 12, color: theme.color.grayscale.a09ca4 }]}>
-              {reviewDetailQuery.data?.author.tags.foodStyle}
-            </Text> */}
           </View>
 
           <TouchableOpacity
+            onPress={() => console.log("구독하기")}
             style={{
-              alignSelf: "flex-start",
-              marginTop: h2p(3)
-            }}
-            onPress={() => {
-              if (reviewDetailQuery.data?.author.id === myId) {
-                setIsBottomDotSheet({
-                  isOpen: true,
-                  topTitle: "푸드로그 수정",
-                  topPress: () => handleEditPress(),
-                  middleTitle: "푸드로그 삭제",
-                  middlePress: () => {
-                    setModalOpen({
-                      isOpen: true,
-                      content: "글을 삭제할까요?",
-                      okButton: () => {
-                        handleDeletePress();
-                        navigation.goBack();
-                      }
-                    });
-                  },
-                  middleTextStyle: { color: theme.color.main },
-                  bottomTitle: "취소하기"
-                });
-              }
-              else {
-                setIsBottomDotSheet({
-                  isOpen: true,
-                  topTitle: "푸드로그 신고",
-                  topPress: () => navigation.navigate("report", { review: reviewDetailQuery.data }),
-                  middleTitle: "유저 차단",
-                  middlePress: () => {
-                    setModalOpen({
-                      isOpen: true,
-                      content: "차단 하시겠습니까?",
-                      okButton: () => {
-                        if (reviewDetailQuery.data) {
-                          blockMutation.mutate({ id: reviewDetailQuery.data?.author.id, isBlock: true });
-                          navigation.goBack();
-                        }
-                      }
-                    });
-                  },
-                  middleTextStyle: { color: theme.color.main },
-                  bottomTitle: "취소하기"
-                });
-              }
+              backgroundColor: theme.color.grayscale.f7f7fc,
+              marginLeft: "auto",
+              paddingHorizontal: d2p(12),
+              paddingVertical: h2p(8),
+              borderRadius: 2
             }}>
-            <Image
-              source={more}
-              resizeMode="contain"
-              style={{ width: d2p(26), height: d2p(16) }}
-            />
+            <Text style={[FONT.Medium, { fontSize: 12 }]}>구독하기</Text>
           </TouchableOpacity>
         </View>
 
@@ -642,143 +559,79 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           {reviewDetailQuery.data?.content}
         </Text>
 
-        {/* 푸드태그 */}
-        {/* {!reviewDetailQuery.data?.parent &&
-          <>
-            <View style={{
-              flexDirection: 'row', alignItems: 'center',
-              width: Dimensions.get("window").width - d2p(90),
-              flexWrap: "wrap",
-              marginHorizontal: d2p(20),
-              marginTop: h2p(10)
-            }}>
-              <Image source={tag} style={{ width: d2p(10), height: d2p(10), marginRight: d2p(5) }} />
-              {React.Children.toArray(tags.map((v) => {
-                if (v === route.params?.badge) {
-                  return;
-                }
-                return <Text style={[FONT.Regular, { color: theme.color.grayscale.C_79737e, fontSize: 12 }]}>
-                  #{v} </Text>;
-              }))}
-              {
-                route.params?.badge ?
-                  <Text style={[FONT.Regular, { color: theme.color.main, fontSize: 12 }]}>#{route.params?.badge}</Text>
-                  :
-                  null
-              }
-            </View>
-          </>
-        } */}
+        <Text style={[{
+          marginTop: h2p(20),
+          marginLeft: d2p(20),
+          marginBottom: h2p(30),
+          fontSize: 12, color: theme.color.grayscale.d2d0d5
+        }, FONT.Regular]}>
+          {(reviewDetailQuery.data) && simpleDate(reviewDetailQuery.data?.created, ' 전')}
+        </Text>
 
-        {reviewDetailQuery.data?.parent &&
-          <>
+        <View style={{ paddingHorizontal: d2p(20), backgroundColor: theme.color.grayscale.f7f7fc }}>
+          <Text style={[FONT.SemiBold, { flexWrap: "wrap", marginTop: h2p(30) }]}>
+            {reviewDetailQuery.data?.author.nickname}님의 구매정보
+          </Text>
+          <View style={{
+            backgroundColor: theme.color.white,
+            flexDirection: "row", alignItems: "center",
+            width: Dimensions.get("window").width - d2p(40),
+            paddingHorizontal: d2p(10),
+            paddingVertical: h2p(10),
+            marginTop: h2p(10),
+            borderRadius: 5,
+            borderColor: theme.color.grayscale.e9e7ec,
+            borderWidth: 1
+          }}>
             <View style={{
-              marginTop: h2p(20),
-              marginLeft: d2p(30),
-              marginRight: d2p(20),
+              width: d2p(60), height: d2p(60),
+              borderColor: theme.color.grayscale.e9e7ec,
               borderWidth: 1,
-              borderColor: theme.color.grayscale.eae7ec,
-              borderRadius: 10,
-              paddingHorizontal: d2p(15)
-            }}>
-              <ReKnew
-                type="detail"
-                review={{ ...reviewDetailQuery.data.parent }}
-              />
-              <TouchableOpacity
-                onPress={() => navigation.push("FeedDetail",
-                  { id: reviewDetailQuery.data.parent?.id })}
-                style={{
-                  marginTop: h2p(15),
-                  marginBottom: h2p(10),
-                  marginLeft: d2p(25),
-                  width: d2p(155), height: h2p(40),
-                  borderWidth: 1, borderColor: theme.color.grayscale.e9e7ec,
-                  justifyContent: "center", alignItems: "center", borderRadius: 5
-                }}>
-                <Text style={[FONT.Medium, { fontSize: 12, color: theme.color.grayscale.C_443e49 }]}>
-                  원문으로</Text>
-              </TouchableOpacity>
-            </View>
-          </>
-        }
-        <View style={[styles.reactionContainer, { paddingTop: reviewDetailQuery.data?.parent ? 0 : h2p(10) }]}>
-          {/* 인용글에서는 리트윗 아이콘 삭제 */}
-          {!reviewDetailQuery.data?.parent &&
-            <TouchableOpacity
-              onPress={() => navigation.navigate("Write",
-                {
-                  loading: false, isEdit: false, type: "reKnewWrite", review: reviewDetailQuery.data,
-                  nickname: getMyProfileQuery.data?.nickname
-                })}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginRight: d2p(20),
-                width: d2p(65)
-              }}>
-              <Image source={reKnew} style={{
-                width: d2p(24),
-                height: d2p(24),
-                marginRight: d2p(10)
-              }} />
+              borderRadius: 2,
+              marginRight: d2p(10)
+            }} />
+            <View style={{ width: Dimensions.get("window").width - d2p(164) }}>
+              <Text style={FONT.Medium}>
+                {reviewDetailQuery.data?.product?.name}
+              </Text>
               <Text style={[FONT.Regular, {
-                fontSize: 12,
-                color: theme.color.grayscale.C_79737e
-              }]}>{reviewDetailQuery.data?.childCount}</Text>
-            </TouchableOpacity>
-          }
+                marginTop: h2p(10),
+                fontSize: 12, color: theme.color.grayscale.C_9F9CA3
+              }]}>
+                마켓컬리・15,800원
+              </Text>
+            </View>
+            <Image source={blackRightArrow} style={{
+              marginLeft: "auto",
+              width: d2p(7), height: d2p(12),
+              marginRight: d2p(8)
+            }} />
+          </View>
+          <View style={{
+            backgroundColor: theme.color.white,
+            flexDirection: "row", alignItems: "center",
+            width: Dimensions.get("window").width - d2p(40),
+            paddingVertical: h2p(12),
+            justifyContent: "center",
+            borderRadius: 5,
+            marginBottom: h2p(24),
+            marginTop: h2p(10),
+            borderWidth: 1
+          }}>
+            <Image source={linkIcon} style={{ width: d2p(15), height: d2p(7.5), marginRight: d2p(6.5) }} />
+            <Text style={FONT.Medium}>구매링크 바로가기</Text>
+          </View>
+        </View>
 
-          <ReactionIcon
-            viewStyle={{ marginRight: d2p(20), width: d2p(65) }}
-            name="like" count={reviewDetailQuery.data?.likeCount} state={like}
-            isState={(isState: boolean) => setLike(isState)} mutation={likeReviewMutation} id={route.params?.id} />
-          <ReactionIcon
-            viewStyle={{ marginRight: d2p(20), width: d2p(65) }}
-            name="cart" state={cart} count={reviewDetailQuery.data?.bookmarkCount}
-            mutation={boomarkMutation}
-            id={route.params?.id}
-            isState={(isState: boolean) => setCart(isState)} />
-          <TouchableOpacity
-            onPress={async () => {
-              const getUrl = await buildLink(reviewDetailQuery.data?.id);
-              Share.open({
-                title: "뉴뉴",
-                url: getUrl
-                // url: `knewnnew://FeedDetail/${reviewDetailQuery.data?.id}`
-              })
-                .then((res) => {
-                  if (reviewDetailQuery.data?.id) {
-                    shareMutation.mutate({ id: reviewDetailQuery.data.id });
-                  }
-                })
-                .catch((err) => {
-                  err && console.log(err);
-                });
-            }}
-            style={{ flexDirection: "row", alignItems: "center" }}>
-            <Image source={shareIcon} style={{ width: d2p(26), height: d2p(26) }} />
-            <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_79737e, marginLeft: d2p(9) }]}>
-              {reviewDetailQuery.data?.shareCount}
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <View style={{
-          flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-          marginTop: h2p(14.5),
+        <Text style={[FONT.SemiBold, {
+          marginTop: h2p(30),
           marginBottom: h2p(10),
-          paddingHorizontal: d2p(20)
-        }}>
-          <Text style={[styles.commentMeta, FONT.Bold]}>작성된 댓글 {reviewDetailQuery.data?.commentCount}개</Text>
-          <Pressable hitSlop={hitslop}
-            onPress={() => navigation.navigate("CommentAll",
-              { id: route.params?.id })}
-          >
-            <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_79737e }]}>
-              {"모두보기 >"}
-            </Text>
-          </Pressable>
-        </View>
+          marginLeft: d2p(20)
+        }]}>댓글
+          <Text style={[FONT.Regular, { color: theme.color.grayscale.C_9F9CA3 }]}>
+            {` ${reviewDetailQuery.data?.commentCount}`}
+          </Text>
+        </Text>
       </View>
     );
   }
@@ -881,16 +734,17 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                 <TouchableOpacity
                   hitSlop={hitslop}
                   onPress={() => {
-                    inputRef.current?.focus();
+                    setIsCommentFoucs(true);
+                    setTimeout(() => {
+                      inputRef.current?.focus();
+                    }, 100);
                     setCommentParentId(item.id);
                     setRecommentName(item.author.nickname);
                     setRecommentMode(true);
                     // * 답글달기 클릭하면 해당 아이템 인덱스로 스크롤
-                    if (Platform.OS === "ios") {
-                      setTimeout(() => {
-                        detailScrollRef.current?.scrollToIndex({ animated: true, index, viewPosition: 0, viewOffset: -15 });
-                      }, 200);
-                    }
+                    setTimeout(() => {
+                      detailScrollRef.current?.scrollToIndex({ animated: true, index, viewPosition: 0, viewOffset: 80 });
+                    }, 200);
                   }}>
                   <Text style={[FONT.Regular, { fontSize: 12, color: theme.color.grayscale.C_79737e }]}>답글달기</Text>
                 </TouchableOpacity>
@@ -936,24 +790,74 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
     reviewDetailQuery.data?.author.id,
     commentIsEdit, commentLikeMutation]);
 
+  const detailFooter = useCallback(() => (
+    <>
+      <TouchableOpacity
+        onPress={() => navigation.push("CommentAll",
+          { id: route.params?.id })}
+        style={{
+          backgroundColor: theme.color.grayscale.f7f7fc,
+          flexDirection: "row",
+          width: Dimensions.get("window").width - d2p(40),
+          paddingVertical: h2p(18),
+          marginHorizontal: d2p(20),
+          borderRadius: 5,
+          justifyContent: "center",
+          alignItems: "center",
+          marginTop: h2p(5),
+        }}>
+        <Text style={FONT.Regular}>
+          {reviewDetailQuery.data?.commentCount}개의 댓글 모두보기
+        </Text>
+        <Image source={blackRightArrow} style={{
+          marginLeft: d2p(8),
+          width: d2p(5.5), height: d2p(9)
+        }} />
+      </TouchableOpacity>
+      {!isCommentFoucs &&
+        <>
+          <View style={{
+            marginTop: h2p(20),
+            width: Dimensions.get("window").width - d2p(40),
+            marginHorizontal: d2p(20)
+          }}>
+            <Pressable
+              onPress={() => {
+                setIsCommentFoucs(true);
+                setTimeout(() => {
+                  inputRef.current?.focus();
+                }, 100);
+              }}
+              style={{
+                borderColor: isCommentFoucs ? theme.color.main : theme.color.grayscale.d3d0d5,
+                borderWidth: 1,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                height: numberLine < 4 ? d2p(45 + (numberLine - 1) * 25) : d2p(115),
+                paddingVertical: h2p(13.5), paddingHorizontal: d2p(20),
+                backgroundColor: theme.color.white,
+                borderRadius: 25,
+              }}>
+              <View
+                style={{ width: Dimensions.get("window").width - d2p(104) }}>
+                <Text style={[FONT.Regular, { color: theme.color.grayscale.d3d0d5 }]}>댓글을 남겨보세요.</Text>
+              </View>
+              <View style={{ alignSelf: "center" }}>
+                <Text style={[{ color: theme.color.grayscale.a09ca4 }, FONT.Regular]}>
+                  작성</Text>
+              </View>
+            </Pressable>
+          </View>
+        </>
+      }
+    </>
+  ), [reviewDetailQuery.data?.commentCount, isCommentFoucs]);
 
   if (reviewDetailQuery.isLoading || reviewDetailQuery.isFetching) {
     return (
       <>
-        <Header
-          isBorder={true}
-          headerLeft={<LeftArrowIcon onBackClick={() => {
-            if (route.path) {
-              //@ts-ignore
-              navigation.reset({ index: 0, routes: [{ name: "TabNav" }] });
-            }
-            else {
-              navigation.navigate("Feed");
-            }
-          }}
-            imageStyle={{ width: d2p(11), height: d2p(25) }} />}
-          title="푸드로그"
-        />
+        <StatusBar backgroundColor="black" barStyle="light-content" />
         <Loading />
       </>
     );
@@ -1014,12 +918,15 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           </View>
         }
         <FlatList
+          bounces={false}
+          onScroll={e => setScrollPosition(e.nativeEvent.contentOffset.y)}
           ref={detailScrollRef}
-          contentContainerStyle={{ paddingBottom: h2p(100) }}
+          contentContainerStyle={{ paddingBottom: h2p(120) }}
           showsVerticalScrollIndicator={false}
-          style={{ paddingTop: h2p(20), flex: 1 }}
+          style={{ flex: 1 }}
           data={commentListQuery.data}
           ListHeaderComponent={detailHeader()}
+          ListFooterComponent={detailFooter}
           ListEmptyComponent={() => {
             if (commentListQuery.isLoading) {
               return (
@@ -1030,94 +937,200 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           }}
           renderItem={detailRenderItem}
         />
-        <View style={{
-          position: "absolute",
-          bottom: keyboardHeight + h2p(20),
-          width: Dimensions.get("window").width - d2p(40),
-          marginHorizontal: d2p(20)
-        }}>
-          {recommentMode &&
-            <View style={{
-              backgroundColor: theme.color.white,
-              paddingVertical: h2p(10),
-              paddingHorizontal: d2p(20),
-              flexDirection: "row",
-              justifyContent: "space-between",
-              borderRadius: 25,
-              shadowColor: "rgba(159, 156, 163, 0.2)",
-              shadowOffset: {
-                width: 0,
-                height: -3
-              },
-              shadowRadius: 6,
-              shadowOpacity: 1,
-              marginBottom: h2p(2)
-            }}>
-              <View style={{ flexDirection: "row" }}>
-                <Text style={[FONT.SemiBold, { fontSize: 13, color: theme.color.grayscale.a09ca4 }]}>
-                  {recommentName}
-                </Text>
-                <Text style={[FONT.Regular, { fontSize: 13, color: theme.color.grayscale.a09ca4 }]}>
-                  님에게 답글을 남기는 중
-                </Text>
+
+        {/* 최상단으로 스크롤하는 버튼 */}
+        <TopScrollButton scrollRef={detailScrollRef} />
+
+        {/* 댓글 인풋 */}
+        {isCommentFoucs ?
+          <View style={{
+            width: Dimensions.get("window").width - d2p(40),
+            marginHorizontal: d2p(20),
+            position: "absolute",
+            bottom: 0,
+          }}>
+            {recommentMode &&
+              <View style={{
+                backgroundColor: theme.color.white,
+                paddingVertical: h2p(10),
+                paddingHorizontal: d2p(20),
+                flexDirection: "row",
+                justifyContent: "space-between",
+                borderRadius: 25,
+                marginBottom: h2p(2)
+              }}>
+                <View style={{ flexDirection: "row" }}>
+                  <Text style={[FONT.SemiBold, { fontSize: 13, color: theme.color.grayscale.a09ca4 }]}>
+                    {recommentName}
+                  </Text>
+                  <Text style={[FONT.Regular, { fontSize: 13, color: theme.color.grayscale.a09ca4 }]}>
+                    님에게 답글을 남기는 중
+                  </Text>
+                </View>
+                <TouchableOpacity onPress={() => setRecommentMode(false)}>
+                  <Text style={[FONT.Bold, { fontSize: 13, color: theme.color.grayscale.a09ca4 }]}>취소</Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity onPress={() => setRecommentMode(false)}>
-                <Text style={[FONT.Bold, { fontSize: 13, color: theme.color.grayscale.a09ca4 }]}>취소</Text>
-              </TouchableOpacity>
-            </View>
-          }
-          <Pressable
-            onPress={() => inputRef.current?.focus()}
-            style={{
-              borderColor: isCommentFoucs ? theme.color.main : theme.color.grayscale.d3d0d5,
-              borderWidth: 1,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              height: numberLine < 4 ? d2p(45 + (numberLine - 1) * 25) : d2p(115),
-              paddingVertical: h2p(13.5), paddingHorizontal: d2p(20),
-              backgroundColor: theme.color.white,
-              borderRadius: 25,
-              shadowColor: "rgba(121, 115, 126, 0.2)",
-              shadowOffset: {
-                width: 0,
-                height: 3
-              },
-              shadowRadius: 5,
-              shadowOpacity: 1,
-            }}>
-            <TextInput
-              onFocus={() => setIsCommentFoucs(true)}
-              onBlur={() => setIsCommentFoucs(false)}
-              autoCapitalize="none"
-              ref={inputRef}
-              style={[{
-                color: theme.color.black,
-                includeFontPadding: false,
-                paddingTop: 0,
-                paddingBottom: 0,
-                width: Dimensions.get("window").width - d2p(104),
-              }, FONT.Regular]}
-              value={content}
-              multiline
-              numberOfLines={Platform.OS === "android" ? numberLine : 4}
-              onContentSizeChange={e => setNumberLine(Math.round(e.nativeEvent.contentSize.height / 20))}
-              maxLength={201}
-              onChangeText={(e) => {
-                if (e.length > 200) {
-                  setContent(e.slice(0, e.length - 1));
-                }
-                else {
-                  setContent(e);
+            }
+            <Pressable
+              onPress={() => inputRef.current?.focus()}
+              style={{
+                borderColor: isCommentFoucs ? theme.color.main : theme.color.grayscale.d3d0d5,
+                borderWidth: 1,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                height: numberLine < 4 ? d2p(45 + (numberLine - 1) * 25) : d2p(115),
+                paddingVertical: h2p(13.5), paddingHorizontal: d2p(20),
+                backgroundColor: theme.color.white,
+                borderRadius: 25,
+                marginBottom: keyboardHeight + h2p(20),
+              }}>
+              <TextInput
+                onBlur={() => {
+                  setIsCommentFoucs(false);
+                  setRecommentMode(false);
+                }}
+                autoCapitalize="none"
+                ref={inputRef}
+                style={[{
+                  color: theme.color.black,
+                  includeFontPadding: false,
+                  paddingTop: 0,
+                  paddingBottom: 0,
+                  width: Dimensions.get("window").width - d2p(104),
+                }, FONT.Regular]}
+                value={content}
+                multiline
+                numberOfLines={Platform.OS === "android" ? numberLine : 4}
+                onContentSizeChange={e => setNumberLine(Math.round(e.nativeEvent.contentSize.height / 20))}
+                maxLength={201}
+                onChangeText={(e) => {
+                  if (e.length > 200) {
+                    setContent(e.slice(0, e.length - 1));
+                  }
+                  else {
+                    setContent(e);
+                  }
+                }}
+                placeholder="댓글을 남겨보세요." placeholderTextColor={theme.color.grayscale.C_9F9CA3} />
+              <Pressable hitSlop={hitslop} onPress={handleWriteComment} style={{ alignSelf: "center" }}>
+                <Text style={[{ color: content ? theme.color.main : theme.color.grayscale.a09ca4 }, FONT.Regular]}>
+                  {!commentIsEdit ? "작성" : "수정"}</Text>
+              </Pressable>
+            </Pressable>
+          </View>
+          :
+          <View style={styles.reactionContainer}>
+            <TouchableOpacity
+              onPress={() => {
+                if (route.params?.id) {
+                  if (!like) {
+                    setLikeCount(prev => prev + 1);
+                  }
+                  else {
+                    setLikeCount(prev => prev - 1);
+                  }
+                  setLike(!like);
+                  likeReviewMutation.mutate({ id: route.params?.id, state: !like });
                 }
               }}
-              placeholder="댓글을 남겨보세요." placeholderTextColor={theme.color.grayscale.d3d0d5} />
-            <Pressable hitSlop={hitslop} onPress={handleWriteComment} style={{ alignSelf: "center" }}>
-              <Text style={[{ color: content ? theme.color.main : theme.color.grayscale.a09ca4 }, FONT.Regular]}>
-                {!commentIsEdit ? "작성" : "수정"}</Text>
-            </Pressable>
-          </Pressable>
-        </View>
+              style={{
+                borderWidth: 1,
+                borderRadius: 18,
+                flexDirection: "row",
+                alignItems: "center",
+                width: d2p(64),
+                height: d2p(36),
+                justifyContent: "center",
+                marginRight: d2p(5)
+              }}
+            >
+              <Image source={like ? colorLike : blackHeart} style={{
+                marginRight: d2p(6),
+                width: d2p(16), height: d2p(15)
+              }} />
+              <Text>{likeCount}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => detailScrollRef.current?.scrollToOffset({ offset: commentLayoutHeight, animated: true })}
+              style={{
+                borderWidth: 1,
+                borderRadius: 18,
+                flexDirection: "row",
+                alignItems: "center",
+                width: d2p(64),
+                height: d2p(36),
+                justifyContent: "center",
+                marginRight: d2p(5)
+              }}
+            >
+              <Image source={blackComment} style={{
+                marginRight: d2p(6),
+                width: d2p(16.2), height: d2p(16.2)
+              }} />
+              <Text>{reviewDetailQuery.data?.commentCount}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={async () => {
+                const getUrl = await buildLink(reviewDetailQuery.data?.id);
+                Share.open({
+                  title: "뉴뉴",
+                  url: getUrl
+                  // url: `knewnnew://FeedDetail/${reviewDetailQuery.data?.id}`
+                })
+                  .then(() => {
+                    if (reviewDetailQuery.data?.id) {
+                      shareMutation.mutate({ id: reviewDetailQuery.data.id });
+                    }
+                  })
+                  .catch((err) => {
+                    err && console.log(err);
+                  });
+              }}
+              style={{
+                borderRadius: 18,
+                width: d2p(44),
+                height: d2p(36),
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: theme.color.grayscale.e9e7ec
+              }}
+            >
+              <Image source={blackShare} style={{
+                marginRight: d2p(6),
+                width: d2p(16), height: d2p(18)
+              }} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                if (route.params?.id) {
+                  setCart(!cart);
+                  bookmarkMutation.mutate({ id: route.params?.id, state: !cart });
+                }
+              }}
+              style={{
+                borderRadius: 18,
+                width: d2p(120),
+                height: d2p(36),
+                alignItems: "center",
+                justifyContent: "center",
+                flexDirection: "row",
+                borderWidth: 1,
+                borderColor: theme.color.main,
+                marginLeft: "auto"
+              }}
+            >
+              <Image source={cart ? mainBookmark : colorBookmark} style={{
+                marginRight: d2p(7.8),
+                width: d2p(11.7), height: d2p(14.4)
+              }} />
+              <Text style={[FONT.SemiBold, { color: theme.color.main }]}>
+                담아가기
+              </Text>
+            </TouchableOpacity>
+          </View>
+        }
       </KeyboardAvoidingView>
     </Fragment >
   );
@@ -1141,29 +1154,32 @@ const styles = StyleSheet.create({
     marginRight: d2p(20)
   },
   reactionContainer: {
+    position: "absolute",
+    width: Dimensions.get("window").width,
     flexDirection: 'row',
     alignItems: 'center',
-    // justifyContent: "space-between",
-    paddingBottom: h2p(10.5),
-    marginHorizontal: d2p(20),
-    marginTop: h2p(5),
-    borderBottomWidth: 1,
-    borderBottomColor: theme.color.grayscale.eae7ec
+    paddingTop: h2p(15),
+    paddingBottom: getBottomSpace() + h2p(15),
+    bottom: 0,
+    paddingHorizontal: d2p(20),
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    shadowColor: '#000000',
+    shadowOpacity: 0.06,
+    shadowOffset: {
+      width: 0,
+      height: -3,
+    },
+    elevation: (Platform.OS === 'android') ? 3 : 0,
   },
   content: {
     color: theme.color.grayscale.C_79737e,
-    // marginBottom: h2p(10), 
-    marginTop: h2p(20)
   },
   commentLine: {
     borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.f7f7fc,
     width: Dimensions.get('window').width - d2p(40),
     marginTop: h2p(14), marginBottom: h2p(10)
   },
-  commentMeta: {
-    fontSize: 12,
-    color: theme.color.grayscale.C_79737e,
-  },
+
   commentImg: {
     width: d2p(30), height: d2p(30),
     borderRadius: 30,

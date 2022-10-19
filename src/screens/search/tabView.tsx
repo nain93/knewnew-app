@@ -1,6 +1,6 @@
 import { Dimensions, FlatList, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { useCallback, useState } from 'react';
-import { TabBar, TabView } from 'react-native-tab-view';
+import React, { useCallback, useRef, useState } from 'react';
+import { TabView } from 'react-native-tab-view';
 //@ts-ignore
 import Highlighter from 'react-native-highlight-words';
 import theme from '~/styles/theme';
@@ -9,7 +9,7 @@ import { ReviewListType } from '~/types/review';
 import FeedReview from '~/components/review/feedReview';
 import { userNormalType } from '~/types/user';
 import { noProfile } from '~/assets/images';
-import { leftArrow } from '~/assets/icons';
+import { blackRightSmallArrow, leftArrow, rightArrow } from '~/assets/icons';
 import Loading from '~/components/loading';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
@@ -17,6 +17,7 @@ import { FONT } from '~/styles/fonts';
 import FastImage from 'react-native-fast-image';
 import { useRecoilValue } from 'recoil';
 import { myIdState } from '~/recoil/atoms';
+import TopScrollButton from '~/components/button/topScrollButton';
 
 interface SearchTabViewProps {
   searchList?: ReviewListType[],
@@ -30,13 +31,15 @@ interface SearchTabViewProps {
 
 const SearchTabView = ({ reviewCount, userCount, searchList, userList, keyword, reviewNext, userNext }: SearchTabViewProps) => {
   const navigation = useNavigation<StackNavigationProp>();
-  const myId = useRecoilValue(myIdState);
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     { key: "menu", title: "푸드로그" },
     { key: "user", title: "유저 닉네임" },
     // { key: "product", title: "상품명" }
   ]);
+
+  const foodLogRef = useRef<FlatList>(null);
+  const userRef = useRef<FlatList>(null);
 
   const menuKey = useCallback((review) => String(review.id), []);
   const menuRenderItem = useCallback((review) => {
@@ -82,6 +85,7 @@ const SearchTabView = ({ reviewCount, userCount, searchList, userList, keyword, 
               <View style={styles.container}>
                 <Text style={[styles.searchResult, FONT.Regular]}>검색결과 · {reviewCount}건</Text>
                 <FlatList
+                  ref={foodLogRef}
                   onEndReached={reviewNext}
                   onEndReachedThreshold={0.5}
                   maxToRenderPerBatch={5}
@@ -95,16 +99,24 @@ const SearchTabView = ({ reviewCount, userCount, searchList, userList, keyword, 
                   renderItem={menuRenderItem}
                   showsVerticalScrollIndicator={false}
                 />
+                <TopScrollButton scrollRef={foodLogRef} />
               </View>
             );
+          // case "product":
+          //   return (
+          //     <View>
+          //       <Text>상품명</Text>
+          //     </View>
+          //   );
           case "user":
             return (
               <View style={styles.container}>
                 <Text style={[styles.searchResult, FONT.Regular]}>검색결과 · {userCount}건</Text>
                 <FlatList
+                  ref={userRef}
                   onEndReached={userNext}
                   onEndReachedThreshold={0.5}
-                  style={{ marginBottom: h2p(80), marginTop: h2p(30) }}
+                  style={{ marginBottom: h2p(80), marginTop: h2p(20) }}
                   contentContainerStyle={{ paddingBottom: d2p(40), paddingHorizontal: d2p(20) }}
                   keyExtractor={(review) => String(review.id)}
                   data={userList}
@@ -117,57 +129,59 @@ const SearchTabView = ({ reviewCount, userCount, searchList, userList, keyword, 
                   renderItem={(user) =>
                     <TouchableOpacity
                       onPress={() => navigation.push('UserPage', { id: user.item.id })}
-                      style={{ marginBottom: h2p(30), flexDirection: "row", alignItems: "center" }}>
-                      <View style={{ borderColor: theme.color.grayscale.e9e7ec, borderWidth: 1, overflow: "hidden", borderRadius: 24, width: d2p(24), height: d2p(24), marginRight: d2p(10) }}>
+                      style={{ marginBottom: h2p(15), flexDirection: "row", alignItems: "center" }}>
+                      <View style={{
+                        borderColor: theme.color.grayscale.e9e7ec, borderWidth: 1,
+                        overflow: "hidden", borderRadius: 24, width: d2p(40), height: d2p(40), marginRight: d2p(10)
+                      }}>
                         <FastImage resizeMode="cover" source={user.item.profileImage ? { uri: user.item.profileImage } : noProfile}
-                          style={{ width: d2p(24), height: d2p(24) }} />
+                          style={{ width: d2p(40), height: d2p(40) }} />
                       </View>
                       <View style={{ flexDirection: "row", width: Dimensions.get("window").width - d2p(84) }}>
                         <Highlighter
-                          highlightStyle={[FONT.Bold, { fontSize: 16, color: theme.color.main }]}
+                          highlightStyle={[FONT.Medium, { fontSize: 16, color: theme.color.main }]}
                           searchWords={[keyword]}
                           textToHighlight={user.item.nickname}
-                          style={[FONT.Regular, { fontSize: 16 }]}
+                          style={[FONT.Medium, { fontSize: 16 }]}
                         />
                       </View>
-                      <Image source={leftArrow} style={{ marginLeft: "auto", width: d2p(11), height: h2p(25), transform: [{ rotate: "180deg" }] }} />
+                      <Image source={blackRightSmallArrow} style={{ marginLeft: "auto", width: d2p(16), height: d2p(16) }} />
                     </TouchableOpacity>
                   }
                   showsVerticalScrollIndicator={false}
                 />
+                <TopScrollButton scrollRef={userRef} />
               </View>
             );
-          // case "product":
-          //   return (
-          //     <View>
-          //       <Text>상품명</Text>
-          //     </View>
-          //   );
           default:
             return null;
         }
       }}
       renderTabBar={(p) =>
-        <TabBar {...p}
-          indicatorStyle={{
-            height: 2,
-            backgroundColor: theme.color.black,
-            marginBottom: d2p(-1),
-          }}
-          style={{
-            height: h2p(44.5),
-            paddingTop: h2p(5),
-            backgroundColor: theme.color.white,
-            borderBottomColor: theme.color.grayscale.d3d0d5, borderBottomWidth: 1,
-            elevation: 0
-          }}
-          renderLabel={({ route, focused }) =>
-            <Text style={[focused ? FONT.Bold : FONT.Regular, {
-              fontSize: 16,
-              color: focused ? theme.color.black : theme.color.grayscale.C_79737e
-            }]}>{route.title}</Text>
-          }
-        />}
+      (
+        <View style={{
+          flexDirection: "row", marginTop: h2p(20), paddingHorizontal: d2p(20),
+          paddingBottom: h2p(10),
+          borderBottomWidth: 1, borderBottomColor: theme.color.grayscale.e9e7ec
+        }}>
+          {React.Children.toArray(routes.map((v, i) => (
+            <TouchableOpacity
+              onPress={() => setIndex(i)}
+              style={{
+                width: (Dimensions.get("window").width - d2p(45)) / 2,
+                borderWidth: 1, borderRadius: 30, paddingVertical: h2p(6),
+                marginRight: i % 2 === 0 ? d2p(5) : 0,
+                backgroundColor: index === i ? theme.color.black : theme.color.white,
+              }}>
+              <Text style={[FONT.Medium, {
+                color: index === i ? theme.color.white : theme.color.black,
+                textAlign: "center"
+              }]}>{v.title}</Text>
+            </TouchableOpacity>
+          )))}
+        </View>
+      )
+      }
     />
   );
 };
@@ -179,7 +193,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
   searchResult: {
-    marginTop: h2p(25),
+    marginTop: h2p(20),
     marginHorizontal: d2p(20),
     color: theme.color.grayscale.a09ca4,
     fontSize: 12

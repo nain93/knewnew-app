@@ -15,32 +15,36 @@ interface HeaderProps {
   headerRightPress?: () => void;
   customRight?: JSX.Element;
   viewStyle?: ViewStyle;
+  type?: "search"
 }
 
-const Header = ({ headerRightPress, headerLeft, headerRight, customRight, title, isBorder = true, bgColor, viewStyle }: HeaderProps) => {
+const Header = ({ type, headerRightPress, headerLeft, headerRight, customRight, title, isBorder = true, bgColor, viewStyle }: HeaderProps) => {
   return (
     <>
       <View style={[styles.container, viewStyle, { borderBottomWidth: isBorder ? 1 : 0 },
       {
         backgroundColor: bgColor ? bgColor : theme.color.white,
-        marginTop: Platform.OS === "ios" ? getStatusBarHeight() : 0
+        marginTop: Platform.OS === "ios" ? getStatusBarHeight() : 0,
       }]}>
         <View
-          style={{ position: "absolute", left: d2p(20) }}>
+          style={{ position: "absolute", left: d2p(30), top: h2p(30) }}>
           {headerLeft}
         </View>
-        <Text style={[{ fontSize: 16, color: theme.color.black }, FONT.Regular]}>
+        <Text style={[{
+          fontSize: 16,
+          color: theme.color.black, includeFontPadding: false
+        }, FONT.Regular]}>
           {title}
         </Text>
         {headerRight ?
           <TouchableOpacity
             hitSlop={hitslop}
             onPress={headerRightPress}
-            style={{ position: "absolute", right: d2p(20) }}>
+            style={{ position: "absolute", right: d2p(30), top: h2p(30) }}>
             {headerRight}
           </TouchableOpacity>
           :
-          <View style={{ position: "absolute", right: d2p(20) }}>
+          <View style={{ position: "absolute", right: type === "search" ? d2p(20) : d2p(30) }}>
             {customRight}
           </View>
         }
@@ -57,6 +61,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderBottomColor: theme.color.grayscale.e9e7ec,
-    paddingVertical: h2p(20),
+    paddingBottom: h2p(20),
+    paddingTop: h2p(30)
   }
 });

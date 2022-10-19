@@ -1,13 +1,12 @@
 import {
-  Dimensions, FlatList, Image, Linking, Platform, Pressable, RefreshControl,
-  ScrollView, StyleSheet, Text, TouchableOpacity, View
+  Dimensions, Linking, Pressable,
+  ScrollView, StyleSheet, Text, View
 } from 'react-native';
 import Modal from "react-native-modal";
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import analytics from '@react-native-firebase/analytics';
 import Header from '~/components/header';
 import { d2p, h2p } from '~/utils';
-import { hitslop } from '~/utils/constant';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import theme from '~/styles/theme';
@@ -22,19 +21,15 @@ import {
 import { interestTagData } from '~/utils/data';
 import { eventBannerImage, fireImg } from '~/assets/images';
 import { useQuery } from 'react-query';
-import { getMyProfile } from '~/api/user';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MyProfileType } from '~/types/user';
 import FastImage from 'react-native-fast-image';
-import { getBanner, getFoodLogCount, getRecommend, getRecommendFoodLog } from '~/api/home';
+import { getBanner } from '~/api/home';
 import Loading from '~/components/loading';
-import SplashScreen from 'react-native-splash-screen';
-import { homeLogo } from '~/assets/logo';
 import BasicButton from '~/components/button/basicButton';
 import { useFocusEffect } from '@react-navigation/native';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 
 export interface HomeProps {
+  filterScreen: FilterType,
   navigation: NavigationStackProp;
   route: NavigationRoute<{
     scrollUp: boolean
@@ -77,7 +72,6 @@ interface RecommendType {
 
 const Home = ({ navigation, route }: HomeProps) => {
   const [token, setToken] = useRecoilState(tokenState);
-  const setMyId = useSetRecoilState(myIdState);
   const homeRef = useRef<ScrollView>(null);
   const bannerListRef = useRef<FlatList>(null);
   const [scrollIdx, setScrollIdx] = useState(0);
@@ -102,11 +96,37 @@ const Home = ({ navigation, route }: HomeProps) => {
     }
   });
 
-  useEffect(() => {
-    if (getFoodLogCountQuery.data) {
-      SplashScreen.hide();
-    }
-  }, [getFoodLogCountQuery.data]);
+  const [markets, setMarkets] = useState<string[]>([]);
+  const [category, setCategory] = useState<{
+    title: string,
+    isClick: boolean,
+  }[]>(categoryData);
+
+  const getBannerQuery = useQuery<BannerType, Error>("banner", () => getBanner(token));
+  // const getFoodLogCountQuery = useQuery<{ count: number }, Error>("foodLogCount", () => getFoodLogCount(token));
+  // const getRecommendQuery = useQuery<RecommendType, Error>("recommend", () => getRecommend({ token }));
+  // const getRecommendFoodQuery = useQuery<RecommendFoodType, Error>("recommendFoodLog", () =>
+  //   getRecommendFoodLog({ token, sort: "0" }));
+  // useQuery<MyProfileType, Error>(["myProfile", token], () => getMyProfile(token), {
+  //   enabled: !!token,
+  //   onSuccess: (data) => {
+  //     if (data) {
+  //       setMyId(data.id);
+  //     }
+  //   },
+  //   onError: () => {
+  //     setToken("");
+  //     AsyncStorage.removeItem("token");
+  //     //@ts-ignore
+  //     navigation.reset({ index: 0, routes: [{ name: "OnBoarding" }] });
+  //   }
+  // });
+
+  // useEffect(() => {
+  //   if (getFoodLogCountQuery.data) {
+  //     SplashScreen.hide();
+  //   }
+  // }, [getFoodLogCountQuery.data]);
 
   useEffect(() => {
     if (route.params?.scrollUp) {
@@ -574,14 +594,18 @@ const styles = StyleSheet.create({
     marginBottom: h2p(80),
     paddingTop: h2p(10)
   },
-  marketImage: {
-    width: d2p(52),
-    height: d2p(52),
-    marginBottom: h2p(6)
+  filterWrap: {
+    flexDirection: "row",
+    borderRadius: 50,
+    borderWidth: 1,
+    borderColor: theme.color.grayscale.e9e7ec,
+    width: d2p(180),
+    alignSelf: "center"
   },
-  ImageWrap: {
-    alignItems: "center",
-    marginRight: d2p(15),
+  filter: {
+    paddingHorizontal: d2p(20),
+    paddingVertical: h2p(8),
+    borderRadius: 50
   },
   banner: {
     width: Dimensions.get("window").width,

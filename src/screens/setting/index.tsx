@@ -150,7 +150,7 @@ const Setting = ({ navigation }: SettingProps) => {
               okButton: () => deleteUserMutation.mutate()
             });
           }}
-          style={[styles.list, { borderWidth: 0, marginTop: h2p(15) }]}>
+          style={[styles.list, { borderWidth: 0, marginTop: h2p(8) }]}>
           <Text style={[FONT.Regular, styles.listText]}>회원 탈퇴</Text>
           <Image source={rightArrow} style={{ width: d2p(12), height: d2p(25) }} />
         </Pressable>
@@ -199,4 +199,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: theme.color.grayscale.C_443e49
   }
-});
+}); 

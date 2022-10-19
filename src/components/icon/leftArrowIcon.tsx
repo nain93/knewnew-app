@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
-import { leftArrow } from "~/assets/icons";
+import { blackLeftArrow, leftArrow } from "~/assets/icons";
 import { TouchableOpacity, Image, ImageStyle, ViewStyle } from "react-native";
 import { d2p } from "~/utils";
 import { hitslop } from "~/utils/constant";
@@ -17,9 +17,9 @@ const LeftArrowIcon = ({ onBackClick, imageStyle, viewStyle }: LeftArrowIconProp
     <TouchableOpacity style={viewStyle} onPress={onBackClick ? onBackClick : () => navigation.goBack()}
       hitSlop={hitslop}>
       <Image
-        source={leftArrow}
+        source={blackLeftArrow}
         resizeMode="contain"
-        style={[{ height: d2p(25), width: d2p(11) }, imageStyle]}
+        style={[{ height: d2p(16), width: d2p(8) }, imageStyle]}
       />
     </TouchableOpacity>
   );
