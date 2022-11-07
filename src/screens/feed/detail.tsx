@@ -1,14 +1,13 @@
-import { View, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, Keyboard, FlatList, StatusBar } from 'react-native';
+import { View, Dimensions, StyleSheet, Pressable, Image, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, Keyboard, FlatList, StatusBar, Linking } from 'react-native';
 import Text from '~/components/style/CustomText';
 import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import LeftArrowIcon from '~/components/icon/leftArrowIcon';
 import theme from '~/styles/theme';
 import { d2p, dateCommentFormat, h2p, simpleDate } from '~/utils';
-import { blackComment, blackHeart, blackLeftArrow, blackMoreIcon, blackRightArrow, blackShare, colorBookmark, colorLike, commentMore, heart, lightHomeIcon, linkIcon, mainBookmark, marketIcon, more, reKnew, rightArrow, shareIcon, tag, tagHome, userIcon, whiteLeftArrow, whiteMoreIcon } from '~/assets/icons';
-import { getBottomSpace, getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
+import { colorLike } from '~/assets/icons';
+import { getBottomSpace, } from 'react-native-iphone-x-helper';
 import ReactionIcon from '~/components/icon/reactionIcon';
 import { blackRightArrow, commentMore, lightHomeIcon, more, reKnew, rightTopArrowIcon, shareIcon, tag, tagHome, userIcon } from '~/assets/icons';
-import { getStatusBarHeight, isIphoneX } from 'react-native-iphone-x-helper';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { bottomDotSheetState, myIdState, okPopupState, popupState, refreshState, tokenState } from '~/recoil/atoms';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
@@ -38,6 +37,8 @@ import { blockUser, getMyProfile } from '~/api/user';
 import { addReport } from '~/api/report';
 import ReviewIcon from '~/components/icon/reviewIcon';
 import TopScrollButton from '~/components/button/topScrollButton';
+import { ImageGallery } from '@georstat/react-native-image-gallery';
+import Header from '~/components/header';
 
 interface FeedDetailProps {
   navigation: NavigationStackProp
@@ -618,7 +619,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
             marginTop: h2p(10),
             borderWidth: 1
           }}>
-            <Image source={linkIcon} style={{ width: d2p(15), height: d2p(7.5), marginRight: d2p(6.5) }} />
+            {/* <Image source={linkIcon} style={{ width: d2p(15), height: d2p(7.5), marginRight: d2p(6.5) }} /> */}
             <Text style={FONT.Medium}>구매링크 바로가기</Text>
           </View>
         </View>
@@ -866,7 +867,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
   return (
     <Fragment>
       {/* 이미지 확대 */}
-      {reviewDetailQuery.data?.images &&
+      {/* {reviewDetailQuery.data?.images &&
         <ImageGallery
           initialIndex={initialIndex}
           close={closeGallery}
@@ -879,7 +880,7 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
           resizeMode="contain"
           thumbSize={84}
         />
-      }
+      } */}
       <Header
         isBorder={true}
         headerLeft={<LeftArrowIcon onBackClick={() => {
@@ -1046,10 +1047,10 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                 marginRight: d2p(5)
               }}
             >
-              <Image source={like ? colorLike : blackHeart} style={{
+              {/* <Image source={like ? colorLike : blackHeart} style={{
                 marginRight: d2p(6),
                 width: d2p(16), height: d2p(15)
-              }} />
+              }} /> */}
               <Text>{likeCount}</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -1065,10 +1066,10 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                 marginRight: d2p(5)
               }}
             >
-              <Image source={blackComment} style={{
+              {/* <Image source={blackComment} style={{
                 marginRight: d2p(6),
                 width: d2p(16.2), height: d2p(16.2)
-              }} />
+              }} /> */}
               <Text>{reviewDetailQuery.data?.commentCount}</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -1097,10 +1098,10 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                 backgroundColor: theme.color.grayscale.e9e7ec
               }}
             >
-              <Image source={blackShare} style={{
+              {/* <Image source={blackShare} style={{
                 marginRight: d2p(6),
                 width: d2p(16), height: d2p(18)
-              }} />
+              }} /> */}
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
@@ -1121,10 +1122,10 @@ const FeedDetail = ({ route, navigation }: FeedDetailProps) => {
                 marginLeft: "auto"
               }}
             >
-              <Image source={cart ? mainBookmark : colorBookmark} style={{
+              {/* <Image source={cart ? mainBookmark : colorBookmark} style={{
                 marginRight: d2p(7.8),
                 width: d2p(11.7), height: d2p(14.4)
-              }} />
+              }} /> */}
               <Text style={[FONT.SemiBold, { color: theme.color.main }]}>
                 담아가기
               </Text>

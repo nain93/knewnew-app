@@ -14,7 +14,7 @@ import { FONT } from '~/styles/fonts';
 import { NavigationStackProp } from 'react-navigation-stack';
 import { NavigationRoute } from 'react-navigation';
 import { ReviewListType } from '~/types/review';
-import { close, graywrite, smallRightArrow, tasteMoreIcon } from '~/assets/icons';
+import { close, graywrite } from '~/assets/icons';
 import FastImage from 'react-native-fast-image';
 import { productBookmarkList } from '~/api/product';
 import { ProductListType } from '~/types/product';
@@ -180,7 +180,7 @@ const Mypage = ({ navigation }: MypageProps) => {
         <Pressable
           onPress={() => setIsTasteMore(true)}
           style={{ marginLeft: "auto" }}>
-          <Image source={tasteMoreIcon} style={{ width: d2p(32), height: d2p(20) }} />
+          {/* <Image source={tasteMoreIcon} style={{ width: d2p(32), height: d2p(20) }} /> */}
         </Pressable>
         {/* } */}
       </View>
@@ -212,9 +212,9 @@ const Mypage = ({ navigation }: MypageProps) => {
               onPress={() => console.log("more")}
               style={{ marginLeft: "auto", flexDirection: "row", alignItems: "center" }}>
               <Text style={[FONT.Medium, { color: theme.color.grayscale.a09ca4 }]}>더보기</Text>
-              <Image source={smallRightArrow} style={{
+              {/* <Image source={smallRightArrow} style={{
                 width: d2p(16), height: d2p(16)
-              }} />
+              }} /> */}
             </Pressable>
           }
         </View>
@@ -284,9 +284,9 @@ const Mypage = ({ navigation }: MypageProps) => {
               onPress={() => console.log("more")}
               style={{ marginLeft: "auto", flexDirection: "row", alignItems: "center" }}>
               <Text style={[FONT.Medium, { color: theme.color.grayscale.a09ca4 }]}>더보기</Text>
-              <Image source={smallRightArrow} style={{
+              {/* <Image source={smallRightArrow} style={{
                 width: d2p(16), height: d2p(16)
-              }} />
+              }} /> */}
             </Pressable>
           }
         </View>
@@ -410,322 +410,10 @@ const Mypage = ({ navigation }: MypageProps) => {
           </View>
         </Modal>
       }
-
-      {/* 팔로우 바텀시트 */}
-      {/* <CustomBottomSheet
-        customStyles={{
-          container: {
-            padding: 0,
-            paddingTop: h2p(20),
-            borderRadius: 30,
-          }
-        }}
-        sheetRef={followRef}
-        height={Dimensions.get("window").height - h2p(60)}
-      >
-        <>
-          <View style={{
-            flexDirection: "row", justifyContent: "space-between",
-            paddingHorizontal: d2p(30), marginBottom: h2p(20)
-          }}>
-            <CloseIcon onPress={() => followRef.current?.close()}
-              imageStyle={{ width: d2p(15), height: h2p(15) }} />
-            <Text style={[{ fontSize: 16, marginRight: d2p(15) }, FONT.Bold]}>nickname</Text>
-            <View />
-          </View>
-        </>
-      </CustomBottomSheet>
-    </>
-  ), [getMyProfileQuery.data, followIndex]);
-
-  // * 작성글
-  const reviewKey = useCallback((v) => String(v.id), []);
-  const reviewEmpty = useCallback(() => {
-    if (!userReviewListQuery.isLoading) {
-      return (
-        <View style={{ paddingTop: h2p(100) }}>
-          <View style={{ marginBottom: h2p(180) }}>
-            <Text style={[FONT.Regular,
-            {
-              color: theme.color.grayscale.C_79737e,
-              textAlign: "center",
-            }]}>
-              작성한 글이 없습니다.</Text>
-          </View>
-          <BasicButton
-            viewStyle={{ marginHorizontal: d2p(20) }}
-            onPress={() => navigation.navigate('BeforeWrite', { loading: false, isEdit: false, stateReset: true })}
-            text="작성하기" textColor={theme.color.main} bgColor={theme.color.white} />
-        </View>
-      );
-    }
-    return null;
-  }, [userReviewListQuery.isLoading]);
-
-  const reviewHeader = useCallback(() => {
-    if (userReviewListQuery.isLoading) {
-      return (
-        <Loading viewStyle={{
-          position: "relative",
-          top: h2p(90)
-        }} />
-      );
-    }
-    return null;
-  }, [userReviewListQuery.isLoading]);
-
-  const reviewRenderItem = useCallback(
-    (review) => {
-      if (userReviewListQuery.isLoading) {
-        return null;
-      }
-      return (
-        <Pressable
-          onPress={() => navigation.push("FeedDetail",
-            { id: review.item.id, isLike: review.item.isLike, authorId: review.item.author.id })}
-          style={styles.review}
-        >
-          <FeedReview
-            review={review.item} />
-        </Pressable>
-      );
-    }
-    , [userReviewListQuery.isLoading]);
-
-  const reviewEndReached = useCallback(() => {
-    if (userReviewListQuery.data &&
-      userReviewListQuery.data.pages.flat().length > 4) {
-      userReviewListQuery.fetchNextPage();
-    }
-  }, [userReviewListQuery]);
-
-  const reviewRefresh = useCallback(() => {
-    userReviewListQuery.refetch();
-    getMyProfileQuery.refetch();
-  }, []);
-  const reviewFooter = useCallback(() => <View style={{ height: h2p(100) }} />, []);
-
-  // * 리뷰 담은글
-  const bookmarkKey = useCallback((v) => (v.id).toString(), []);
-  const bookmarkEmpty = useCallback(() => {
-    if (!userBookmarkListQuery.isLoading) {
-      return (
-        <View style={{ paddingTop: h2p(100) }}>
-          <View style={{ marginBottom: h2p(180) }}>
-            <Text style={[FONT.Regular,
-            {
-              color: theme.color.grayscale.C_79737e,
-              textAlign: "center",
-            }]}>
-              담은 글이 없습니다.</Text>
-          </View>
-          <BasicButton
-            viewStyle={{ marginHorizontal: d2p(20) }}
-            onPress={() => navigation.navigate('Feed')}
-            text="담으러 가기" textColor={theme.color.main} bgColor={theme.color.white} />
-        </View>
-      );
-    }
-    return null;
-  }, [userBookmarkListQuery.isLoading]);
-
-  const bookmarkHeader = useCallback(() => {
-    if (userBookmarkListQuery.isLoading) {
-      return (
-        <Loading viewStyle={{
-          position: "relative",
-          top: h2p(90)
-        }} />
-      );
-    }
-    return null;
-  }, [userBookmarkListQuery.isLoading]);
-
-  const bookmarkRenderItem = useCallback((bookmarks) => {
-    if (userBookmarkListQuery.isLoading) {
-      return null;
-    }
-    return (
-      <Pressable
-        onPress={() => navigation.push("FeedDetail",
-          { id: bookmarks.item.id, isLike: bookmarks.item.isLike, authorId: bookmarks.item.author.id })}
-        style={styles.review}
-      >
-        <FeedReview
-          review={bookmarks.item} />
-      </Pressable>
+</ScrollView>
     );
-  }, [userBookmarkListQuery.isLoading]);
-
-  const bookmarkEndReached = useCallback(() => {
-    if (userBookmarkListQuery.data &&
-      userBookmarkListQuery.data?.pages.flat().length > 4) {
-      userBookmarkListQuery.fetchNextPage();
-    }
-  }, [userBookmarkListQuery]);
-
-  const bookmarkRefresh = useCallback(() => {
-    userBookmarkListQuery.refetch();
-    getMyProfileQuery.refetch();
-  }, []);
-
-  const bookmarkFooter = useCallback(() => <View style={{ height: h2p(100) }} />, []);
-
-
-  // * 상품 담은 글 //
-  const productHeader = useCallback(() => {
-    if (userProductBookmarkQuery.isLoading) {
-      return (
-        <Loading viewStyle={{
-          position: "relative",
-          top: h2p(90)
-        }} />
-      );
-    }
-    return null;
-  }, [userProductBookmarkQuery.isLoading]);
-
-  const productEmpty = useCallback(() => {
-    if (!userProductBookmarkQuery.isLoading) {
-      return (
-        <View style={{ paddingTop: h2p(100) }}>
-          <View style={{ marginBottom: h2p(180) }}>
-            <Text style={[FONT.Regular,
-            {
-              color: theme.color.grayscale.C_79737e,
-              textAlign: "center",
-            }]}>
-              담은 상품이 없습니다.</Text>
-          </View>
-          <BasicButton
-            onPress={() => navigation.navigate('Feed')}
-            text="담으러 가기" textColor={theme.color.main} bgColor={theme.color.white} />
-        </View>
-      );
-    }
-    return null;
-  }, [userProductBookmarkQuery.isLoading]);
-
-  const proudctRenderItem = useCallback((products) =>
-    <ProductBookmark
-      apiBlock={apiBlock}
-      setApiBlock={(isApi: boolean) => setApiBlock(isApi)}
-      product={products.item} />, [userProductBookmarkQuery.isLoading]);
-
-  const productEndReached = useCallback(() => {
-    if (userProductBookmarkQuery.data &&
-      userProductBookmarkQuery.data?.pages.flat().length > 4) {
-      userProductBookmarkQuery.fetchNextPage();
-    }
-  }, [userProductBookmarkQuery]);
-
-  const productRefresh = useCallback(() => {
-    userProductBookmarkQuery.refetch();
-    getMyProfileQuery.refetch();
-  }, []);
-
-  const productFooter = useCallback(() => <View style={{ height: h2p(100) }} />, []);
-
-  useEffect(() => {
-    // * 로그아웃시 온보딩화면으로
-    if (!token) {
-      //@ts-ignore
-      navigation.reset({ index: 0, routes: [{ name: "OnBoarding" }] });
-    }
-  }, [token]);
-
-  if (getMyProfileQuery.isLoading) {
-    return (
-      <Loading />
-    );
-  }
-
-  return (
-    <>
-      <Tabs.Container
-        onIndexChange={setIndex}
-        initialTabName={`작성 글 ${getMyProfileQuery.data?.reviewCount}`}
-        containerStyle={styles.container}
-        renderTabBar={(props) => <MaterialTabBar
-          contentContainerStyle={{ paddingBottom: h2p(4.5), paddingTop: h2p(20) }}
-          indicatorStyle={{
-            height: 2,
-            backgroundColor: theme.color.black,
-            marginBottom: d2p(-1)
-          }} TabItemComponent={(tabs) => (
-            <Pressable
-              onPress={() => props.onTabPress(tabs.label)}
-              style={{ width: Dimensions.get("window").width / 2 }}>
-              <Text style={[{
-                fontSize: 16,
-                textAlign: "center"
-              }, tabs.index === index ? FONT.Bold : FONT.Regular]}>{tabs.label}
-              </Text>
-            </Pressable>
-          )} {...props} />}
-        renderHeader={tabHeader}
-      >
-        <Tabs.Tab
-          name={`작성 글 ${getMyProfileQuery.data?.reviewCount}`}>
-          <Tabs.FlatList
-            ListHeaderComponent={Platform.OS === "android" ? reviewHeader : null}
-            ListEmptyComponent={reviewEmpty}
-            onEndReached={reviewEndReached}
-            onEndReachedThreshold={0.5}
-            maxToRenderPerBatch={5}
-            windowSize={5}
-            removeClippedSubviews={true}
-            refreshing={userReviewListQuery.isLoading}
-            onRefresh={reviewRefresh}
-            showsVerticalScrollIndicator={false}
-            ListFooterComponent={reviewFooter}
-            data={userReviewListQuery.data?.pages.flat()}
-            renderItem={reviewRenderItem}
-            keyExtractor={reviewKey}
-          />
-
-        </Tabs.Tab>
-        <Tabs.Tab name={`담은 글 ${getMyProfileQuery.data?.reviewBookmarkCount}`}>
-          <Tabs.FlatList
-            ListHeaderComponent={Platform.OS === "android" ? bookmarkHeader : null}
-            ListEmptyComponent={bookmarkEmpty}
-            onEndReached={bookmarkEndReached}
-            onEndReachedThreshold={0.5}
-            maxToRenderPerBatch={5}
-            windowSize={5}
-            removeClippedSubviews={true}
-            refreshing={userBookmarkListQuery.isLoading}
-            onRefresh={bookmarkRefresh}
-            showsVerticalScrollIndicator={false}
-            ListFooterComponent={bookmarkFooter}
-            data={userBookmarkListQuery.data?.pages.flat()}
-            renderItem={bookmarkRenderItem}
-            keyExtractor={bookmarkKey}
-          />
-        </Tabs.Tab>
-        {/* <Tabs.Tab name={`담은 상품 ${getMyProfileQuery.data?.productBookmarkCount}`}>
-          <Tabs.FlatList
-            ListHeaderComponent={Platform.OS === "android" ? productHeader : null}
-            ListEmptyComponent={productEmpty}
-            onEndReached={productEndReached}
-            onEndReachedThreshold={0.5}
-            maxToRenderPerBatch={5}
-            windowSize={5}
-            removeClippedSubviews={true}
-            refreshing={userProductBookmarkQuery.isLoading}
-            onRefresh={productRefresh}
-            showsVerticalScrollIndicator={false}
-            ListFooterComponent={productFooter}
-            style={{ paddingHorizontal: d2p(20) }}
-            data={userProductBookmarkQuery.data?.pages.flat()}
-            keyExtractor={bookmarkKey}
-            renderItem={proudctRenderItem}
-          />
-        </Tabs.Tab> */}
-      </Tabs.Container>
-    </>
-  );
 };
+
 
 export default Mypage;
 

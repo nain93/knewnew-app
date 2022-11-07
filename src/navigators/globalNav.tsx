@@ -31,6 +31,8 @@ import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { hitslop } from '~/utils/constant';
 import CommentAll from '~/screens/feed/comment/commentAll';
 import EventPage from '~/screens/event';
+import TagResult from '~/screens/onboarding/tagResult';
+import TagSelect from '~/screens/onboarding/tagSelect';
 
 const Stack = createStackNavigator();
 

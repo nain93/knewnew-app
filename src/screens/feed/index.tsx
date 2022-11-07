@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { convertFoodLogName, d2p, h2p } from '~/utils';
 import theme from '~/styles/theme';
 import FeedReview from '~/components/review/feedReview';
-import { filterIcon } from '~/assets/icons';
 
 import RBSheet from "react-native-raw-bottom-sheet";
 import { useInfiniteQuery } from 'react-query';
@@ -94,10 +93,10 @@ const Feed = ({ navigation, route, filterScreen }: FeedProps) => {
       <Pressable
         onPress={() => navigation.goBack()}
         style={{ flexDirection: "row", alignItems: "center" }}>
-        <Image source={filterIcon} style={{
+        {/* <Image source={filterIcon} style={{
           marginRight: d2p(6.5),
           width: d2p(11.5), height: d2p(11)
-        }} />
+        }} /> */}
         <Text style={[FONT.Regular, { fontSize: 12 }]}>
           필터 선택
         </Text>

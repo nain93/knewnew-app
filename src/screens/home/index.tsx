@@ -1,6 +1,7 @@
 import {
-  Dimensions, Linking, Pressable,
-  ScrollView, StyleSheet, Text, View
+  Dimensions, FlatList, Image, Linking, Platform, Pressable,
+  RefreshControl,
+  ScrollView, StyleSheet, Text, TouchableOpacity, View
 } from 'react-native';
 import Modal from "react-native-modal";
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -22,11 +23,17 @@ import { interestTagData } from '~/utils/data';
 import { eventBannerImage, fireImg } from '~/assets/images';
 import { useQuery } from 'react-query';
 import FastImage from 'react-native-fast-image';
-import { getBanner } from '~/api/home';
+import { getBanner, getFoodLogCount, getRecommend, getRecommendFoodLog } from '~/api/home';
 import Loading from '~/components/loading';
 import BasicButton from '~/components/button/basicButton';
 import { useFocusEffect } from '@react-navigation/native';
 import { isIphoneX } from 'react-native-iphone-x-helper';
+import { FilterType } from '~/types';
+import { MyProfileType } from '~/types/user';
+import { getMyProfile } from '~/api/user';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { homeLogo } from '~/assets/logo';
+import { hitslop } from '~/utils/constant';
 
 export interface HomeProps {
   filterScreen: FilterType,
@@ -72,6 +79,7 @@ interface RecommendType {
 
 const Home = ({ navigation, route }: HomeProps) => {
   const [token, setToken] = useRecoilState(tokenState);
+  const setMyId = useSetRecoilState(myIdState)
   const homeRef = useRef<ScrollView>(null);
   const bannerListRef = useRef<FlatList>(null);
   const [scrollIdx, setScrollIdx] = useState(0);
@@ -97,12 +105,8 @@ const Home = ({ navigation, route }: HomeProps) => {
   });
 
   const [markets, setMarkets] = useState<string[]>([]);
-  const [category, setCategory] = useState<{
-    title: string,
-    isClick: boolean,
-  }[]>(categoryData);
+  
 
-  const getBannerQuery = useQuery<BannerType, Error>("banner", () => getBanner(token));
   // const getFoodLogCountQuery = useQuery<{ count: number }, Error>("foodLogCount", () => getFoodLogCount(token));
   // const getRecommendQuery = useQuery<RecommendType, Error>("recommend", () => getRecommend({ token }));
   // const getRecommendFoodQuery = useQuery<RecommendFoodType, Error>("recommendFoodLog", () =>
@@ -191,7 +195,7 @@ const Home = ({ navigation, route }: HomeProps) => {
                 <Loading viewStyle={{ top: h2p(40) }} />
               </View>
               :
-              <>
+              <View>
                 <FlatList
                   ref={bannerListRef}
                   horizontal
@@ -232,10 +236,11 @@ const Home = ({ navigation, route }: HomeProps) => {
                   )}
                 />
                 {(getBannerQuery.data?.length || 0) > 1 &&
+                 <>
                   <View style={{
                     position: "absolute", bottom: h2p(10),
                     flexDirection: "row",
-                    alignSelf: "center"
+                    alignSelf: "center",
                   }}>
                     {React.Children.toArray(getBannerQuery.data?.map((_, i) => {
                       if (i === scrollIdx) {
@@ -254,12 +259,13 @@ const Home = ({ navigation, route }: HomeProps) => {
                           borderRadius: 6,
                           backgroundColor: theme.color.white,
                           marginRight: d2p(10)
-                        }} />
+                        }}/>
                       );
                     }))}
                   </View>
+                 </>
                 }
-              </>
+              </View>
             }
 
             <View style={[styles.borderBar, {
@@ -478,7 +484,7 @@ const Home = ({ navigation, route }: HomeProps) => {
             </View>
 
             <View style={styles.foodlogWrap}>
-              {React.Children.toArray([{ title: "모두보기", isClick: false }, ...interestTagData.interest].map((v) => {
+              {React.Children.toArray([{ title: "모두보기", isClick: false }, ...interestTagData].map((v) => {
                 if (!v.title.includes("기타")) {
                   return (
                     <TouchableOpacity
@@ -601,6 +607,15 @@ const styles = StyleSheet.create({
     borderColor: theme.color.grayscale.e9e7ec,
     width: d2p(180),
     alignSelf: "center"
+  },
+  marketImage: {
+    width: d2p(52),
+    height: d2p(52),
+    marginBottom: h2p(6)
+  },
+  ImageWrap: {
+    alignItems: "center",
+    marginRight: d2p(15),
   },
   filter: {
     paddingHorizontal: d2p(20),
