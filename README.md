@@ -1,5 +1,6 @@
 # knewnnew-app
 
+## version 1.2.0 Release
 ## Code push
 
 yarn global add appcenter-cli
