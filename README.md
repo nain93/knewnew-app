@@ -1,5 +1,6 @@
 # knewnnew-app
 
+## version 1.2.0 Release
 ## Code push
 
 appcenter 로그인 후
